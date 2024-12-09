@@ -1,0 +1,269 @@
+---
+title: "Explanation of GenerateModelCP"
+author: "Wendie Yang"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Introduction
+
+The `GenerateModelCP` function dynamically generates a Structural Equation Model (SEM) formula to analyze models with a single chained mediator and multiple parallel mediators for 'lavaan' based on the prepared dataset. This document explains the mathematical principles and the structure of the generated model.
+
+---
+
+## 1. Model Description
+
+### 1.1 Regression for \( Y_{\text{diff}} \) and \( M_{\text{diff}} \)
+
+For a single chained mediator \( M_1 \) and \( N \) parallel mediators \( M_2, M_3, \dots, M_{N+1} \), the model is defined as:
+
+1. **Outcome Difference Model (\( Y_{\text{diff}} \)):**
+   \[
+   Y_{\text{diff}} = cp + b_1 M_{1\text{diff}} + \sum_{i=2}^{N+1} \left( b_i M_{i\text{diff}} + d_i M_{i\text{avg}} \right) + d_1 M_{1\text{avg}} + e
+   \]
+
+2. **Mediator Difference Model (\( M_{i\text{diff}} \)):**
+    For the chained mediator (\( M_1 \)):
+     \[
+     M_{1\text{diff}} = a_1 + \epsilon_1
+     \]
+    For parallel mediators (\( M_2, \dots, M_{N+1} \)):
+     \[
+     M_{i\text{diff}} = a_i + b_{1i} M_{1\text{diff}} + d_{1i} M_{1\text{avg}} + \epsilon_i
+     \]
+
+Where:
+- \( cp \): Direct effect of the independent variable.
+- \( b_1, b_i \): Effects of the chained and parallel mediators.
+- \( d_1, d_i, d_{1i} \): Moderating effects of mediator averages.
+- \( \epsilon_i \): Residuals.
+
+---
+
+## 2. Indirect Effects
+
+For each mediator, the indirect effects are calculated as:
+
+1. **Single-Mediator Effects:**
+    For the chained mediator:
+     \[
+     \text{indirect}_1 = a_1 \cdot b_1
+     \]
+    For the parallel mediators (\( M_2, \dots, M_{N+1} \)):
+     \[
+     \text{indirect}_i = a_i \cdot b_i
+     \]
+
+2. **Chained Path Effects:**
+   For paths from the chained mediator through the parallel mediators:
+   \[
+   \text{indirect}_{1i} = a_1 \cdot b_{1i} \cdot b_i
+   \]
+
+3. **Total Indirect Effect:**
+   The total indirect effect is the sum of all individual indirect effects:
+   \[
+   \text{total_indirect} = \text{indirect}_1 + \sum_{i=2}^{N+1} \left( \text{indirect}_i + \text{indirect}_{1i} \right)
+   \]
+
+---
+
+## 3. Total Effect
+
+The total effect combines the direct effect and the total indirect effect:
+\[
+\text{total_effect} = cp + \text{total_indirect}
+\]
+
+Where \( cp \) is the direct effect.
+
+---
+
+## 4. Comparison of Indirect Effects
+
+When comparing the strengths of indirect effects, the contrast between two effects is calculated as:
+\[
+CI_{\text{path}_1\text{vs}\text{path}_2} = \text{indirect}_{\text{path}_1} - \text{indirect}_{\text{path}_2}
+\]
+
+### 4.1 Example: Three Mediators (\( M_1, M_2, M_3 \))
+
+1. **Indirect Effects:**
+
+   \[
+   \text{indirect}_1 = a_1 \cdot b_1
+   \]
+
+   \[
+   \text{indirect}_2 = a_2 \cdot b_2
+   \]
+
+   \[
+   \text{indirect}_3 = a_3 \cdot b_3
+   \]
+
+   \[
+   \text{indirect}_{12} = a_1 \cdot b_{12} \cdot b_2
+   \]
+
+   \[
+   \text{indirect}_{13} = a_1 \cdot b_{13} \cdot b_3
+   \]
+
+2. **Comparisons:**
+
+   \[
+   CI_{1\text{vs}2} = \text{indirect}_1 - \text{indirect}_2
+   \]
+
+   \[
+   CI_{1\text{vs}3} = \text{indirect}_1 - \text{indirect}_3
+   \]
+
+   \[
+   CI_{1\text{vs}12} = \text{indirect}_1 - \text{indirect}_{12}
+   \]
+
+   \[
+   CI_{1\text{vs}13} = \text{indirect}_1 - \text{indirect}_{13}
+   \]
+
+   \[
+   CI_{2\text{vs}3} = \text{indirect}_2 - \text{indirect}_3
+   \]
+
+   \[
+   CI_{2\text{vs}12} = \text{indirect}_2 - \text{indirect}_{12}
+   \]
+
+   \[
+   CI_{2\text{vs}13} = \text{indirect}_2 - \text{indirect}_{13}
+   \]
+
+   \[
+   CI_{3\text{vs}12} = \text{indirect}_3 - \text{indirect}_{12}
+   \]
+
+   \[
+   CI_{3\text{vs}13} = \text{indirect}_3 - \text{indirect}_{13}
+   \]
+
+   \[
+   CI_{12\text{vs}13} = \text{indirect}_{12} - \text{indirect}_{13}
+   \]
+
+---
+
+## 5. Pre- and Post-Measurement Coefficients
+
+### Definitions
+
+1. **Post-Measurement Coefficient (\( X1_{b,i} \)):**
+   \[
+   X1_{b,i} = b_i + d_i
+   \]
+
+2. **Pre-Measurement Coefficient (\( X0_{b,i} \)):**
+   \[
+   X0_{b,i} = X1_{b,i} - d_i
+   \]
+
+### 5.1 Example: Three Mediators (\( M_1, M_2, M_3 \))
+
+1. **Mediator \( M_1 \):**
+
+   \[
+   X1_{b,1} = b_1 + d_1
+   \]
+
+   \[
+   X0_{b,1} = X1_{b,1} - d_1
+   \]
+
+2. **Mediator \( M_2 \):**
+
+   \[
+   X1_{b,2} = b_2 + d_2
+   \]
+
+   \[
+   X0_{b,2} = X1_{b,2} - d_2
+   \]
+
+3. **Mediator \( M_3 \):**
+
+   \[
+   X1_{b,3} = b_3 + d_3
+   \]
+
+   \[
+   X0_{b,3} = X1_{b,3} - d_3
+   \]
+
+4. **Chained Path (\( M_1 \to M_2 \)):**
+
+   \[
+   X1_{b,12} = b_{12} + d_{12}
+   \]
+
+   \[
+   X0_{b,12} = X1_{b,12} - d_{12}
+   \]
+
+5. **Chained Path (\( M_1 \to M_3 \)):**
+
+   \[
+   X1_{b,13} = b_{13} + d_{13}
+   \]
+
+   \[
+   X0_{b,13} = X1_{b,13} - d_{13}
+   \]
+
+
+---
+
+## 6. Summary of Regression Equations
+
+This section summarizes all equations used in the model:
+
+
+   \[
+   Y_{\text{diff}} = cp + b_1 M_{1\text{diff}} + \sum_{i=2}^{N+1} \left( b_i M_{i\text{diff}} + d_i M_{i\text{avg}} \right) + d_1 M_{1\text{avg}} + e
+   \]
+
+   \[
+   M_{1\text{diff}} = a_1 + \epsilon_1
+   \]
+
+   \[
+   M_{i\text{diff}} = a_i + b_{1i} M_{1\text{diff}} + d_{1i} M_{1\text{avg}} + \epsilon_i
+   \]
+
+   \[
+   \text{indirect}_1 = a_1 \cdot b_1
+   \]
+
+   \[
+   \text{indirect}_i = a_i \cdot b_i
+   \]
+
+   \[
+   \text{indirect}_{1i} = a_1 \cdot b_{1i} \cdot b_i
+   \]
+
+   \[
+   CI_{\text{path}_1\text{vs}\text{path}_2} = \text{indirect}_{\text{path}_1} - \text{indirect}_{\text{path}_2}
+   \]
+   \[
+   X1_{b,i} = b_i + d_i
+   \]
+
+   \[
+   X0_{b,i} = X1_{b,i} - d_i
+   \]
+
+
+---
+
+This comprehensive approach supports models with both chained and parallel mediators, enabling detailed analysis of their effects and interactions.
