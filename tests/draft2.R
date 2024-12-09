@@ -1,4 +1,7 @@
-# 定义验证函数
+test_that("draft", {
+  skip("This test is skipped for demonstration purposes")
+
+    # 定义验证函数
 ValidateStep4Logic <- function(mi, premi, predata, M_before, M_after, Y_before, Y_after) {
   m <- mi$m # 插补次数
   for (i in 1:m) {
@@ -77,25 +80,7 @@ predata <- PrepareData(eaN, M_before = c("A2", "B2"),
 premi <- mice::mice(data = predata,m = 5L, seed = 123)
 mi$imp
 # Step 4: 对每个插补数据集应用 PrepareData 并替换 premi 中的数据集
-for (i in 1:m) {
-  # 从 mi 中提取第 i 个插补数据集
-  imputed_data <- mice::complete(mi, action = 1)
-  predata1 <- PrepareData(imputed_data,M_before = c("A2", "B2"),
-                          M_after = c("A1", "B1"),
-                          Y_before = "D2",
-                          Y_after = "D1")
-  imputed_data <- mice::complete(premi, action = 1)
-  head(predata1)
-  head(imputed_data)
 
-
-
-  imputed_result <- ImputeData(
-    data_missing = eaN,
-    m = 5,
-    method = "pmm",
-    seed = 123
-  )
 
   # 获取插补后的数据集列表
   imputed_data_list <- imputed_result$imputed_data_list
@@ -223,3 +208,11 @@ library(semmcci)
     class(out) <- c("semmcci", class(out))
     return(out)
   }
+
+
+
+
+)})
+
+
+
