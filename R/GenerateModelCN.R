@@ -1,3 +1,64 @@
+#' @title Generate Chained Mediation Model
+#'
+#' @description Dynamically generates a structural equation modeling (SEM) syntax for
+#' chained mediation analysis based on the prepared dataset. The function computes regression
+#' equations for mediators and the outcome variable, indirect effects along multi-step mediation paths,
+#' total effects, contrasts between indirect effects, and coefficients in different conditions.
+#'
+#' @details This function is used to construct SEM models for chained mediation analysis.
+#' It automatically parses variable names from the prepared dataset and dynamically creates
+#' the necessary model syntax, including:
+#'
+#' - **Outcome regression**: Defines the relationship between the difference scores of
+#' the outcome (`Ydiff`) and the mediators (`Mdiff`) as well as their average scores (`Mavg`).
+#'
+#' - **Mediator regressions**: Defines the sequential regression models for each mediator's
+#' difference score, incorporating prior mediators as predictors.
+#'
+#' - **Indirect effects**: Computes the indirect effects along all possible multi-step
+#' mediation paths using the product of path coefficients.
+#'
+#' - **Total indirect effect**: Calculates the sum of all indirect effects from the chained
+#' mediation paths.
+#'
+#' - **Total effect**: Combines the direct effect (`cp`) and the total indirect effect.
+#'
+#' - **Contrasts of indirect effects**: Optionally calculates the pairwise contrasts between
+#' the indirect effects for different mediation paths.
+#'
+#' - **Coefficients in different 'X' conditions**: Calculates path coefficients in different `X`
+#' conditions to observe the moderation effect of `X`.
+#'
+#' This model is suitable for chained mediation designs where mediators influence each other in
+#' a sequential manner, forming multi-step mediation paths.
+#'
+#' @param prepared_data A data frame returned by [PrepareData()], containing the processed
+#' within-subject mediator and outcome variables. The data frame must include columns for
+#' difference scores (`Mdiff`) and average scores (`Mavg`) of mediators, as well as the
+#' outcome difference score (`Ydiff`).
+#'
+#' @return A character string representing the SEM model syntax for the specified chained mediation analysis.
+#'
+#' @seealso [PrepareData()], [WsMed()], [GenerateModelP()]
+#'
+#' @examples
+#' # Example prepared data
+#' prepared_data <- data.frame(
+#'   M1diff = rnorm(100),
+#'   M2diff = rnorm(100),
+#'   M3diff = rnorm(100),
+#'   M1avg = rnorm(100),
+#'   M2avg = rnorm(100),
+#'   M3avg = rnorm(100),
+#'   Ydiff = rnorm(100)
+#' )
+#'
+#' # Generate SEM model syntax
+#' sem_model <- GenerateModelCN(prepared_data)
+#' cat(sem_model)
+#'
+#' @export
+
 GenerateModelCN <- function(prepared_data) {
   # 提取生成的变量名称
   Mdiff_vars <- grep("M\\ddiff", colnames(prepared_data), value = TRUE)
@@ -55,7 +116,7 @@ GenerateModelCN <- function(prepared_data) {
 
   for (length_path in 1:n) {
     # 生成长度为 length_path 的所有路径组合
-    path_combinations <- combn(1:n, length_path, simplify = FALSE)
+    path_combinations <- utils::combn(1:n, length_path, simplify = FALSE)
 
     for (path in path_combinations) {
       if (length(path) > 1) {
@@ -87,7 +148,6 @@ GenerateModelCN <- function(prepared_data) {
 
   # 5. 总效应
   total_effect <- "total_effect := cp + total_indirect"
-  print(indirect_effect_labels)
 
   # 6. 间接效应两两比较
   # 6. 间接效应两两比较
@@ -114,7 +174,6 @@ GenerateModelCN <- function(prepared_data) {
     compare_indirect_effect <- paste(comparisons, collapse = "\n")
   }
 
-  print(compare_indirect_effect)
 
   # 7. 前后测系数
   pre_post_coefficients <- paste(

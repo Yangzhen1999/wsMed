@@ -1,3 +1,59 @@
+#' @title Generate Parallel Mediation Model
+#'
+#' @description Dynamically generates a structural equation modeling (SEM) syntax for
+#' parallel mediation analysis based on the prepared dataset. The function computes regression
+#' equations for mediators and the outcome variable, indirect effects, total effects,
+#' contrasts between indirect effect, and .
+#'
+#' @details This function is used to construct SEM models for parallel mediation analysis.
+#' It automatically parses variable names from the prepared dataset and dynamically creates
+#' the necessary model syntax, including:
+#'
+#' - **Outcome regression**: Defines the relationship between the difference scores of
+#' the outcome (`Ydiff`) and the mediators (`Mdiff`) as well as their average scores (`Mavg`).
+#'
+#' - **Mediator regressions**: Defines the intercept models for each mediator's difference score.
+#'
+#' - **Indirect effects**: Computes the indirect effects for each mediator using the
+#' product of path coefficients (e.g., `a * b`).
+#'
+#' - **Total indirect effect**: Calculates the sum of all indirect effects.
+#'
+#' - **Total effect**: Combines the direct effect (`cp`) and the total indirect effect.
+#'
+#' - **Contrasts of indirect effects**: Optionally calculates the pairwise contrasts between
+#' the indirect effects when multiple mediators are present.
+#'
+#' - **coefficients in different 'X' conditions**: Calculates path coefficients in different X conditions
+#' to observe the moderation effect of ‘X'.
+#'
+#' This model is suitable for parallel mediation designs where multiple mediators act independently.
+#'
+#' @param prepared_data A data frame returned by [PrepareData()], containing the processed
+#' within-subject mediator and outcome variables. The data frame must include columns for
+#' difference scores (`Mdiff`) and average scores (`Mavg`) of mediators, as well as the
+#' outcome difference score (`Ydiff`).
+#'
+#' @return A character string representing the SEM model syntax for the specified parallel mediation analysis.
+#'
+#' @seealso [PrepareData()], [WsMed()], [GenerateModelCN()]
+#'
+#' @examples
+#' # Example prepared data
+#' prepared_data <- data.frame(
+#'   M1diff = rnorm(100),
+#'   M2diff = rnorm(100),
+#'   M1avg = rnorm(100),
+#'   M2avg = rnorm(100),
+#'   Ydiff = rnorm(100)
+#' )
+#'
+#' # Generate SEM model syntax
+#' sem_model <- GenerateModelP(prepared_data)
+#' cat(sem_model)
+#'
+#' @export
+
 GenerateModelP <- function(prepared_data) {
   # 提取生成的变量名称
   Mdiff_vars <- grep("M\\ddiff", colnames(prepared_data), value = TRUE)
@@ -43,7 +99,7 @@ GenerateModelP <- function(prepared_data) {
   # 6. 间接效应的对比公式
   indirect_contrasts <- ""
   if (length(Mdiff_vars) > 1) {
-    indirect_combinations <- combn(seq_along(Mdiff_vars), 2)
+    indirect_combinations <- utils::combn(seq_along(Mdiff_vars), 2)
     indirect_contrasts <- paste(
       apply(indirect_combinations, 2, function(pair) {
         paste0(

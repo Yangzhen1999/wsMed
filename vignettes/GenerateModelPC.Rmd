@@ -1,13 +1,18 @@
 ---
-title: "Explanation of GenerateModelPC"
-author: "Wendie Yang"
-date: "`r Sys.Date()`"
-output: html_document
+title: "GenerateModelPC"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{GenerateModelPC}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ## Introduction
 
 The `GenerateModelPC` function dynamically generates a Structural Equation Model (SEM) formula to analyze models with multiple parallel mediators influencing a single chained mediator for 'lavaan' based on the prepared dataset. This document explains the mathematical principles and the structure of the generated model.
+```{r, echo=FALSE, out.width="100%"}
+knitr::include_graphics("PC.png")
+```
 
 ---
 

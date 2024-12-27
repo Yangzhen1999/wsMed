@@ -1,3 +1,61 @@
+#' @title Generate Combined Parallel and Chained Mediation Model
+#'
+#' @description Dynamically generates a structural equation modeling (SEM) syntax for
+#' combined parallel and chained mediation analysis based on the prepared dataset. The function computes regression
+#' equations for mediators and the outcome variable, indirect effects for both parallel and chained mediation paths,
+#' total effects, contrasts between indirect effects, and coefficients in different X conditions.
+#'
+#' @details This function is used to construct SEM models that combine parallel and chained mediation analysis.
+#' It automatically parses variable names from the prepared dataset and dynamically creates
+#' the necessary model syntax, including:
+#'
+#' - **Outcome regression**: Defines the relationship between the difference scores of
+#' the outcome (`Ydiff`), the chained mediator (`M1diff`), and the parallel mediators (`M2diff`, `M3diff`, etc.).
+#'
+#' - **Mediator regressions**: Defines the sequential regression models for the chained mediator and each parallel mediator.
+#'
+#' - **Indirect effects**: Computes the indirect effects for both chained and parallel mediation paths,
+#' including multi-step indirect effects involving both chained and parallel mediators.
+#'
+#' - **Total indirect effect**: Calculates the sum of all indirect effects from chained and parallel mediation paths.
+#'
+#' - **Total effect**: Combines the direct effect (`cp`) and the total indirect effect.
+#'
+#' - **Contrasts of indirect effects**: Optionally calculates the pairwise contrasts between
+#' the indirect effects for different mediation paths.
+#'
+#' - **Coefficients in different 'X' conditions**: Calculates path coefficients in different `X`
+#' conditions to observe the moderation effect of `X`.
+#'
+#' This model is suitable for designs where mediators include both a sequential chain (chained mediation)
+#' and independent parallel mediators.
+#'
+#' @param prepared_data A data frame returned by [PrepareData()], containing the processed
+#' within-subject mediator and outcome variables. The data frame must include columns for
+#' difference scores (`Mdiff`) and average scores (`Mavg`) of mediators, as well as the
+#' outcome difference score (`Ydiff`).
+#'
+#' @return A character string representing the SEM model syntax for the specified combined parallel and chained mediation analysis.
+#'
+#' @seealso [PrepareData()], [WsMed()], [GenerateModelP()], [GenerateModelCN()]
+#'
+#' @examples
+#' # Example prepared data
+#' prepared_data <- data.frame(
+#'   M1diff = rnorm(100),
+#'   M2diff = rnorm(100),
+#'   M3diff = rnorm(100),
+#'   M1avg = rnorm(100),
+#'   M2avg = rnorm(100),
+#'   M3avg = rnorm(100),
+#'   Ydiff = rnorm(100)
+#' )
+#'
+#' # Generate SEM model syntax
+#' sem_model <- GenerateModelCP(prepared_data)
+#' cat(sem_model)
+#'
+#' @export
 GenerateModelCP <- function(prepared_data) {
   # 提取链式中介和并行中介变量名称
   chain_var <- grep("M1diff", colnames(prepared_data), value = TRUE)

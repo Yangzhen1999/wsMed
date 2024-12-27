@@ -1,3 +1,61 @@
+#' @title Prepare Data for Within-Subject Mediation Analysis
+#'
+#' @description Prepares a dataset for within-subject mediation analysis by calculating
+#' difference scores and centered average scores for specified mediators and the outcome variable.
+#' The function ensures that the input data meets the necessary requirements and generates
+#' new variables required for subsequent mediation analysis.
+#'
+#' @details This function processes raw data to create variables essential for within-subject
+#' mediation analysis. It performs the following operations:
+#'
+#' - **Difference scores**: Calculates the difference between "before" and "after" values for
+#' the outcome variable (`Ydiff`) and each mediator (`Mdiff`).
+#'
+#' - **Centered average scores**: Computes the centered average of "before" and "after"
+#' values for each mediator (`Mavg`), providing a measure of their mean level relative to
+#' their centered baseline.
+#'
+#' - **Input validation**: Checks that the number of "before" and "after" mediators match,
+#' and ensures all specified variables exist in the dataset.
+#'
+#' This function is a prerequisite for generating structural equation modeling (SEM)
+#' syntax and conducting mediation analysis.
+#'
+#' @param data A data frame containing the raw dataset with mediator and outcome variables.
+#' @param M_before A character vector of column names representing mediators "before" the intervention.
+#' @param M_after A character vector of column names representing mediators "after" the intervention.
+#' Must match the length of `M_before`.
+#' @param Y_before A character string representing the column name of the outcome variable "before" the intervention.
+#' @param Y_after A character string representing the column name of the outcome variable "after" the intervention.
+#'
+#' @return A data frame containing the following columns:
+#' - `Ydiff`: Difference score for the outcome variable.
+#' - `M1diff`, `M2diff`, ...: Difference scores for each mediator.
+#' - `M1avg`, `M2avg`, ...: Centered average scores for each mediator.
+#'
+#' @seealso [GenerateModelP()], [GenerateModelCN()], [GenerateModelPC()], [WsMed()]
+#'
+#' @examples
+#' # Example raw data
+#' data <- data.frame(
+#'   M1_before = rnorm(100), M1_after = rnorm(100),
+#'   M2_before = rnorm(100), M2_after = rnorm(100),
+#'   Y_before = rnorm(100), Y_after = rnorm(100)
+#' )
+#'
+#' # Prepare the dataset
+#' prepared_data <- PrepareData(
+#'   data = data,
+#'   M_before = c("M1_before", "M2_before"),
+#'   M_after = c("M1_after", "M2_after"),
+#'   Y_before = "Y_before",
+#'   Y_after = "Y_after"
+#' )
+#'
+#' head(prepared_data)
+#'
+#' @export
+
 PrepareData <- function(data, M_before, M_after, Y_before, Y_after) {
   # 检查输入长度是否匹配
   if (length(M_before) != length(M_after)) {

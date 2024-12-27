@@ -1,0 +1,139 @@
+#' @title Compute Updated Parameter Estimates for SEM Models
+#'
+#' @description A wrapper for the internal `.ThetaHat()` function from the `semmcci` package.
+#' This function computes updated parameter estimates for structural equation models (SEM)
+#' using pooled estimates from multiple imputations or Monte Carlo simulations.
+#'
+#' @details The function takes a fitted SEM model object and pooled parameter estimates
+#' to calculate the updated parameter values. It is particularly useful for combining results
+#' from multiple imputations or Monte Carlo samples to refine parameter estimates.
+#'
+#' @param object A fitted `lavaan` SEM model object.
+#' @param est A numeric vector of pooled parameter estimates, typically obtained from multiple imputations
+#' or Monte Carlo simulations.
+#'
+#' @return A numeric vector of updated parameter estimates.
+#'
+#' @seealso [MCMI()], [RunMCMIAnalysis()]
+#'
+#' @examples NULL
+#'
+#' @export
+
+ThetaHatWrapper <- function(object,
+                      est = NULL) {
+  # extract all estimates including fixed parameters
+  thetahat_names_free <- names(
+    lavaan::coef(object)
+  )
+  thetahat_eq <- paste0(
+    object@ParTable$lhs,
+    object@ParTable$op,
+    object@ParTable$rhs
+  )
+  thetahat_names <- thetahat_eq
+  label <- object@ParTable$label
+  thetahat_names <- ifelse(
+    label == "",
+    yes = thetahat_names,
+    no = label
+  )
+  for (i in seq_along(object@ParTable$free)) {
+    if (object@ParTable$free[i] > 0) {
+      thetahat_names[i] <- thetahat_names_free[
+        object@ParTable$free[i]
+      ]
+    }
+  }
+  if (is.null(est)) {
+    # extract estimates from parameter table
+    thetahat_est <- object@ParTable$est
+  } else {
+    # update with supplied values
+    thetahat_est <- est
+  }
+  return(
+    .ThetaHatDef(
+      object = object,
+      thetahat_est = thetahat_est,
+      thetahat_names_free = thetahat_names_free,
+      thetahat_names = thetahat_names
+    )
+  )
+}
+
+.ThetaHatDef <- function(object,
+                         thetahat_est,
+                         thetahat_names_free,
+                         thetahat_names) {
+  thetahat_fixed <- thetahat_def <- thetahat_cin <- thetahat_ceq <- rep(
+    x = NA,
+    times = length(thetahat_est)
+  )
+  for (i in seq_along(thetahat_est)) {
+    if (object@ParTable$op[i] == "==") {
+      thetahat_names[i] <- paste0(
+        object@ParTable$lhs[i],
+        "_ceq"
+      )
+      thetahat_ceq[i] <- object@ParTable$lhs[i]
+    }
+    if (
+      object@ParTable$op[i] %in% c(
+        ">",
+        "<",
+        ">=",
+        "<="
+      )
+    ) {
+      thetahat_names[i] <- paste0(
+        object@ParTable$lhs[i],
+        "_cin"
+      )
+      thetahat_cin[i] <- object@ParTable$lhs[i]
+    }
+    if (object@ParTable$op[i] == ":=") {
+      thetahat_def[i] <- object@ParTable$lhs[i]
+    }
+    if (object@ParTable$free[i] == 0) {
+      fixed <- TRUE
+      if (
+        object@ParTable$op[i] %in% c(
+          ":=",
+          "==",
+          ">",
+          "<",
+          ">=",
+          "<="
+        )
+      ) {
+        fixed <- FALSE
+      }
+      if (fixed) {
+        thetahat_fixed[i] <- thetahat_names[i]
+      }
+    }
+  }
+  names(
+    thetahat_est
+  ) <- thetahat_names
+  return(
+    list(
+      est = thetahat_est,
+      par_names = thetahat_names,
+      def = thetahat_def[
+        stats::complete.cases(thetahat_def)
+      ],
+      ceq = thetahat_ceq[
+        stats::complete.cases(thetahat_ceq)
+      ],
+      cin = thetahat_cin[
+        stats::complete.cases(thetahat_cin)
+      ],
+      fixed = thetahat_fixed[
+        stats::complete.cases(thetahat_fixed)
+      ],
+      free = thetahat_names_free
+    )
+  )
+}

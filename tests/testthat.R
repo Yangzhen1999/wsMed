@@ -8,5 +8,4 @@
 
 library(testthat)
 library(wsMed)
-
 test_check("wsMed")

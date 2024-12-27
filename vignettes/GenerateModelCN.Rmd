@@ -1,13 +1,19 @@
 ---
-title: "Explanation of GenerateModelCN"
-author: "Wendie Yang"
-date: "`r Sys.Date()`"
-output: html_document
+title: "GenerateModelCN"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{GenerateModelCN}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
+
 
 ## Introduction
 
 The `GenerateModelCN` function dynamically generates a Structural Equation Model (SEM) formula to analyze chained or nested mediation for 'lavaan' based on the prepared dataset. This document explains the mathematical principles and the structure of the generated model.
+```{r, echo=FALSE, out.width="100%"}
+knitr::include_graphics("CN.png")
+```
 
 ---
 
