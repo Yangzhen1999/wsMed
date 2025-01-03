@@ -61,11 +61,25 @@ The `WsMed` function accepts the following parameters:
 ```{r}
 library(wsMed)
 data(example_data)
-set.seed(123) # 确保结果可重复
+set.seed(123) 
 example_dataN <- mice::ampute(
   data = example_data,       
   prop = 0.1,      
 )$amp
+```
+
+
+```{r}
+result4 <- WsMed(
+  data = example_data,
+  M_before = c("A1"),
+  M_after = c("A2"),
+  Y_before = "B1",
+  Y_after = "B2",
+  form = "P",
+  standardized = TRUE
+)
+print(result4)
 ```
 
 ```{r}

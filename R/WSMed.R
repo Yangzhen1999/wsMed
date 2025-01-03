@@ -162,18 +162,17 @@ WsMed <- function(data,
     fit <- lavaan::sem(
       model = sem_model,
       data = prepared_data,
-      missing = "fiml",
+      missing = "fiml"
     )
   } else if (Na == "MI") {
     fit <- lavaan::sem(
       model = sem_model,
-      data = prepared_data,
+      data = prepared_data
     )
     if (!inherits(fit, "lavaan")) {
       stop("Model fitting failed. Check your input model and data.")
     }
   }
-
   # Monte Carlo
   mi_result <- NULL
   fiml_result <- NULL
@@ -219,8 +218,16 @@ WsMed <- function(data,
       std_fiml_result <- semmcci::MCStd(fiml_result, alpha = alphastd)
     }
   }
-  # Step 6: 返回结果
-  return(list(
+
+  input_vars <- list(
+    M_before = M_before,
+    M_after = M_after,
+    Y_before = Y_before,
+    Y_after = Y_after
+  )
+
+
+  out <- list(
     prepared_data = prepared_data,
     model_summary = summary(fit, fit.measures = TRUE, standardized = standardized),
     lavaan_fit = fit,
@@ -229,6 +236,11 @@ WsMed <- function(data,
     fiml_result = fiml_result,
     std_result = std_result,
     std_mi_result = std_mi_result,
-    std_fiml_result = std_fiml_result
-  ))
+    std_fiml_result = std_fiml_result,
+    input_vars = input_vars
+  )
+
+  # Step 6: 返回结果
+  class(out) <- "WsMed"
+  return(out)
 }
