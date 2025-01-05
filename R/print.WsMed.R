@@ -92,6 +92,78 @@ print.WsMed <- function(x, ...) {
     print(kable(fit_indices, align = c("l", "r"), row.names = FALSE))
   }
 
+  #regresssion
+
+  if (!is.null(fit)) {
+    # 提取参数估计
+    param_estimates <- lavaan::parameterEstimates(fit)
+
+    # 提取回归系数部分
+    regressions <- param_estimates[param_estimates$op == "~", ]
+    if (nrow(regressions) > 0) {
+      cat("\n*************** REGRESSION PATHS ***************\n")
+      regression_table <- data.frame(
+        Outcome = regressions$lhs,
+        Predictor = regressions$rhs,
+        Label = regressions$label,  # 保留标签值
+        Estimate = regressions$est,
+        SE = regressions$se,
+        z = regressions$z,
+        `P-value` = regressions$pvalue,
+        LLCI = regressions$ci.lower,
+        ULCI = regressions$ci.upper
+      )
+      print(kable(
+        regression_table,
+        align = c("l", "l", "l", "r", "r", "r", "r", "r", "r"),
+        row.names = FALSE
+      ))
+    }
+
+    # 提取截距部分
+    intercepts <- param_estimates[param_estimates$op == "~1", ]
+    if (nrow(intercepts) > 0) {
+      cat("\n*************** INTERCEPTS ***************\n")
+      intercept_table <- data.frame(
+        Intercept = paste0(intercepts$lhs, "~1"),
+        Label = intercepts$label,  # 保留标签值
+        Estimate = intercepts$est,
+        SE = intercepts$se,
+        z = intercepts$z,
+        `P-value` = intercepts$pvalue,
+        LLCI = intercepts$ci.lower,
+        ULCI = intercepts$ci.upper
+      )
+      print(kable(
+        intercept_table,
+        align = c("l", "l", "r", "r", "r", "r", "r", "r"),
+        row.names = FALSE
+      ))
+    }
+
+    # 提取方差部分
+    variances <- param_estimates[param_estimates$op == "~~" & param_estimates$lhs == param_estimates$rhs, ]
+    if (nrow(variances) > 0) {
+      cat("\n*************** VARIANCES ***************\n")
+      variance_table <- data.frame(
+        Variance = paste0(variances$lhs, "~~", variances$rhs),
+        Estimate = variances$est,
+        SE = variances$se,
+        z = variances$z,
+        `P-value` = variances$pvalue,
+        LLCI = variances$ci.lower,
+        ULCI = variances$ci.upper
+      )
+      print(kable(
+        variance_table,
+        align = c("l", "r", "r", "r", "r", "r", "r"),
+        row.names = FALSE
+      ))
+    }
+  }
+
+
+
   # 总效应
   total_effect <- param_estimates[param_estimates$lhs == "total_effect", ]
   if (nrow(total_effect) > 0) {
@@ -568,7 +640,3 @@ print.WsMed <- function(x, ...) {
   # 返回原始对象
   invisible(x)
 }
-
-
-
-
