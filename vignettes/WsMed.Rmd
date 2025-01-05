@@ -70,19 +70,6 @@ example_dataN <- mice::ampute(
 
 
 ```{r}
-result4 <- WsMed(
-  data = example_data,
-  M_before = c("A1"),
-  M_after = c("A2"),
-  Y_before = "B1",
-  Y_after = "B2",
-  form = "P",
-  standardized = TRUE
-)
-print(result4)
-```
-
-```{r}
 result1 <- WsMed(
   data = example_dataN,
   M_before = c("A1","B1"),
