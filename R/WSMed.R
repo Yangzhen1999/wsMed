@@ -66,7 +66,8 @@
 #' @param tol A numeric value for the tolerance used in positive definiteness checks. Defaults to `1e-06`.
 #' @param seed An integer for setting the random seed during Monte Carlo simulations. Defaults to `123`.
 #' @param alphastd A numeric value specifying the significance level for standardized confidence intervals. Defaults to `0.05`.
-#'
+#' @param fixed.x Logical. If `TRUE`, the x variables are fixed. Default is `FALSE`.
+
 #' @return A list containing the following components:
 #' - `prepared_data`: The preprocessed dataset.
 #' - `model_summary`: Summary statistics of the fitted SEM model.
@@ -109,6 +110,7 @@ WsMed <- function(data,
                   iseed = 123,
                   se = "boot",
                   R = 20000L,  # Monte Carlo 重复次数
+                  fixed.x = FALSE,
                   alpha = c(0.001, 0.01, 0.05),  # 显著性水平
                   m = 5,  # 插补次数
                   method = "pmm",  # 插补方法
@@ -116,7 +118,7 @@ WsMed <- function(data,
                   pd = TRUE,
                   tol = 1e-06,
                   seed = 123,
-                  alphastd = 0.05) {
+                  alphastd = c(0.001, 0.01, 0.05)) {
 
   if (Na %in% c("MI", "FIML") && all(stats::complete.cases(data))) {
     message("No missing values detected in the data.")
@@ -155,19 +157,22 @@ WsMed <- function(data,
       data = prepared_data,
       se = se,
       bootstrap = bootstrap,
-      iseed = iseed
+      iseed = iseed,
+      fixed.x = fixed.x
     )
   } else if (Na == "FIML") {
     # 使用 FIML 方法处理缺失值
     fit <- lavaan::sem(
       model = sem_model,
       data = prepared_data,
-      missing = "fiml"
+      missing = "fiml",
+      fixed.x = fixed.x
     )
   } else if (Na == "MI") {
     fit <- lavaan::sem(
       model = sem_model,
-      data = prepared_data
+      data = prepared_data,
+      fixed.x = fixed.x
     )
     if (!inherits(fit, "lavaan")) {
       stop("Model fitting failed. Check your input model and data.")
@@ -226,6 +231,16 @@ WsMed <- function(data,
     Y_after = Y_after
   )
 
+  paras <- list(
+    alpha = alpha,  # 显著性水平
+    m = m,  # 插补次数
+    method = method,  # 插补方法
+    decomposition = decomposition,
+    pd = pd,
+    tol = tol,
+    seed = seed,
+    alphastd = alphastd
+  )
 
   out <- list(
     prepared_data = prepared_data,
@@ -237,7 +252,12 @@ WsMed <- function(data,
     std_result = std_result,
     std_mi_result = std_mi_result,
     std_fiml_result = std_fiml_result,
-    input_vars = input_vars
+    input_vars = input_vars,
+    alphastd = alphastd,
+    alpha = alpha,
+    Na = Na,
+    iseed = iseed,
+    paras = paras
   )
 
   # Step 6: 返回结果

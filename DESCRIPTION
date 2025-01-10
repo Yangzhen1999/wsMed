@@ -19,7 +19,8 @@ Imports:
     lavaan,
     semmcci,
     mice,
-    semhelpinghands
+    semhelpinghands,
+    knitr
 VignetteBuilder: knitr
 LazyData: true
 URL: https://github.com/Yangzhen1999/wsMed
