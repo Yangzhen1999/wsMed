@@ -1,31 +1,47 @@
 #' @title Print Method for WsMed Objects
 #'
-#' @description Provides a detailed summary of the results from a \code{WsMed} object, including
-#' variables, model fit indices, regression paths, total, direct, and indirect effects,
-#' contrast effects, moderation effects, and Monte Carlo confidence intervals (if applicable).
-#' It also generates diagnostic information and analysis notes for further interpretation.
+#' @description Provides a comprehensive summary of results from a \code{WsMed} object, including:
+#' - Input and computed variables with sample size.
+#' - Model fit indices, regression paths, and variance estimates.
+#' - Total, direct, and indirect effects with pairwise contrasts.
+#' - Moderation effects and Monte Carlo confidence intervals for raw and standardized estimates (if applicable).
+#' - Diagnostic notes for bootstrapping, imputation, and analysis parameters.
+#'
+#' The output is formatted for clarity, ensuring an intuitive presentation of mediation analysis results,
+#' including dynamic confidence intervals, moderation keys, and pre-post coefficients.
 #'
 #' @details This function is specifically designed to display results from the within-subject mediation
 #' analysis conducted using the \code{WsMed} function. Key features include:
 #'
-#' - **Variables**: Displays input variables, computed variables, and sample size.
-#' - **Model Fit Indices**: Includes common SEM fit indices like chi-square, CFI, TLI, RMSEA, and SRMR.
-#' - **Regression Paths**: Summarizes regression paths, intercepts, and variances with estimates and confidence intervals.
+#' - **Variables**:
+#'   - Shows input variables (`M_before`, `M_after`, `Y_before`, `Y_after`) and computed variables like `Ydiff`, `Mdiff`, and `Mavg`.
+#'   - Reports the sample size used in the analysis.
+#'
+#' - **Model Fit Indices**:
+#'   - Displays SEM fit indices (e.g., Chi-square, CFI, TLI, RMSEA, SRMR) to assess model quality.
+#'
+#' - **Regression Paths and Variance Estimates**:
+#'   - Summarizes path coefficients, intercepts, variances, and confidence intervals.
+#'
 #' - **Effects**:
-#'   - Total, direct, and indirect effects.
-#'   - Contrast effects for pairwise comparisons of indirect effects.
-#' - **Moderation Effects**: Displays effects related to moderator variables.
-#' - **Monte Carlo Confidence Intervals**: Provides detailed Monte Carlo results for both raw and standardized estimates.
-#' - **Diagnostic Notes**: Summarizes bootstrapping, imputation, and Monte Carlo settings used in the analysis.
+#'   - Reports total, direct, and indirect effects with their significance.
+#'   - Highlights pairwise contrasts between indirect effects for mediation paths.
 #'
-#' The output is formatted for readability and includes dynamic confidence intervals, moderation keys,
-#' and pre-post coefficients.
+#' - **Moderation Effects**:
+#'   - Provides moderation results for identified variables with corresponding coefficients and paths.
 #'
-#' @param x A \code{WsMed} object containing results of within-subject mediation analysis.
+#' - **Monte Carlo Confidence Intervals**:
+#'   - Includes results for raw and standardized estimates obtained using methods such as MI or FIML.
+#'
+#' - **Diagnostics**:
+#'   - Summarizes analysis parameters like bootstrapping, imputation settings, Monte Carlo iterations, and random seeds.
+#'
+#' @param x A \code{WsMed} object containing the results of within-subject mediation analysis.
 #' @param level Numeric. Confidence level for the intervals (default = 0.95).
+#' @param digits Numeric. Number of digits to display in the results.
 #' @param ... Additional arguments (not used currently).
 #'
-#' @return Invisibly returns the input \code{WsMed} object.
+#' @return Invisibly returns the input \code{WsMed} object for further use.
 #'
 #' @seealso \code{\link{WsMed}}, \code{\link[lavaan]{sem}}, \code{\link[semhelpinghands]{standardizedSolution_boot_ci}}
 #'
@@ -59,7 +75,7 @@
 #'   pd = TRUE,
 #'   tol = 1e-06,
 #'   seed = 123,
-#'   alphastd = c(0.001, 0.01, 0.05)
+#'   alphastd = c(0.01, 0.05)
 #' )
 #'
 #' # Print the results
@@ -69,7 +85,73 @@
 #' @importFrom knitr kable
 #' @export
 
-print.WsMed <- function(x, level = 0.95, ...) {
+
+print.WsMed <- function(x, level = 0.95,digits=3, ...) {
+
+  print_table_dynamic <- function(data, digits_local = digits, width = 10) {
+    # 动态设置 columns_per_row
+    columns_per_row <- ifelse(digits_local <= 4, 9, 7)
+
+    # 确保数据是数据框格式
+    data <- as.data.frame(data)
+
+    # 获取总列数
+    total_columns <- ncol(data)
+    current_col <- 1
+
+    # 循环按列分块打印
+    while (current_col <= total_columns) {
+      # 当前需要打印的列范围
+      sub_data <- data[, current_col:min(current_col + columns_per_row - 1, total_columns), drop = FALSE]
+
+      # 格式化当前子集的数值列
+      numeric_cols <- sapply(sub_data, is.numeric)
+      sub_data[numeric_cols] <- lapply(sub_data[numeric_cols], function(col) {
+        formatC(col, format = "f", digits = digits_local, width = width, flag = " ")
+      })
+
+      # 强制将所有列转为字符，以确保对齐效果
+      sub_data[] <- lapply(sub_data, as.character)
+
+      # 打印当前子集表格
+      print(knitr::kable(sub_data, align = rep("r", ncol(sub_data)), row.names = FALSE))
+
+      # 更新当前列索引
+      current_col <- current_col + columns_per_row
+    }
+  }
+  print_table_dynamic2 <- function(data, digits_local = digits, width = 10) {
+    # 动态设置 columns_per_row
+    columns_per_row <- ifelse(digits_local <= 4, 9, 6)
+
+    # 确保数据是数据框格式
+    data <- as.data.frame(data)
+
+    # 获取总列数
+    total_columns <- ncol(data)
+    current_col <- 1
+
+    # 循环按列分块打印
+    while (current_col <= total_columns) {
+      # 当前需要打印的列范围
+      sub_data <- data[, current_col:min(current_col + columns_per_row - 1, total_columns), drop = FALSE]
+
+      # 格式化当前子集的数值列
+      numeric_cols <- sapply(sub_data, is.numeric)
+      sub_data[numeric_cols] <- lapply(sub_data[numeric_cols], function(col) {
+        formatC(col, format = "f", digits = digits_local, width = width, flag = " ")
+      })
+
+      # 强制将所有列转为字符，以确保对齐效果
+      sub_data[] <- lapply(sub_data, as.character)
+
+      # 打印当前子集表格
+      print(knitr::kable(sub_data, align = rep("r", ncol(sub_data)), row.names = FALSE))
+
+      # 更新当前列索引
+      current_col <- current_col + columns_per_row
+    }
+  }
   # 检查输入对象是否为 WsMed 类
   if (!inherits(x, "WsMed")) {
     stop("The input object must be of class 'WsMed'.")
@@ -104,10 +186,10 @@ print.WsMed <- function(x, level = 0.95, ...) {
       cat(paste0("M", i, " = "), paste(original_vars$M[[i]], collapse = " "), "\n")
     }
     cat("\nComputed Variables:\n")
-    print(kable(computed_vars, align = c("l", "l"), row.names = FALSE))
+    print_table_dynamic(computed_vars)
     cat("\nSample Size: ", sample_size, "\n")}
-    confidence_level <- level * 100
-    cat("Confidence Level: ", confidence_level, "%\n")
+  confidence_level <- level * 100
+  cat("Confidence Level: ", confidence_level, "%\n")
 
   # 如果没有模型拟合结果，退出函数
   if (is.null(fit)) {
@@ -137,15 +219,16 @@ print.WsMed <- function(x, level = 0.95, ...) {
   )
   cat("\n")
   cat("\n*************** MODEL FIT INDICES ***************\n")
-  print(kable(fit_indices, align = c("l", "r"), row.names = FALSE))
+  print_table_dynamic(fit_indices)
 
   # 回归路径部分
   regressions <- param_estimates[param_estimates$op == "~", ]
   if (nrow(regressions) > 0) {
     cat("\n*************** REGRESSION PATHS, INTERCEPTS AND VARIANCES ***************\n")
+
+    # 创建新的 "Path" 列，合并 Outcome 和 Predictor
     regression_table <- data.frame(
-      Outcome = regressions$lhs,
-      Predictor = regressions$rhs,
+      Path = paste(regressions$lhs, "~", regressions$rhs),  # 使用箭头符号合并
       Label = regressions$label,
       Estimate = regressions$est,
       SE = regressions$se,
@@ -154,11 +237,9 @@ print.WsMed <- function(x, level = 0.95, ...) {
       LLCI = regressions$ci.lower,
       ULCI = regressions$ci.upper
     )
-    print(kable(
-      regression_table,
-      align = c("l", "l", "l", "r", "r", "r", "r", "r", "r"),
-      row.names = FALSE
-    ))
+
+    # 打印表格
+    print_table_dynamic2(regression_table)
   }
 
   # 截距部分
@@ -174,11 +255,7 @@ print.WsMed <- function(x, level = 0.95, ...) {
       LLCI = intercepts$ci.lower,
       ULCI = intercepts$ci.upper
     )
-    print(kable(
-      intercept_table,
-      align = c("l", "l", "r", "r", "r", "r", "r", "r"),
-      row.names = FALSE
-    ))
+    print_table_dynamic2(intercept_table)
   }
 
   # 方差部分
@@ -193,11 +270,7 @@ print.WsMed <- function(x, level = 0.95, ...) {
       LLCI = variances$ci.lower,
       ULCI = variances$ci.upper
     )
-    print(kable(
-      variance_table,
-      align = c("l", "r", "r", "r", "r", "r", "r"),
-      row.names = FALSE
-    ))
+    print_table_dynamic(variance_table)
   }
 
   # 总效应和直接效应
@@ -226,7 +299,7 @@ print.WsMed <- function(x, level = 0.95, ...) {
   if (nrow(combined_effects) > 0) {
     cat("\n")
     cat("\n*************** TOTAL AND DIRECT EFFECT ***************\n")
-    print(kable(combined_effects, align = c("c", "c", "c", "c", "c", "c", "c"), row.names = FALSE))
+    print_table_dynamic(combined_effects)
   }
 
 
@@ -262,7 +335,7 @@ print.WsMed <- function(x, level = 0.95, ...) {
     )
     cat("\n")
     cat("\n*************** INDIRECT EFFECTS ***************\n")
-    print(kable(combined_effects, align = c("c", "c", "c", "c", "c", "c"), row.names = FALSE))
+    print_table_dynamic(combined_effects)
   }
 
   # 动态生成 Indirect Key
@@ -324,7 +397,7 @@ print.WsMed <- function(x, level = 0.95, ...) {
     # 打印对比效应
     cat("\n")
     cat("\n*************** CONTRAST INDIRECT EFFECTS ***************\n")
-    print(kable(contrast_table, align = c("c", "c", "c", "c", "c", "c"), row.names = FALSE))
+    print_table_dynamic(contrast_table)
   }
 
   # Moderation Effects
@@ -335,7 +408,7 @@ print.WsMed <- function(x, level = 0.95, ...) {
   if (nrow(moderation_effects) > 0) {
     cat("\n")
     cat("\n*************** MODERATION EFFECTS of X ***************\n")
-    print(kable(data.frame(
+    moderation_table <- data.frame(
       Name = moderation_effects$label,
       Effect = moderation_effects$est,
       SE = moderation_effects$se,
@@ -343,7 +416,8 @@ print.WsMed <- function(x, level = 0.95, ...) {
       p = moderation_effects$pvalue,
       LLCI = moderation_effects$ci.lower,
       ULCI = moderation_effects$ci.upper
-    ), align = c("c", "c", "c", "c", "c", "c", "c"), row.names = FALSE))
+    )
+    print_table_dynamic(moderation_table)
   }
 
   # Moderation Effects Key
@@ -352,30 +426,34 @@ print.WsMed <- function(x, level = 0.95, ...) {
     Mdiff_vars <- grep("M\\ddiff", colnames(x$prepared_data), value = TRUE)
     moderation_key <- data.frame()
 
-    # Add single moderation effects (d1, d2, ...)
-    for (i in seq_along(Mavg_vars)) {
-      moderation_key <- rbind(moderation_key, data.frame(
-        Coefficient = paste0("d", i),
-        Path = paste0(Mavg_vars[i], " -> Ydiff")
-      ))
-    }
-
-    # Add cross-variable moderation effects (d12, d23, ...)
-    for (i in seq_along(Mavg_vars)) {
-      if (i < length(Mdiff_vars)) {
-        moderation_key <- rbind(moderation_key, data.frame(
-          Coefficient = paste0("d", i, i + 1),
-          Path = paste0(Mavg_vars[i], " -> ", Mdiff_vars[i + 1])
-        ))
+    # Add all moderation effects based on labels starting with "d"
+    d_labels <- grep("^d", param_estimates$label, value = TRUE)
+    for (label in d_labels) {
+      if (nchar(label) == 2) {
+        # Single moderation effects (e.g., d1, d2, ...)
+        index <- as.numeric(substr(label, 2, 2))
+        if (!is.na(index) && index <= length(Mdiff_vars)) {
+          moderation_key <- rbind(moderation_key, data.frame(
+            Coefficient = label,
+            Path = paste0(Mdiff_vars[index], " -> Ydiff")
+          ))
+        }
+      } else if (nchar(label) > 2) {
+        # Cross-variable moderation effects (e.g., d12, d23, ...)
+        indices <- as.numeric(unlist(strsplit(substr(label, 2, nchar(label)), split = "")))
+        if (all(!is.na(indices)) && all(indices <= length(Mdiff_vars)) && length(indices) == 2) {
+          moderation_key <- rbind(moderation_key, data.frame(
+            Coefficient = label,
+            Path = paste0(Mdiff_vars[indices[1]], " -> ", Mdiff_vars[indices[2]])
+          ))
+        }
       }
     }
 
     if (nrow(moderation_key) > 0) {
-      #cat("\n*************** MODERATION EFFECTS KEY ***************\n")
       print(kable(moderation_key, align = c("c", "c"), row.names = FALSE))
     }
   }
-
 
 
   # 前后测系数对比
@@ -383,7 +461,7 @@ print.WsMed <- function(x, level = 0.95, ...) {
   if (nrow(pre_post_coeff) > 0) {
     cat("\n")
     cat("\n*************** PRE-POST COEFFICIENTS ***************\n")
-    print(kable(data.frame(
+    prepost_table <- data.frame(
       Name = pre_post_coeff$lhs,
       Effect = pre_post_coeff$est,
       SE = pre_post_coeff$se,
@@ -391,7 +469,8 @@ print.WsMed <- function(x, level = 0.95, ...) {
       p = pre_post_coeff$pvalue,
       LLCI = pre_post_coeff$ci.lower,
       ULCI = pre_post_coeff$ci.upper
-    ), align = c("c", "c", "c", "c", "c", "c", "c"), row.names = FALSE))
+    )
+    print_table_dynamic(prepost_table)
   }
 
   # 前后测系数 Key
@@ -493,8 +572,7 @@ print.WsMed <- function(x, level = 0.95, ...) {
       result_table <- data.frame(
         Parameter = param_names,
         Estimate = estimates,
-        SE = se,
-        R = R
+        SE = se
       )
 
       # 添加动态生成的置信区间列
@@ -503,12 +581,9 @@ print.WsMed <- function(x, level = 0.95, ...) {
       result_table <- cbind(result_table, ci.columns)
 
       # 打印表格
-      print(kable(result_table, align = c("l", "r", "r", "r", rep("r", ncol(ci.columns))), row.names = FALSE))
-    } else {
-      warning("mi_result does not contain necessary components for Monte Carlo confidence intervals.")
+      print_table_dynamic(result_table)
     }
   }
-
   if (!is.null(x$fiml_result)) {
     cat("\n")
     cat("\n*************** MONTE CARLO CONFIDENCE INTERVALS (FIML) ***************\n")
@@ -556,8 +631,7 @@ print.WsMed <- function(x, level = 0.95, ...) {
       result_table <- data.frame(
         Parameter = param_names,
         Estimate = estimates,
-        SE = se,
-        R = R
+        SE = se
       )
 
       # 添加动态生成的置信区间列
@@ -566,18 +640,15 @@ print.WsMed <- function(x, level = 0.95, ...) {
       result_table <- cbind(result_table, ci.columns)
 
       # 打印表格
-      print(kable(result_table, align = c("l", "r", "r", "r", rep("r", ncol(ci.columns))), row.names = FALSE))
-    } else {
-      warning("fiml_result does not contain necessary components for Monte Carlo confidence intervals.")
+      print_table_dynamic(result_table)
     }
   }
-
   if (!is.null(x$std_result)) {
     cat("\n")
     cat("\n*************** STANDARDIZED RESULTS ***************\n")
 
     if (level == 0.95){std_result <- x$std_result} else {
-    std_result <- semhelpinghands::standardizedSolution_boot_ci(fit,level =level)}
+      std_result <- semhelpinghands::standardizedSolution_boot_ci(fit,level =level)}
 
     alphastd <- x$alphastd  # 提取 alphastd
     lower_bound <- alphastd / 2
@@ -598,24 +669,18 @@ print.WsMed <- function(x, level = 0.95, ...) {
     )
 
     # 删除 lhs, op, rhs 列
-    result_table <- std_result[, !(names(std_result) %in% c("lhs", "op", "rhs"))]
+    result_table <- std_result[, !(names(std_result) %in% c("lhs", "op", "rhs", "se", "ci.lower", "ci.upper"))]
 
     # 重命名列
     colnames(result_table) <- c(
-      "Label", "Estimate (Std)", "SE", "Z", "P-value",
-      "CI Lower", "CI Upper", "Boot CI Lower", "Boot CI Upper", "Boot SE"
+      "Label", "Estimate (Std)", "Z", "P-value",
+      "LLCI", "ULCI", "Boot SE"
     )
 
 
     # 打印表格，确保列对齐
-    print(kable(
-      result_table,
-      align = c("l", "r", "r", "r", "r", "r", "r", "r", "r", "r"),
-      row.names = FALSE,
-      format = "pipe"
-    ))
+    print_table_dynamic(result_table)
   }
-
   if (!is.null(x$std_fiml_result)) {
     cat("\n")
     cat("\n*************** MONTE CARLO CONFIDENCE INTERVALS (STANDARDIZED) ***************\n")
@@ -664,7 +729,6 @@ print.WsMed <- function(x, level = 0.95, ...) {
       Parameter = common_parameters_replaced,
       Estimate = std_fiml_estimates,
       SE = se,
-      R = nrow(thetahatstar),
       check.names = FALSE  # 防止列名自动更改
     )
 
@@ -674,7 +738,7 @@ print.WsMed <- function(x, level = 0.95, ...) {
     result_table <- cbind(result_table, ci.columns)
 
     # 打印表格
-    print(kable(result_table, align = c("l", "r", "r", "r", rep("r", ncol(ci.columns))), row.names = FALSE))
+    print_table_dynamic(result_table)
   }
   if (!is.null(x$std_mi_result)) {
     cat("\n")
@@ -724,7 +788,6 @@ print.WsMed <- function(x, level = 0.95, ...) {
       Parameter = common_parameters_replaced,
       Estimate = std_mi_estimates,
       SE = se,
-      R = nrow(thetahatstar),
       check.names = FALSE  # 防止列名自动更改
     )
 
@@ -733,27 +796,27 @@ print.WsMed <- function(x, level = 0.95, ...) {
     colnames(ci.columns) <- ci.names
     result_table <- cbind(result_table, ci.columns)
 
-    # 打印表格
-    print(kable(result_table, align = c("l", "r", "r", "r", rep("r", ncol(ci.columns))), row.names = FALSE))
+    print_table_dynamic(result_table)
+
   }
 
-   # Monte Carlo Notes
+  # Monte Carlo Notes
   if (!is.null(x$mi_result) || !is.null(x$fiml_result)){
     if (!is.null(x$paras)) {
-    cat("\n")
-    cat("\n*************** IMPUTATION AND MONTE CARLO NOTES ***************\n")
-    cat("\n")
-    paras <- x$paras  # 提取参数列表
-    if (!is.null(x$mi_result)){cat("Number of imputations (m): ", paras$m, "\n")}
-    if (!is.null(x$mi_result)){cat("Imputation method: ", paras$method, "\n")}
-    cat("Random seed: ", paras$seed, "\n")
-    cat("Number of Monte Carlo repetitions (R): ", R, "\n")
-    cat("Decomposition method for covariance matrices: ", paras$decomposition, "\n")
-    cat("Check positive definiteness of covariance matrices: ", ifelse(paras$pd, "Yes", "No"), "\n")
-    cat("Tolerance for positive definiteness checks : ", paras$tol, "\n")
-    cat("Significance levels for confidence intervals: ", paste(paras$alpha, collapse = ", "), "\n")
-    if (!is.null(x$std_mi_result) || !is.null(x$std_fiml_result)){cat("Significance levels for standardized confidence intervals: ", paste(paras$alphastd, collapse = ", "), "\n")}
-  }
+      cat("\n")
+      cat("\n*************** IMPUTATION AND MONTE CARLO NOTES ***************\n")
+      cat("\n")
+      paras <- x$paras  # 提取参数列表
+      if (!is.null(x$mi_result)){cat("Number of imputations (m): ", paras$m, "\n")}
+      if (!is.null(x$mi_result)){cat("Imputation method: ", paras$method, "\n")}
+      cat("Random seed: ", paras$seed, "\n")
+      cat("Number of Monte Carlo repetitions (R): ", R, "\n")
+      cat("Decomposition method for covariance matrices: ", paras$decomposition, "\n")
+      cat("Check positive definiteness of covariance matrices: ", ifelse(paras$pd, "Yes", "No"), "\n")
+      cat("Tolerance for positive definiteness checks : ", paras$tol, "\n")
+      cat("Significance levels for confidence intervals: ", paste(paras$alpha, collapse = ", "), "\n")
+      if (!is.null(x$std_mi_result) || !is.null(x$std_fiml_result)){cat("Significance levels for standardized confidence intervals: ", paste(paras$alphastd, collapse = ", "), "\n")}
+    }
   }
 
   # 返回对象

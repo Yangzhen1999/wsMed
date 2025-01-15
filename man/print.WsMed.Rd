@@ -4,12 +4,14 @@
 \alias{print.WsMed}
 \title{Print Method for WsMed Objects}
 \usage{
-\method{print}{WsMed}(x, level = 0.95, ...)
+\method{print}{WsMed}(x, level = 0.95, digits = 3, ...)
 }
 \arguments{
 \item{x}{A \code{WsMed} object containing results of within-subject mediation analysis.}
 
 \item{level}{Numeric. Confidence level for the intervals (default = 0.95).}
+
+\item{digits}{Numeric.}
 
 \item{...}{Additional arguments (not used currently).}
 }

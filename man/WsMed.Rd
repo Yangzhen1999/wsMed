@@ -18,14 +18,14 @@ WsMed(
   se = "boot",
   R = 20000L,
   fixed.x = FALSE,
-  alpha = c(0.001, 0.01, 0.05),
+  alpha = c(0.01, 0.05),
   m = 5,
   method = "pmm",
   decomposition = "eigen",
   pd = TRUE,
   tol = 1e-06,
   seed = 123,
-  alphastd = c(0.001, 0.01, 0.05)
+  alphastd = c(0.01, 0.05)
 )
 }
 \arguments{

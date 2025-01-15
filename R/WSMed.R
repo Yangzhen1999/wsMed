@@ -111,14 +111,14 @@ WsMed <- function(data,
                   se = "boot",
                   R = 20000L,  # Monte Carlo 重复次数
                   fixed.x = FALSE,
-                  alpha = c(0.001, 0.01, 0.05),  # 显著性水平
+                  alpha = c(0.01, 0.05),  # 显著性水平
                   m = 5,  # 插补次数
                   method = "pmm",  # 插补方法
                   decomposition = "eigen",
                   pd = TRUE,
                   tol = 1e-06,
                   seed = 123,
-                  alphastd = c(0.001, 0.01, 0.05)) {
+                  alphastd = c(0.01, 0.05)) {
 
   if (Na %in% c("MI", "FIML") && all(stats::complete.cases(data))) {
     message("No missing values detected in the data.")

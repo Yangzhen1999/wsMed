@@ -58,8 +58,15 @@ The `WsMed` function accepts the following parameters:
 
 # Calling WsMed
 
+```{r, include=FALSE}
+
+.libPaths(c(tempdir(), .libPaths()))
+library(wsMed) 
+```
+
+
+
 ```{r}
-library(wsMed)
 library(knitr)
 data(example_data)
 set.seed(123) 
@@ -97,14 +104,14 @@ result2 <- WsMed(
   Na = "MI",
   standardized = TRUE,
   R = 20000L,  # Monte Carlo 重复次数
-  alpha = c(0.001, 0.01, 0.05),  # 显著性水平
+  alpha = c(0.01, 0.05),  # 显著性水平
   m = 5,  # 插补次数
   method = "pmm",  # 插补方法
   decomposition = "eigen",
   pd = TRUE,
   tol = 1e-06,
   seed = 123,
-  alphastd = c(0.001, 0.01, 0.05)
+  alphastd = c(0.01, 0.05)
 )
 print(result2)
 ```
