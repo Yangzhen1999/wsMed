@@ -7,42 +7,65 @@
 \method{print}{WsMed}(x, level = 0.95, digits = 3, ...)
 }
 \arguments{
-\item{x}{A \code{WsMed} object containing results of within-subject mediation analysis.}
+\item{x}{A \code{WsMed} object containing the results of within-subject mediation analysis.}
 
 \item{level}{Numeric. Confidence level for the intervals (default = 0.95).}
 
-\item{digits}{Numeric.}
+\item{digits}{Numeric. Number of digits to display in the results.}
 
 \item{...}{Additional arguments (not used currently).}
 }
 \value{
-Invisibly returns the input \code{WsMed} object.
+Invisibly returns the input \code{WsMed} object for further use.
 }
 \description{
-Provides a detailed summary of the results from a \code{WsMed} object, including
-variables, model fit indices, regression paths, total, direct, and indirect effects,
-contrast effects, moderation effects, and Monte Carlo confidence intervals (if applicable).
-It also generates diagnostic information and analysis notes for further interpretation.
+Provides a comprehensive summary of results from a \code{WsMed} object, including:
+\itemize{
+\item Input and computed variables with sample size.
+\item Model fit indices, regression paths, and variance estimates.
+\item Total, direct, and indirect effects with pairwise contrasts.
+\item Moderation effects and Monte Carlo confidence intervals for raw and standardized estimates (if applicable).
+\item Diagnostic notes for bootstrapping, imputation, and analysis parameters.
+}
+
+The output is formatted for clarity, ensuring an intuitive presentation of mediation analysis results,
+including dynamic confidence intervals, moderation keys, and pre-post coefficients.
 }
 \details{
 This function is specifically designed to display results from the within-subject mediation
 analysis conducted using the \code{WsMed} function. Key features include:
 \itemize{
-\item \strong{Variables}: Displays input variables, computed variables, and sample size.
-\item \strong{Model Fit Indices}: Includes common SEM fit indices like chi-square, CFI, TLI, RMSEA, and SRMR.
-\item \strong{Regression Paths}: Summarizes regression paths, intercepts, and variances with estimates and confidence intervals.
+\item \strong{Variables}:
+\itemize{
+\item Shows input variables (\code{M_before}, \code{M_after}, \code{Y_before}, \code{Y_after}) and computed variables like \code{Ydiff}, \code{Mdiff}, and \code{Mavg}.
+\item Reports the sample size used in the analysis.
+}
+\item \strong{Model Fit Indices}:
+\itemize{
+\item Displays SEM fit indices (e.g., Chi-square, CFI, TLI, RMSEA, SRMR) to assess model quality.
+}
+\item \strong{Regression Paths and Variance Estimates}:
+\itemize{
+\item Summarizes path coefficients, intercepts, variances, and confidence intervals.
+}
 \item \strong{Effects}:
 \itemize{
-\item Total, direct, and indirect effects.
-\item Contrast effects for pairwise comparisons of indirect effects.
+\item Reports total, direct, and indirect effects with their significance.
+\item Highlights pairwise contrasts between indirect effects for mediation paths.
 }
-\item \strong{Moderation Effects}: Displays effects related to moderator variables.
-\item \strong{Monte Carlo Confidence Intervals}: Provides detailed Monte Carlo results for both raw and standardized estimates.
-\item \strong{Diagnostic Notes}: Summarizes bootstrapping, imputation, and Monte Carlo settings used in the analysis.
+\item \strong{Moderation Effects}:
+\itemize{
+\item Provides moderation results for identified variables with corresponding coefficients and paths.
 }
-
-The output is formatted for readability and includes dynamic confidence intervals, moderation keys,
-and pre-post coefficients.
+\item \strong{Monte Carlo Confidence Intervals}:
+\itemize{
+\item Includes results for raw and standardized estimates obtained using methods such as MI or FIML.
+}
+\item \strong{Diagnostics}:
+\itemize{
+\item Summarizes analysis parameters like bootstrapping, imputation settings, Monte Carlo iterations, and random seeds.
+}
+}
 }
 \examples{
 # Example dataset with missing values
@@ -74,7 +97,7 @@ result1 <- WsMed(
   pd = TRUE,
   tol = 1e-06,
   seed = 123,
-  alphastd = c(0.001, 0.01, 0.05)
+  alphastd = c(0.01, 0.05)
 )
 
 # Print the results
