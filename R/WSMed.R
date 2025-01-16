@@ -120,13 +120,83 @@ WsMed <- function(data,
                   seed = 123,
                   alphastd = c(0.01, 0.05)) {
 
-  if (Na %in% c("MI", "FIML") && all(stats::complete.cases(data))) {
-    message("No missing values detected in the data.")
-    Na <- "DE"
+  # 输入验证
+  {
+    # 检查 data
+    if (is.null(data) || length(data) == 0) {
+      stop("Error: 'data' cannot be NULL or empty.")
+    }
+    if (!is.data.frame(data)) {
+      stop("Error: 'data' must be a data frame.")
+    }
+
+    # 检查 M_before 和 M_after
+    if (is.null(M_before) || is.null(M_after)) {
+      stop("Error: 'M_before' and 'M_after' cannot be NULL. Please provide valid column names.")
+    }
+    if (length(M_before) != length(M_after)) {
+      stop("Error: The lengths of 'M_before' and 'M_after' must match.")
+    }
+
+    # 检查 Y_before 和 Y_after
+    if (is.null(Y_before) || is.null(Y_after)) {
+      stop("Error: 'Y_before' and 'Y_after' cannot be NULL. Please provide valid column names.")
+    }
+
+    # 检查必需列
+    required_columns <- c(M_before, M_after, Y_before, Y_after)
+    missing_columns <- required_columns[!required_columns %in% colnames(data)]
+    if (length(missing_columns) > 0) {
+      stop(paste("Error: Missing columns in data:", paste(missing_columns, collapse = ", ")))
+    }
+
+    # 验证 form 参数
+    if (!form %in% c("P", "CN", "CP", "PC")) {
+      stop("Error: Invalid 'form' parameter. Use 'P', 'CN', 'CP', or 'PC'.")
+    }
+
+    # 验证 Na 参数
+    if (!Na %in% c("DE", "FIML", "MI")) {
+      stop("Error: Invalid 'Na' parameter. Use 'DE', 'FIML', or 'MI'.")
+    }
+
+    # 验证 bootstrap, R, 和 m
+    if (!is.numeric(bootstrap) || bootstrap < 0) {
+      stop("Error: 'bootstrap' must be a non-negative integer.")
+    }
+    if (!is.numeric(R) || R <= 0) {
+      stop("Error: 'R' must be a positive integer.")
+    }
+    if (!is.numeric(m) || m <= 0) {
+      stop("Error: 'm' must be a positive integer.")
+    }
+
+    # 处理缺失值
+    if (Na %in% c("MI", "FIML")) {
+      total_missing <- sum(is.na(data))
+      if (total_missing == 0) {
+        message("No missing values detected in the data. Switching to 'DE'.")
+        Na <- "DE"
+      }
+    }
+    if (Na == "DE") {
+      total_missing <- sum(is.na(data))
+      if (total_missing > 0) {
+        warning("The dataset contains missing values. Consider using 'Na = MI' or 'Na = FIML' to handle them")
+      }
+      data <- stats::na.omit(data)
+    }
+
+    # 验证调节变量数量
+    num_mediators <- length(M_before)
+    if (form == "CN" && num_mediators < 2) {
+      stop("Error: For 'CN' models, the number of mediators must be at least 2.")
+    }
+    if (form %in% c("PC", "CP") && num_mediators < 3) {
+      stop("Error: For 'PC' and 'CP' models, the number of mediators must be at least 3.")
+    }
   }
 
-  if (Na == "DE") {
-    data <- stats::na.omit(data)}
 
   # Step 1: 数据预处理
   prepared_data <- PrepareData(data = data,
@@ -158,7 +228,8 @@ WsMed <- function(data,
       se = se,
       bootstrap = bootstrap,
       iseed = iseed,
-      fixed.x = fixed.x
+      fixed.x = fixed.x,
+      warn = FALSE
     )
   } else if (Na == "FIML") {
     # 使用 FIML 方法处理缺失值
@@ -166,13 +237,15 @@ WsMed <- function(data,
       model = sem_model,
       data = prepared_data,
       missing = "fiml",
-      fixed.x = fixed.x
+      fixed.x = fixed.x,
+      warn = FALSE
     )
   } else if (Na == "MI") {
     fit <- lavaan::sem(
       model = sem_model,
       data = prepared_data,
-      fixed.x = fixed.x
+      fixed.x = fixed.x,
+      warn = FALSE
     )
     if (!inherits(fit, "lavaan")) {
       stop("Model fitting failed. Check your input model and data.")
@@ -208,21 +281,53 @@ WsMed <- function(data,
   }
 
   # Step 5: 标准化结果
+  # 初始化结果变量
   std_result <- NULL
   std_mi_result <- NULL
   std_fiml_result <- NULL
 
-  if (standardized){
-    if (Na == "DE") {
-      std_result <- semhelpinghands::standardizedSolution_boot_ci(fit)
-    }
-    if (Na == "MI") {
-      std_mi_result <- semmcci::MCStd(mi_result, alpha = alphastd)
-    }
-    if (Na == "FIML") {
-      std_fiml_result <- semmcci::MCStd(fiml_result, alpha = alphastd)
-    }
+  # 生成标准化结果
+  if (standardized) {
+    tryCatch({
+      if (Na == "DE") {
+        std_result <- semhelpinghands::standardizedSolution_boot_ci(fit)
+        if (is.null(std_result)) {
+          warning("Standardized solution for DE method returned NULL.")
+        }
+      }
+
+      if (Na == "MI") {
+        if (is.null(mi_result)) {
+          warning("MI result is NULL, cannot compute standardized solution.")
+        } else {
+          std_mi_result <- tryCatch(
+            semmcci::MCStd(mi_result, alpha = alphastd),
+            error = function(e) {
+              warning("Standardized solution for MI failed: ", e$message)
+              NULL
+            }
+          )
+        }
+      }
+
+      if (Na == "FIML") {
+        if (is.null(fiml_result)) {
+          warning("FIML result is NULL, cannot compute standardized solution.")
+        } else {
+          std_fiml_result <- tryCatch(
+            semmcci::MCStd(fiml_result, alpha = alphastd),
+            error = function(e) {
+              warning("Standardized solution for FIML failed: ", e$message)
+              NULL
+            }
+          )
+        }
+      }
+    }, error = function(e) {
+      warning("Error during standardized solution generation: ", e$message)
+    })
   }
+
 
   input_vars <- list(
     M_before = M_before,
@@ -257,7 +362,8 @@ WsMed <- function(data,
     alpha = alpha,
     Na = Na,
     iseed = iseed,
-    paras = paras
+    paras = paras,
+    standardized = standardized
   )
 
   # Step 6: 返回结果
