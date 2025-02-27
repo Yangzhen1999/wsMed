@@ -100,11 +100,14 @@ GenerateModelCN <- function(prepared_data) {
   # 3. 动态生成间接效应公式
   generate_path_effects <- function(paths) {
     paste0(
-      "a1 * ",  # 起点系数固定为 a1
+      "a", paths[1], " * ",  # `aX` 现在取决于路径的起点
       paste(
-        sapply(1:(length(paths) - 1), function(i) {
-          paste0("b", paths[i], paths[i + 1])  # 生成路径上的中介系数
-        }),
+        c(
+          sapply(1:(length(paths) - 1), function(i) {
+            paste0("b", paths[i], paths[i + 1])  # 生成路径上的 `bX`
+          }),
+          paste0("b", paths[length(paths)])  # **加上终点的 `bX`**
+        ),
         collapse = " * "
       )
     )

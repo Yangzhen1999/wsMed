@@ -228,6 +228,7 @@ CI_{\text{path}_1\text{vs}\text{path}_2} = \text{indirect}_{\text{path}_1} - \te
 
 ---
 
+
 ## 6. Summary of Regression Equations
 
 This section summarizes all equations used in the model:
