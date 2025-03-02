@@ -10,7 +10,7 @@
 #' - **Multiple Imputation**: Uses [PrepareMissingData()] to impute missing values and calculate the necessary
 #' difference and centered average scores for mediators and the outcome variable.
 #'
-#' - **SEM Fitting and Monte Carlo Analysis**: Uses [MCMI()] to fit the specified SEM model to the imputed datasets,
+#' - **SEM Fitting and Monte Carlo Analysis**: Uses [MCMI2()] to fit the specified SEM model to the imputed datasets,
 #' pool the parameter estimates, and compute Monte Carlo confidence intervals.
 #'
 #' This function is suitable for mediation or other SEM analyses where missing data need to be addressed
@@ -40,7 +40,7 @@
 #' - `thetahatstar`: Monte Carlo samples for parameter estimates.
 #' - Other components specific to the `semmcci` class.
 #'
-#' @seealso [PrepareMissingData()], [MCMI()], [WsMed()]
+#' @seealso [PrepareMissingData()], [MCMI2()], [WsMed()]
 #'
 #' @examples
 #' # Example dataset with missing values
@@ -112,8 +112,8 @@ RunMCMIAnalysis <- function(data_missing,
     # 获取处理后的插补数据集列表
     processed_data_list <- prepared_data$processed_data_list
 
-    # 调用 MCMI 进行 Monte Carlo 分析
-    mi_result <- MCMI(
+    # 调用 MCMI2 进行 Monte Carlo 分析
+    mi_result <- MCMI2(
       sem_model = sem_model,
       imputations = processed_data_list,
       R = R,

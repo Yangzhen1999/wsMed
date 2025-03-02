@@ -44,5 +44,5 @@ NULL
 
 }
 \seealso{
-\code{\link[=MCMI]{MCMI()}}, \code{\link[=RunMCMIAnalysis]{RunMCMIAnalysis()}}
+\code{\link[=MCMI2]{MCMI2()}}, \code{\link[=RunMCMIAnalysis]{RunMCMIAnalysis()}}
 }

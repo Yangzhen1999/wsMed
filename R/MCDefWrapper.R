@@ -16,7 +16,7 @@
 #'
 #' @return A matrix of computed defined parameters for each Monte Carlo sample.
 #'
-#' @seealso [MCMI()], [RunMCMIAnalysis()]
+#' @seealso [MCMI2()], [RunMCMIAnalysis()]
 #'
 #' @examples NULL
 #' @export

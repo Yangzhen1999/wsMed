@@ -75,7 +75,7 @@ This function streamlines the workflow for SEM analysis with missing data by int
 \itemize{
 \item \strong{Multiple Imputation}: Uses \code{\link[=PrepareMissingData]{PrepareMissingData()}} to impute missing values and calculate the necessary
 difference and centered average scores for mediators and the outcome variable.
-\item \strong{SEM Fitting and Monte Carlo Analysis}: Uses \code{\link[=MCMI]{MCMI()}} to fit the specified SEM model to the imputed datasets,
+\item \strong{SEM Fitting and Monte Carlo Analysis}: Uses \code{\link[=MCMI2]{MCMI2()}} to fit the specified SEM model to the imputed datasets,
 pool the parameter estimates, and compute Monte Carlo confidence intervals.
 }
 
@@ -117,5 +117,5 @@ result <- RunMCMIAnalysis(
 
 }
 \seealso{
-\code{\link[=PrepareMissingData]{PrepareMissingData()}}, \code{\link[=MCMI]{MCMI()}}, \code{\link[=WsMed]{WsMed()}}
+\code{\link[=PrepareMissingData]{PrepareMissingData()}}, \code{\link[=MCMI2]{MCMI2()}}, \code{\link[=WsMed]{WsMed()}}
 }
