@@ -26,7 +26,7 @@ test_data_4m <- data.frame(
 )
 
 test_that("GenerateModelCP correctly generates SEM model syntax for 4 mediators", {
-  model_syntax <- GenerateModelCP(test_data_4m)
+  model_syntax <- GenerateModelPC(test_data_4m)
 
   # 确保 SEM 语法是字符串
   expect_type(model_syntax, "character")
@@ -39,10 +39,7 @@ test_that("GenerateModelCP correctly generates SEM model syntax for 4 mediators"
   expect_match(model_syntax, "b4\\*M4diff")
 
   # 确保并行中介对 M1 的回归路径正确 (M2 → M1 → Y)
-  expect_match(model_syntax, "M1diff ~ a1\\*1 \\+ b21\\*M2diff \\+ d21\\*M2avg")
-  expect_match(model_syntax, "M1diff ~ a1\\*1 \\+ b31\\*M3diff \\+ d31\\*M3avg")
-  expect_match(model_syntax, "M1diff ~ a1\\*1 \\+ b41\\*M4diff \\+ d41\\*M4avg")
-
+  expect_match(model_syntax, "M1diff ~ a1\\*1 \\+ b21\\*M2diff \\+ b31\\*M3diff \\+ b41\\*M4diff \\+ d21\\*M2avg \\+ d31\\*M3avg \\+ d41\\*M4avg")
   # 确保独立的中介变量回归项
   expect_match(model_syntax, "M2diff ~ a2\\*1")
   expect_match(model_syntax, "M3diff ~ a3\\*1")
@@ -112,7 +109,7 @@ test_that("GenerateModelCP correctly generates SEM model syntax for 4 mediators"
   expect_match(model_syntax, "X0_b41 := X1_b41 - d41")
 })
 test_that("GenerateModelCP correctly generates SEM model syntax for 3 mediators", {
-  model_syntax <- GenerateModelCP(test_data_3m)
+  model_syntax <- GenerateModelPC(test_data_3m)
 
   # 确保 SEM 语法是字符串
   expect_type(model_syntax, "character")
@@ -124,8 +121,8 @@ test_that("GenerateModelCP correctly generates SEM model syntax for 3 mediators"
   expect_match(model_syntax, "b3\\*M3diff")
 
   # 确保并行中介对 M1 的回归路径正确 (M2 → M1 → Y)
-  expect_match(model_syntax, "M1diff ~ a1\\*1 \\+ b21\\*M2diff \\+ d21\\*M2avg")
-  expect_match(model_syntax, "M1diff ~ a1\\*1 \\+ b31\\*M3diff \\+ d31\\*M3avg")
+  # 确保并行中介对 M1 的回归路径正确 (M2 → M1 → Y)
+  expect_match(model_syntax, "M1diff ~ a1\\*1 \\+ b21\\*M2diff \\+ b31\\*M3diff \\+ d21\\*M2avg \\+ d31\\*M3avg")
 
   # 确保独立的中介变量回归项
   expect_match(model_syntax, "M2diff ~ a2\\*1")
