@@ -1,0 +1,53 @@
+---
+title: "Demonstration of print.GM()"
+author: "Wendie Yang"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Demonstration of `print.GM()`
+
+### Using `print.GM()` with `WsMed()`
+The `WsMed()` function returns a list containing `sem_model`. `print.GM()` can automatically extract and format the model equations.
+
+```{r, message=FALSE, warning=FALSE}
+library(wsMed) 
+result1 <- wsMed(
+  data = example_data,
+  M_before = c("A1","B1","C1"),
+  M_after = c("A2","B2","C2"),
+  Y_before = "D1",
+  Y_after = "D2",
+  form = "P",
+  Na = "DE",
+  standardized = TRUE,
+  bootstrap = 1000,
+  iseed = 123
+)
+print.GM(result1)
+```
+
+### Using print.GM() with GenerateModel*()
+If you already have preprocessed data, you can directly generate the SEM model syntax using GenerateModelPC() or other GenerateModel*() functions.
+
+```{r, message=FALSE, warning=FALSE}
+# Load necessary packages
+library(wsMed) 
+# Load example data
+data(example_data)
+
+# Prepare data
+prepared_data <- PrepareData(
+  data = example_data,
+  M_before = c("A1", "B1"),
+  M_after = c("A2", "B2"),
+  Y_before = "C1",
+  Y_after = "C2"
+)
+
+# Generate Model
+sem_model <- GenerateModelPC(prepared_data)
+
+# print Model equations
+print.GM(sem_model)
+```

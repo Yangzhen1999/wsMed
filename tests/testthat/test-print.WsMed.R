@@ -11,10 +11,10 @@ example_dataN <- mice::ampute(
   prop = 0.1,
 )$amp
 
-test_that("print.WsMed prints correct output for complete data", {
+test_that("print.wsMed prints correct output for complete data", {
   # 加载示例数据
   data(example_data)
-  result <- WsMed(
+  result <- wsMed(
     data = example_data,
     M_before = c("A1", "B1"),
     M_after = c("A2", "B2"),
@@ -42,9 +42,9 @@ test_that("print.WsMed prints correct output for complete data", {
   expect_true(any(grepl("Bootstrapping NOTES", printed_output)))
 })
 
-test_that("print.WsMed handles missing data correctly with MI", {
-  # 使用有缺失值的数据运行 WsMed
-  result_with_na <- WsMed(
+test_that("print.wsMed handles missing data correctly with MI", {
+  # 使用有缺失值的数据运行 wsMed
+  result_with_na <- wsMed(
     data = example_dataN,
     M_before = c("A2", "B2"),
     M_after = c("A1", "B1"),
@@ -81,7 +81,7 @@ test_that("print.WsMed handles missing data correctly with MI", {
   expect_true(any(grepl("Significance levels for standardized confidence intervals", printed_output)))
 })
 
-test_that("print.WsMed correctly handles FIML missing data method", {
+test_that("print.wsMed correctly handles FIML missing data method", {
   # 生成带有缺失值的数据
   set.seed(456)
   example_dataN <- mice::ampute(
@@ -90,7 +90,7 @@ test_that("print.WsMed correctly handles FIML missing data method", {
   )$amp
 
   # 执行 mediation 分析
-  result <- WsMed(
+  result <- wsMed(
     data = example_dataN,
     M_before = c("A1", "B1","C1"),
     M_after = c("A2", "B2","C2"),

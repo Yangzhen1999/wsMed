@@ -10,9 +10,9 @@ vignette: >
 ## Introduction
 
 The `GenerateModelPC` function dynamically generates a Structural Equation Model (SEM) formula to analyze models with multiple parallel mediators influencing a single chained mediator for 'lavaan' based on the prepared dataset. This document explains the mathematical principles and the structure of the generated model.
-```{r, echo=FALSE, out.width="100%"}
-knitr::include_graphics("PC.png")
-```
+<p align="center">
+  <img src="PC.png" alt="Parallel + serial mediation model" width="100%">
+</p>
 
 ---
 

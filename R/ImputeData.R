@@ -34,6 +34,12 @@
 ImputeData<- function(data_missing, m, method = "pmm", seed = 123, predictorMatrix = NULL) {
   data_missing[data_missing == -999] <- NA
 
+  # 检查数据是否包含至少两个非常数列（mice 需要至少两个变量）
+  valid_vars <- sapply(data_missing, function(col) length(unique(na.omit(col))) > 1)
+
+  if (sum(valid_vars) < 2) {
+    stop("Error in ImputeData: Too few valid variables after removing constants or collinear variables.")
+  }
   # if don't provide predictorMatrix，use NULL
   if (is.null(predictorMatrix)) {
     imp <- mice(data_missing, m = m, method = method, seed = seed)

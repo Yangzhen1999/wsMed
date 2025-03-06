@@ -39,7 +39,7 @@
 #'
 #' @return A character string representing the SEM model syntax for the specified chained mediation analysis.
 #'
-#' @seealso [PrepareData()], [WsMed()], [GenerateModelP()]
+#' @seealso [PrepareData()], [wsMed()], [GenerateModelP()]
 #'
 #' @examples
 #' # Example prepared data

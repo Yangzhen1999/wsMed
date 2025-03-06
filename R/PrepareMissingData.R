@@ -35,7 +35,7 @@
 #' ready for within-subject mediation analysis.
 #' - `imputation_summary`: A summary of the imputation process, including diagnostics and convergence information.
 #'
-#' @seealso [PrepareData()], [ImputeData()], [WsMed()]
+#' @seealso [PrepareData()], [ImputeData()], [wsMed()]
 #'
 #' @examples
 #' # Example dataset with missing values
@@ -71,7 +71,17 @@ PrepareMissingData <- function(data_missing,
                                M_after,
                                Y_before,
                                Y_after) {
-  # Step 1: 插补数据
+  #  检查 M_before 和 M_after 长度是否匹配
+  if (length(M_before) != length(M_after)) {
+    stop("Error in PrepareMissingData: M_before and M_after must have the same length.")
+  }
+
+  #  确保 Y_before 和 Y_after 存在
+  if (!(Y_before %in% colnames(data_missing)) || !(Y_after %in% colnames(data_missing))) {
+    stop("Error in PrepareMissingData: Y_before or Y_after is missing in the dataset.")
+  }
+
+   # Step 1: 插补数据
   imputed_result <- ImputeData(
     data_missing = data_missing,
     m = m,

@@ -1,27 +1,27 @@
 ---
-title: "WsMed Function Documentation"
+title: "wsMed Function Documentation"
 date: "`r Sys.Date()`"
 output:
   rmarkdown::html_vignette:
     number_sections: true
 vignette: >
-  %\VignetteIndexEntry{WsMed Function Documentation}
+  %\VignetteIndexEntry{wsMed Function Documentation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 # Introduction
 
-The `WsMed` function is designed for two condition within-subject mediation analysis, incorporating SEM models through the `lavaan` package and Monte Carlo simulation methods. This document provides a detailed description of the function's parameters, workflow, and usage, along with an example demonstration.
+The `wsMed` function is designed for two condition within-subject mediation analysis, incorporating SEM models through the `lavaan` package and Monte Carlo simulation methods. This document provides a detailed description of the function's parameters, workflow, and usage, along with an example demonstration.
 
 ---
 
 # Workflow
 
-The workflow of the `WsMed` function is illustrated below:
+The workflow of the `wsMed` function is illustrated below:
 
 ```{r, echo=FALSE, out.width="100%"}
-knitr::include_graphics("WsMed.svg")
+knitr::include_graphics("wsMed.svg")
 ```
 The main steps include:
 
@@ -37,7 +37,7 @@ The main steps include:
 
 # Parameters
 
-The `WsMed` function accepts the following parameters:
+The `wsMed` function accepts the following parameters:
 
 | **Parameter**      | **Type**       | **Default**       | **Description**                                                  |
 |---------------------|----------------|-------------------|------------------------------------------------------------------|
@@ -56,7 +56,7 @@ The `WsMed` function accepts the following parameters:
 | `method`           | String         | `"pmm"`           | Imputation method for the `"MI"` method.                         |
 | `seed`             | Integer        | `123`             | Random seed for reproducibility.                                 |
 
-# Calling WsMed
+# Calling wsMed
 
 ```{r, include=FALSE}
 
@@ -78,7 +78,8 @@ example_dataN <- mice::ampute(
 
 
 ```{r}
-result1 <- WsMed(
+library(wsMed) 
+result1 <- wsMed(
   data = example_data,
   M_before = c("A1","B1","C1"),
   M_after = c("A2","B2","C2"),
@@ -94,7 +95,7 @@ print(result1,level = 0.99)
 ```
 
 ```{r}
-result2 <- WsMed(
+result2 <- wsMed(
   data = example_dataN,
   M_before = c("A1","B1","C1"),
   M_after = c("A2","B2","C2"),
@@ -117,7 +118,7 @@ print(result2)
 ```
 
 ```{r}
-result3 <- WsMed(
+result3 <- wsMed(
   data = example_dataN,
   M_before = c("A1","B1","C1"),
   M_after = c("A2","B2","C2"),
@@ -141,7 +142,7 @@ print(result3)
 
 
 ```{r}
-result4 <- WsMed(
+result4 <- wsMed(
   data = example_dataN,
   M_before = c("A1","B1"),
   M_after = c("A2","B2"),

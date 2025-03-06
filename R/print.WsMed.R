@@ -1,6 +1,6 @@
-#' @title Print Method for WsMed Objects
+#' @title Print Method for wsMed Objects
 #'
-#' @description Provides a comprehensive summary of results from a \code{WsMed} object, including:
+#' @description Provides a comprehensive summary of results from a \code{wsMed} object, including:
 #' - Input and computed variables with sample size.
 #' - Model fit indices, regression paths, and variance estimates.
 #' - Total, direct, and indirect effects with pairwise contrasts.
@@ -11,7 +11,7 @@
 #' including dynamic confidence intervals, moderation keys, and pre-post coefficients.
 #'
 #' @details This function is specifically designed to display results from the within-subject mediation
-#' analysis conducted using the \code{WsMed} function. Key features include:
+#' analysis conducted using the \code{wsMed} function. Key features include:
 #'
 #' - **Variables**:
 #'   - Shows input variables (`M_before`, `M_after`, `Y_before`, `Y_after`) and computed variables like `Ydiff`, `Mdiff`, and `Mavg`.
@@ -36,14 +36,14 @@
 #' - **Diagnostics**:
 #'   - Summarizes analysis parameters like bootstrapping, imputation settings, Monte Carlo iterations, and random seeds.
 #'
-#' @param x A \code{WsMed} object containing the results of within-subject mediation analysis.
+#' @param x A \code{wsMed} object containing the results of within-subject mediation analysis.
 #' @param level Numeric. Confidence level for the intervals (default = 0.95).
 #' @param digits Numeric. Number of digits to display in the results.
 #' @param ... Additional arguments (not used currently).
 #'
-#' @return Invisibly returns the input \code{WsMed} object for further use.
+#' @return Invisibly returns the input \code{wsMed} object for further use.
 #'
-#' @seealso \code{\link{WsMed}}, \code{\link[lavaan]{sem}}, \code{\link[semhelpinghands]{standardizedSolution_boot_ci}}
+#' @seealso \code{\link{wsMed}}, \code{\link[lavaan]{sem}}, \code{\link[semhelpinghands]{standardizedSolution_boot_ci}}
 #'
 #' @examples
 #' # Example dataset with missing values
@@ -55,7 +55,7 @@
 #' )$amp
 #'
 #' # Perform within-subject mediation analysis
-#' result1 <- WsMed(
+#' result1 <- wsMed(
 #'   data = example_dataN,
 #'   M_before = c("A1", "B1"),
 #'   M_after = c("A2", "B2"),
@@ -86,7 +86,7 @@
 #' @export
 
 
-print.WsMed <- function(x, level = 0.95,digits=3, ...) {
+print.wsMed <- function(x, level = 0.95,digits=3, ...) {
 
   print_table_dynamic <- function(data, digits_local = digits, width = 10) {
     # 动态设置 columns_per_row
@@ -152,9 +152,9 @@ print.WsMed <- function(x, level = 0.95,digits=3, ...) {
       current_col <- current_col + columns_per_row
     }
   }
-  # 检查输入对象是否为 WsMed 类
-  if (!inherits(x, "WsMed")) {
-    stop("The input object must be of class 'WsMed'.")
+  # 检查输入对象是否为 wsMed 类
+  if (!inherits(x, "wsMed")) {
+    stop("The input object must be of class 'wsMed'.")
   }
 
   # 提取 lavaan_fit
@@ -529,9 +529,9 @@ print.WsMed <- function(x, level = 0.95,digits=3, ...) {
     cat("\n")
     cat("\n*************** MONTE CARLO CONFIDENCE INTERVALS (MI) ***************\n")
     # 提取 alpha 参数
-    alpha <- x$alpha  # 假设在 WsMed 输出中包含 alpha 参数
+    alpha <- x$alpha  # 假设在 wsMed 输出中包含 alpha 参数
     if (is.null(alpha)) {
-      stop("The 'alpha' parameter is missing from the WsMed object.")
+      stop("The 'alpha' parameter is missing from the wsMed object.")
     }
 
     # 动态生成置信区间的概率值
@@ -588,9 +588,9 @@ print.WsMed <- function(x, level = 0.95,digits=3, ...) {
     cat("\n")
     cat("\n*************** MONTE CARLO CONFIDENCE INTERVALS (FIML) ***************\n")
     # 提取 alpha 参数
-    alpha <- x$alpha  # 假设在 WsMed 输出中包含 alpha 参数
+    alpha <- x$alpha  # 假设在 wsMed 输出中包含 alpha 参数
     if (is.null(alpha)) {
-      stop("The 'alpha' parameter is missing from the WsMed object.")
+      stop("The 'alpha' parameter is missing from the wsMed object.")
     }
 
     # 动态生成置信区间的概率值
@@ -686,9 +686,9 @@ print.WsMed <- function(x, level = 0.95,digits=3, ...) {
     cat("\n*************** MONTE CARLO CONFIDENCE INTERVALS (STANDARDIZED) ***************\n")
 
     # 提取 alphastd 参数
-    alphastd <- x$alphastd  # 假设在 WsMed 输出中包含 alphastd 参数
+    alphastd <- x$alphastd  # 假设在 wsMed 输出中包含 alphastd 参数
     if (is.null(alphastd)) {
-      stop("The 'alphastd' parameter is missing from the WsMed object.")
+      stop("The 'alphastd' parameter is missing from the wsMed object.")
     }
 
     # 动态生成置信区间的概率值
@@ -745,9 +745,9 @@ print.WsMed <- function(x, level = 0.95,digits=3, ...) {
     cat("\n*************** MONTE CARLO CONFIDENCE INTERVALS (STANDARDIZED) ***************\n")
 
     # 提取 alphastd 参数
-    alphastd <- x$alphastd  # 假设在 WsMed 输出中包含 alphastd 参数
+    alphastd <- x$alphastd  # 假设在 wsMed 输出中包含 alphastd 参数
     if (is.null(alphastd)) {
-      stop("The 'alphastd' parameter is missing from the WsMed object.")
+      stop("The 'alphastd' parameter is missing from the wsMed object.")
     }
 
     # 动态生成置信区间的概率值

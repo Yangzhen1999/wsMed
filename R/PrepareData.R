@@ -33,7 +33,7 @@
 #' - `M1diff`, `M2diff`, ...: Difference scores for each mediator.
 #' - `M1avg`, `M2avg`, ...: Centered average scores for each mediator.
 #'
-#' @seealso [GenerateModelP()], [GenerateModelCN()], [GenerateModelPC()], [WsMed()]
+#' @seealso [GenerateModelP()], [GenerateModelCN()], [GenerateModelPC()], [wsMed()]
 #'
 #' @examples
 #' # Example raw data

@@ -40,7 +40,7 @@
 #' - `thetahatstar`: Monte Carlo samples for parameter estimates.
 #' - Other components specific to the `semmcci` class.
 #'
-#' @seealso [PrepareMissingData()], [MCMI2()], [WsMed()]
+#' @seealso [PrepareMissingData()], [MCMI2()], [wsMed()]
 #'
 #' @examples
 #' # Example dataset with missing values

@@ -1,0 +1,67 @@
+url: https://github.com/Yangzhen1999/wsMed
+template:
+  bootstrap: 5
+  bootswatch: flatly  # You can change the theme
+
+navbar:
+  structure:
+    left:  [home, reference, articles, news]
+    right: [github]
+  components:
+    home:
+      text: "Home"
+      href: index.html
+    reference:
+      text: "Functions"
+      href: reference/index.html
+    articles:
+      text: "Tutorials"
+      menu:
+        - text: "Introduction to wsMed"
+          href: articles/wsMed.html
+        - text: "Different Models"
+          menu:
+            - text: "Chained Mediation (CN)"
+              href: articles/GenerateModelCN.html
+            - text: "Combined Parallel and Chained Mediation (CP)"
+              href: articles/GenerateModelCP.html
+            - text: "Parallel Mediation (P)"
+              href: articles/GenerateModelP.html
+            - text: "Parallel + Chained Mediation (PC)"
+              href: articles/GenerateModelPC.html
+        - text: "Using print.GM()"
+          href: articles/print.GM.html
+    news:
+      text: "Changelog"
+      href: news/index.html
+    github:
+      icon: fab fa-github
+      href: https://github.com/Yangzhen1999/wsMed
+      aria-label: "GitHub Repository"
+
+reference:
+  - title: "Main Functions"
+    desc: "Core functions for mediation analysis"
+    contents:
+      - wsMed
+      - ARIVwrapper
+      - example_data
+      - ImputeData
+      - MCDefWrapper
+      - MCMI2
+      - MICombineWrapper
+      - PrepareData
+      - PrepareMissingData
+      - print.wsMed
+      - RunMCMIAnalysis
+      - TestPositiveDefinitewrapper
+      - ThetaHatStarWrapper
+      - ThetaHatWrapper
+      - TotalAdjwrapper
+      - GenerateModelCN
+      - GenerateModelCP
+      - GenerateModelP
+      - GenerateModelPC
+      - print.GM
+
+

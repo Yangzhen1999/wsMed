@@ -69,5 +69,5 @@ head(prepared_data)
 
 }
 \seealso{
-\code{\link[=GenerateModelP]{GenerateModelP()}}, \code{\link[=GenerateModelCN]{GenerateModelCN()}}, \code{\link[=GenerateModelPC]{GenerateModelPC()}}, \code{\link[=WsMed]{WsMed()}}
+\code{\link[=GenerateModelP]{GenerateModelP()}}, \code{\link[=GenerateModelCN]{GenerateModelCN()}}, \code{\link[=GenerateModelPC]{GenerateModelPC()}}, \code{\link[=wsMed]{wsMed()}}
 }

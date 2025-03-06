@@ -5,7 +5,7 @@
 #' It also supports handling missing data using Full Information Maximum Likelihood (FIML) or
 #' Multiple Imputation (MI), and generates Monte Carlo confidence intervals for the estimated mediation effects.
 #'
-#' @details The `WsMed` function is designed for analyzing within-subject mediation models, where the
+#' @details The `wsMed` function is designed for analyzing within-subject mediation models, where the
 #' mediator and outcome variables are measured before and after an intervention or under multiple
 #' conditions. Key features include:
 #'
@@ -84,7 +84,7 @@
 #' data(example_data)
 #' # example 1
 #' # parallel mediation model with unstandardized effects
-#' result1 <- WsMed(
+#' result1 <- wsMed(
 #'   data = example_data,
 #'   M_before = c("A2", "B2"),
 #'   M_after = c("A1", "B1"),
@@ -98,7 +98,7 @@
 #' @importFrom semhelpinghands standardizedSolution_boot_ci
 #' @export
 
-WsMed <- function(data,
+wsMed <- function(data,
                   M_before,
                   M_after,
                   Y_before,
@@ -367,6 +367,6 @@ WsMed <- function(data,
   )
 
   # Step 6: 返回结果
-  class(out) <- "WsMed"
+  class(out) <- "wsMed"
   return(out)
 }

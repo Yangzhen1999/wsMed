@@ -88,5 +88,5 @@ imputation_summary <- prepared_missing_data$imputation_summary
 
 }
 \seealso{
-\code{\link[=PrepareData]{PrepareData()}}, \code{\link[=ImputeData]{ImputeData()}}, \code{\link[=WsMed]{WsMed()}}
+\code{\link[=PrepareData]{PrepareData()}}, \code{\link[=ImputeData]{ImputeData()}}, \code{\link[=wsMed]{wsMed()}}
 }
