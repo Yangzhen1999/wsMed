@@ -13,10 +13,10 @@
 #' head(example_data)
 #' prepared_data <- PrepareData(
 #'   data = example_data,
-#'   M_before = c("A1", "B1",),
-#'   M_after = c("A2", "B2"),
-#'   Y_before = "C1",
-#'   Y_after = "C2"
+#'   M_C1 = c("A1", "B1",),
+#'   M_C2 = c("A2", "B2"),
+#'   Y_C1 = "C1",
+#'   Y_C2 = "C2"
 #' )
 #' sem_model <- GenerateModelPC(prepared_data)
 #' print.GM(sem_model)
@@ -48,7 +48,7 @@ print.GM <- function(x, ...) {
     "Total Indirect Effect" = "^total_indirect",
     "Total Effect" = "^total_effect",
     "Contrast of Indirect Effects" = "^CI\\d+vs",
-    "Pre-Post Coefficients" = "^X[01]_b"
+    "C1-C2 Coefficients" = "^X[01]_b"
   )
 
   # **遍历不同部分，按类别格式化输出**

@@ -16,10 +16,10 @@ test_that("print.wsMed prints correct output for complete data", {
   data(example_data)
   result <- wsMed(
     data = example_data,
-    M_before = c("A1", "B1"),
-    M_after = c("A2", "B2"),
-    Y_before = "C1",
-    Y_after = "C2",
+    M_C1 = c("A1", "B1"),
+    M_C2 = c("A2", "B2"),
+    Y_C1 = "C1",
+    Y_C2 = "C2",
     form = "P",
     standardized = TRUE,
     Na = "DE",
@@ -46,10 +46,10 @@ test_that("print.wsMed handles missing data correctly with MI", {
   # 使用有缺失值的数据运行 wsMed
   result_with_na <- wsMed(
     data = example_dataN,
-    M_before = c("A2", "B2"),
-    M_after = c("A1", "B1"),
-    Y_before = "C2",
-    Y_after = "C1",
+    M_C1 = c("A2", "B2"),
+    M_C2 = c("A1", "B1"),
+    Y_C1 = "C2",
+    Y_C2 = "C1",
     form = "P",
     Na = "MI",
     standardized = TRUE,
@@ -92,10 +92,10 @@ test_that("print.wsMed correctly handles FIML missing data method", {
   # 执行 mediation 分析
   result <- wsMed(
     data = example_dataN,
-    M_before = c("A1", "B1","C1"),
-    M_after = c("A2", "B2","C2"),
-    Y_before = "D1",
-    Y_after = "D2",
+    M_C1 = c("A1", "B1","C1"),
+    M_C2 = c("A2", "B2","C2"),
+    Y_C1 = "D1",
+    Y_C2 = "D2",
     form = "CP",
     standardized = TRUE,
     Na = "FIML",

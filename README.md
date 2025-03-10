@@ -43,10 +43,10 @@ data(example_data)
 # Perform within-subject mediation analysis (Parallel mediation model)
 result <- WsMed(
   data = example_data,
-  M_before = c("A1", "B1"), # A1/B1 is A/B mediator variable in condition 1 
-  M_after = c("A2", "B2"),  # A2/B2 is A/B mediator variable in condition 2 
-  Y_before = "C1", # C1 is outcome variable in condition 1
-  Y_after = "C2",  # C2 is outcome variable in condition 2
+  M_C1 = c("A1", "B1"), # A1/B1 is A/B mediator variable in condition 1 
+  M_C2 = c("A2", "B2"),  # A2/B2 is A/B mediator variable in condition 2 
+  Y_C1 = "C1", # C1 is outcome variable in condition 1
+  Y_C2 = "C2",  # C2 is outcome variable in condition 2
   form = "P",            # Parallel mediation
   standardized = TRUE,   # Compute standardized effects
   Na = "DE",             # Deletion method for missing data
@@ -64,10 +64,10 @@ print(result)
 
 ### **1. Four Types of Mediation Models**
 
-`wsMed` supports a variety of mediation models, each suitable for different experimental designs: - **Parallel Mediation** (`"P"`) – Multiple independent mediators acting simultaneously.
-- **Chained/Serial Mediation** (`"CN"`) – Sequential mediators in a chain.
-- **Chained + Parallel Mediation** (`"CP"`) – A combination of chained and parallel mediators.
-- **Parallel + Chained Mediation** (`"PC"`) – Parallel mediators influencing a chained mediator.
+`wsMed` supports a variety of mediation models, each suitable for different experimental designs: - **Parallel Mediation** (`"P"`) -- Multiple independent mediators acting simultaneously.
+- **Chained/Serial Mediation** (`"CN"`) -- Sequential mediators in a chain.
+- **Chained + Parallel Mediation** (`"CP"`) -- A combination of chained and parallel mediators.
+- **Parallel + Chained Mediation** (`"PC"`) -- Parallel mediators influencing a chained mediator.
 
 Each model can handle **any number of mediators**, providing flexibility for complex studies.
 
@@ -80,14 +80,14 @@ In addition to the basic model fit statistics, it includes:
 -   **Indirect Effects**: Estimates, standardized errors,p-values,z-values and CIs for each mediated path in the model.
 -   **Contrast Indirect Effects**: Pairwise comparisons of indirect effects between different mediation paths.
 -   **Moderation Effects of X**: Analysis of whether a moderator influences the mediation paths.
--   **Group1-Group2 Coefficients**: Comparison of coefficients between two groups or conditions.
+-   **Condition1-Condition2 Coefficients**: Comparison of coefficients between two conditions.
 -   **Standardized Results**: Standardized estimates and confidence intervals, allowing for easier interpretation and comparison across variables.
 
 ### **3. Missing Data Handling**
 
-`wsMed` offers **flexible strategies for handling missing data**: - **Listwise Deletion** (`"DE"`) – Removes rows with missing values.
-- **Full Information Maximum Likelihood** (`"FIML"`) – Uses SEM to handle missing data in the analysis.
-- **Multiple Imputation** (`"MI"`) – Imputes missing data using the `mice` package, providing more robust results.
+`wsMed` offers **flexible strategies for handling missing data**: - **Listwise Deletion** (`"DE"`) -- Removes rows with missing values.
+- **Full Information Maximum Likelihood** (`"FIML"`) -- Uses SEM to handle missing data in the analysis.
+- **Multiple Imputation** (`"MI"`) -- Imputes missing data using the `mice` package, providing more robust results.
 
 ### **4. Standardized and Unstandardized Estimates**
 

@@ -4,16 +4,16 @@ test_that("PrepareData correctly computes difference and average scores", {
   data <- data.frame(
     M1_before = rnorm(100), M1_after = rnorm(100),
     M2_before = rnorm(100), M2_after = rnorm(100),
-    Y_before = rnorm(100), Y_after = rnorm(100)
+    Y_C1 = rnorm(100), Y_C2 = rnorm(100)
   )
 
   # 运行 PrepareData 函数
   prepared_data <- PrepareData(
     data = data,
-    M_before = c("M1_before", "M2_before"),
-    M_after = c("M1_after", "M2_after"),
-    Y_before = "Y_before",
-    Y_after = "Y_after"
+    M_C1 = c("M1_before", "M2_before"),
+    M_C2 = c("M1_after", "M2_after"),
+    Y_C1 = "Y_C1",
+    Y_C2 = "Y_C2"
   )
 
   # 确保返回的数据是数据框
@@ -24,7 +24,7 @@ test_that("PrepareData correctly computes difference and average scores", {
   expect_true(all(expected_cols %in% colnames(prepared_data)))
 
   # 验证 Ydiff 计算是否正确
-  expect_equal(prepared_data$Ydiff, data$Y_after - data$Y_before, tolerance = 1e-6)
+  expect_equal(prepared_data$Ydiff, data$Y_C2 - data$Y_C1, tolerance = 1e-6)
 
   # 验证 Mdiff 计算是否正确
   expect_equal(prepared_data$M1diff, data$M1_after - data$M1_before, tolerance = 1e-6)
@@ -37,26 +37,26 @@ test_that("PrepareData correctly computes difference and average scores", {
                                      data$M2_after - mean(data$M2_after)) / 2, tolerance = 1e-6)
 })
 
-# 测试 M_before 和 M_after 长度不匹配时应报错
-test_that("PrepareData throws an error when M_before and M_after lengths do not match", {
+# 测试 M_C1 和 M_C2 长度不匹配时应报错
+test_that("PrepareData throws an error when M_C1 and M_C2 lengths do not match", {
   data <- data.frame(
     M1_before = rnorm(100), M1_after = rnorm(100),
-    Y_before = rnorm(100), Y_after = rnorm(100)
+    Y_C1 = rnorm(100), Y_C2 = rnorm(100)
   )
 
   expect_error(
     PrepareData(
       data = data,
-      M_before = c("M1_before"),
-      M_after = c("M1_after", "M2_after"),  # 长度不匹配
-      Y_before = "Y_before",
-      Y_after = "Y_after"
+      M_C1 = c("M1_before"),
+      M_C2 = c("M1_after", "M2_after"),  # 长度不匹配
+      Y_C1 = "Y_C1",
+      Y_C2 = "Y_C2"
     ),
-    "The number of M_before and M_after variables must match."
+    "The number of M_C1 and M_C2 variables must match."
   )
 })
 
-# 测试数据缺少 Y_before / Y_after 时应报错
+# 测试数据缺少 Y_C1 / Y_C2 时应报错
 test_that("PrepareData throws an error when Y variables are missing", {
   data <- data.frame(
     M1_before = rnorm(100), M1_after = rnorm(100)
@@ -65,28 +65,28 @@ test_that("PrepareData throws an error when Y variables are missing", {
   expect_error(
     PrepareData(
       data = data,
-      M_before = c("M1_before"),
-      M_after = c("M1_after"),
-      Y_before = "Y_before",  # 这个变量不存在
-      Y_after = "Y_after"
+      M_C1 = c("M1_before"),
+      M_C2 = c("M1_after"),
+      Y_C1 = "Y_C1",  # 这个变量不存在
+      Y_C2 = "Y_C2"
     ),
     "Y variables not found in the dataset."
   )
 })
 
-# 测试数据缺少 M_before / M_after 时应报错
+# 测试数据缺少 M_C1 / M_C2 时应报错
 test_that("PrepareData throws an error when M variables are missing", {
   data <- data.frame(
-    Y_before = rnorm(100), Y_after = rnorm(100)
+    Y_C1 = rnorm(100), Y_C2 = rnorm(100)
   )
 
   expect_error(
     PrepareData(
       data = data,
-      M_before = c("M1_before"),
-      M_after = c("M1_after"),
-      Y_before = "Y_before",
-      Y_after = "Y_after"
+      M_C1 = c("M1_before"),
+      M_C2 = c("M1_after"),
+      Y_C1 = "Y_C1",
+      Y_C2 = "Y_C2"
     ),
     "M variables for M1_before and M1_after not found in the dataset."
   )
@@ -98,7 +98,7 @@ test_that("PrepareData correctly handles missing values", {
   data <- data.frame(
     M1_before = rnorm(100), M1_after = rnorm(100),
     M2_before = rnorm(100), M2_after = rnorm(100),
-    Y_before = rnorm(100), Y_after = rnorm(100)
+    Y_C1 = rnorm(100), Y_C2 = rnorm(100)
   )
 
   # 人为引入缺失值
@@ -108,10 +108,10 @@ test_that("PrepareData correctly handles missing values", {
   # 运行 PrepareData
   prepared_data <- PrepareData(
     data = data,
-    M_before = c("M1_before", "M2_before"),
-    M_after = c("M1_after", "M2_after"),
-    Y_before = "Y_before",
-    Y_after = "Y_after"
+    M_C1 = c("M1_before", "M2_before"),
+    M_C2 = c("M1_after", "M2_after"),
+    Y_C1 = "Y_C1",
+    Y_C2 = "Y_C2"
   )
 
   # 确保包含正确的列名

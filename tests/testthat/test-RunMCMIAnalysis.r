@@ -20,10 +20,10 @@ test_that("RunMCMIAnalysis correctly handles multiple imputation and Monte Carlo
     m = 3,  # 设定较小的插补次数以加快测试
     method = "pmm",
     seed = 123,
-    M_before = c("A2", "B2"),
-    M_after = c("A1", "B1"),
-    Y_before = "C2",
-    Y_after = "C1",
+    M_C1 = c("A2", "B2"),
+    M_C2 = c("A1", "B1"),
+    Y_C1 = "C2",
+    Y_C2 = "C1",
     sem_model = sem_model,
     R = 1000,  # Monte Carlo 采样次数
     alpha = c(0.05, 0.01)

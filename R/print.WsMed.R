@@ -8,13 +8,13 @@
 #' - Diagnostic notes for bootstrapping, imputation, and analysis parameters.
 #'
 #' The output is formatted for clarity, ensuring an intuitive presentation of mediation analysis results,
-#' including dynamic confidence intervals, moderation keys, and pre-post coefficients.
+#' including dynamic confidence intervals, moderation keys, and C1-C2 coefficients.
 #'
 #' @details This function is specifically designed to display results from the within-subject mediation
 #' analysis conducted using the \code{wsMed} function. Key features include:
 #'
 #' - **Variables**:
-#'   - Shows input variables (`M_before`, `M_after`, `Y_before`, `Y_after`) and computed variables like `Ydiff`, `Mdiff`, and `Mavg`.
+#'   - Shows input variables (`M_C1`, `M_C2`, `Y_C1`, `Y_C2`) and computed variables like `Ydiff`, `Mdiff`, and `Mavg`.
 #'   - Reports the sample size used in the analysis.
 #'
 #' - **Model Fit Indices**:
@@ -57,10 +57,10 @@
 #' # Perform within-subject mediation analysis
 #' result1 <- wsMed(
 #'   data = example_dataN,
-#'   M_before = c("A1", "B1"),
-#'   M_after = c("A2", "B2"),
-#'   Y_before = "C1",
-#'   Y_after = "C2",
+#'   M_C1 = c("A1", "B1"),
+#'   M_C2 = c("A2", "B2"),
+#'   Y_C1 = "C1",
+#'   Y_C2 = "C2",
 #'   form = "P",
 #'   Na = "MI",
 #'   standardized = TRUE,
@@ -164,13 +164,13 @@ print.wsMed <- function(x, level = 0.95,digits=3, ...) {
   if (!is.null(x$input_vars)) {
     input_vars <- x$input_vars
     original_vars <- list(
-      Y = c(Y_after = input_vars$Y_after, Y_before = input_vars$Y_before),
-      M = lapply(seq_along(input_vars$M_before), function(i) {
-        c(M_after = input_vars$M_after[i], M_before = input_vars$M_before[i])
+      Y = c(Y_C2 = input_vars$Y_C2, Y_C1 = input_vars$Y_C1),
+      M = lapply(seq_along(input_vars$M_C1), function(i) {
+        c(M_C2 = input_vars$M_C2[i], M_C1 = input_vars$M_C1[i])
       })
     )
     computed_vars <- data.frame(
-      Variable = c("Ydiff", paste0("M", seq_along(input_vars$M_before), "diff"), paste0("M", seq_along(input_vars$M_before), "avg")),
+      Variable = c("Ydiff", paste0("M", seq_along(input_vars$M_C1), "diff"), paste0("M", seq_along(input_vars$M_C1), "avg")),
       Formula = c(
         paste(original_vars$Y, collapse = " - "),
         sapply(seq_along(original_vars$M), function(i) paste(original_vars$M[[i]], collapse = " - ")),
@@ -460,7 +460,7 @@ print.wsMed <- function(x, level = 0.95,digits=3, ...) {
   pre_post_coeff <- param_estimates[grep("^X[01]_b", param_estimates$lhs), ]
   if (nrow(pre_post_coeff) > 0) {
     cat("\n")
-    cat("\n*************** PRE-POST COEFFICIENTS ***************\n")
+    cat("\n*************** C1-C2 COEFFICIENTS ***************\n")
     prepost_table <- data.frame(
       Name = pre_post_coeff$lhs,
       Effect = pre_post_coeff$est,
@@ -496,7 +496,7 @@ print.wsMed <- function(x, level = 0.95,digits=3, ...) {
       }
     }
 
-    #cat("\n*************** PRE-POST COEFFICIENTS KEY ***************\n")
+    #cat("\n*************** C1-C2 COEFFICIENTS KEY ***************\n")
     print(kable(pre_post_key, align = c("c", "c"), row.names = FALSE))
   }
 

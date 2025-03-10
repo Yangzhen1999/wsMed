@@ -9,10 +9,10 @@ RunMCMIAnalysis(
   m = 5,
   method = "pmm",
   seed = 123,
-  M_before,
-  M_after,
-  Y_before,
-  Y_after,
+  M_C1,
+  M_C2,
+  Y_C1,
+  Y_C2,
   sem_model,
   Na = "MI",
   R = 20000L,
@@ -32,14 +32,14 @@ RunMCMIAnalysis(
 
 \item{seed}{An integer specifying the random seed for reproducibility. Default is \code{123}.}
 
-\item{M_before}{A character vector of column names representing mediators "before" the intervention.}
+\item{M_C1}{A character vector of column names representing mediators "before" the intervention.}
 
-\item{M_after}{A character vector of column names representing mediators "after" the intervention.
-Must match the length of \code{M_before}.}
+\item{M_C2}{A character vector of column names representing mediators "after" the intervention.
+Must match the length of \code{M_C1}.}
 
-\item{Y_before}{A character string representing the column name of the outcome variable "before" the intervention.}
+\item{Y_C1}{A character string representing the column name of the outcome variable "before" the intervention.}
 
-\item{Y_after}{A character string representing the column name of the outcome variable "after" the intervention.}
+\item{Y_C2}{A character string representing the column name of the outcome variable "after" the intervention.}
 
 \item{sem_model}{A character string specifying the SEM model syntax.}
 
@@ -106,10 +106,10 @@ result <- RunMCMIAnalysis(
   m = 5,
   method = "pmm",
   seed = 123,
-  M_before = c("A2", "B2"),
-  M_after = c("A1", "B1"),
-  Y_before = "C2",
-  Y_after = "C1",
+  M_C1 = c("A2", "B2"),
+  M_C2 = c("A1", "B1"),
+  Y_C1 = "C2",
+  Y_C2 = "C1",
   sem_model = sem_model,
   R = 1000,
   alpha = c(0.05, 0.01)

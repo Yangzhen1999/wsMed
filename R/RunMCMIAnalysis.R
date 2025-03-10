@@ -21,11 +21,11 @@
 #' @param method A character string specifying the imputation method. Default is `"pmm"`
 #' (predictive mean matching). Other methods supported by [mice()] can be used.
 #' @param seed An integer specifying the random seed for reproducibility. Default is `123`.
-#' @param M_before A character vector of column names representing mediators "before" the intervention.
-#' @param M_after A character vector of column names representing mediators "after" the intervention.
-#' Must match the length of `M_before`.
-#' @param Y_before A character string representing the column name of the outcome variable "before" the intervention.
-#' @param Y_after A character string representing the column name of the outcome variable "after" the intervention.
+#' @param M_C1 A character vector of column names representing mediators "before" the intervention.
+#' @param M_C2 A character vector of column names representing mediators "after" the intervention.
+#' Must match the length of `M_C1`.
+#' @param Y_C1 A character string representing the column name of the outcome variable "before" the intervention.
+#' @param Y_C2 A character string representing the column name of the outcome variable "after" the intervention.
 #' @param sem_model A character string specifying the SEM model syntax.
 #' @param Na A character string specifying the missing data handling strategy. Currently, only `"MI"` (Multiple Imputation) is supported. Default is `"MI"`.
 #' @param R An integer specifying the number of Monte Carlo samples. Default is `20000L`.
@@ -66,10 +66,10 @@
 #'   m = 5,
 #'   method = "pmm",
 #'   seed = 123,
-#'   M_before = c("A2", "B2"),
-#'   M_after = c("A1", "B1"),
-#'   Y_before = "C2",
-#'   Y_after = "C1",
+#'   M_C1 = c("A2", "B2"),
+#'   M_C2 = c("A1", "B1"),
+#'   Y_C1 = "C2",
+#'   Y_C2 = "C1",
 #'   sem_model = sem_model,
 #'   R = 1000,
 #'   alpha = c(0.05, 0.01)
@@ -81,10 +81,10 @@ RunMCMIAnalysis <- function(data_missing,
                             m = 5,
                             method = "pmm",
                             seed = 123,
-                            M_before,
-                            M_after,
-                            Y_before,
-                            Y_after,
+                            M_C1,
+                            M_C2,
+                            Y_C1,
+                            Y_C2,
                             sem_model,
                             Na = "MI",
                             R = 20000L,
@@ -103,10 +103,10 @@ RunMCMIAnalysis <- function(data_missing,
       m = m,
       method = method,
       seed = seed,
-      M_before = M_before,
-      M_after = M_after,
-      Y_before = Y_before,
-      Y_after = Y_after
+      M_C1 = M_C1,
+      M_C2 = M_C2,
+      Y_C1 = Y_C1,
+      Y_C2 = Y_C2
     )
 
     # 获取处理后的插补数据集列表

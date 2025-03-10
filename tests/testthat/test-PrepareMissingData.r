@@ -2,23 +2,23 @@ library(testthat)
 library(mice) # 确保 mice 包可用
 library(wsMed) # 加载你的 R 包（如果包名更改，修改此处）
 
-test_that("PrepareMissingData detects mismatched M_before and M_after lengths", {
+test_that("PrepareMissingData detects mismatched M_C1 and M_C2 lengths", {
   data_test <- data.frame(
     M1_before = rnorm(100),
     M1_after = rnorm(100),
-    Y_before = rnorm(100),
-    Y_after = rnorm(100)
+    Y_C1 = rnorm(100),
+    Y_C2 = rnorm(100)
   )
 
   expect_error(
     PrepareMissingData(
       data_missing = data_test,
-      M_before = c("M1_before"),
-      M_after = c("M1_after", "M2_after"),  # ❌ 长度不匹配
-      Y_before = "Y_before",
-      Y_after = "Y_after"
+      M_C1 = c("M1_before"),
+      M_C2 = c("M1_after", "M2_after"),  # ❌ 长度不匹配
+      Y_C1 = "Y_C1",
+      Y_C2 = "Y_C2"
     ),
-    "M_before and M_after must have the same length."
+    "M_C1 and M_C2 must have the same length."
   )
 })
 
@@ -26,17 +26,17 @@ test_that("PrepareMissingData detects missing Y variables", {
   data_test <- data.frame(
     M1_before = rnorm(100),
     M1_after = rnorm(100)
-  ) # ❌ Y_before 和 Y_after 缺失
+  ) # ❌ Y_C1 和 Y_C2 缺失
 
   expect_error(
     PrepareMissingData(
       data_missing = data_test,
-      M_before = c("M1_before"),
-      M_after = c("M1_after"),
-      Y_before = "Y_before",  # ❌ 这个变量不存在
-      Y_after = "Y_after"
+      M_C1 = c("M1_before"),
+      M_C2 = c("M1_after"),
+      Y_C1 = "Y_C1",  # ❌ 这个变量不存在
+      Y_C2 = "Y_C2"
     ),
-    "Y_before or Y_after is missing in the dataset."
+    "Y_C1 or Y_C2 is missing in the dataset."
   )
 })
 
@@ -46,8 +46,8 @@ test_that("PrepareMissingData correctly imputes and processes data", {
   data_test <- data.frame(
     M1_before = c(rnorm(95), rep(NA, 5)), # 5% 缺失值
     M1_after = c(rnorm(95), rep(NA, 5)),
-    Y_before = rnorm(100),
-    Y_after = rnorm(100)
+    Y_C1 = rnorm(100),
+    Y_C2 = rnorm(100)
   )
 
   # 运行函数
@@ -56,10 +56,10 @@ test_that("PrepareMissingData correctly imputes and processes data", {
     m = 5,
     method = "pmm",
     seed = 123,
-    M_before = c("M1_before"),
-    M_after = c("M1_after"),
-    Y_before = "Y_before",
-    Y_after = "Y_after"
+    M_C1 = c("M1_before"),
+    M_C2 = c("M1_after"),
+    Y_C1 = "Y_C1",
+    Y_C2 = "Y_C2"
   )
 
   # 验证返回结果

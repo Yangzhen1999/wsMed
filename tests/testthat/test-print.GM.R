@@ -7,10 +7,10 @@ test_that("print.GM correctly formats SEM output for all GenerateModel functions
   # 预处理数据
   prepared_data <- PrepareData(
     data = example_data,
-    M_before = c("A1", "B1"),
-    M_after = c("A2", "B2"),
-    Y_before = "C1",
-    Y_after = "C2"
+    M_C1 = c("A1", "B1"),
+    M_C2 = c("A2", "B2"),
+    Y_C1 = "C1",
+    Y_C2 = "C2"
   )
 
   # 需要测试的四个模型
@@ -44,10 +44,10 @@ test_that("print.GM works with wsMed() results", {
 
   result1 <- wsMed(
     data = example_data,
-    M_before = c("A1", "B1", "C1"),
-    M_after = c("A2", "B2", "C2"),
-    Y_before = "D1",
-    Y_after = "D2",
+    M_C1 = c("A1", "B1", "C1"),
+    M_C2 = c("A2", "B2", "C2"),
+    Y_C1 = "D1",
+    Y_C2 = "D2",
     form = "P",
     Na = "DE",
     standardized = TRUE,

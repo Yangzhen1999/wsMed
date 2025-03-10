@@ -47,10 +47,10 @@
 #' - `"MI"`: Perform multiple imputations (requires the `mice` package).
 #'
 #' @param data A data frame containing the input data.
-#' @param M_before A character vector of column names representing the mediator variables measured "before."
-#' @param M_after A character vector of column names representing the mediator variables measured "after."
-#' @param Y_before A character string representing the outcome variable measured "before."
-#' @param Y_after A character string representing the outcome variable measured "after."
+#' @param M_C1 A character vector of column names representing the mediator variables measured "before."
+#' @param M_C2 A character vector of column names representing the mediator variables measured "after."
+#' @param Y_C1 A character string representing the outcome variable measured "before."
+#' @param Y_C2 A character string representing the outcome variable measured "after."
 #' @param form A string specifying the type of mediation model (`"P"`, `"CN"`, `"CP"`, or `"PC"`). Defaults to `"P"`.
 #' @param standardized Logical. If `TRUE`, standardized effects and confidence intervals are computed. Defaults to `FALSE`.
 #' @param Na A string specifying the missing data handling method (`"DE"`, `"FIML"`, or `"MI"`). Defaults to `"DE"`.
@@ -86,10 +86,10 @@
 #' # parallel mediation model with unstandardized effects
 #' result1 <- wsMed(
 #'   data = example_data,
-#'   M_before = c("A2", "B2"),
-#'   M_after = c("A1", "B1"),
-#'   Y_before = "C2",
-#'   Y_after = "C1",
+#'   M_C1 = c("A2", "B2"),
+#'   M_C2 = c("A1", "B1"),
+#'   Y_C1 = "C2",
+#'   Y_C2 = "C1",
 #'   form = "P",
 #'   standardized = FALSE,
 #' )
@@ -99,10 +99,10 @@
 #' @export
 
 wsMed <- function(data,
-                  M_before,
-                  M_after,
-                  Y_before,
-                  Y_after,
+                  M_C1,
+                  M_C2,
+                  Y_C1,
+                  Y_C2,
                   form = "P",
                   standardized = FALSE,
                   Na = "DE",
@@ -130,21 +130,21 @@ wsMed <- function(data,
       stop("Error: 'data' must be a data frame.")
     }
 
-    # 检查 M_before 和 M_after
-    if (is.null(M_before) || is.null(M_after)) {
-      stop("Error: 'M_before' and 'M_after' cannot be NULL. Please provide valid column names.")
+    # 检查 M_C1 和 M_C2
+    if (is.null(M_C1) || is.null(M_C2)) {
+      stop("Error: 'M_C1' and 'M_C2' cannot be NULL. Please provide valid column names.")
     }
-    if (length(M_before) != length(M_after)) {
-      stop("Error: The lengths of 'M_before' and 'M_after' must match.")
+    if (length(M_C1) != length(M_C2)) {
+      stop("Error: The lengths of 'M_C1' and 'M_C2' must match.")
     }
 
-    # 检查 Y_before 和 Y_after
-    if (is.null(Y_before) || is.null(Y_after)) {
-      stop("Error: 'Y_before' and 'Y_after' cannot be NULL. Please provide valid column names.")
+    # 检查 Y_C1 和 Y_C2
+    if (is.null(Y_C1) || is.null(Y_C2)) {
+      stop("Error: 'Y_C1' and 'Y_C2' cannot be NULL. Please provide valid column names.")
     }
 
     # 检查必需列
-    required_columns <- c(M_before, M_after, Y_before, Y_after)
+    required_columns <- c(M_C1, M_C2, Y_C1, Y_C2)
     missing_columns <- required_columns[!required_columns %in% colnames(data)]
     if (length(missing_columns) > 0) {
       stop(paste("Error: Missing columns in data:", paste(missing_columns, collapse = ", ")))
@@ -188,7 +188,7 @@ wsMed <- function(data,
     }
 
     # 验证调节变量数量
-    num_mediators <- length(M_before)
+    num_mediators <- length(M_C1)
     if (form == "CN" && num_mediators < 2) {
       stop("Error: For 'CN' models, the number of mediators must be at least 2.")
     }
@@ -200,10 +200,10 @@ wsMed <- function(data,
 
   # Step 1: 数据预处理
   prepared_data <- PrepareData(data = data,
-                               M_before = M_before,
-                               M_after = M_after,
-                               Y_before = Y_before,
-                               Y_after = Y_after)
+                               M_C1 = M_C1,
+                               M_C2 = M_C2,
+                               Y_C1 = Y_C1,
+                               Y_C2 = Y_C2)
 
   # Step 2: 构建模型
   # P is parallel mediation, CN is chained mediation, CP/PC is parallel + chain mediation
@@ -261,10 +261,10 @@ wsMed <- function(data,
       m = m,
       method = method,
       seed = seed,
-      M_before = M_before,
-      M_after = M_after,
-      Y_before = Y_before,
-      Y_after = Y_after,
+      M_C1 = M_C1,
+      M_C2 = M_C2,
+      Y_C1 = Y_C1,
+      Y_C2 = Y_C2,
       sem_model = sem_model,
       Na = Na,
       R = R,
@@ -330,10 +330,10 @@ wsMed <- function(data,
 
 
   input_vars <- list(
-    M_before = M_before,
-    M_after = M_after,
-    Y_before = Y_before,
-    Y_after = Y_after
+    M_C1 = M_C1,
+    M_C2 = M_C2,
+    Y_C1 = Y_C1,
+    Y_C2 = Y_C2
   )
 
   paras <- list(

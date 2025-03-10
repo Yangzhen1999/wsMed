@@ -4,19 +4,19 @@
 \alias{PrepareData}
 \title{Prepare Data for Within-Subject Mediation Analysis}
 \usage{
-PrepareData(data, M_before, M_after, Y_before, Y_after)
+PrepareData(data, M_C1, M_C2, Y_C1, Y_C2)
 }
 \arguments{
 \item{data}{A data frame containing the raw dataset with mediator and outcome variables.}
 
-\item{M_before}{A character vector of column names representing mediators "before" the intervention.}
+\item{M_C1}{A character vector of column names representing mediators "before" the intervention.}
 
-\item{M_after}{A character vector of column names representing mediators "after" the intervention.
-Must match the length of \code{M_before}.}
+\item{M_C2}{A character vector of column names representing mediators "after" the intervention.
+Must match the length of \code{M_C1}.}
 
-\item{Y_before}{A character string representing the column name of the outcome variable "before" the intervention.}
+\item{Y_C1}{A character string representing the column name of the outcome variable "before" the intervention.}
 
-\item{Y_after}{A character string representing the column name of the outcome variable "after" the intervention.}
+\item{Y_C2}{A character string representing the column name of the outcome variable "after" the intervention.}
 }
 \value{
 A data frame containing the following columns:
@@ -53,16 +53,16 @@ syntax and conducting mediation analysis.
 data <- data.frame(
   M1_before = rnorm(100), M1_after = rnorm(100),
   M2_before = rnorm(100), M2_after = rnorm(100),
-  Y_before = rnorm(100), Y_after = rnorm(100)
+  Y_C1 = rnorm(100), Y_C2 = rnorm(100)
 )
 
 # Prepare the dataset
 prepared_data <- PrepareData(
   data = data,
-  M_before = c("M1_before", "M2_before"),
-  M_after = c("M1_after", "M2_after"),
-  Y_before = "Y_before",
-  Y_after = "Y_after"
+  M_C1 = c("M1_before", "M2_before"),
+  M_C2 = c("M1_after", "M2_after"),
+  Y_C1 = "Y_C1",
+  Y_C2 = "Y_C2"
 )
 
 head(prepared_data)
