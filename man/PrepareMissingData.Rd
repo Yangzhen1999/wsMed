@@ -9,10 +9,10 @@ PrepareMissingData(
   m = 5,
   method = "pmm",
   seed = 123,
-  M_before,
-  M_after,
-  Y_before,
-  Y_after
+  M_C1,
+  M_C2,
+  Y_C1,
+  Y_C2
 )
 }
 \arguments{
@@ -25,14 +25,14 @@ PrepareMissingData(
 
 \item{seed}{An integer specifying the random seed for reproducibility. Default is \code{123}.}
 
-\item{M_before}{A character vector of column names representing mediators "before" the intervention.}
+\item{M_C1}{A character vector of column names representing mediators "before" the intervention.}
 
-\item{M_after}{A character vector of column names representing mediators "after" the intervention.
-Must match the length of \code{M_before}.}
+\item{M_C2}{A character vector of column names representing mediators "after" the intervention.
+Must match the length of \code{M_C1}.}
 
-\item{Y_before}{A character string representing the column name of the outcome variable "before" the intervention.}
+\item{Y_C1}{A character string representing the column name of the outcome variable "before" the intervention.}
 
-\item{Y_after}{A character string representing the column name of the outcome variable "after" the intervention.}
+\item{Y_C2}{A character string representing the column name of the outcome variable "after" the intervention.}
 }
 \value{
 A list containing:
@@ -76,10 +76,10 @@ prepared_missing_data <- PrepareMissingData(
   data_missing = example_dataN,
   m = 5,
   method = "pmm",
-  M_before = c("A2", "B2"),
-  M_after = c("A1", "B1"),
-  Y_before = "C2",
-  Y_after = "C1",
+  M_C1 = c("A2", "B2"),
+  M_C2 = c("A1", "B1"),
+  Y_C1 = "C2",
+  Y_C2 = "C1",
 )
 
 # Access processed datasets
@@ -88,5 +88,5 @@ imputation_summary <- prepared_missing_data$imputation_summary
 
 }
 \seealso{
-\code{\link[=PrepareData]{PrepareData()}}, \code{\link[=ImputeData]{ImputeData()}}, \code{\link[=WsMed]{WsMed()}}
+\code{\link[=PrepareData]{PrepareData()}}, \code{\link[=ImputeData]{ImputeData()}}, \code{\link[=wsMed]{wsMed()}}
 }

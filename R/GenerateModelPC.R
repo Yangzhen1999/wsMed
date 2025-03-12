@@ -40,7 +40,7 @@
 #'
 #' @return A character string representing the SEM model syntax for the specified parallel and chained mediation analysis.
 #'
-#' @seealso [PrepareData()], [WsMed()], [GenerateModelP()], [GenerateModelCN()]
+#' @seealso [PrepareData()], [wsMed()], [GenerateModelP()], [GenerateModelCN()]
 #'
 #' @examples
 #' # Example prepared data
@@ -76,10 +76,10 @@ GenerateModelPC <- function(prepared_data) {
   # 1. 因变量 Ydiff 的回归方程
   regression_y <- paste(
     "Ydiff ~ cp*1",
-    paste0(" + b", seq(2, n + 1), "*", parallel_vars, collapse = " + "),
-    paste0(" + b1*", chain_var),
-    paste0(" + d", seq(2, n + 1), "*", parallel_avgs, collapse = " + "),
+    paste0(" + b1*", chain_var),  # 先放 b1*M1diff
+    if (length(parallel_vars) > 0) paste0(" + b", seq(2, n + 1), "*", parallel_vars, collapse = " + ") else "",
     paste0(" + d1*", chain_avg),
+    if (length(parallel_avgs) > 0) paste0(" + d", seq(2, n + 1), "*", parallel_avgs, collapse = " + ") else "",
     sep = ""
   )
 
@@ -95,12 +95,15 @@ GenerateModelPC <- function(prepared_data) {
   }
 
   # 链式中介的回归方程（接收所有平行中介的路径）
-  chain_predictors <- c(
-    paste0("b", seq(2, n + 1), "1*", parallel_vars),
-    paste0("d", seq(2, n + 1), "1*", parallel_avgs)
-  )
+  chain_predictors <- c()
+  if (length(parallel_vars) > 0) {
+    chain_predictors <- c(
+      paste0("b", seq(2, n + 1), "1*", parallel_vars),
+      paste0("d", seq(2, n + 1), "1*", parallel_avgs)
+    )
+  }
   regression_m <- c(
-    paste0(chain_var, " ~ a1*1 + ", paste(chain_predictors, collapse = " + ")),
+    paste0(chain_var, " ~ a1*1", if (length(chain_predictors) > 0) paste0(" + ", paste(chain_predictors, collapse = " + ")) else ""),
     regression_m
   )
 
@@ -128,12 +131,14 @@ GenerateModelPC <- function(prepared_data) {
     indirect_effect_labels <- c(indirect_effect_labels, label)
   }
 
-  # 总间接效应
-  total_indirect <- paste0(
-    "total_indirect := ",
-    paste(indirect_effect_labels, collapse = " + ")
-  )
+  # **确保 indirect1 总是在最前面**
+  first_label <- "indirect1"
+  other_labels <- setdiff(indirect_effect_labels, first_label)
 
+  # **重新组合 total_indirect 计算顺序**
+  total_indirect <- paste0(
+    "total_indirect := ", first_label, " + ", paste(other_labels, collapse = " + ")
+  )
   # 总效应
   total_effect <- "total_effect := cp + total_indirect"
 
@@ -141,24 +146,39 @@ GenerateModelPC <- function(prepared_data) {
   compare_indirect_effect <- ""
   if (length(indirect_effect_labels) > 1) {
     comparisons <- c()
-    for (i in seq_along(indirect_effect_labels)) {
-      for (j in seq_along(indirect_effect_labels)) {
+
+    # **确保 indirect1 先被比较**
+    first_label <- "indirect1"
+    other_labels <- setdiff(indirect_effect_labels, first_label)
+
+    # **优先计算 CI1vsX**
+    for (label in other_labels) {
+      short_label_i <- gsub("indirect", "", first_label)
+      short_label_j <- gsub("indirect", "", label)
+      comparisons <- c(
+        comparisons,
+        paste0("CI", short_label_i, "vs", short_label_j,
+               " := ", first_label, " - ", label)
+      )
+    }
+
+    # **比较所有其余的间接效应**
+    for (i in seq_along(other_labels)) {
+      for (j in seq_along(other_labels)) {
         if (i < j) {
-          # 使用命名规则 CI1vs2, CI1vs3 等
-          short_label_i <- gsub("indirect", "", indirect_effect_labels[i])
-          short_label_j <- gsub("indirect", "", indirect_effect_labels[j])
+          short_label_i <- gsub("indirect", "", other_labels[i])
+          short_label_j <- gsub("indirect", "", other_labels[j])
           comparisons <- c(
             comparisons,
-            paste0(
-              "CI", short_label_i, "vs", short_label_j,
-              " := ", indirect_effect_labels[i], " - ", indirect_effect_labels[j]
-            )
+            paste0("CI", short_label_i, "vs", short_label_j,
+                   " := ", other_labels[i], " - ", other_labels[j])
           )
         }
       }
     }
+
     compare_indirect_effect <- paste(comparisons, collapse = "\n")
-  }
+   }
 
   # 5. 前后测系数
   pre_post_coefficients <- paste(

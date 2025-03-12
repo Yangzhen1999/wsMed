@@ -16,7 +16,7 @@
 #' - `thetahatstar`: A matrix of simulated parameter estimates with dimensions `R x length(location)`.
 #' - `decomposition`: The decomposition method used.
 #'
-#' @seealso [MCMI()], [RunMCMIAnalysis()]
+#' @seealso [MCMI2()], [RunMCMIAnalysis()]
 #'
 #' @examples NULL
 #'

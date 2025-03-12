@@ -37,7 +37,7 @@
 #' - `args`: A list of input arguments.
 #' - `thetahat`: The pooled parameter estimates.
 #' - `thetahatstar`: Monte Carlo samples for parameter estimates.
-#' - `fun`: The name of the function (`"MCMI"`).
+#' - `fun`: The name of the function (`"MCMI2"`).
 #'
 #' @seealso [lavaan::sem()], [semmcci::MC()], [semmcci::MCStd()]
 #'
@@ -57,7 +57,7 @@
 #' )
 #'
 #' # Compute Monte Carlo confidence intervals
-#' result <- MCMI(
+#' result <- MCMI2(
 #'   sem_model = sem_model,
 #'   imputations = imputations,
 #'   R = 1000,
@@ -67,7 +67,7 @@
 #' @import semmcci
 #' @export
 
-MCMI <- function(sem_model,
+MCMI2 <- function(sem_model,
                  imputations,
                  R = 20000L,
                  alpha = c(0.001, 0.01, 0.05),

@@ -14,7 +14,7 @@
 #'
 #' @return A numeric vector of updated parameter estimates.
 #'
-#' @seealso [MCMI()], [RunMCMIAnalysis()]
+#' @seealso [MCMI2()], [RunMCMIAnalysis()]
 #'
 #' @examples NULL
 #'

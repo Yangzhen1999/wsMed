@@ -36,7 +36,7 @@
 #'
 #' @return A character string representing the SEM model syntax for the specified parallel mediation analysis.
 #'
-#' @seealso [PrepareData()], [WsMed()], [GenerateModelCN()]
+#' @seealso [PrepareData()], [wsMed()], [GenerateModelCN()]
 #'
 #' @examples
 #' # Example prepared data

@@ -9,10 +9,10 @@ RunMCMIAnalysis(
   m = 5,
   method = "pmm",
   seed = 123,
-  M_before,
-  M_after,
-  Y_before,
-  Y_after,
+  M_C1,
+  M_C2,
+  Y_C1,
+  Y_C2,
   sem_model,
   Na = "MI",
   R = 20000L,
@@ -32,14 +32,14 @@ RunMCMIAnalysis(
 
 \item{seed}{An integer specifying the random seed for reproducibility. Default is \code{123}.}
 
-\item{M_before}{A character vector of column names representing mediators "before" the intervention.}
+\item{M_C1}{A character vector of column names representing mediators "before" the intervention.}
 
-\item{M_after}{A character vector of column names representing mediators "after" the intervention.
-Must match the length of \code{M_before}.}
+\item{M_C2}{A character vector of column names representing mediators "after" the intervention.
+Must match the length of \code{M_C1}.}
 
-\item{Y_before}{A character string representing the column name of the outcome variable "before" the intervention.}
+\item{Y_C1}{A character string representing the column name of the outcome variable "before" the intervention.}
 
-\item{Y_after}{A character string representing the column name of the outcome variable "after" the intervention.}
+\item{Y_C2}{A character string representing the column name of the outcome variable "after" the intervention.}
 
 \item{sem_model}{A character string specifying the SEM model syntax.}
 
@@ -75,7 +75,7 @@ This function streamlines the workflow for SEM analysis with missing data by int
 \itemize{
 \item \strong{Multiple Imputation}: Uses \code{\link[=PrepareMissingData]{PrepareMissingData()}} to impute missing values and calculate the necessary
 difference and centered average scores for mediators and the outcome variable.
-\item \strong{SEM Fitting and Monte Carlo Analysis}: Uses \code{\link[=MCMI]{MCMI()}} to fit the specified SEM model to the imputed datasets,
+\item \strong{SEM Fitting and Monte Carlo Analysis}: Uses \code{\link[=MCMI2]{MCMI2()}} to fit the specified SEM model to the imputed datasets,
 pool the parameter estimates, and compute Monte Carlo confidence intervals.
 }
 
@@ -106,10 +106,10 @@ result <- RunMCMIAnalysis(
   m = 5,
   method = "pmm",
   seed = 123,
-  M_before = c("A2", "B2"),
-  M_after = c("A1", "B1"),
-  Y_before = "C2",
-  Y_after = "C1",
+  M_C1 = c("A2", "B2"),
+  M_C2 = c("A1", "B1"),
+  Y_C1 = "C2",
+  Y_C2 = "C1",
   sem_model = sem_model,
   R = 1000,
   alpha = c(0.05, 0.01)
@@ -117,5 +117,5 @@ result <- RunMCMIAnalysis(
 
 }
 \seealso{
-\code{\link[=PrepareMissingData]{PrepareMissingData()}}, \code{\link[=MCMI]{MCMI()}}, \code{\link[=WsMed]{WsMed()}}
+\code{\link[=PrepareMissingData]{PrepareMissingData()}}, \code{\link[=MCMI2]{MCMI2()}}, \code{\link[=wsMed]{wsMed()}}
 }

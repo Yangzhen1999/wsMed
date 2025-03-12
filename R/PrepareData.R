@@ -22,62 +22,62 @@
 #' syntax and conducting mediation analysis.
 #'
 #' @param data A data frame containing the raw dataset with mediator and outcome variables.
-#' @param M_before A character vector of column names representing mediators "before" the intervention.
-#' @param M_after A character vector of column names representing mediators "after" the intervention.
-#' Must match the length of `M_before`.
-#' @param Y_before A character string representing the column name of the outcome variable "before" the intervention.
-#' @param Y_after A character string representing the column name of the outcome variable "after" the intervention.
+#' @param M_C1 A character vector of column names representing mediators "before" the intervention.
+#' @param M_C2 A character vector of column names representing mediators "after" the intervention.
+#' Must match the length of `M_C1`.
+#' @param Y_C1 A character string representing the column name of the outcome variable "before" the intervention.
+#' @param Y_C2 A character string representing the column name of the outcome variable "after" the intervention.
 #'
 #' @return A data frame containing the following columns:
 #' - `Ydiff`: Difference score for the outcome variable.
 #' - `M1diff`, `M2diff`, ...: Difference scores for each mediator.
 #' - `M1avg`, `M2avg`, ...: Centered average scores for each mediator.
 #'
-#' @seealso [GenerateModelP()], [GenerateModelCN()], [GenerateModelPC()], [WsMed()]
+#' @seealso [GenerateModelP()], [GenerateModelCN()], [GenerateModelPC()], [wsMed()]
 #'
 #' @examples
 #' # Example raw data
 #' data <- data.frame(
 #'   M1_before = rnorm(100), M1_after = rnorm(100),
 #'   M2_before = rnorm(100), M2_after = rnorm(100),
-#'   Y_before = rnorm(100), Y_after = rnorm(100)
+#'   Y_C1 = rnorm(100), Y_C2 = rnorm(100)
 #' )
 #'
 #' # Prepare the dataset
 #' prepared_data <- PrepareData(
 #'   data = data,
-#'   M_before = c("M1_before", "M2_before"),
-#'   M_after = c("M1_after", "M2_after"),
-#'   Y_before = "Y_before",
-#'   Y_after = "Y_after"
+#'   M_C1 = c("M1_before", "M2_before"),
+#'   M_C2 = c("M1_after", "M2_after"),
+#'   Y_C1 = "Y_C1",
+#'   Y_C2 = "Y_C2"
 #' )
 #'
 #' head(prepared_data)
 #'
 #' @export
 
-PrepareData <- function(data, M_before, M_after, Y_before, Y_after) {
+PrepareData <- function(data, M_C1, M_C2, Y_C1, Y_C2) {
   # 检查输入长度是否匹配
-  if (length(M_before) != length(M_after)) {
-    stop("The number of M_before and M_after variables must match.")
+  if (length(M_C1) != length(M_C2)) {
+    stop("The number of M_C1 and M_C2 variables must match.")
   }
 
-  # 检查 Y_before 和 Y_after 是否存在
-  if (!(Y_before %in% colnames(data)) || !(Y_after %in% colnames(data))) {
+  # 检查 Y_C1 和 Y_C2 是否存在
+  if (!(Y_C1 %in% colnames(data)) || !(Y_C2 %in% colnames(data))) {
     stop("Y variables not found in the dataset.")
   }
 
   # 计算 Y 的差异
-  data$Ydiff <- data[[Y_after]] - data[[Y_before]]
+  data$Ydiff <- data[[Y_C2]] - data[[Y_C1]]
 
   # 初始化存储差异和均值的列
   diffs <- list()
   avgs <- list()
 
   # 循环处理每对中介变量
-  for (i in seq_along(M_before)) {
-    M1 <- M_before[i]
-    M2 <- M_after[i]
+  for (i in seq_along(M_C1)) {
+    M1 <- M_C1[i]
+    M2 <- M_C2[i]
 
     # 检查 M1 和 M2 是否存在
     if (!(M1 %in% colnames(data)) || !(M2 %in% colnames(data))) {

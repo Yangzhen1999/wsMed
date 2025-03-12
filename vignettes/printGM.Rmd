@@ -1,0 +1,131 @@
+---
+title: "Demonstration of printGM()"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Demonstration of printGM()}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Demonstration of `printGM()`
+
+### Using `printGM()` with `WsMed()`
+The `WsMed()` function returns a list containing `sem_model`. `printGM()` can automatically extract and format the model equations.
+
+
+``` r
+devtools::load_all()
+library(wsMed) 
+result1 <- wsMed(
+  data = example_data,
+  M_C1 = c("A1","B1","C1"),
+  M_C2 = c("A2","B2","C2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2",
+  form = "P",
+  Na = "DE",
+  standardized = TRUE,
+  bootstrap = 1000,
+  iseed = 123
+)
+printGM(result1)
+```
+
+```
+## 
+## Outcome Difference Model (Ydiff):
+## Ydiff ~ cp*1 + b1*M1diff + b2*M2diff + b3*M3diff + d1*M1avg + d2*M2avg + d3*M3avg 
+## 
+## Mediator Difference Model (Chained Mediator - M1diff):
+## M1diff ~ a1*1 
+## 
+## Mediator Difference Model (Parallel Mediators - M2diff, M3diff, ...):
+## M2diff ~ a2*1
+## M3diff ~ a3*1 
+## 
+## Indirect Effects:
+## indirect1 := a1 * b1
+## indirect2 := a2 * b2
+## indirect3 := a3 * b3 
+## 
+## Total Indirect Effect:
+## total_indirect := indirect1 + indirect2 + indirect3 
+## 
+## Total Effect:
+## total_effect := cp + total_indirect 
+## 
+## Contrast of Indirect Effects:
+## CI1vs2 := indirect1 - indirect2
+## CI1vs3 := indirect1 - indirect3
+## CI2vs3 := indirect2 - indirect3 
+## 
+## C1-C2 Coefficients:
+## X1_b1 := (2*b1 + d1) / 2
+## X0_b1 := X1_b1 - d1
+## X1_b2 := (2*b2 + d2) / 2
+## X0_b2 := X1_b2 - d2
+## X1_b3 := (2*b3 + d3) / 2
+## X0_b3 := X1_b3 - d3
+```
+
+### Using printGM() with GenerateModel*()
+If you already have preprocessed data, you can directly generate the SEM model syntax using GenerateModelPC() or other GenerateModel*() functions.
+
+
+``` r
+# Load necessary packages
+library(wsMed) 
+# Load example data
+data(example_data)
+
+# Prepare data
+prepared_data <- PrepareData(
+  data = example_data,
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
+  Y_C1 = "C1",
+  Y_C2 = "C2"
+)
+
+# Generate Model
+sem_model <- GenerateModelPC(prepared_data)
+
+# print Model equations
+printGM(sem_model)
+```
+
+```
+## 
+## Outcome Difference Model (Ydiff):
+## Ydiff ~ cp*1 + b1*M1diff + b2*M2diff + d1*M1avg + d2*M2avg 
+## 
+## Mediator Difference Model (Chained Mediator - M1diff):
+## M1diff ~ a1*1 + b21*M2diff + d21*M2avg 
+## 
+## Mediator Difference Model (Parallel Mediators - M2diff, M3diff, ...):
+## M2diff ~ a2*1 
+## 
+## Indirect Effects:
+## indirect2 := a2 * b2
+## indirect1 := a1 * b1
+## indirect21 := a2 * b21 * b1 
+## 
+## Total Indirect Effect:
+## total_indirect := indirect1 + indirect2 + indirect21 
+## 
+## Total Effect:
+## total_effect := cp + total_indirect 
+## 
+## Contrast of Indirect Effects:
+## CI1vs2 := indirect1 - indirect2
+## CI1vs21 := indirect1 - indirect21
+## CI2vs21 := indirect2 - indirect21 
+## 
+## C1-C2 Coefficients:
+## X1_b1 := (2*b1 + d1)/2
+## X0_b1 := X1_b1 - d1
+## X1_b2 := (2*b2 + d2)/2
+## X0_b2 := X1_b2 - d2
+## X1_b21 := (2*b21 + d21)/2
+## X0_b21 := X1_b21 - d21
+```

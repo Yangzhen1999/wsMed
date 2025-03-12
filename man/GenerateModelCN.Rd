@@ -62,5 +62,5 @@ cat(sem_model)
 
 }
 \seealso{
-\code{\link[=PrepareData]{PrepareData()}}, \code{\link[=WsMed]{WsMed()}}, \code{\link[=GenerateModelP]{GenerateModelP()}}
+\code{\link[=PrepareData]{PrepareData()}}, \code{\link[=wsMed]{wsMed()}}, \code{\link[=GenerateModelP]{GenerateModelP()}}
 }

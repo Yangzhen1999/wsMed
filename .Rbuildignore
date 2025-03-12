@@ -1,7 +1,11 @@
-^.*\.Rproj$
-^\.Rproj\.user$
-^doc$
-^Meta$
+^LICENSE\.md$
+^\.lintr$
+^\.vscode$
+^\.github$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^vignettes/articles$
+^rebuild_vignettes.R$
+^doc$
+^wsMed\.Rproj$

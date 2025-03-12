@@ -1,0 +1,132 @@
+﻿
+Run MATRIX procedure:
+
+*********************** MEMORE Procedure for SPSS Version 3.0 ***********************
+
+                           Written by Amanda Montoya
+
+                    Documentation available at github.com/akmontoya/MEMORE
+
+**************************** ANALYSIS NOTES AND WARNINGS ****************************
+
+Bootstrap confidence interval method used: Percentile bootstrap.
+
+Number of bootstrap samples for bootstrap confidence intervals:
+  5000
+
+The following variables were mean centered prior to analysis:
+ (        A2        +       A1       )        /2
+ (        B2        +       B1       )        /2
+
+Level of confidence for all confidence intervals in output:
+      95.00
+
+**************************************************************************************
+
+Model:
+  1
+
+Variables:
+Y =   C2       C1
+M1 =  A2       A1
+M2 =  B2       B1
+
+Computed Variables:
+Ydiff =           C2        -       C1
+M1diff =          A2        -       A1
+M2diff =          B2        -       B1
+M1avg  = (        A2        +       A1       )        /2                         Centered
+M2avg  = (        B2        +       B1       )        /2                         Centered
+
+Sample Size:
+  100
+
+**************************************************************************************
+Outcome: Ydiff =  C2        -       C1
+
+Model
+               Coef         SE          t          p       LLCI       ULCI
+constant      .0153      .0163      .9404      .3493     -.0170      .0477
+
+Degrees of freedom for all regression coefficient estimates:
+  99
+
+**************************************************************************************
+Outcome: M1diff = A2        -       A1
+
+Model
+               Coef         SE          t          p       LLCI       ULCI
+constant     -.0271      .0176    -1.5385      .1271     -.0621      .0079
+
+Degrees of freedom for all regression coefficient estimates:
+  99
+
+**************************************************************************************
+Outcome: M2diff = B2        -       B1
+
+Model Summary
+          R       R-sq        MSE          F        df1        df2          p
+      .2351      .0553      .0314     2.8371     2.0000    97.0000      .0635
+
+Model
+              coeff         SE          t          p       LLCI       ULCI
+constant      .0208      .0179     1.1603      .2488     -.0148      .0564
+M1diff        .2333      .1010     2.3086      .0231      .0327      .4338
+M1avg        -.0578      .0963     -.6002      .5498     -.2489      .1333
+
+Degrees of freedom for all regression coefficient estimates:
+  97
+
+**************************************************************************************
+Outcome: Ydiff =  C2        -       C1
+
+Model Summary
+          R       R-sq        MSE          F        df1        df2          p
+      .1720      .0296      .0269      .7238     4.0000    95.0000      .5778
+
+Model
+               Coef         SE          t          p       LLCI       ULCI
+constant      .0160      .0167      .9563      .3413     -.0172      .0492
+M1diff       -.0360      .0962     -.3744      .7089     -.2270      .1549
+M2diff       -.1123      .0967    -1.1607      .2487     -.3043      .0798
+M1avg        -.0617      .0931     -.6619      .5097     -.2466      .1233
+M2avg        -.0733      .0875     -.8374      .4044     -.2469      .1004
+
+Degrees of freedom for all regression coefficient estimates:
+  95
+
+************************* TOTAL, DIRECT, AND INDIRECT EFFECTS *************************
+
+Total effect of X on Y
+     Effect         SE          t         df          p       LLCI       ULCI
+      .0153      .0163      .9404    99.0000      .3493     -.0170      .0477
+
+Direct effect of X on Y
+     Effect         SE          t         df          p       LLCI       ULCI
+      .0160      .0167      .9563    95.0000      .3413     -.0172      .0492
+
+Indirect Effect of X on Y through M
+          Effect     BootSE   BootLLCI   BootULCI
+Ind1       .0010      .0031     -.0045      .0084
+Ind2      -.0023      .0036     -.0111      .0033
+Ind3       .0007      .0010     -.0008      .0034
+Total     -.0006      .0048     -.0109      .0095
+
+Indirect Key
+Ind1  'X'      ->       M1diff   ->       Ydiff
+Ind2  'X'      ->       M2diff   ->       Ydiff
+Ind3  'X'      ->       M1diff   ->       M2diff   ->       YDiff
+
+Pairwise Contrasts Between Specific Indirect Effects
+          Effect     BootSE   BootLLCI   BootULCI
+(C1)       .0033      .0042     -.0042      .0128
+(C2)       .0003      .0034     -.0063      .0083
+(C3)      -.0030      .0041     -.0132      .0035
+
+Contrast Key:
+(C1)  Ind1      -       Ind2
+(C2)  Ind1      -       Ind3
+(C3)  Ind2      -       Ind3
+
+------ END MATRIX -----
+
