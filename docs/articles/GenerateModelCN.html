@@ -8,8 +8,8 @@
 <title>GenerateModelCN • wsMed</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="GenerateModelCN">
 </head>
 <body>
@@ -35,7 +35,12 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials">
 <li><a class="dropdown-item" href="../articles/wsMed.html">Introduction to wsMed</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelCN.html">Different Models (CP, CN, P, PC)</a></li>
+    <li><a class="dropdown-item" href="../articles/printGM.html">Using printGM() to generate SEM models in detail</a></li>
+    <li><a class="dropdown-item" href="../articles/GenerateModelP.html">Parallel Mediation (P)</a></li>
+    <li><a class="dropdown-item" href="../articles/GenerateModelCN.html">Chained Mediation (CN)</a></li>
+    <li><a class="dropdown-item" href="../articles/GenerateModelCP.html">Combined Parallel and Chained Mediation (CP)</a></li>
+    <li><a class="dropdown-item" href="../articles/GenerateModelPC.html">Parallel + Chained Mediation (PC)</a></li>
+    <li><a class="dropdown-item" href="../articles/MEMORE_vs_wsMed.html">Comparison of MEMORE 3.0 and wsMed Outputs</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -315,30 +320,30 @@ has a stronger indirect effect.</li>
 </div>
 </div>
 <div class="section level2">
-<h2 id="pre--and-post-measurement-coefficients">5. Pre- and Post-Measurement Coefficients<a class="anchor" aria-label="anchor" href="#pre--and-post-measurement-coefficients"></a>
+<h2 id="c1-and-c2-coefficients">5. C1 and C2 Coefficients<a class="anchor" aria-label="anchor" href="#c1-and-c2-coefficients"></a>
 </h2>
-<p>For pre- and post-measurement conditions, the coefficients are
+<p>For C1- and C2-measurement conditions, the coefficients are
 calculated as follows:</p>
 <ol style="list-style-type: decimal">
-<li><p><strong>Post-Measurement Coefficient
+<li><p><strong>C2-Measurement Coefficient
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">X1_{b,i}</annotation></semantics></math>):</strong>
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><msub><mi>b</mi><mi>i</mi></msub><mo>+</mo><msub><mi>d</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">
 X1_{b,i} = b_i + d_i
 </annotation></semantics></math></p></li>
-<li><p><strong>Pre-Measurement Coefficient
+<li><p><strong>C1-Measurement Coefficient
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>0</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">X0_{b,i}</annotation></semantics></math>):</strong>
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>0</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>−</mo><msub><mi>d</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">
 X0_{b,i} = X1_{b,i} - d_i
 </annotation></semantics></math></p></li>
 </ol>
-<p>For chained pathways: 1. <strong>Post-Measurement Coefficient
+<p>For chained pathways: 1. <strong>C2-Measurement Coefficient
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi><mi>j</mi></mrow></msub></mrow><annotation encoding="application/x-tex">X1_{b,ij}</annotation></semantics></math>):</strong>
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><msub><mi>b</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>+</mo><msub><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mrow><annotation encoding="application/x-tex">
    X1_{b,ij} = b_{ij} + d_{ij}
    </annotation></semantics></math></p>
 <ol start="2" style="list-style-type: decimal">
 <li>
-<p><strong>Pre-Measurement Coefficient
+<p><strong>C1-Measurement Coefficient
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>0</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi><mi>j</mi></mrow></msub></mrow><annotation encoding="application/x-tex">X0_{b,ij}</annotation></semantics></math>):</strong>
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>0</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi><mi>j</mi></mrow></msub><mo>−</mo><msub><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mrow><annotation encoding="application/x-tex">
 X0_{b,ij} = X1_{b,ij} - d_{ij}
@@ -346,35 +351,35 @@ X0_{b,ij} = X1_{b,ij} - d_{ij}
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>M</mi><mn>1</mn></msub><mo>,</mo><msub><mi>M</mi><mn>2</mn></msub><mo>,</mo><msub><mi>M</mi><mn>3</mn></msub></mrow><annotation encoding="application/x-tex">M_1, M_2, M_3</annotation></semantics></math>,
 the coefficients are calculated as follows:</p>
 <ul>
-<li><p>Post-Measurement Coefficient:
+<li><p>C2-Measurement Coefficient:
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>b</mi><mn>1</mn></msub><mo>+</mo><msub><mi>d</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">
 X1_{b,1} = b_1 + d_1
 </annotation></semantics></math></p></li>
-<li><p>Pre-Measurement Coefficient:
+<li><p>C1-Measurement Coefficient:
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>0</mn><mrow><mi>b</mi><mo>,</mo><mn>1</mn></mrow></msub><mo>=</mo><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mi>d</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">
 X0_{b,1} = X1_{b,1} - d_1
 </annotation></semantics></math></p></li>
-<li><p>Post-Measurement Coefficient:
+<li><p>C2-Measurement Coefficient:
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mn>2</mn></mrow></msub><mo>=</mo><msub><mi>b</mi><mn>2</mn></msub><mo>+</mo><msub><mi>d</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">
 X1_{b,2} = b_2 + d_2
 </annotation></semantics></math></p></li>
-<li><p>Pre-Measurement Coefficient:
+<li><p>C1-Measurement Coefficient:
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>0</mn><mrow><mi>b</mi><mo>,</mo><mn>2</mn></mrow></msub><mo>=</mo><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mn>2</mn></mrow></msub><mo>−</mo><msub><mi>d</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">
 X0_{b,2} = X1_{b,2} - d_2
 </annotation></semantics></math></p></li>
-<li><p>Post-Measurement Coefficient:
+<li><p>C2-Measurement Coefficient:
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mn>3</mn></mrow></msub><mo>=</mo><msub><mi>b</mi><mn>3</mn></msub><mo>+</mo><msub><mi>d</mi><mn>3</mn></msub></mrow><annotation encoding="application/x-tex">
 X1_{b,3} = b_3 + d_3
 </annotation></semantics></math></p></li>
-<li><p>Pre-Measurement Coefficient:
+<li><p>C1-Measurement Coefficient:
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>0</mn><mrow><mi>b</mi><mo>,</mo><mn>3</mn></mrow></msub><mo>=</mo><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mn>3</mn></mrow></msub><mo>−</mo><msub><mi>d</mi><mn>3</mn></msub></mrow><annotation encoding="application/x-tex">
 X0_{b,3} = X1_{b,3} - d_3
 </annotation></semantics></math></p></li>
-<li><p>Post-Measurement Coefficient:
+<li><p>C2-Measurement Coefficient:
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mn>12</mn></mrow></msub><mo>=</mo><msub><mi>b</mi><mn>12</mn></msub><mo>+</mo><msub><mi>d</mi><mn>12</mn></msub></mrow><annotation encoding="application/x-tex">
 X1_{b,12} = b_{12} + d_{12}
 </annotation></semantics></math></p></li>
-<li><p>Pre-Measurement Coefficient:
+<li><p>C1-Measurement Coefficient:
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>0</mn><mrow><mi>b</mi><mo>,</mo><mn>12</mn></mrow></msub><mo>=</mo><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mn>12</mn></mrow></msub><mo>−</mo><msub><mi>d</mi><mn>12</mn></msub></mrow><annotation encoding="application/x-tex">
 X0_{b,12} = X1_{b,12} - d_{12}
 </annotation></semantics></math> —</p></li>
@@ -405,7 +410,7 @@ M_{\text{diff},i} = a_i + \sum_{j&lt;i} \left( b_{ji} M_{\text{diff},j} + d_{ji}
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>I</mi><mrow><msub><mtext mathvariant="normal">path</mtext><mn>1</mn></msub><mtext mathvariant="normal">vs</mtext><msub><mtext mathvariant="normal">path</mtext><mn>2</mn></msub></mrow></msub><mo>=</mo><msub><mtext mathvariant="normal">indirect</mtext><msub><mtext mathvariant="normal">path</mtext><mn>1</mn></msub></msub><mo>−</mo><msub><mtext mathvariant="normal">indirect</mtext><msub><mtext mathvariant="normal">path</mtext><mn>2</mn></msub></msub></mrow><annotation encoding="application/x-tex">
  CI_{\text{path}_1\text{vs}\text{path}_2} = \text{indirect}_{\text{path}_1} - \text{indirect}_{\text{path}_2}
  </annotation></semantics></math></p></li>
-<li><p><strong>Pre- and Post-Measurement Coefficients:</strong>
+<li><p><strong>C1- and C2-Measurement Coefficients:</strong>
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><msub><mi>b</mi><mi>i</mi></msub><mo>+</mo><msub><mi>d</mi><mi>i</mi></msub><mo>,</mo><mspace width="1.0em"></mspace><mi>X</mi><msub><mn>0</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>−</mo><msub><mi>d</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">
 X1_{b,i} = b_i + d_i, \quad X0_{b,i} = X1_{b,i} - d_i
 </annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><msub><mi>b</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>+</mo><msub><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>,</mo><mspace width="1.0em"></mspace><mi>X</mi><msub><mn>0</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi><mi>j</mi></mrow></msub><mo>−</mo><msub><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mrow><annotation encoding="application/x-tex">

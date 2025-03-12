@@ -20,9 +20,11 @@ The `wsMed` function is designed for two condition within-subject mediation anal
 
 The workflow of the `wsMed` function is illustrated below:
 
-```{r, echo=FALSE, out.width="100%"}
-knitr::include_graphics("wsMed.svg")
-```
+<p align="center">
+
+<img src="WsMed.svg" alt="wsMed workflow" width="100%"/>
+
+</p>
 
 The main steps include:
 
@@ -40,31 +42,30 @@ The main steps include:
 
 The `wsMed` function accepts the following parameters:
 
-| **Parameter**   | **Type**       | **Default**     | **Description**                                                                                         |
-|-----------------|----------------|-----------------|---------------------------------------------------------------------------------------------------------|
-| `data`          | Data frame     | Required        | The input dataset.                                                                                      |
-| `M_C1`          | String vector  | Required        | Names of the mediator variables in Condition 1.                                                         |
-| `M_C2`          | String vector  | Required        | Names of the mediator variables in Condition 2.                                                         |
-| `Y_C1`          | String         | Required        | Name of the outcome variable in Condition 1.                                                            |
-| `Y_C2`          | String         | Required        | Name of the outcome variable in Condition 2.                                                            |
-| `form`          | String         | `"P"`           | Model type: `"P"` (parallel), `"CN"` (chained), `"CP"`(chained+ parallel), or `"PC"`(parallel+chained). |
-| `standardized`  | Boolean        | `FALSE`         | Whether to standardize the results.                                                                     |
-| `Na`            | String         | `"DE"`          | Missing data handling method: `"DE"`, `"FIML"`, or `"MI"`.                                              |
-| `bootstrap`     | Integer        | `1000`          | Bootstrap resampling iterations (only for `"DE"` method).                                               |
-| `iseed`         | Integer        | `123`           | Integer for setting the random seed.                                                                    |
-| `se`            | String         | `"standard"`    | Method for computing standard errors (`"standard"` or `"bootstrap"`).                                   |
-| `R`             | Integer        | `20000L`        | Number of Monte Carlo repetitions.                                                                      |
-| `alpha`         | Numeric vector | `c(0.01, 0.05)` | Significance levels.                                                                                    |
-| `m`             | Integer        | `5`             | Number of imputations for the `"MI"` method.                                                            |
-| `method`        | String         | `"pmm"`         | Imputation method for the `"MI"` method.                                                                |
-| `decomposition` | String         | `"eigen"`       | Decomposition method for covariance matrices.                                                           |
-| `pd`            | Boolean        | `TRUE`          | Checks the positive definiteness of covariance matrices.                                                |
-| `tol`           | Numeric        | `1e-06`         | Tolerance used in positive definiteness checks.                                                         |
-| `seed`          | Integer        | `123`           | Random seed during Monte Carlo simulations.                                                             |
-| `alphastd`      | Numeric        | `c(0.01, 0.05)` | Significance level for standardized confidence intervals.                                               |
-| `fixed.x`       | Boolean        | `FALSE`         | Whether x variables are fixed.                                                                          |
+| **Parameter** | **Type** | **Default** | **Description** |
+|-----------|-----------|-----------|----------------------------------------|
+| `data` | Data frame | Required | The input dataset. |
+| `M_C1` | String vector | Required | Names of the mediator variables in Condition 1. |
+| `M_C2` | String vector | Required | Names of the mediator variables in Condition 2. |
+| `Y_C1` | String | Required | Name of the outcome variable in Condition 1. |
+| `Y_C2` | String | Required | Name of the outcome variable in Condition 2. |
+| `form` | String | `"P"` | Model type: `"P"` (parallel), `"CN"` (chained), `"CP"`(chained+ parallel), or `"PC"`(parallel+chained). |
+| `standardized` | Boolean | `FALSE` | Whether to standardize the results. |
+| `Na` | String | `"DE"` | Missing data handling method: `"DE"`, `"FIML"`, or `"MI"`. |
+| `bootstrap` | Integer | `1000` | Bootstrap resampling iterations (only for `"DE"` method). |
+| `iseed` | Integer | `123` | Integer for setting the random seed. |
+| `se` | String | `"standard"` | Method for computing standard errors (`"standard"` or `"bootstrap"`). |
+| `R` | Integer | `20000L` | Number of Monte Carlo repetitions. |
+| `alpha` | Numeric vector | `c(0.01, 0.05)` | Significance levels. |
+| `m` | Integer | `5` | Number of imputations for the `"MI"` method. |
+| `method` | String | `"pmm"` | Imputation method for the `"MI"` method. |
+| `decomposition` | String | `"eigen"` | Decomposition method for covariance matrices. |
+| `pd` | Boolean | `TRUE` | Checks the positive definiteness of covariance matrices. |
+| `tol` | Numeric | `1e-06` | Tolerance used in positive definiteness checks. |
+| `seed` | Integer | `123` | Random seed during Monte Carlo simulations. |
+| `alphastd` | Numeric | `c(0.01, 0.05)` | Significance level for standardized confidence intervals. |
+| `fixed.x` | Boolean | `FALSE` | Whether x variables are fixed. |
 
-# Example of Loading Data in R:
 
 The dataset should be in wide format, where each participant has separate columns for measurements in different conditions. Specifically, each mediator variable (e.g., M1) should be split into two columns: one for Condition 1 and one for Condition 2. Similarly, the outcome variable should also have separate columns for each condition. This structure ensures that within-subject changes can be properly analyzed.
 

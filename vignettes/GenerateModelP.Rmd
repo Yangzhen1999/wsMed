@@ -158,9 +158,9 @@ CI_{i,j} = \text{indirect}_i - \text{indirect}_j
 
 ---
 
-## 5. Pre- and Post-Measurement Coefficients
+## 5. C1- and C2-Measurement Coefficients
 
-To compute pre- and post-measurement coefficients \( X1_{b,i} \) and \( X0_{b,i} \), consider two mediators \( M_1 \) and \( M_2 \):
+To compute C1- and C2-measurement coefficients \( X1_{b,i} \) and \( X0_{b,i} \), consider two mediators \( M_1 \) and \( M_2 \):
 
 ---
 
@@ -177,9 +177,9 @@ Define:
 
 ---
 
-### 5.2 Post-Measurement Coefficients
+### 5.2 C2-Measurement Coefficients
 
-The post-measurement coefficient \( X1_{b,i} \) is defined as:
+The C2-measurement coefficient \( X1_{b,i} \) is defined as:
 \[
 X1_{b,i} = b + d
 \]
@@ -193,9 +193,9 @@ Thus, \( X1_{b,i} \) is the effect of \( M_i \) under Condition 2.
 
 ---
 
-### 5.3 Pre-Measurement Coefficients
+### 5.3 C1-Measurement Coefficients
 
-The pre-measurement coefficient \( X0_{b,i} \) is defined as:
+The C1-measurement coefficient \( X0_{b,i} \) is defined as:
 \[
 X0_{b,i} = X1_{b,i} - d
 \]
@@ -218,7 +218,7 @@ The coefficient \( d_i = b_{2i} - b_{1i} \) reflects the moderating effect of th
 
 ## 6. Summary of Regression Equations
 
-This section summarizes all the regression equations used in the analysis, including the difference model, indirect effects, mediator comparisons, and pre- and post-measurement coefficients.
+This section summarizes all the regression equations used in the analysis, including the difference model, indirect effects, mediator comparisons, and C1- and C2-measurement coefficients.
 
 ---
 
@@ -263,6 +263,6 @@ CI_{i,j} = \text{indirect}_i - \text{indirect}_j
 By combining these equations:
 1. The difference model \( Y_{\text{diff}} \) decomposes into contributions from mediator differences (\( M_{\text{diff}} \)) and averages (\( M_{\text{avg}} \)).
 2. Indirect effects and their contrasts provide insights into the mediators' relative importance.
-3. Pre- and post-measurement coefficients quantify the effects in specific conditions.
+3. C1- and C2-measurement coefficients quantify the effects in specific conditions.
 
 ---

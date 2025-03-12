@@ -1,7 +1,7 @@
 library(testthat)
 
-####  测试 `print.GM()` 兼容所有 `GenerateModel*()` 生成的 SEM 语法**
-test_that("print.GM correctly formats SEM output for all GenerateModel functions", {
+####  测试 `printGM()` 兼容所有 `GenerateModel*()` 生成的 SEM 语法**
+test_that("printGM correctly formats SEM output for all GenerateModel functions", {
   data(example_data)
 
   # 预处理数据
@@ -26,10 +26,10 @@ test_that("print.GM correctly formats SEM output for all GenerateModel functions
     sem_model <- model_functions[[model_name]](prepared_data)
 
     # 捕获 `print.GM()` 输出
-    output <- capture.output(print.GM(sem_model))
+    output <- capture.output(printGM(sem_model))
 
     # 打印测试进度（可选）
-    message("Testing print.GM() for model: ", model_name)
+    message("Testing printGM() for model: ", model_name)
 
     # 确保输出中包含核心部分标题
     expect_true(any(grepl("Outcome Difference Model \\(Ydiff\\)", output)), info = paste(model_name, "missing Ydiff"))
@@ -39,7 +39,7 @@ test_that("print.GM correctly formats SEM output for all GenerateModel functions
   })
 })
 
-test_that("print.GM works with wsMed() results", {
+test_that("printGM works with wsMed() results", {
   data(example_data)
 
   result1 <- wsMed(
@@ -55,8 +55,8 @@ test_that("print.GM works with wsMed() results", {
     iseed = 123
   )
 
-  # 捕获 `print.GM()` 输出
-  output <- capture.output(print.GM(result1))
+  # 捕获 `printGM()` 输出
+  output <- capture.output(printGM(result1))
 
   # 确保输出中包含核心部分标题
   expect_true(any(grepl("Outcome Difference Model \\(Ydiff\\)", output)), info = "WsMed() output missing Ydiff")
@@ -65,12 +65,12 @@ test_that("print.GM works with wsMed() results", {
   expect_true(any(grepl("Total Effect", output)), info = "WsMed() output missing Total Effect")
 })
 
-####  测试 `print.GM()` 的错误处理**
-test_that("print.GM throws error for invalid inputs", {
-  expect_error(print.GM(list()), "Input must be a non-empty character string", fixed = TRUE)
-  expect_error(print.GM(data.frame()), "Input must be a non-empty character string", fixed = TRUE)
-  expect_error(print.GM(NULL), "Input must be a non-empty character string", fixed = TRUE)
-  expect_error(print.GM(NA_character_), "Input must be a non-empty character string", fixed = TRUE)
-  expect_error(print.GM(""), "Input must be a non-empty character string", fixed = TRUE)
+####  测试 `printGM()` 的错误处理**
+test_that("printGM throws error for invalid inputs", {
+  expect_error(printGM(list()), "Input must be a non-empty character string", fixed = TRUE)
+  expect_error(printGM(data.frame()), "Input must be a non-empty character string", fixed = TRUE)
+  expect_error(printGM(NULL), "Input must be a non-empty character string", fixed = TRUE)
+  expect_error(printGM(NA_character_), "Input must be a non-empty character string", fixed = TRUE)
+  expect_error(printGM(""), "Input must be a non-empty character string", fixed = TRUE)
 })
 

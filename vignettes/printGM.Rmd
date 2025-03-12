@@ -1,14 +1,16 @@
 ---
-title: "Demonstration of print.GM()"
-author: "Wendie Yang"
-date: "`r Sys.Date()`"
-output: html_document
+title: "Demonstration of printGM()"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Demonstration of printGM()}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
-## Demonstration of `print.GM()`
+## Demonstration of `printGM()`
 
-### Using `print.GM()` with `WsMed()`
-The `WsMed()` function returns a list containing `sem_model`. `print.GM()` can automatically extract and format the model equations.
+### Using `printGM()` with `WsMed()`
+The `WsMed()` function returns a list containing `sem_model`. `printGM()` can automatically extract and format the model equations.
 
 ```{r, message=FALSE, warning=FALSE}
 devtools::load_all()
@@ -25,10 +27,10 @@ result1 <- wsMed(
   bootstrap = 1000,
   iseed = 123
 )
-print.GM(result1)
+printGM(result1)
 ```
 
-### Using print.GM() with GenerateModel*()
+### Using printGM() with GenerateModel*()
 If you already have preprocessed data, you can directly generate the SEM model syntax using GenerateModelPC() or other GenerateModel*() functions.
 
 ```{r, message=FALSE, warning=FALSE}
@@ -50,5 +52,5 @@ prepared_data <- PrepareData(
 sem_model <- GenerateModelPC(prepared_data)
 
 # print Model equations
-print.GM(sem_model)
+printGM(sem_model)
 ```

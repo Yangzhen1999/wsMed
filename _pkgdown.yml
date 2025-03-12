@@ -2,6 +2,8 @@ url: https://github.com/Yangzhen1999/wsMed
 template:
   bootstrap: 5
   bootswatch: flatly  # You can change the theme
+  params:
+    copy_vignettes: true
 
 navbar:
   structure:
@@ -19,18 +21,18 @@ navbar:
       menu:
         - text: "Introduction to wsMed"
           href: articles/wsMed.html
-        - text: "Different Models"
-          menu:
-            - text: "Chained Mediation (CN)"
-              href: articles/GenerateModelCN.html
-            - text: "Combined Parallel and Chained Mediation (CP)"
-              href: articles/GenerateModelCP.html
-            - text: "Parallel Mediation (P)"
-              href: articles/GenerateModelP.html
-            - text: "Parallel + Chained Mediation (PC)"
-              href: articles/GenerateModelPC.html
-        - text: "Using print.GM()"
-          href: articles/print.GM.html
+        - text: "Using printGM() to generate SEM models in detail"
+          href: articles/printGM.html
+        - text: "Parallel Mediation (P)"
+          href: articles/GenerateModelP.html
+        - text: "Chained Mediation (CN)"
+          href: articles/GenerateModelCN.html
+        - text: "Combined Parallel and Chained Mediation (CP)"
+          href: articles/GenerateModelCP.html
+        - text: "Parallel + Chained Mediation (PC)"
+          href: articles/GenerateModelPC.html
+        - text: "Comparison of MEMORE 3.0 and wsMed Outputs"
+          href: articles/MEMORE_vs_wsMed.html
     news:
       text: "Changelog"
       href: news/index.html
@@ -62,6 +64,4 @@ reference:
       - GenerateModelCP
       - GenerateModelP
       - GenerateModelPC
-      - print.GM
-
-
+      - printGM

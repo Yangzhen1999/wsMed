@@ -8,8 +8,8 @@
 <title>GenerateModelP • wsMed</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="GenerateModelP">
 </head>
 <body>
@@ -31,11 +31,16 @@
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../index.html">Home</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Functions</a></li>
-<li class="nav-item dropdown">
+<li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials">
 <li><a class="dropdown-item" href="../articles/wsMed.html">Introduction to wsMed</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelCN.html">Different Models (CP, CN, P, PC)</a></li>
+    <li><a class="dropdown-item" href="../articles/printGM.html">Using printGM() to generate SEM models in detail</a></li>
+    <li><a class="dropdown-item" href="../articles/GenerateModelP.html">Parallel Mediation (P)</a></li>
+    <li><a class="dropdown-item" href="../articles/GenerateModelCN.html">Chained Mediation (CN)</a></li>
+    <li><a class="dropdown-item" href="../articles/GenerateModelCP.html">Combined Parallel and Chained Mediation (CP)</a></li>
+    <li><a class="dropdown-item" href="../articles/GenerateModelPC.html">Parallel + Chained Mediation (PC)</a></li>
+    <li><a class="dropdown-item" href="../articles/MEMORE_vs_wsMed.html">Comparison of MEMORE 3.0 and wsMed Outputs</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -264,9 +269,9 @@ has a stronger indirect effect than
 </div>
 </div>
 <div class="section level2">
-<h2 id="pre--and-post-measurement-coefficients">5. Pre- and Post-Measurement Coefficients<a class="anchor" aria-label="anchor" href="#pre--and-post-measurement-coefficients"></a>
+<h2 id="c1--and-c2-measurement-coefficients">5. C1- and C2-Measurement Coefficients<a class="anchor" aria-label="anchor" href="#c1--and-c2-measurement-coefficients"></a>
 </h2>
-<p>To compute pre- and post-measurement coefficients
+<p>To compute C1- and C2-measurement coefficients
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">X1_{b,i}</annotation></semantics></math>
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>0</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">X0_{b,i}</annotation></semantics></math>,
@@ -290,9 +295,9 @@ Difference in effect.</p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="post-measurement-coefficients">5.2 Post-Measurement Coefficients<a class="anchor" aria-label="anchor" href="#post-measurement-coefficients"></a>
+<h3 id="c2-measurement-coefficients">5.2 C2-Measurement Coefficients<a class="anchor" aria-label="anchor" href="#c2-measurement-coefficients"></a>
 </h3>
-<p>The post-measurement coefficient
+<p>The C2-measurement coefficient
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">X1_{b,i}</annotation></semantics></math>
 is defined as:
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><mi>b</mi><mo>+</mo><mi>d</mi></mrow><annotation encoding="application/x-tex">
@@ -313,9 +318,9 @@ under Condition 2.</p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="pre-measurement-coefficients">5.3 Pre-Measurement Coefficients<a class="anchor" aria-label="anchor" href="#pre-measurement-coefficients"></a>
+<h3 id="c1-measurement-coefficients">5.3 C1-Measurement Coefficients<a class="anchor" aria-label="anchor" href="#c1-measurement-coefficients"></a>
 </h3>
-<p>The pre-measurement coefficient
+<p>The C1-measurement coefficient
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>0</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">X0_{b,i}</annotation></semantics></math>
 is defined as:
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>0</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>−</mo><mi>d</mi></mrow><annotation encoding="application/x-tex">
@@ -345,7 +350,7 @@ capturing how the mediator’s influence differs across conditions.</p>
 </h2>
 <p>This section summarizes all the regression equations used in the
 analysis, including the difference model, indirect effects, mediator
-comparisons, and pre- and post-measurement coefficients.</p>
+comparisons, and C1- and C2-measurement coefficients.</p>
 <hr>
 <div class="section level3">
 <h3 id="difference-model">6.1 Difference Model<a class="anchor" aria-label="anchor" href="#difference-model"></a>
@@ -388,8 +393,8 @@ decomposes into contributions from mediator differences
 and averages
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>M</mi><mtext mathvariant="normal">avg</mtext></msub><annotation encoding="application/x-tex">M_{\text{avg}}</annotation></semantics></math>).
 2. Indirect effects and their contrasts provide insights into the
-mediators’ relative importance. 3. Pre- and post-measurement
-coefficients quantify the effects in specific conditions.</p>
+mediators’ relative importance. 3. C1- and C2-measurement coefficients
+quantify the effects in specific conditions.</p>
 <hr>
 </div>
 </div>

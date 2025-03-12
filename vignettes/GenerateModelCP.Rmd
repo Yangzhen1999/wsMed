@@ -159,16 +159,16 @@ CI_{\text{path}_1\text{vs}\text{path}_2} = \text{indirect}_{\text{path}_1} - \te
 
 ---
 
-## 5. Pre- and Post-Measurement Coefficients
+## 5. C1 and C2 Coefficients
 
 ### Definitions
 
-1. **Post-Measurement Coefficient (\( X1_{b,i} \)):**
+1. **C2-Measurement Coefficient (\( X1_{b,i} \)):**
    \[
    X1_{b,i} = b_i + d_i
    \]
 
-2. **Pre-Measurement Coefficient (\( X0_{b,i} \)):**
+2. **C1-Measurement Coefficient (\( X0_{b,i} \)):**
    \[
    X0_{b,i} = X1_{b,i} - d_i
    \]
