@@ -55,23 +55,22 @@
 #' @export
 
 GenerateModelP <- function(prepared_data) {
-  # 提取生成的变量名称
   Mdiff_vars <- grep("M\\ddiff", colnames(prepared_data), value = TRUE)
   Mavg_vars <- grep("M\\davg", colnames(prepared_data), value = TRUE)
 
   regression_y <- paste(
-    "Ydiff ~ cp*1",  # 截距部分
+    "Ydiff ~ cp*1", 
     paste(
       c(
-        paste0("b", seq_along(Mdiff_vars), "*", Mdiff_vars),  # 动态生成每个 Mdiff 的回归系数
-        paste0("d", seq_along(Mavg_vars), "*", Mavg_vars)    # 动态生成每个 Mavg 的回归系数
+        paste0("b", seq_along(Mdiff_vars), "*", Mdiff_vars),   
+        paste0("d", seq_along(Mavg_vars), "*", Mavg_vars)    
       ),
-      collapse = " + "  # 用 " + " 拼接所有部分
+      collapse = " + "   
     ),
-    sep = " + "  # 确保 cp*1 和后续项之间有分隔符
+    sep = " + "   
   )
 
-  # 2. 每个 Mdiff 的截距模型
+  
   regression_m <- paste(
     sapply(seq_along(Mdiff_vars), function(i) {
       paste0(Mdiff_vars[i], " ~ a", i, "*1")
@@ -79,7 +78,7 @@ GenerateModelP <- function(prepared_data) {
     collapse = "\n"
   )
 
-  # 3. 每个间接效应公式
+ 
   indirect_effects <- paste(
     sapply(seq_along(Mdiff_vars), function(i) {
       paste0("indirect", i, " := a", i, " * b", i)
@@ -87,16 +86,15 @@ GenerateModelP <- function(prepared_data) {
     collapse = "\n"
   )
 
-  # 4. 总间接效应
+ 
   total_indirect <- paste0(
     "total_indirect := ",
     paste(paste0("indirect", seq_along(Mdiff_vars)), collapse = " + ")
   )
 
-  # 5. 总效应
+ 
   total_effect <- "total_effect := cp + total_indirect"
-
-  # 6. 间接效应的对比公式
+ 
   indirect_contrasts <- ""
   if (length(Mdiff_vars) > 1) {
     indirect_combinations <- utils::combn(seq_along(Mdiff_vars), 2)
@@ -111,7 +109,7 @@ GenerateModelP <- function(prepared_data) {
     )
   }
 
-  # 7. 前后测系数
+ 
   pre_post_coefficients <- paste(
     sapply(seq_along(Mdiff_vars), function(i) {
       x1_bi <- paste0("X1_b", i, " := (2*b", i, " + d", i, ") / 2")
@@ -121,7 +119,7 @@ GenerateModelP <- function(prepared_data) {
     collapse = "\n"
   )
 
-  # 合并所有公式
+ 
   sem_model <- paste(
     regression_y,
     regression_m,

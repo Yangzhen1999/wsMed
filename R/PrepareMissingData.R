@@ -40,10 +40,10 @@
 #' @examples
 #' # Example dataset with missing values
 #' data(example_data)
-#' set.seed(123) # 确保结果可重复
+#' set.seed(123)  
 #' example_dataN <- mice::ampute(
-#'    data = example_data,       # 输入完整数据
-#'    prop = 0.1,      # 缺失值比例 (20%)
+#'    data = example_data,        
+#'    prop = 0.1,       
 #'    )$amp
 #'
 #' # Prepare the dataset with multiple imputations
@@ -71,17 +71,14 @@ PrepareMissingData <- function(data_missing,
                                M_C2,
                                Y_C1,
                                Y_C2) {
-  #  检查 M_C1 和 M_C2 长度是否匹配
   if (length(M_C1) != length(M_C2)) {
     stop("Error in PrepareMissingData: M_C1 and M_C2 must have the same length.")
   }
 
-  #  确保 Y_C1 和 Y_C2 存在
   if (!(Y_C1 %in% colnames(data_missing)) || !(Y_C2 %in% colnames(data_missing))) {
     stop("Error in PrepareMissingData: Y_C1 or Y_C2 is missing in the dataset.")
   }
 
-   # Step 1: 插补数据
   imputed_result <- ImputeData(
     data_missing = data_missing,
     m = m,
@@ -89,10 +86,8 @@ PrepareMissingData <- function(data_missing,
     seed = seed
   )
 
-  # 获取插补后的数据集列表
   imputed_data_list <- imputed_result$imputed_data_list
 
-  # Step 2: 对每个插补数据集进行数据处理
   processed_data_list <- lapply(imputed_data_list, function(imputed_data) {
     PrepareData(
       data = imputed_data,
@@ -103,9 +98,8 @@ PrepareMissingData <- function(data_missing,
     )
   })
 
-  # 返回处理后的数据集列表
   return(list(
     processed_data_list = processed_data_list,
-    imputation_summary = imputed_result$summary  # 插补过程的诊断信息
+    imputation_summary = imputed_result$summary   
   ))
 }

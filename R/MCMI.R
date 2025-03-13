@@ -78,13 +78,11 @@ MCMI2 <- function(sem_model,
                  estimator = "ML",
                  se = "standard",
                  missing = "listwise") {
-  # 验证输入
   stopifnot(
     is.character(sem_model),
     is.list(imputations) && all(sapply(imputations, is.data.frame))
   )
 
-  # 使用每个插补数据集重新拟合模型
   fits <- lapply(imputations, function(data) {
     lavaan::sem(
       model = sem_model,
@@ -95,11 +93,9 @@ MCMI2 <- function(sem_model,
     )
   })
 
-  # 提取系数和协方差矩阵
   coefs <- lapply(fits, lavaan::coef)
   vcovs <- lapply(fits, lavaan::vcov)
 
-  # 使用 MICombine 合并插补结果
   pooled <- MICombineWrapper(
     coefs = coefs,
     vcovs = vcovs,
@@ -110,7 +106,6 @@ MCMI2 <- function(sem_model,
   scale <- pooled$total
   location <- pooled$est
 
-  # 设置 Monte Carlo 采样
   if (!is.null(seed)) {
     set.seed(seed)
   }
@@ -125,7 +120,6 @@ MCMI2 <- function(sem_model,
   thetahatstar_orig <- thetahatstar$thetahatstar
   decomposition <- thetahatstar$decomposition
 
-  # 更新估计值
   thetahat <- ThetaHatWrapper(
     object = fits[[1]],
     est = colMeans(
@@ -136,17 +130,14 @@ MCMI2 <- function(sem_model,
     )
   )
 
-  # 处理定义参数
   thetahatstar <- MCDefWrapper(
     object = fits[[1]],
     thetahat = thetahat,
     thetahatstar_orig = thetahatstar_orig
   )
 
-  # 使用第一个 fits 对象作为 `lav` 对象
   lav <- fits[[1]]
 
-  # 输出结果
   out <- list(
     call = match.call(),
     args = list(

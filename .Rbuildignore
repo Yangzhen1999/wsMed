@@ -9,3 +9,4 @@
 ^rebuild_vignettes.R$
 ^doc$
 ^wsMed\.Rproj$
+^\.Rproj\.user$

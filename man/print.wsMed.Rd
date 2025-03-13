@@ -84,20 +84,9 @@ result1 <- wsMed(
   Y_C1 = "C1",
   Y_C2 = "C2",
   form = "P",
-  Na = "MI",
-  standardized = TRUE,
-  bootstrap = 1000,
-  iseed = 123,
-  se = "boot",
-  R = 20000L,  # Monte Carlo repetitions
-  alpha = c(0.001, 0.01, 0.05),  # Significance levels
-  m = 5,  # Number of imputations
-  method = "pmm",  # Imputation method
-  decomposition = "eigen",
-  pd = TRUE,
-  tol = 1e-06,
-  seed = 123,
-  alphastd = c(0.01, 0.05)
+  Na = "DE",
+  standardized = FALSE,
+  bootstrap = 100
 )
 
 # Print the results

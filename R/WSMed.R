@@ -92,6 +92,7 @@
 #'   Y_C2 = "C1",
 #'   form = "P",
 #'   standardized = FALSE,
+#'   bootstrap = 100,
 #' )
 #' print(result1)
 #'
