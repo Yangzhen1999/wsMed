@@ -1,0 +1,19 @@
+# 加载必要的库
+install.packages("gert")
+library(gert)
+
+# 获取 Git 提交历史
+commit_history <- git_log(max = 50)  # 获取最近 50 次提交记录
+
+# 格式化提交记录为 NEWS.md 格式
+news_content <- paste0(
+  "# Package News\n\n",
+  paste0("## Version ", commit_history$message, " (", commit_history$time, ")\n", collapse = "\n")
+)
+
+# 写入 NEWS.md
+writeLines(news_content, "NEWS.md")
+
+# 打开 NEWS.md 进行检查
+file.edit("NEWS.md")
+library(remotes)
