@@ -1,0 +1,7 @@
+"0","library(knitr)"
+"0","data(example_data)"
+"0","set.seed(123) "
+"0","example_dataN <- mice::ampute("
+"0","  data = example_data,       "
+"0","  prop = 0.1,      "
+"0",")$amp"

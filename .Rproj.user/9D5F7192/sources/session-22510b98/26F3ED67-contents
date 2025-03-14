@@ -1,6 +1,6 @@
 Package: wsMed
-Title: Title: Within-Subject Mediation Analysis Using 'SEM'
-Version: 0.1.1
+Title:  Title: Within-Subject Mediation Analysis Using 'SEM'
+Version: 0.0.0.9000
 Authors@R:
     c(person(given = "Wendie",
              family ="Yang",
@@ -12,9 +12,9 @@ Authors@R:
              role = c("aut"),
              email = "shufai.cheung@gmail.com",
              comment = c(ORCID = "0000-0002-9871-9448")))
-Description: Within-subject mediation analysis using structural equation modeling.
-    Examine how changes in an outcome variable between two conditions are mediated 
-    through one or more variables.
+Description: 'wsMed' is an R package for within-subject mediation analysis.
+It helps researchers examine how changes in an outcome variable between two 
+conditions are mediated through one or more variables.
 License: GPL (>= 3)
 Depends: R (>= 2.10)
 Encoding: UTF-8
