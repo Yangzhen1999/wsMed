@@ -1,0 +1,49 @@
+library(simmcbootanalysis)
+
+dir0 <- ("/icto/user/yc47319/ondemand/data/sys/myjobs/projects/default/1/data")
+dir1 <- ("/icto/user/yc47319/ondemand/data/sys/myjobs/projects/default/1/out")
+
+system.time(simmcbootanalysis::sim_main(taskid = 13,
+                 FUN = med_lv_sim_i,
+                 ci_rate = .90,
+                 seed = 83911628,
+                 mc_ml = list(FUN = "med_lv_mc",
+                              args = list(brep = 10000,
+                                          sem_args = list())),
+                 mc_mlr = list(FUN = "med_lv_mc",
+                               args = list(brep = 10000,
+                                           sem_args = list(estimator = "MLR"))),
+                 nb = list(FUN = "med_lv_nb",
+                           args = list(brep = 2000,
+                                       sem_args = list())),
+                 corereserve = -1,
+                 data_dir = dir0,
+                 out_dir = dir1,
+                 returnout = FALSE,
+                 saveout = TRUE,
+                 progress = TRUE,
+                 save_type_data = "qs",
+                 save_type_out = "qs"))
+
+
+system.time(simmcbootanalysis::sim_main(taskid = 14,
+                 FUN = med_lv_sim_i,
+                 ci_rate = .90,
+                 seed = 47418184,
+                 mc_ml = list(FUN = "med_lv_mc",
+                              args = list(brep = 10000,
+                                          sem_args = list())),
+                 mc_mlr = list(FUN = "med_lv_mc",
+                               args = list(brep = 10000,
+                                           sem_args = list(estimator = "MLR"))),
+                 nb = list(FUN = "med_lv_nb",
+                           args = list(brep = 2000,
+                                       sem_args = list())),
+                 corereserve = -1,
+                 data_dir = dir0,
+                 out_dir = dir1,
+                 returnout = FALSE,
+                 saveout = TRUE,
+                 progress = TRUE,
+                 save_type_data = "qs",
+                 save_type_out = "qs"))
