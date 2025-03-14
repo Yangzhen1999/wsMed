@@ -45,10 +45,10 @@
 #' @examples
 #' # Example dataset with missing values
 #' data(example_data)
-#' set.seed(123) # 确保结果可重复
+#' set.seed(123)  
 #' example_dataN <- mice::ampute(
-#'    data = example_data,       # 输入完整数据
-#'    prop = 0.1,      # 缺失值比例 (20%)
+#'    data = example_data,       
+#'    prop = 0.1,       
 #'    )$amp
 #'
 #'

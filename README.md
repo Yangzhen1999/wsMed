@@ -1,31 +1,31 @@
 ---
-editor_options: 
+  editor_options: 
   markdown: 
-    wrap: sentence
+  wrap: sentence
 ---
-
-# wsMed
-
-<!-- badges: start -->
-
-<!-- badges: end -->
-
-wsMed is an R package for within-subject mediation analysis designed to help researchers examine how changes in an outcome variable between two conditions are mediated through one or more variables.
+  
+  # wsMed
+  
+  <!-- badges: start -->
+  
+  <!-- badges: end -->
+  
+  wsMed is an R package for within-subject mediation analysis designed to help researchers examine how changes in an outcome variable between two conditions are mediated through one or more variables.
 The package supports multiple mediation models, including chained, parallel, and combined chained + parallel mediation, allowing for any number of mediators.
 It generates both unstandardized and standardized results and provides flexible options for handling missing data, including Multiple Imputation (MI) and Full Information Maximum Likelihood (FIML).
 
 ## Installation
 
 You can install the development version of wsMed from [GitHub](https://github.com/) with:
-
-``` r
+  
+  ``` r
 # install.packages("pak")
 pak::pak("Yangzhen1999/wsMed")
 ```
 
 Alternatively, if you prefer using devtools, you can install wsMed as follows:
-
-``` r
+  
+  ``` r
 # install.packages("devtools")
 devtools::install_github("Yangzhen1999/wsMed")
 ```
@@ -33,8 +33,8 @@ devtools::install_github("Yangzhen1999/wsMed")
 ## Example
 
 This is a basic example which shows you how to solve a common problem:
-
-``` r
+  
+  ``` r
 library(wsMed)
 
 # Load example data
@@ -64,22 +64,50 @@ print(result)
 
 ### **1. Four Types of Mediation Models**
 
-`wsMed` supports a variety of mediation models, each suitable for different experimental designs: - **Parallel Mediation** (`"P"`) -- Multiple independent mediators acting simultaneously.
-- **Chained/Serial Mediation** (`"CN"`) -- Sequential mediators in a chain.
-- **Chained + Parallel Mediation** (`"CP"`) -- A combination of chained and parallel mediators.
-- **Parallel + Chained Mediation** (`"PC"`) -- Parallel mediators influencing a chained mediator.
+`wsMed` supports a variety of mediation models, each suitable for different experimental designs:
+  
+  -   **Parallel Mediation** (`"P"`) -- Multiple independent mediators acting simultaneously.
+<p align="center">
+  
+  <img src="man/figures/PM.png" alt="serial within-subject mediation model" width="70%"/>
+  
+  </p>
+  
+  -   **Chained/Serial Mediation** (`"CN"`) -- Sequential mediators in a chain.
+<p align="center">
+  
+  <img src="man/figures/CNM.png" alt="serial within-subject mediation model" width="70%"/>
+  
+  </p>
+  
+  -   **Chained + Parallel Mediation** (`"CP"`) -- A combination of chained and parallel mediators.
+<p align="center">
+  
+  <img src="man/figures/CPM.png" alt="serial within-subject mediation model" width="90%"/>
+  
+  </p>
+    
+  -   **Parallel + Chained Mediation** (`"PC"`) -- Parallel mediators influencing a chained mediator.
 
-Each model can handle **any number of mediators**, providing flexibility for complex studies.
+<p align="center">
+  
+  <img src="man/figures/PCM.png" alt="serial within-subject mediation model" width="90%"/>
+  
+  </p>
+  
+  Each model can handle **any number of mediators**, providing flexibility for complex studies.
+
+How to choose and build models can be found in the tutorial on models.
 
 ### **2. Comprehensive Output**
 
 `wsMed` provides **detailed mediation results**.
 In addition to the basic model fit statistics, it includes:
-
--   **Total and Direct Effects**: Estimates, standardized errors,p-values,z-values and CIs for the overall and direct influence of the independent variable.
+  
+  -   **Total and Direct Effects**: Estimates, standardized errors,p-values,z-values and CIs for the overall and direct influence of the independent variable.
 -   **Indirect Effects**: Estimates, standardized errors,p-values,z-values and CIs for each mediated path in the model.
 -   **Contrast Indirect Effects**: Pairwise comparisons of indirect effects between different mediation paths.
--   **Moderation Effects of X**: Analysis of whether a moderator influences the mediation paths.
+-   **Moderation Effects of 'X'**: Analysis of whether a moderator influences the mediation paths.
 -   **Condition1-Condition2 Coefficients**: Comparison of coefficients between two conditions.
 -   **Standardized Results**: Standardized estimates and confidence intervals, allowing for easier interpretation and comparison across variables.
 
@@ -97,14 +125,15 @@ In addition to the basic model fit statistics, it includes:
 ### **5. Confidence Intervals (CIs)**
 
 `wsMed` calculates **confidence intervals (CIs)** for both raw and standardized estimates, with different methods used depending on how missing data is handled:
-
--   **Monte Carlo Confidence Intervals**: - Used when **Multiple Imputation (MI)** or **Full Information Maximum Likelihood (FIML)** is used for handling missing data.
-    -   Provides robust and reliable confidence intervals based on simulation.
+  
+  -   **Monte Carlo Confidence Intervals**: - Used when Multiple Imputation (MI) or Full Information Maximum Likelihood (FIML) is used for handling missing data.
+-   Provides robust and reliable confidence intervals based on simulation.
 -   **Bootstrap Confidence Intervals**:
-    -   Used when **Listwise Deletion (DE)** is used to handle missing data or no missing data.
-    -   Provides confidence intervals based on resampling, ensuring accurate estimates for standard and non-standardized results.
+  -   Used when **Listwise Deletion (DE)** is used to handle missing data or no missing data.
+-   Provides confidence intervals based on resampling, ensuring accurate estimates for standard and non-standardized results.
 
 ### **6. User-Friendly and Efficient**
 
 With `wsMed`, **all you need to do is call the `wsMed` function**, and the package will handle everything for you.
 This makes `wsMed` accessible to both **beginners** and **advanced users**, providing a streamlined process for complex within subject mediation analysis.
+

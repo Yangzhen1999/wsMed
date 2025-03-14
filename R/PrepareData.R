@@ -57,34 +57,27 @@
 #' @export
 
 PrepareData <- function(data, M_C1, M_C2, Y_C1, Y_C2) {
-  # 检查输入长度是否匹配
   if (length(M_C1) != length(M_C2)) {
     stop("The number of M_C1 and M_C2 variables must match.")
   }
 
-  # 检查 Y_C1 和 Y_C2 是否存在
   if (!(Y_C1 %in% colnames(data)) || !(Y_C2 %in% colnames(data))) {
     stop("Y variables not found in the dataset.")
   }
 
-  # 计算 Y 的差异
   data$Ydiff <- data[[Y_C2]] - data[[Y_C1]]
 
-  # 初始化存储差异和均值的列
   diffs <- list()
   avgs <- list()
 
-  # 循环处理每对中介变量
   for (i in seq_along(M_C1)) {
     M1 <- M_C1[i]
     M2 <- M_C2[i]
 
-    # 检查 M1 和 M2 是否存在
     if (!(M1 %in% colnames(data)) || !(M2 %in% colnames(data))) {
       stop(paste0("M variables for ", M1, " and ", M2, " not found in the dataset."))
     }
 
-    # 计算差异和中心化均值
     diff_name <- paste0("M", i, "diff")
     avg_name <- paste0("M", i, "avg")
     diffs[[diff_name]] <- data[[M2]] - data[[M1]]
@@ -93,10 +86,8 @@ PrepareData <- function(data, M_C1, M_C2, Y_C1, Y_C2) {
     avgs[[avg_name]] <- (M1_centered + M2_centered) / 2
   }
 
-  # 将生成的差异和均值列添加到数据框中
   data <- cbind(data, do.call(cbind, diffs), do.call(cbind, avgs))
 
-  # 返回只包含 Ydiff 和所有差异与均值的列
   cols_to_return <- c("Ydiff", names(diffs), names(avgs))
   return(data[, cols_to_return])
 }

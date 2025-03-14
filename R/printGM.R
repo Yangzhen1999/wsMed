@@ -4,7 +4,9 @@
 #' `GenerateModelCN`, `GenerateModelCP`, `GenerateModelP`, and `GenerateModelPC`.
 #' It organizes the equations into labeled sections for better readability.
 #'
-#' @param x A character string representing an SEM model syntax.
+#' @param x A list or character string containing SEM model syntax.
+#' If `x` is a `wsMed()` result, it will extract and print the model syntax.
+#' If `x` is a `GenerateModel*()` result, it will format and print the model.
 #' @param ... Additional arguments (not used).
 #'
 #' @return Invisibly returns the formatted SEM model syntax.
@@ -13,16 +15,16 @@
 #' head(example_data)
 #' prepared_data <- PrepareData(
 #'   data = example_data,
-#'   M_C1 = c("A1", "B1",),
+#'   M_C1 = c("A1", "B1"),
 #'   M_C2 = c("A2", "B2"),
 #'   Y_C1 = "C1",
 #'   Y_C2 = "C2"
 #' )
 #' sem_model <- GenerateModelPC(prepared_data)
-#' print.GM(sem_model)
+#' printGM(sem_model)
 #' @export
 
-print.GM <- function(x, ...) {
+printGM <- function(x, ...) {
   # **只有在 `x` 是 `list` 并且包含 `sem_model` 时，才提取 `sem_model`**
   if (is.list(x) && "sem_model" %in% names(x)) {
     x <- x$sem_model
@@ -30,14 +32,11 @@ print.GM <- function(x, ...) {
 
   # **确保 `x` 是单个字符串**
   if (!is.character(x) || length(x) != 1 || is.na(x) || x == "") {
-    stop("Error in print.GM(): Input must be a non-empty character string representing an SEM model.")
+    stop("Error in printGM(): Input must be a non-empty character string representing an SEM model.")
   }
 
-  # **解析 `\n` 确保换行正确**
-  lines <- strsplit(x, "\n")[[1]]
-
-  # **去除前后空格**
-  lines <- trimws(lines)
+  # **拆分换行符，去除空格**
+  lines <- trimws(unlist(strsplit(x, "\n")))
 
   # **定义不同方程的分类**
   section_titles <- list(
