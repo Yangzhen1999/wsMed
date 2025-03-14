@@ -1,4 +1,0 @@
-"0","# 指定临时库路径"
-"0",".libPaths(c(tempdir(), .libPaths()))"
-"0","# 加载你的包"
-"0","library(wsMed) # 替换为你的包名"
