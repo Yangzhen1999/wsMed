@@ -22,7 +22,7 @@
 #' @param data_missing A data frame containing the raw dataset with missing values.
 #' @param m An integer specifying the number of imputations to perform. Default is `5`.
 #' @param method A character string specifying the imputation method. Default is `"pmm"`
-#' (predictive mean matching). Other methods supported by [mice()] can be used.
+#' (predictive mean matching). Other methods supported by [mice::mice()] can be used.
 #' @param seed An integer specifying the random seed for reproducibility. Default is `123`.
 #' @param M_C1 A character vector of column names representing mediators "before" the intervention.
 #' @param M_C2 A character vector of column names representing mediators "after" the intervention.
