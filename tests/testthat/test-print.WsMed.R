@@ -1,7 +1,7 @@
 library(testthat)
 library(lavaan)
 library(knitr)
-library(semhelpinghands)
+library(semboottools)
 library(semmcci)
 
 data(example_data)

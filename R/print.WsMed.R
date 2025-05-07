@@ -69,7 +69,7 @@
 #'
 #' # Print the results
 #' print(result1)
-#' 
+#'
 #' @importFrom stats quantile sd
 #' @importFrom knitr kable
 #' @export
@@ -494,7 +494,7 @@ print.wsMed <- function(x, level = 0.95,digits=3, ...) {
   if (!is.null(fit) && !is.null(x$Na) && x$Na == "DE") {
     bootstrap_info <- list(
       method = if (!is.null(fit@Options$se) && fit@Options$se == "bootstrap") {
-        "Percentile bootstrap"
+        paste0("Bootstrap (", if (!is.null(x$boot_ci_type)) x$boot_ci_type else "unknown", ")")
       } else {
         "Not bootstrap"
       },
@@ -511,6 +511,9 @@ print.wsMed <- function(x, level = 0.95,digits=3, ...) {
     if (!is.null(x$iseed)) {
       cat("Random seed used: ", x$iseed, "\n")
     }
+    cat("SE: Delta-method standard error\n")
+    cat("Boot SE: Standard deviation of bootstrap estimates\n")
+    cat("Bootstrap P: Asymmetric bootstrap p-value (only for perc)\n")
   }
 
   # mi_result Section
@@ -636,40 +639,64 @@ print.wsMed <- function(x, level = 0.95,digits=3, ...) {
     cat("\n")
     cat("\n*************** STANDARDIZED RESULTS ***************\n")
 
-    if (level == 0.95){std_result <- x$std_result} else {
-      std_result <- semhelpinghands::standardizedSolution_boot_ci(fit,level =level)}
+    # 如果 level != 0.95，重新生成标准化解
+    if (level == 0.95) {
+      std_result <- x$std_result
+    } else {
+      std_result <- semboottools::standardizedSolution_boot(
+        object = x$lavaan_fit,
+        level = level,
+        type = "std.all",
+        boot_ci_type = x$boot_ci_type,
+        save_boot_est_std = FALSE,
+        boot_pvalue = TRUE
+      )
+    }
 
-    alphastd <- x$alphastd  # 提取 alphastd
-    lower_bound <- alphastd / 2
-    upper_bound <- 1 - lower_bound
-
-    # 提取并重命名参数名称
-    std_result$label <- gsub("^cp$", "Direct effect", std_result$label)                     # 替换 cp 为 Direct effect
-    std_result$label <- gsub("^total_effect$", "Total effect", std_result$label)           # 替换 total_effect 为 Total effect
-    std_result$label <- gsub("^indirect", "ind", std_result$label)                         # 替换 indirect 为 ind
-    std_result$label <- gsub("^total_indirect$", "total ind", std_result$label)            # 替换 total_indirect 为 total ind
-    std_result$label <- gsub("^CI(\\d+)vs(\\d+)$", "ind\\1-ind\\2", std_result$label)      # 替换 CI1vs2 为 ind1-ind2
-
-    # 检查并生成新的 label
+    # 清理标签
+    std_result$label <- gsub("^cp$", "Direct effect", std_result$label)
+    std_result$label <- gsub("^total_effect$", "Total effect", std_result$label)
+    std_result$label <- gsub("^indirect", "ind", std_result$label)
+    std_result$label <- gsub("^total_indirect$", "total ind", std_result$label)
+    std_result$label <- gsub("^CI(\\d+)vs(\\d+)$", "ind\\1-ind\\2", std_result$label)
     std_result$label <- ifelse(
       is.na(std_result$label) | std_result$label == "",
       paste(std_result$lhs, std_result$op, std_result$rhs, sep = " "),
       std_result$label
     )
 
-    # 删除 lhs, op, rhs 列
-    result_table <- std_result[, !(names(std_result) %in% c("lhs", "op", "rhs", "se", "ci.lower", "ci.upper"))]
+    # 提取显示列
+    keep_cols <- c("label", "est.std", "se", "z", "pvalue",
+                   "ci.lower", "ci.upper", "boot.se", "boot.p", "boot.ci.lower", "boot.ci.upper")
+    std_result_clean <- std_result[, names(std_result) %in% keep_cols]
 
     # 重命名列
-    colnames(result_table) <- c(
-      "Label", "Estimate (Std)", "Z", "P-value",
-      "LLCI", "ULCI", "Boot SE"
+    col_renaming <- c(
+      label = "Label",
+      est.std = "Estimate (Std)",
+      se = "SE",
+      z = "Z",
+      pvalue = "P-value",
+      ci.lower = "CI Lower",
+      ci.upper = "CI Upper",
+      boot.se = "Boot SE",
+      boot.p = "Bootstrap P",
+      boot.ci.lower = "Boot CI Lower",
+      boot.ci.upper = "Boot CI Upper"
     )
+    colnames(std_result_clean) <- col_renaming[names(std_result_clean)]
 
-
-    # 打印表格，确保列对齐
-    print_table_dynamic(result_table)
+    # 打印结果
+    print_table_dynamic(std_result_clean)
+    if (!is.null(x$boot_ci_type) && x$boot_ci_type %in% c("bc", "bca.simple")) {
+      cat("\n Warning:\n")
+      cat("If you see 'extreme order statistics used as endpoints',\n")
+      cat("some CIs rely on the most extreme bootstrap values.\n")
+      cat("This can happen with highly skewed estimates or limited bootstrap samples.\n")
+      cat("Consider increasing bootstrap = 5000 or using boot_ci_type = \"perc\".\n")
+    }
   }
+
   if (!is.null(x$std_fiml_result)) {
     cat("\n")
     cat("\n*************** MONTE CARLO CONFIDENCE INTERVALS (STANDARDIZED) ***************\n")

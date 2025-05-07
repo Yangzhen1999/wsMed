@@ -1,6 +1,6 @@
 library(testthat)
 library(lavaan)
-library(semhelpinghands)
+library(semboottools)
 library(semmcci)
 
 data(example_data)

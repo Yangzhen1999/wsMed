@@ -67,7 +67,8 @@
 #' @param seed An integer for setting the random seed during Monte Carlo simulations. Defaults to `123`.
 #' @param alphastd A numeric value specifying the significance level for standardized confidence intervals. Defaults to `0.05`.
 #' @param fixed.x Logical. If `TRUE`, the x variables are fixed. Default is `FALSE`.
-
+#' @param boot_ci_type Character. The type of bootstrap confidence interval to use for standardized results.
+#'
 #' @return A list containing the following components:
 #' - `prepared_data`: The preprocessed dataset.
 #' - `model_summary`: Summary statistics of the fitted SEM model.
@@ -96,30 +97,31 @@
 #' )
 #' print(result1)
 #'
-#' @importFrom semhelpinghands standardizedSolution_boot_ci
+#' @importFrom semboottools standardizedSolution_boot
 #' @export
 
 wsMed <- function(data,
-                  M_C1,
-                  M_C2,
-                  Y_C1,
-                  Y_C2,
-                  form = "P",
-                  standardized = FALSE,
-                  Na = "DE",
-                  bootstrap = 1000,
-                  iseed = 123,
-                  se = "boot",
-                  R = 20000L,  # Monte Carlo 重复次数
-                  fixed.x = FALSE,
-                  alpha = c(0.01, 0.05),  # 显著性水平
-                  m = 5,  # 插补次数
-                  method = "pmm",  # 插补方法
-                  decomposition = "eigen",
-                  pd = TRUE,
-                  tol = 1e-06,
-                  seed = 123,
-                  alphastd = c(0.01, 0.05)) {
+                   M_C1,
+                   M_C2,
+                   Y_C1,
+                   Y_C2,
+                   form = "P",
+                   standardized = FALSE,
+                   Na = "DE",
+                   bootstrap = 1000,
+                   iseed = 123,
+                   se = "boot",
+                   boot_ci_type = "perc",
+                   R = 20000L,  # Monte Carlo 重复次数
+                   fixed.x = FALSE,
+                   alpha = c(0.01, 0.05),  # 显著性水平
+                   m = 5,  # 插补次数
+                   method = "pmm",  # 插补方法
+                   decomposition = "eigen",
+                   pd = TRUE,
+                   tol = 1e-06,
+                   seed = 123,
+                   alphastd = c(0.01, 0.05)) {
 
   # 输入验证
   {
@@ -291,7 +293,15 @@ wsMed <- function(data,
   if (standardized) {
     tryCatch({
       if (Na == "DE") {
-        std_result <- semhelpinghands::standardizedSolution_boot_ci(fit)
+        boot_ci_type <- match.arg(boot_ci_type, choices = c("perc", "bc", "bca.simple"))
+        std_result <-  semboottools::standardizedSolution_boot(
+          object = fit,
+          level = max(1 - alphastd),
+          type = "std.all",
+          boot_ci_type = boot_ci_type,
+          save_boot_est_std = TRUE,
+          boot_pvalue = TRUE
+        )
         if (is.null(std_result)) {
           warning("Standardized solution for DE method returned NULL.")
         }
@@ -356,6 +366,7 @@ wsMed <- function(data,
     mi_result = mi_result,
     fiml_result = fiml_result,
     std_result = std_result,
+    boot_ci_type = boot_ci_type,
     std_mi_result = std_mi_result,
     std_fiml_result = std_fiml_result,
     input_vars = input_vars,
@@ -366,8 +377,6 @@ wsMed <- function(data,
     paras = paras,
     standardized = standardized
   )
-
-  # Step 6: 返回结果
   class(out) <- "wsMed"
   return(out)
 }
