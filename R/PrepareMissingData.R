@@ -40,10 +40,10 @@
 #' @examples
 #' # Example dataset with missing values
 #' data(example_data)
-#' set.seed(123)  
+#' set.seed(123)
 #' example_dataN <- mice::ampute(
-#'    data = example_data,        
-#'    prop = 0.1,       
+#'    data = example_data,
+#'    prop = 0.1,
 #'    )$amp
 #'
 #' # Prepare the dataset with multiple imputations
@@ -99,7 +99,8 @@ PrepareMissingData <- function(data_missing,
   })
 
   return(list(
+    mids = imputed_result$mids,
     processed_data_list = processed_data_list,
-    imputation_summary = imputed_result$summary   
+    imputation_summary = imputed_result$summary
   ))
 }

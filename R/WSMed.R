@@ -110,7 +110,6 @@ wsMed <- function(data,
                    Na = "DE",
                    bootstrap = 1000,
                    iseed = 123,
-                   se = "boot",
                    boot_ci_type = "perc",
                    R = 20000L,  # Monte Carlo 重复次数
                    fixed.x = FALSE,
@@ -121,7 +120,7 @@ wsMed <- function(data,
                    pd = TRUE,
                    tol = 1e-06,
                    seed = 123,
-                   alphastd = c(0.01, 0.05)) {
+                   alphastd = 0.05) {
 
   # 输入验证
   {
@@ -222,19 +221,33 @@ wsMed <- function(data,
     stop("Invalid 'form' parameter. Use 'CP', 'PC' or 'CN'.")
   }
 
+  assign("sem_model", sem_model, envir = .GlobalEnv)
+  assign("prepared_data", prepared_data, envir = .GlobalEnv)
+
   # fit the model
   if (Na == "DE") {
     # 删除缺失值的模型拟合
     fit <- lavaan::sem(
       model = sem_model,
       data = prepared_data,
-      se = se,
-      bootstrap = bootstrap,
-      iseed = iseed,
       fixed.x = fixed.x,
       warn = FALSE
     )
-  } else if (Na == "FIML") {
+
+    fit_u <- semboottools::store_boot(
+      fit,
+      do_bootstrapping = TRUE,
+      R = bootstrap,
+      iseed = iseed
+    )
+
+    ustd_result <- semboottools::parameterEstimates_boot(
+      object = fit_u,
+      boot_ci_type = boot_ci_type,
+      boot_pvalue = TRUE
+    )
+  }
+  else if (Na == "FIML") {
     # 使用 FIML 方法处理缺失值
     fit <- lavaan::sem(
       model = sem_model,
@@ -243,44 +256,37 @@ wsMed <- function(data,
       fixed.x = fixed.x,
       warn = FALSE
     )
-  } else if (Na == "MI") {
-    fit <- lavaan::sem(
-      model = sem_model,
-      data = prepared_data,
-      fixed.x = fixed.x,
-      warn = FALSE
+
+    fit_u <- semboottools::store_boot(
+      fit,
+      do_bootstrapping = TRUE,
+      R = bootstrap,
+      iseed = iseed
     )
-    if (!inherits(fit, "lavaan")) {
-      stop("Model fitting failed. Check your input model and data.")
-    }
-  }
+
+    ustd_result <- semboottools::parameterEstimates_boot(
+      object = fit_u,
+      boot_ci_type = boot_ci_type,
+      boot_pvalue = TRUE
+    )
+  } else if (Na == "MI") { }
+
   # Monte Carlo
-  mi_result <- NULL
   fiml_result <- NULL
-  if (Na == "MI") {
-    # Step 4: MCMI 分析（可选）
-    mi_result <- RunMCMIAnalysis(
-      data_missing = data,
-      m = m,
-      method = method,
-      seed = seed,
-      M_C1 = M_C1,
-      M_C2 = M_C2,
-      Y_C1 = Y_C1,
-      Y_C2 = Y_C2,
-      sem_model = sem_model,
-      Na = Na,
-      R = R,
-      alpha = alpha,
-      decomposition = decomposition,
-      pd = pd,
-      tol = tol
-    )
-  }
   if (Na == "FIML"){
     fiml_result <- MC(fit,
                       R = R,
                       alpha = alpha)
+    mc_fiml_result <- run_mc_mediation(
+      fit = fit,
+      data = prepared_data,
+      standardized = standardized,
+      R = R,
+      seed = seed,
+      alpha = alpha,
+      alphastd = alphastd)
+
+    fiml_result2 <- summarize_mc_ci(mc_fiml_result$unstd_result)
   }
 
   # Step 5: 标准化结果
@@ -288,14 +294,15 @@ wsMed <- function(data,
   std_result <- NULL
   std_mi_result <- NULL
   std_fiml_result <- NULL
+  mi_result <- NULL
 
   # 生成标准化结果
   if (standardized) {
     tryCatch({
-      if (Na == "DE") {
+      if (Na %in% c("DE", "FIML")){
         boot_ci_type <- match.arg(boot_ci_type, choices = c("perc", "bc", "bca.simple"))
         std_result <-  semboottools::standardizedSolution_boot(
-          object = fit,
+          object = fit_u,
           level = max(1 - alphastd),
           type = "std.all",
           boot_ci_type = boot_ci_type,
@@ -307,38 +314,19 @@ wsMed <- function(data,
         }
       }
 
-      if (Na == "MI") {
-        if (is.null(mi_result)) {
-          warning("MI result is NULL, cannot compute standardized solution.")
+      if (Na == "FIML") {
+        if (is.null(mc_fiml_result)) {
+          warning("FIML result is NULL, cannot compute standardized solution.")
         } else {
-          std_mi_result <- tryCatch(
-            semmcci::MCStd(mi_result, alpha = alphastd),
-            error = function(e) {
-              warning("Standardized solution for MI failed: ", e$message)
-              NULL
-            }
-          )
+          std_fiml_result <- summarize_mc_ci(mc_fiml_result$std_result)
         }
       }
 
-      if (Na == "FIML") {
-        if (is.null(fiml_result)) {
-          warning("FIML result is NULL, cannot compute standardized solution.")
-        } else {
-          std_fiml_result <- tryCatch(
-            semmcci::MCStd(fiml_result, alpha = alphastd),
-            error = function(e) {
-              warning("Standardized solution for FIML failed: ", e$message)
-              NULL
-            }
-          )
-        }
-      }
     }, error = function(e) {
       warning("Error during standardized solution generation: ", e$message)
     })
-  }
 
+  }
 
   input_vars <- list(
     M_C1 = M_C1,
@@ -365,8 +353,10 @@ wsMed <- function(data,
     sem_model = sem_model,
     mi_result = mi_result,
     fiml_result = fiml_result,
+    fiml_result2 = fiml_result2,
     std_result = std_result,
     boot_ci_type = boot_ci_type,
+    ustd_result = ustd_result,
     std_mi_result = std_mi_result,
     std_fiml_result = std_fiml_result,
     input_vars = input_vars,
@@ -379,4 +369,6 @@ wsMed <- function(data,
   )
   class(out) <- "wsMed"
   return(out)
-}
+  }
+
+

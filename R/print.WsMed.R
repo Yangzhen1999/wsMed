@@ -75,7 +75,7 @@
 #' @export
 
 
-print.wsMed <- function(x, level = 0.95,digits=3, ...) {
+print.wsMed <- function(x, level = 0.95,digits=3, delta = FALSE, ...) {
 
   print_table_dynamic <- function(data, digits_local = digits, width = 10) {
     # 动态设置 columns_per_row
@@ -188,6 +188,7 @@ print.wsMed <- function(x, level = 0.95,digits=3, ...) {
 
   # SEM 模型拟合指标
   param_estimates <- lavaan::parameterEstimates(fit, ci = TRUE, level = level)
+  ustd_result <- x$ustd_result
   fit_measures <- lavaan::fitMeasures(fit, fit.measures = c(
     "chisq", "df", "pvalue", "cfi", "tli", "rmsea", "rmsea.ci.lower", "rmsea.ci.upper", "srmr"
   ))
@@ -206,11 +207,10 @@ print.wsMed <- function(x, level = 0.95,digits=3, ...) {
       fit_measures["srmr"]
     )
   )
-  cat("\n")
-  cat("\n*************** MODEL FIT INDICES ***************\n")
-  print_table_dynamic(fit_indices)
 
-  # 回归路径部分
+  #MI部分的非标准化系数
+  if (!is.null(x$mi_result)){
+     # 回归路径部分
   regressions <- param_estimates[param_estimates$op == "~", ]
   if (nrow(regressions) > 0) {
     cat("\n*************** REGRESSION PATHS, INTERCEPTS AND VARIANCES ***************\n")
@@ -491,16 +491,464 @@ print.wsMed <- function(x, level = 0.95,digits=3, ...) {
 
 
   # Analysis Notes and Warnings
-  if (!is.null(fit) && !is.null(x$Na) && x$Na == "DE") {
+  {
     bootstrap_info <- list(
       method = if (!is.null(fit@Options$se) && fit@Options$se == "bootstrap") {
-        paste0("Bootstrap (", if (!is.null(x$boot_ci_type)) x$boot_ci_type else "unknown", ")")
+        "Percentile bootstrap"
       } else {
         "Not bootstrap"
       },
       num_samples = if (!is.null(fit@Options$bootstrap)) fit@Options$bootstrap else NA
     )
     cat("\n")
+    cat("\n*************** Bootstrapping NOTES ***************\n")
+    cat("\n")
+    cat("Bootstrap confidence interval method used: ", bootstrap_info$method, "\n")
+    if (!is.na(bootstrap_info$num_samples)) {
+      cat("Number of bootstrap samples: ", bootstrap_info$num_samples, "\n")
+    }
+    cat("Confidence level: ", level * 100, "%\n")
+    if (!is.null(x$iseed)) {
+      cat("Random seed used: ", x$iseed, "\n")
+    }
+  }
+
+  # mi_result Section
+  if (!is.null(x$mi_result)) {
+    cat("\n")
+    cat("\n*************** MONTE CARLO CONFIDENCE INTERVALS (MI) ***************\n")
+    # 提取 alpha 参数
+    alpha <- x$alpha  # 假设在 wsMed 输出中包含 alpha 参数
+    if (is.null(alpha)) {
+      stop("The 'alpha' parameter is missing from the wsMed object.")
+    }
+
+    # 动态生成置信区间的概率值
+    lower_bounds <- alpha / 2
+    upper_bounds <- 1 - lower_bounds
+    ci.levels <- sort(c(lower_bounds, upper_bounds))  # 确保排序
+
+    mi_result <- x$mi_result
+
+    if (!is.null(mi_result$thetahat$est) && !is.null(mi_result$thetahatstar)) {
+      # 提取参数估计
+      estimates <- mi_result$thetahat$est
+      param_names <- names(estimates)
+
+      # 修改参数名称
+      param_names <- gsub("^cp$", "direct effect", param_names)                     # 替换 cp 为 Direct effect
+      param_names <- gsub("^total_effect$", "total effect", param_names)           # 替换 total_effect 为 Total effect
+      param_names <- gsub("^indirect", "ind", param_names)                         # 替换 indirect 为 ind
+      param_names <- gsub("^total_indirect$", "total ind", param_names)            # 替换 total_indirect 为 total ind
+      param_names <- gsub("^CI(\\d+)vs(\\d+)$", "ind\\1-ind\\2", param_names)      # 替换 CI1vs2 为 ind1-ind2
+
+      # 更新参数名称到 thetahatstar
+      colnames(mi_result$thetahatstar) <- param_names
+
+      # 使用 thetahatstar 计算所有的置信区间百分位数
+      thetahatstar <- mi_result$thetahatstar
+
+      # 计算置信区间值
+      ci.values <- t(sapply(ci.levels, function(level) apply(thetahatstar, 2, quantile, probs = level)))
+      ci.names <- paste0(sprintf("%.1f", pmin(pmax(ci.levels * 100, 0.1), 99.9)), "%")
+      rownames(ci.values) <- ci.names
+
+      # 提取标准误
+      se <- apply(thetahatstar, 2, sd)
+      R <- nrow(thetahatstar)
+
+      # 构建结果表
+      result_table <- data.frame(
+        Parameter = param_names,
+        Estimate = estimates,
+        SE = se
+      )
+
+      # 添加动态生成的置信区间列
+      ci.columns <- as.data.frame(t(ci.values))  # 转置为列格式
+      colnames(ci.columns) <- ci.names
+      result_table <- cbind(result_table, ci.columns)
+
+      # 打印表格
+      print_table_dynamic(result_table)
+    }
+  }
+
+  }
+  #DE和FIML的非标准化系数
+  if (is.null(x$mi_result)){cat("\n")
+    cat("\n*************** MODEL FIT INDICES ***************\n")
+    print_table_dynamic(fit_indices)
+
+    # 回归路径部分
+    delta <- isTRUE(delta)
+    regressions <- ustd_result[ustd_result$op == "~", ]
+    if (nrow(regressions) > 0) {
+      cat("\n*************** REGRESSION PATHS, INTERCEPTS AND VARIANCES ***************\n")
+
+      # 创建基础列
+      regression_table <- data.frame(
+        Path     = paste(regressions$lhs, "~", regressions$rhs),
+        Label    = regressions$label,
+        Estimate = regressions$est,
+        bSE      = regressions$boot.se,
+        bp       = regressions$boot.p,
+        bCI.Lo   = regressions$boot.ci.lower,
+        bCI.Up   = regressions$boot.ci.upper
+      )
+
+      # 如果 delta = TRUE，则添加原始估计列
+      if (delta) {
+        regression_table$SE      <- regressions$se
+        regression_table$`P-value` <- regressions$pvalue
+        regression_table$CI.Lo   <- regressions$ci.lower
+        regression_table$CI.Up   <- regressions$ci.upper
+      }
+
+      print_table_dynamic2(regression_table)
+    }
+
+    # 截距部分（修改版本，支持 delta 参数）
+    intercepts <- ustd_result[ustd_result$op == "~1", ]
+    if (nrow(intercepts) > 0) {
+      intercept_table <- data.frame(
+        Intercept = paste0(intercepts$lhs, "~1"),
+        Label     = intercepts$label,
+        Estimate  = intercepts$est,
+        bSE       = intercepts$boot.se,
+        bp        = intercepts$boot.p,
+        bCI.Lo    = intercepts$boot.ci.lower,
+        bCI.Up    = intercepts$boot.ci.upper
+      )
+
+      # 如果 delta=TRUE，添加原始估计列
+      if (delta) {
+        intercept_table$SE       <- intercepts$se
+        intercept_table$`P-value` <- intercepts$pvalue
+        intercept_table$CI.Lo    <- intercepts$ci.lower
+        intercept_table$CI.Up    <- intercepts$ci.upper
+      }
+
+      print_table_dynamic2(intercept_table)
+    }
+
+
+    # 方差部分（支持 delta 控制原始估计输出）
+    variances <- ustd_result[ustd_result$op == "~~" & ustd_result$lhs == ustd_result$rhs, ]
+    if (nrow(variances) > 0) {
+      variance_table <- data.frame(
+        Variance = paste0(variances$lhs, "~~", variances$rhs),
+        Estimate = variances$est,
+        bSE      = variances$boot.se,
+        bp       = variances$boot.p,
+        bCI.Lo   = variances$boot.ci.lower,
+        bCI.Up   = variances$boot.ci.upper
+      )
+
+      # 添加原始估计值（delta = TRUE）
+      if (delta) {
+        variance_table$SE       <- variances$se
+        variance_table$`P-value` <- variances$pvalue
+        variance_table$CI.Lo    <- variances$ci.lower
+        variance_table$CI.Up    <- variances$ci.upper
+      }
+
+      print_table_dynamic(variance_table)
+    }
+
+    # 总效应和直接效应（支持 delta 控制是否包含原始估计）
+    total_effect <- ustd_result[ustd_result$lhs == "total_effect", ]
+    direct_effect <- ustd_result[ustd_result$lhs == "Ydiff" & ustd_result$op == "~1", ]
+
+    # 构建表格
+    combined_effects <- data.frame(
+      Name = c(if (nrow(total_effect) > 0) "Total effect" else NULL,
+               if (nrow(direct_effect) > 0) "Direct effect" else NULL),
+      Effect = c(if (nrow(total_effect) > 0) total_effect$est else NULL,
+                 if (nrow(direct_effect) > 0) direct_effect$est else NULL),
+      bSE = c(if (nrow(total_effect) > 0) total_effect$boot.se else NULL,
+              if (nrow(direct_effect) > 0) direct_effect$boot.se else NULL),
+      bp = c(if (nrow(total_effect) > 0) total_effect$boot.p else NULL,
+             if (nrow(direct_effect) > 0) direct_effect$boot.p else NULL),
+      bCI.Lo = c(if (nrow(total_effect) > 0) total_effect$boot.ci.lower else NULL,
+                 if (nrow(direct_effect) > 0) direct_effect$boot.ci.lower else NULL),
+      bCI.Up = c(if (nrow(total_effect) > 0) total_effect$boot.ci.upper else NULL,
+                 if (nrow(direct_effect) > 0) direct_effect$boot.ci.upper else NULL)
+    )
+
+    # 添加原始估计列（若 delta = TRUE）
+    if (delta) {
+      combined_effects$SE <- c(if (nrow(total_effect) > 0) total_effect$se else NULL,
+                               if (nrow(direct_effect) > 0) direct_effect$se else NULL)
+      combined_effects$`P-value` <- c(if (nrow(total_effect) > 0) total_effect$pvalue else NULL,
+                                      if (nrow(direct_effect) > 0) direct_effect$pvalue else NULL)
+      combined_effects$CI.Lo <- c(if (nrow(total_effect) > 0) total_effect$ci.lower else NULL,
+                                  if (nrow(direct_effect) > 0) direct_effect$ci.lower else NULL)
+      combined_effects$CI.Up <- c(if (nrow(total_effect) > 0) total_effect$ci.upper else NULL,
+                                  if (nrow(direct_effect) > 0) direct_effect$ci.upper else NULL)
+    }
+
+    # 打印合并后的表格
+    if (nrow(combined_effects) > 0) {
+      cat("\n")
+      cat("\n*************** TOTAL AND DIRECT EFFECT ***************\n")
+      print_table_dynamic(combined_effects)
+    }
+
+
+    # 间接效应
+    indirect_effects <- ustd_result[grep("^indirect", ustd_result$lhs), ]
+    total_indirect_effect <- ustd_result[ustd_result$lhs == "total_indirect", ]
+
+    if (nrow(indirect_effects) > 0 || nrow(total_indirect_effect) > 0) {
+      # 缩写名称
+      indirect_names <- gsub("indirect", "ind", indirect_effects$lhs)
+      total_ind_name <- "total ind"
+
+      # 构建基本表格（bootstrap）
+      combined_effects <- rbind(
+        data.frame(
+          Name = indirect_names,
+          Effect = indirect_effects$est,
+          bSE = indirect_effects$boot.se,
+          bp = indirect_effects$boot.p,
+          bCI.Lo = indirect_effects$boot.ci.lower,
+          bCI.Up = indirect_effects$boot.ci.upper
+        ),
+        if (nrow(total_indirect_effect) > 0) {
+          data.frame(
+            Name = total_ind_name,
+            Effect = total_indirect_effect$est,
+            bSE = total_indirect_effect$boot.se,
+            bp = total_indirect_effect$boot.p,
+            bCI.Lo = total_indirect_effect$boot.ci.lower,
+            bCI.Up = total_indirect_effect$boot.ci.upper
+          )
+        } else {
+          NULL
+        }
+      )
+
+      # 添加原始估计（如果 delta = TRUE）
+      if (delta) {
+        combined_effects$SE <- c(indirect_effects$se, if (nrow(total_indirect_effect) > 0) total_indirect_effect$se else NULL)
+        combined_effects$`P-value` <- c(indirect_effects$pvalue, if (nrow(total_indirect_effect) > 0) total_indirect_effect$pvalue else NULL)
+        combined_effects$CI.Lo <- c(indirect_effects$ci.lower, if (nrow(total_indirect_effect) > 0) total_indirect_effect$ci.lower else NULL)
+        combined_effects$CI.Up <- c(indirect_effects$ci.upper, if (nrow(total_indirect_effect) > 0) total_indirect_effect$ci.upper else NULL)
+      }
+
+      cat("\n")
+      cat("\n*************** INDIRECT EFFECTS ***************\n")
+      print_table_dynamic(combined_effects)
+    }
+
+    # 动态生成 Indirect Key
+    if (!is.null(x$prepared_data)) {
+      Mdiff_vars <- grep("M\\ddiff", colnames(x$prepared_data), value = TRUE)
+
+      if (length(Mdiff_vars) == 0) {
+        warning("No mediator variables found. Unable to generate Indirect Key.")
+      } else {
+        indirect_key <- data.frame()
+
+        # 遍历所有间接效应名称（如 indirect1, indirect12）
+        for (ind in indirect_effects$lhs) {
+          # 提取路径中的索引
+          indices <- unlist(strsplit(gsub("indirect", "", ind), split = ""))
+          indices <- as.numeric(indices)  # 转换为数字
+
+          if (all(!is.na(indices))) {
+            # 匹配对应的变量名称，生成路径
+            path_vars <- Mdiff_vars[indices]
+            path <- paste(c("X", path_vars, "Ydiff"), collapse = " -> ")
+
+            # 添加到 Indirect Key 表格
+            ind_name <- gsub("indirect", "ind", ind)  # 缩写名称
+            indirect_key <- rbind(indirect_key, data.frame(Ind = ind_name, Path = path))
+          }
+        }
+
+        # 打印 Indirect Key
+        if (nrow(indirect_key) > 0) {
+          #cat("\n*************** INDIRECT KEY ***************\n")
+          print(kable(indirect_key, align = c("c", "c"), row.names = FALSE))
+        }
+      }
+    }
+
+    # 对比效应
+    contrast_effects <- ustd_result[grep("^CI", ustd_result$lhs), ]
+    if (nrow(contrast_effects) > 0) {
+      # 修改对比效应的名称
+      contrast_names <- sapply(contrast_effects$lhs, function(name) {
+        indices <- unlist(regmatches(name, gregexpr("\\d+", name)))  # 提取数字组
+        if (length(indices) == 2) {
+          paste0("ind", indices[1], " - ind", indices[2])
+        } else {
+          name
+        }
+      })
+
+      # 构建基础表格（仅 bootstrap）
+      contrast_table <- data.frame(
+        Name = contrast_names,
+        Effect = contrast_effects$est,
+        bSE = contrast_effects$boot.se,
+        bp = contrast_effects$boot.p,
+        bCI.Lo = contrast_effects$boot.ci.lower,
+        bCI.Up = contrast_effects$boot.ci.upper
+      )
+
+      # 添加原始估计（如 delta = TRUE）
+      if (delta) {
+        contrast_table$SE <- contrast_effects$se
+        contrast_table$`P-value` <- contrast_effects$pvalue
+        contrast_table$CI.Lo <- contrast_effects$ci.lower
+        contrast_table$CI.Up <- contrast_effects$ci.upper
+      }
+
+      # 打印表格
+      cat("\n")
+      cat("\n*************** CONTRAST INDIRECT EFFECTS ***************\n")
+      print_table_dynamic(contrast_table)
+    }
+
+
+    # Moderation Effects
+    moderation_effects <- ustd_result[
+      ustd_result$rhs %in% grep("M\\davg", colnames(x$prepared_data), value = TRUE) &
+        grepl("^d", ustd_result$label),
+    ]
+    if (nrow(moderation_effects) > 0) {
+      cat("\n")
+      cat("\n*************** MODERATION EFFECTS of X ***************\n")
+
+      # 构建基础表格（bootstrap 信息）
+      moderation_table <- data.frame(
+        Name = moderation_effects$label,
+        Effect = moderation_effects$est,
+        bSE = moderation_effects$boot.se,
+        bp = moderation_effects$boot.p,
+        bCI.Lo = moderation_effects$boot.ci.lower,
+        bCI.Up = moderation_effects$boot.ci.upper
+      )
+
+      # 如果 delta = TRUE，添加原始估计
+      if (delta) {
+        moderation_table$SE <- moderation_effects$se
+        moderation_table$`P-value` <- moderation_effects$pvalue
+        moderation_table$CI.Lo <- moderation_effects$ci.lower
+        moderation_table$CI.Up <- moderation_effects$ci.upper
+      }
+
+      print_table_dynamic(moderation_table)
+    }
+
+    # Moderation Effects Key
+    if (!is.null(x$prepared_data)) {
+      Mavg_vars <- grep("M\\davg", colnames(x$prepared_data), value = TRUE)
+      Mdiff_vars <- grep("M\\ddiff", colnames(x$prepared_data), value = TRUE)
+      moderation_key <- data.frame()
+
+      # Add all moderation effects based on labels starting with "d"
+      d_labels <- grep("^d", param_estimates$label, value = TRUE)
+      for (label in d_labels) {
+        if (nchar(label) == 2) {
+          # Single moderation effects (e.g., d1, d2, ...)
+          index <- as.numeric(substr(label, 2, 2))
+          if (!is.na(index) && index <= length(Mdiff_vars)) {
+            moderation_key <- rbind(moderation_key, data.frame(
+              Coefficient = label,
+              Path = paste0(Mdiff_vars[index], " -> Ydiff")
+            ))
+          }
+        } else if (nchar(label) > 2) {
+          # Cross-variable moderation effects (e.g., d12, d23, ...)
+          indices <- as.numeric(unlist(strsplit(substr(label, 2, nchar(label)), split = "")))
+          if (all(!is.na(indices)) && all(indices <= length(Mdiff_vars)) && length(indices) == 2) {
+            moderation_key <- rbind(moderation_key, data.frame(
+              Coefficient = label,
+              Path = paste0(Mdiff_vars[indices[1]], " -> ", Mdiff_vars[indices[2]])
+            ))
+          }
+        }
+      }
+
+      if (nrow(moderation_key) > 0) {
+        print(kable(moderation_key, align = c("c", "c"), row.names = FALSE))
+      }
+    }
+
+
+    # 前后测系数对比
+    # C1-C2 COEFFICIENTS
+    pre_post_coeff <- ustd_result[grep("^X[01]_b", ustd_result$lhs), ]
+    if (nrow(pre_post_coeff) > 0) {
+      cat("\n")
+      cat("\n*************** C1-C2 COEFFICIENTS ***************\n")
+
+      # 基础：bootstrap 推断结果
+      prepost_table <- data.frame(
+        Name = pre_post_coeff$lhs,
+        Effect = pre_post_coeff$est,
+        bSE = pre_post_coeff$boot.se,
+        bp = pre_post_coeff$boot.p,
+        bCI.Lo = pre_post_coeff$boot.ci.lower,
+        bCI.Up = pre_post_coeff$boot.ci.upper
+      )
+
+      # 如果 delta = TRUE，补充 delta-method 推断结果
+      if (delta) {
+        prepost_table$SE <- pre_post_coeff$se
+        prepost_table$z <- pre_post_coeff$z
+        prepost_table$p <- pre_post_coeff$pvalue
+        prepost_table$CI.Lo <- pre_post_coeff$ci.lower
+        prepost_table$CI.Up <- pre_post_coeff$ci.upper
+      }
+
+      print_table_dynamic(prepost_table)
+    }
+
+    # 前后测系数 Key
+    if (!is.null(x$prepared_data)) {
+      Mdiff_vars <- grep("M\\ddiff", colnames(x$prepared_data), value = TRUE)
+      pre_post_key <- data.frame()
+
+      for (i in seq_along(Mdiff_vars)) {
+        pre_post_key <- rbind(pre_post_key, data.frame(
+          Coefficient = paste0("b", i),
+          Path = paste0(Mdiff_vars[i], " -> Ydiff")
+        ))
+      }
+
+      if (length(Mdiff_vars) > 1) {
+        for (i in 1:(length(Mdiff_vars) - 1)) {
+          for (j in (i + 1):length(Mdiff_vars)) {
+            pre_post_key <- rbind(pre_post_key, data.frame(
+              Coefficient = paste0("b", i, j),
+              Path = paste0(Mdiff_vars[i], " -> ", Mdiff_vars[j])
+            ))
+          }
+        }
+      }
+
+      #cat("\n*************** C1-C2 COEFFICIENTS KEY ***************\n")
+      print(kable(pre_post_key, align = c("c", "c"), row.names = FALSE))
+    }
+
+
+    # Analysis Notes and Warnings
+     {
+      bootstrap_info <- list(
+        method = if (!is.null(fit@Options$se) && fit@Options$se == "bootstrap") {
+          paste0("Bootstrap (", if (!is.null(x$boot_ci_type)) x$boot_ci_type else "unknown", ")")
+        } else {
+          "Not bootstrap"
+        },
+        num_samples = if (!is.null(fit@Options$bootstrap)) fit@Options$bootstrap else NA
+      )
+      cat("\n")}
+
     cat("\n*************** Bootstrapping NOTES ***************\n")
     cat("\n")
     cat("Bootstrap confidence interval method used: ", bootstrap_info$method, "\n")
@@ -576,70 +1024,10 @@ print.wsMed <- function(x, level = 0.95,digits=3, ...) {
       print_table_dynamic(result_table)
     }
   }
-  if (!is.null(x$fiml_result)) {
-    cat("\n")
-    cat("\n*************** MONTE CARLO CONFIDENCE INTERVALS (FIML) ***************\n")
-    # 提取 alpha 参数
-    alpha <- x$alpha  # 假设在 wsMed 输出中包含 alpha 参数
-    if (is.null(alpha)) {
-      stop("The 'alpha' parameter is missing from the wsMed object.")
-    }
-
-    # 动态生成置信区间的概率值
-    lower_bounds <- alpha / 2
-    upper_bounds <- 1 - lower_bounds
-    ci.levels <- sort(c(lower_bounds, upper_bounds))  # 确保排序
-
-    fiml_result <- x$fiml_result
-
-    if (!is.null(fiml_result$thetahat$est) && !is.null(fiml_result$thetahatstar)) {
-      # 提取参数估计
-      estimates <- fiml_result$thetahat$est
-      param_names <- names(estimates)
-
-      # 修改参数名称
-      param_names <- gsub("^cp$", "direct effect", param_names)                     # 替换 cp 为 Direct effect
-      param_names <- gsub("^total_effect$", "total effect", param_names)           # 替换 total_effect 为 Total effect
-      param_names <- gsub("^indirect", "ind", param_names)                         # 替换 indirect 为 ind
-      param_names <- gsub("^total_indirect$", "total ind", param_names)            # 替换 total_indirect 为 total ind
-      param_names <- gsub("^CI(\\d+)vs(\\d+)$", "ind\\1-ind\\2", param_names)      # 替换 CI1vs2 为 ind1-ind2
-
-      # 更新参数名称到 thetahatstar
-      colnames(fiml_result$thetahatstar) <- param_names
-
-      # 使用 thetahatstar 计算所有的置信区间百分位数
-      thetahatstar <- fiml_result$thetahatstar
-
-      # 计算置信区间值
-      ci.values <- t(sapply(ci.levels, function(level) apply(thetahatstar, 2, quantile, probs = level)))
-      ci.names <- paste0(sprintf("%.1f", pmin(pmax(ci.levels * 100, 0.1), 99.9)), "%")
-      rownames(ci.values) <- ci.names
-
-      # 提取标准误
-      se <- apply(thetahatstar, 2, sd)
-      R <- nrow(thetahatstar)
-
-      # 构建结果表
-      result_table <- data.frame(
-        Parameter = param_names,
-        Estimate = estimates,
-        SE = se
-      )
-
-      # 添加动态生成的置信区间列
-      ci.columns <- as.data.frame(t(ci.values))  # 转置为列格式
-      colnames(ci.columns) <- ci.names
-      result_table <- cbind(result_table, ci.columns)
-
-      # 打印表格
-      print_table_dynamic(result_table)
-    }
-  }
   if (!is.null(x$std_result)) {
     cat("\n")
     cat("\n*************** STANDARDIZED RESULTS ***************\n")
 
-    # 如果 level != 0.95，重新生成标准化解
     if (level == 0.95) {
       std_result <- x$std_result
     } else {
@@ -652,8 +1040,9 @@ print.wsMed <- function(x, level = 0.95,digits=3, ...) {
         boot_pvalue = TRUE
       )
     }
+    # 删除方差（~~）和截距（~1）项
+    std_result <- std_result[!std_result$op %in% c("~~", "~1"), ]
 
-    # 清理标签
     std_result$label <- gsub("^cp$", "Direct effect", std_result$label)
     std_result$label <- gsub("^total_effect$", "Total effect", std_result$label)
     std_result$label <- gsub("^indirect", "ind", std_result$label)
@@ -665,12 +1054,16 @@ print.wsMed <- function(x, level = 0.95,digits=3, ...) {
       std_result$label
     )
 
-    # 提取显示列
-    keep_cols <- c("label", "est.std", "se", "z", "pvalue",
-                   "ci.lower", "ci.upper", "boot.se", "boot.p", "boot.ci.lower", "boot.ci.upper")
+    # 动态选择列
+    if (isTRUE(delta)) {
+      keep_cols <- c("label", "est.std", "se", "z", "pvalue",
+                     "ci.lower", "ci.upper", "boot.se", "boot.p", "boot.ci.lower", "boot.ci.upper")
+    } else {
+      keep_cols <- c("label", "est.std", "boot.se", "boot.p", "boot.ci.lower", "boot.ci.upper")
+    }
+
     std_result_clean <- std_result[, names(std_result) %in% keep_cols]
 
-    # 重命名列
     col_renaming <- c(
       label = "Label",
       est.std = "Estimate (Std)",
@@ -686,8 +1079,8 @@ print.wsMed <- function(x, level = 0.95,digits=3, ...) {
     )
     colnames(std_result_clean) <- col_renaming[names(std_result_clean)]
 
-    # 打印结果
     print_table_dynamic(std_result_clean)
+
     if (!is.null(x$boot_ci_type) && x$boot_ci_type %in% c("bc", "bca.simple")) {
       cat("\n Warning:\n")
       cat("If you see 'extreme order statistics used as endpoints',\n")
@@ -696,65 +1089,39 @@ print.wsMed <- function(x, level = 0.95,digits=3, ...) {
       cat("Consider increasing bootstrap = 5000 or using boot_ci_type = \"perc\".\n")
     }
   }
+  if (!is.null(x$fiml_result2)) {
+    cat("\n")
+    cat("\n*************** MONTE CARLO CONFIDENCE INTERVALS (FIML) ***************\n")
 
+    fiml_result2 <- x$fiml_result2
+    if (!is.null(fiml_result2) && is.data.frame(fiml_result2)) {
+      # 格式化参数名
+      fiml_result2$Parameter <- gsub("^cp$", "direct effect", fiml_result2$Parameter)
+      fiml_result2$Parameter <- gsub("^total_effect$", "total effect", fiml_result2$Parameter)
+      fiml_result2$Parameter <- gsub("^indirect", "ind", fiml_result2$Parameter)
+      fiml_result2$Parameter <- gsub("^total_indirect$", "total ind", fiml_result2$Parameter)
+      fiml_result2$Parameter <- gsub("^CI(\\d+)vs(\\d+)$", "ind\\1-ind\\2", fiml_result2$Parameter)
+
+      # 打印
+      print_table_dynamic(fiml_result2)
+    }
+  }
   if (!is.null(x$std_fiml_result)) {
     cat("\n")
     cat("\n*************** MONTE CARLO CONFIDENCE INTERVALS (STANDARDIZED) ***************\n")
 
-    # 提取 alphastd 参数
-    alphastd <- x$alphastd  # 假设在 wsMed 输出中包含 alphastd 参数
-    if (is.null(alphastd)) {
-      stop("The 'alphastd' parameter is missing from the wsMed object.")
+    std_fiml_result <- x$std_fiml_result
+    if (!is.null(std_fiml_result) && is.data.frame(std_fiml_result)) {
+      # 格式化参数名
+      std_fiml_result$Parameter <- gsub("^cp$", "direct effect", std_fiml_result$Parameter)
+      std_fiml_result$Parameter <- gsub("^total_effect$", "total effect", std_fiml_result$Parameter)
+      std_fiml_result$Parameter <- gsub("^indirect", "ind", std_fiml_result$Parameter)
+      std_fiml_result$Parameter <- gsub("^total_indirect$", "total ind", std_fiml_result$Parameter)
+      std_fiml_result$Parameter <- gsub("^CI(\\d+)vs(\\d+)$", "ind\\1-ind\\2", std_fiml_result$Parameter)
+
+      # 打印
+      print_table_dynamic(std_fiml_result)
     }
-
-    # 动态生成置信区间的概率值
-    lower_bounds <- alphastd / 2
-    upper_bounds <- 1 - lower_bounds
-    ci.levels <- sort(c(lower_bounds, upper_bounds))  # 确保排序
-
-    # 提取标准化结果
-    std_fiml_estimates <- x$std_fiml_result$thetahat$est
-    parameter_names <- names(std_fiml_estimates)
-    thetahatstar <- x$std_fiml_result$thetahatstar
-
-    # Align estimates with Monte Carlo results
-    common_parameters <- intersect(parameter_names, colnames(thetahatstar))
-    std_fiml_estimates <- std_fiml_estimates[common_parameters]
-    thetahatstar <- thetahatstar[, common_parameters, drop = FALSE]
-
-    # Replace parameter names
-    common_parameters_replaced <- gsub("^cp$", "direct effect", common_parameters)                     # 替换 cp 为 Direct effect
-    common_parameters_replaced <- gsub("^total_effect$", "total effect", common_parameters_replaced)   # 替换 total_effect 为 Total effect
-    common_parameters_replaced <- gsub("^indirect", "ind", common_parameters_replaced)                 # 替换 indirect 为 ind
-    common_parameters_replaced <- gsub("^total_indirect$", "total ind", common_parameters_replaced)    # 替换 total_indirect 为 total ind
-    common_parameters_replaced <- gsub("^CI(\\d+)vs(\\d+)$", "ind\\1-ind\\2", common_parameters_replaced)  # 替换 CI1vs2 为 ind1-ind2
-
-    # Ensure names align
-    colnames(thetahatstar) <- common_parameters_replaced
-
-    # Calculate confidence intervals
-    ci.values <- t(sapply(ci.levels, function(level) apply(thetahatstar, 2, quantile, probs = level)))
-    ci.names <- paste0(sprintf("%.1f", pmin(pmax(ci.levels * 100, 0.1), 99.9)), "%")
-    rownames(ci.values) <- ci.names
-
-    # Calculate standard errors
-    se <- apply(thetahatstar, 2, sd)
-
-    # 构建结果表
-    result_table <- data.frame(
-      Parameter = common_parameters_replaced,
-      Estimate = std_fiml_estimates,
-      SE = se,
-      check.names = FALSE  # 防止列名自动更改
-    )
-
-    # 动态添加置信区间列
-    ci.columns <- as.data.frame(t(ci.values))  # 转置为列格式
-    colnames(ci.columns) <- ci.names
-    result_table <- cbind(result_table, ci.columns)
-
-    # 打印表格
-    print_table_dynamic(result_table)
   }
   if (!is.null(x$std_mi_result)) {
     cat("\n")
@@ -817,24 +1184,26 @@ print.wsMed <- function(x, level = 0.95,digits=3, ...) {
   }
 
   # Monte Carlo Notes
-  if (!is.null(x$mi_result) || !is.null(x$fiml_result)){
-    if (!is.null(x$paras)) {
-      cat("\n")
-      cat("\n*************** IMPUTATION AND MONTE CARLO NOTES ***************\n")
-      cat("\n")
-      paras <- x$paras  # 提取参数列表
-      if (!is.null(x$mi_result)){cat("Number of imputations (m): ", paras$m, "\n")}
-      if (!is.null(x$mi_result)){cat("Imputation method: ", paras$method, "\n")}
-      cat("Random seed: ", paras$seed, "\n")
-      cat("Number of Monte Carlo repetitions (R): ", R, "\n")
-      cat("Decomposition method for covariance matrices: ", paras$decomposition, "\n")
-      cat("Check positive definiteness of covariance matrices: ", ifelse(paras$pd, "Yes", "No"), "\n")
-      cat("Tolerance for positive definiteness checks : ", paras$tol, "\n")
-      cat("Significance levels for confidence intervals: ", paste(paras$alpha, collapse = ", "), "\n")
-      if (!is.null(x$std_mi_result) || !is.null(x$std_fiml_result)){cat("Significance levels for standardized confidence intervals: ", paste(paras$alphastd, collapse = ", "), "\n")}
-    }
-  }
+ # if (!is.null(x$mi_result) || !is.null(x$fiml_result)){
+ #   if (!is.null(x$paras)) {
+  #    cat("\n")
+  #    cat("\n*************** IMPUTATION AND MONTE CARLO NOTES ***************\n")
+   #   cat("\n")
+    #  paras <- x$paras  # 提取参数列表
+   #  if (!is.null(x$mi_result)){cat("Number of imputations (m): ", paras$m, "\n")}
+    #  if (!is.null(x$mi_result)){cat("Imputation method: ", paras$method, "\n")}
+     # cat("Random seed: ", paras$seed, "\n")
+     # cat("Number of Monte Carlo repetitions (R): ", R, "\n")
+     # cat("Decomposition method for covariance matrices: ", paras$decomposition, "\n")
+     # cat("Check positive definiteness of covariance matrices: ", ifelse(paras$pd, "Yes", "No"), "\n")
+     # cat("Tolerance for positive definiteness checks : ", paras$tol, "\n")
+     # cat("Significance levels for confidence intervals: ", paste(paras$alpha, collapse = ", "), "\n")
+     # if (!is.null(x$std_mi_result) || !is.null(x$std_fiml_result)){cat("Significance levels for standardized confidence intervals: ", paste(paras$alphastd, collapse = ", "), "\n")}
+    #}
+  #}
 
   # 返回对象
   invisible(x)
 }
+
+
