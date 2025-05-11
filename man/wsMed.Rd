@@ -15,7 +15,6 @@ wsMed(
   Na = "DE",
   bootstrap = 1000,
   iseed = 123,
-  se = "boot",
   boot_ci_type = "perc",
   R = 20000L,
   fixed.x = FALSE,
@@ -26,7 +25,7 @@ wsMed(
   pd = TRUE,
   tol = 1e-06,
   seed = 123,
-  alphastd = c(0.01, 0.05)
+  alphastd = 0.05
 )
 }
 \arguments{
@@ -50,8 +49,6 @@ wsMed(
 
 \item{iseed}{An integer for setting the random seed. Defaults to \code{123}.}
 
-\item{se}{A string specifying the method for computing standard errors (\code{"standard"} or \code{"bootstrap"}). Defaults to \code{"standard"}.}
-
 \item{boot_ci_type}{Character. The type of bootstrap confidence interval to use for standardized results.}
 
 \item{R}{An integer specifying the number of Monte Carlo repetitions. Defaults to \code{20000L}.}
@@ -73,6 +70,8 @@ wsMed(
 \item{seed}{An integer for setting the random seed during Monte Carlo simulations. Defaults to \code{123}.}
 
 \item{alphastd}{A numeric value specifying the significance level for standardized confidence intervals. Defaults to \code{0.05}.}
+
+\item{se}{A string specifying the method for computing standard errors (\code{"standard"} or \code{"bootstrap"}). Defaults to \code{"standard"}.}
 }
 \value{
 A list containing the following components:
@@ -161,8 +160,9 @@ result1 <- wsMed(
   Y_C2 = "C1",
   form = "P",
   standardized = FALSE,
-  bootstrap = 100,
+  bootstrap = 1000,
 )
+
 print(result1)
 
 }

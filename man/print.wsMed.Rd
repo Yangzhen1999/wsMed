@@ -4,7 +4,7 @@
 \alias{print.wsMed}
 \title{Print Method for wsMed Objects}
 \usage{
-\method{print}{wsMed}(x, level = 0.95, digits = 3, ...)
+\method{print}{wsMed}(x, level = 0.95, digits = 3, delta = FALSE, ...)
 }
 \arguments{
 \item{x}{A \code{wsMed} object containing the results of within-subject mediation analysis.}

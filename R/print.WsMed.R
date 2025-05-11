@@ -964,6 +964,69 @@ print.wsMed <- function(x, level = 0.95,digits=3, delta = FALSE, ...) {
     cat("Bootstrap P: Asymmetric bootstrap p-value (only for perc)\n")
   }
 
+
+  if (!is.null(x$fiml_result)) {
+    cat("\n")
+    cat("\n*************** MONTE CARLO CONFIDENCE INTERVALS (FIML) ***************\n")
+    # 提取 alpha 参数
+    alpha <- x$alpha  # 假设在 wsMed 输出中包含 alpha 参数
+    if (is.null(alpha)) {
+      stop("The 'alpha' parameter is missing from the wsMed object.")
+    }
+
+    # 动态生成置信区间的概率值
+    lower_bounds <- alpha / 2
+    upper_bounds <- 1 - lower_bounds
+    ci.levels <- sort(c(lower_bounds, upper_bounds))  # 确保排序
+
+    fiml_result <- x$fiml_result
+    # 删除方差项和截距项
+    if (!is.null(fiml_result$thetahat$est) && !is.null(fiml_result$thetahatstar)) {
+      # 提取参数估计
+      estimates <- fiml_result$thetahat$est
+      param_names <- names(estimates)
+
+      # 修改参数名称
+      param_names <- gsub("^cp$", "direct effect", param_names)                     # 替换 cp 为 Direct effect
+      param_names <- gsub("^total_effect$", "total effect", param_names)           # 替换 total_effect 为 Total effect
+      param_names <- gsub("^indirect", "ind", param_names)                         # 替换 indirect 为 ind
+      param_names <- gsub("^total_indirect$", "total ind", param_names)            # 替换 total_indirect 为 total ind
+      param_names <- gsub("^CI(\\d+)vs(\\d+)$", "ind\\1-ind\\2", param_names)      # 替换 CI1vs2 为 ind1-ind2
+
+      # 更新参数名称到 thetahatstar
+      colnames(fiml_result$thetahatstar) <- param_names
+
+      # 使用 thetahatstar 计算所有的置信区间百分位数
+      thetahatstar <- fiml_result$thetahatstar
+
+      # 计算置信区间值
+      ci.values <- t(sapply(ci.levels, function(level) apply(thetahatstar, 2, quantile, probs = level)))
+      ci.names <- paste0(sprintf("%.1f", pmin(pmax(ci.levels * 100, 0.1), 99.9)), "%")
+      rownames(ci.values) <- ci.names
+
+      # 提取标准误
+      se <- apply(thetahatstar, 2, sd)
+      R <- nrow(thetahatstar)
+
+      # 构建结果表
+      result_table <- data.frame(
+        Parameter = param_names,
+        Estimate = estimates,
+        SE = se
+      )
+
+      # 添加动态生成的置信区间列
+      ci.columns <- as.data.frame(t(ci.values))  # 转置为列格式
+      colnames(ci.columns) <- ci.names
+      result_table <- cbind(result_table, ci.columns)
+
+      result_table <- result_table[!grepl("~~", result_table$Parameter), ]
+      result_table <- result_table[!grepl("~1$", result_table$Parameter), ]
+      # 打印表格
+      print_table_dynamic(result_table)
+    }
+  }
+
   # mi_result Section
   if (!is.null(x$mi_result)) {
     cat("\n")
@@ -1024,6 +1087,7 @@ print.wsMed <- function(x, level = 0.95,digits=3, delta = FALSE, ...) {
       print_table_dynamic(result_table)
     }
   }
+
   if (!is.null(x$std_result)) {
     cat("\n")
     cat("\n*************** STANDARDIZED RESULTS ***************\n")
@@ -1040,10 +1104,11 @@ print.wsMed <- function(x, level = 0.95,digits=3, delta = FALSE, ...) {
         boot_pvalue = TRUE
       )
     }
-    # 删除方差（~~）和截距（~1）项
-    std_result <- std_result[!std_result$op %in% c("~~", "~1"), ]
+    # 删除方差和部分截距项
+    std_result <- std_result[std_result$op != "~~", ]
+    std_result <- std_result[!(std_result$op == "~1" & grepl("avg$", std_result$lhs)), ]
 
-    std_result$label <- gsub("^cp$", "Direct effect", std_result$label)
+    std_result$label <- gsub("^cp$", "direct effect", std_result$label)
     std_result$label <- gsub("^total_effect$", "Total effect", std_result$label)
     std_result$label <- gsub("^indirect", "ind", std_result$label)
     std_result$label <- gsub("^total_indirect$", "total ind", std_result$label)
@@ -1078,7 +1143,9 @@ print.wsMed <- function(x, level = 0.95,digits=3, delta = FALSE, ...) {
       boot.ci.upper = "Boot CI Upper"
     )
     colnames(std_result_clean) <- col_renaming[names(std_result_clean)]
-
+    std_result_clean$Parameter <- std_result_clean$Label
+    std_result_clean <- sort_parameters(std_result_clean)
+    std_result_clean$Parameter <- NULL  # 可选：排序后再删掉它
     print_table_dynamic(std_result_clean)
 
     if (!is.null(x$boot_ci_type) && x$boot_ci_type %in% c("bc", "bca.simple")) {
@@ -1089,29 +1156,49 @@ print.wsMed <- function(x, level = 0.95,digits=3, delta = FALSE, ...) {
       cat("Consider increasing bootstrap = 5000 or using boot_ci_type = \"perc\".\n")
     }
   }
-  if (!is.null(x$fiml_result2)) {
-    cat("\n")
-    cat("\n*************** MONTE CARLO CONFIDENCE INTERVALS (FIML) ***************\n")
+  if (!is.null(x$std_fiml_result)) {
+    cat("\n*************** MONTE CARLO CONFIDENCE INTERVALS (STANDARDIZED) (Lavaan) ***************\n")
 
-    fiml_result2 <- x$fiml_result2
-    if (!is.null(fiml_result2) && is.data.frame(fiml_result2)) {
-      # 格式化参数名
-      fiml_result2$Parameter <- gsub("^cp$", "direct effect", fiml_result2$Parameter)
-      fiml_result2$Parameter <- gsub("^total_effect$", "total effect", fiml_result2$Parameter)
-      fiml_result2$Parameter <- gsub("^indirect", "ind", fiml_result2$Parameter)
-      fiml_result2$Parameter <- gsub("^total_indirect$", "total ind", fiml_result2$Parameter)
-      fiml_result2$Parameter <- gsub("^CI(\\d+)vs(\\d+)$", "ind\\1-ind\\2", fiml_result2$Parameter)
+    std_fiml_result2 <- x$std_fiml_result
+    if (is.data.frame(std_fiml_result2)) {
+      # 删除方差项和截距项
+      std_fiml_result2 <- std_fiml_result2[!grepl("~~", std_fiml_result2$Parameter), ]
+      std_fiml_result2 <- std_fiml_result2[!grepl("~1$", std_fiml_result2$Parameter), ]
+
+      # 格式化参数名称
+      std_fiml_result2$Parameter <- gsub("^cp$", "direct effect", std_fiml_result2$Parameter)
+      std_fiml_result2$Parameter <- gsub("^total_effect$", "total effect", std_fiml_result2$Parameter)
+      std_fiml_result2$Parameter <- gsub("^indirect", "ind", std_fiml_result2$Parameter)
+      std_fiml_result2$Parameter <- gsub("^total_indirect$", "total ind", std_fiml_result2$Parameter)
+      std_fiml_result2$Parameter <- gsub("^CI(\\d+)vs(\\d+)$", "ind\\1-ind\\2", std_fiml_result2$Parameter)
+
+      # 重命名置信区间列
+      if (all(c("2.5%", "97.5%") %in% colnames(std_fiml_result2))) {
+        std_fiml_result2$CI_lower <- std_fiml_result2[["2.5%"]]
+        std_fiml_result2$CI_upper <- std_fiml_result2[["97.5%"]]
+        std_fiml_result2[["2.5%"]] <- NULL
+        std_fiml_result2[["97.5%"]] <- NULL
+      }
+
+      # 删除 R 列（不需要）
+      if ("R" %in% colnames(std_fiml_result2)) {
+        std_fiml_result2$R <- NULL
+      }
+
+      # 统一列顺序
+      desired_order <- c("Parameter", "Estimate", "SE", "CI_lower", "CI_upper")
+      std_fiml_result2 <- std_fiml_result2[, intersect(desired_order, names(std_fiml_result2)), drop = FALSE]
 
       # 打印
-      print_table_dynamic(fiml_result2)
+      std_fiml_result2 <- sort_parameters(std_fiml_result2)
+      print_table_dynamic(std_fiml_result2)
     }
   }
-  if (!is.null(x$std_fiml_result)) {
-    cat("\n")
-    cat("\n*************** MONTE CARLO CONFIDENCE INTERVALS (STANDARDIZED) ***************\n")
+  if (!is.null(x$std_fiml_result2)) {
+    cat("\n*************** MONTE CARLO CONFIDENCE INTERVALS (STANDARDIZED) (Bootstrap SD) ***************\n")
 
-    std_fiml_result <- x$std_fiml_result
-    if (!is.null(std_fiml_result) && is.data.frame(std_fiml_result)) {
+    std_fiml_result <- x$std_fiml_result2
+    if (is.data.frame(std_fiml_result)) {
       # 格式化参数名
       std_fiml_result$Parameter <- gsub("^cp$", "direct effect", std_fiml_result$Parameter)
       std_fiml_result$Parameter <- gsub("^total_effect$", "total effect", std_fiml_result$Parameter)
@@ -1119,10 +1206,29 @@ print.wsMed <- function(x, level = 0.95,digits=3, delta = FALSE, ...) {
       std_fiml_result$Parameter <- gsub("^total_indirect$", "total ind", std_fiml_result$Parameter)
       std_fiml_result$Parameter <- gsub("^CI(\\d+)vs(\\d+)$", "ind\\1-ind\\2", std_fiml_result$Parameter)
 
+      # 移除 R 列（如果存在）
+      if ("R" %in% colnames(std_fiml_result)) {
+        std_fiml_result$R <- NULL
+      }
+
+      # 如果包含 2.5% 和 97.5% 列，则改名为 CI_lower / CI_upper
+      if (all(c("2.5%", "97.5%") %in% colnames(std_fiml_result))) {
+        std_fiml_result$CI_lower <- std_fiml_result[["2.5%"]]
+        std_fiml_result$CI_upper <- std_fiml_result[["97.5%"]]
+        std_fiml_result[["2.5%"]] <- NULL
+        std_fiml_result[["97.5%"]] <- NULL
+      }
+
+      # 统一列顺序
+      desired_cols <- c("Parameter", "Estimate", "SE", "CI_lower", "CI_upper")
+      std_fiml_result <- std_fiml_result[, intersect(desired_cols, names(std_fiml_result)), drop = FALSE]
+
       # 打印
+      std_fiml_result <- sort_parameters(std_fiml_result)
       print_table_dynamic(std_fiml_result)
     }
   }
+
   if (!is.null(x$std_mi_result)) {
     cat("\n")
     cat("\n*************** MONTE CARLO CONFIDENCE INTERVALS (STANDARDIZED) ***************\n")
@@ -1207,3 +1313,57 @@ print.wsMed <- function(x, level = 0.95,digits=3, delta = FALSE, ...) {
 }
 
 
+#' @title Sort Parameters for Printing in SEM Output
+#' @description Sorts a parameter table by conceptual priority for presentation purposes.
+#' This function is designed to support formatted output of mediation and SEM results
+#' by organizing parameters such as a-paths, b-paths, indirect effects, contrasts, etc.
+#'
+#' @param df A data frame that contains a column named \code{Parameter} (e.g., from Monte Carlo CI output).
+#' @return A reordered version of the same data frame, with rows sorted according to
+#' a predefined logical structure:
+#' \enumerate{
+#'   \item a-paths (e.g., a1, a2, ...)
+#'   \item b-paths (e.g., b1, b2, ...)
+#'   \item d-paths (e.g., d1, d2, ...)
+#'   \item indirect effects (e.g., ind1, ind2, ...)
+#'   \item direct effect
+#'   \item total indirect
+#'   \item total effect
+#'   \item contrasts (e.g., ind1-ind2, ind2-ind3)
+#'   \item X-condition path terms (e.g., X1_b1, X0_b1, ...)
+#' }
+#'
+#' @details This is an internal helper function used by \code{print.WsMed()} to ensure that printed
+#' tables of standardized or unstandardized estimates appear in a logical and human-readable order.
+#'
+#' @examples
+#' df <- data.frame(Parameter = c("b2", "a1", "direct effect", "ind2", "total effect"))
+#' sort_parameters(df)
+#'
+#' @keywords internal
+#' @export
+
+
+sort_parameters <- function(df) {
+  if (!"Parameter" %in% colnames(df)) return(df)
+
+  # 获取参数名
+  param <- df$Parameter
+
+  # 定义排序优先级规则
+  priority <- rep(99, length(param))
+  priority[grepl("^a\\d+$", param)] <- 1
+  priority[grepl("^b\\d+$", param)] <- 2
+  priority[grepl("^d\\d+$", param)] <- 3
+  priority[grepl("^ind\\d+$", param)] <- 4
+  priority[grepl("^direct effect$", param)] <- 5
+  priority[grepl("^total ind$", param)] <- 6
+  priority[grepl("^total effect$", param)] <- 7
+  priority[grepl("^ind\\d+-ind\\d+$", param)] <- 8
+  priority[grepl("^X[01]_b\\d+$", param)] <- 9
+
+  df$..sort_order <- priority
+  df <- df[order(df$..sort_order, param), , drop = FALSE]
+  df$..sort_order <- NULL
+  return(df)
+}

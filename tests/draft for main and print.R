@@ -1,7 +1,7 @@
 devtools::load_all()
 library(semboottools)
 library(wsMed)
-result1 <- wsMed2(
+result1 <- wsMed(
   data = example_data, #dataset
   M_C1 = c("A1","B1","C1"), # A1/B1/C1 is A/B/C mediator variable in condition 1
   M_C2 = c("A2","B2","C2"), # A2/B2/C2 is A/B/C mediator variable in condition 2
@@ -44,25 +44,25 @@ result5 <- wsMed(
   alpha =  0.05,  # Significance level
   alphastd = 0.05 # Significance level for standardized
 )
-
+print(result5)
 result8 <- wsMed5(
-  data = dataE,
+  data = example_dataN,
   M_C1 = c("A1","B1"),# A1/B1/C1 is A/B/C mediator variable in condition 1
   M_C2 = c("A2","B2"),# A2/B2/C2 is A/B/C mediator variable in condition 2
   Y_C1 = "C1", # D1 is outcome variable in condition 1
   Y_C2 = "C2", # D2 is outcome variable in condition 2
   form = "P", # chained mediation
-  Na = "MI", # Use Multiple Imputation ("MI") for handling missing data
+  Na = "FIML", # Use Multiple Imputation ("MI") for handling missing data
   standardized = TRUE,
   R = 20000L,  # the number of Monte Carlo repetitions
   alpha =  0.05,  # Significance level
   alphastd = 0.05 # Significance level for standardized
 )
-print(result8,digits = 5)
+print(result8,digits = )
 
 
 result7 <- wsMed(
-  data = dataE,
+  data = example_dataN,
   M_C1 = c("A1","B1"),# A1/B1/C1 is A/B/C mediator variable in condition 1
   M_C2 = c("A2","B2"),# A2/B2/C2 is A/B/C mediator variable in condition 2
   Y_C1 = "C1", # D1 is outcome variable in condition 1
@@ -76,8 +76,10 @@ result7 <- wsMed(
 )
 print(result7)
 
+result7$fiml_result
 result6$std_result
-result6$std_fiml_result
+result7$std_fiml_result
+result7$std_fiml_result2
 
 head( example_dataN)
 

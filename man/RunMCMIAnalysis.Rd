@@ -85,10 +85,10 @@ through multiple imputation and Monte Carlo methods for enhanced precision.
 \examples{
 # Example dataset with missing values
 data(example_data)
-set.seed(123)  
+set.seed(123)
 example_dataN <- mice::ampute(
-   data = example_data,       
-   prop = 0.1,       
+   data = example_data,
+   prop = 0.1,
    )$amp
 
 

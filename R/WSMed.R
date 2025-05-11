@@ -93,8 +93,9 @@
 #'   Y_C2 = "C1",
 #'   form = "P",
 #'   standardized = FALSE,
-#'   bootstrap = 100,
+#'   bootstrap = 1000,
 #' )
+#'
 #' print(result1)
 #'
 #' @importFrom semboottools standardizedSolution_boot
@@ -272,6 +273,7 @@ wsMed <- function(data,
   } else if (Na == "MI") { }
 
   # Monte Carlo
+  fiml_result2 <- NULL
   fiml_result <- NULL
   if (Na == "FIML"){
     fiml_result <- MC(fit,
@@ -294,6 +296,7 @@ wsMed <- function(data,
   std_result <- NULL
   std_mi_result <- NULL
   std_fiml_result <- NULL
+  std_fiml_result2 <- NULL
   mi_result <- NULL
 
   # 生成标准化结果
@@ -318,7 +321,8 @@ wsMed <- function(data,
         if (is.null(mc_fiml_result)) {
           warning("FIML result is NULL, cannot compute standardized solution.")
         } else {
-          std_fiml_result <- summarize_mc_ci(mc_fiml_result$std_result)
+          std_fiml_result2 <- summarize_mc_ci(mc_fiml_result$std_result)
+          std_fiml_result <- MCStd2(fiml_result,alpha = alphastd)
         }
       }
 
@@ -359,6 +363,7 @@ wsMed <- function(data,
     ustd_result = ustd_result,
     std_mi_result = std_mi_result,
     std_fiml_result = std_fiml_result,
+    std_fiml_result2 = std_fiml_result2,
     input_vars = input_vars,
     alphastd = alphastd,
     alpha = alpha,
