@@ -13,156 +13,162 @@ wsMed(
   form = "P",
   standardized = FALSE,
   Na = "DE",
+  ci_method = NULL,
   bootstrap = 1000,
   iseed = 123,
   boot_ci_type = "perc",
   R = 20000L,
   fixed.x = FALSE,
-  alpha = c(0.01, 0.05),
+  alpha = 0.05,
   m = 5,
   method = "pmm",
   decomposition = "eigen",
   pd = TRUE,
   tol = 1e-06,
   seed = 123,
+  MCmethod = NULL,
   alphastd = 0.05
 )
 }
 \arguments{
 \item{data}{A data frame containing the input data.}
 
-\item{M_C1}{A character vector of column names representing the mediator variables measured "before."}
+\item{M_C1}{Character vector. Mediator variables under condition 1 (e.g., "before").}
 
-\item{M_C2}{A character vector of column names representing the mediator variables measured "after."}
+\item{M_C2}{Character vector. Mediator variables under condition 2 (e.g., "after").}
 
-\item{Y_C1}{A character string representing the outcome variable measured "before."}
+\item{Y_C1}{Character. Outcome variable under condition 1.}
 
-\item{Y_C2}{A character string representing the outcome variable measured "after."}
+\item{Y_C2}{Character. Outcome variable under condition 2.}
 
-\item{form}{A string specifying the type of mediation model (\code{"P"}, \code{"CN"}, \code{"CP"}, or \code{"PC"}). Defaults to \code{"P"}.}
+\item{form}{Character. Mediation model type: \code{"P"}, \code{"CN"}, \code{"CP"}, or \code{"PC"}. Defaults to \code{"P"}.}
 
-\item{standardized}{Logical. If \code{TRUE}, standardized effects and confidence intervals are computed. Defaults to \code{FALSE}.}
+\item{standardized}{Logical. Whether to compute standardized estimates. Defaults to \code{FALSE}.}
 
-\item{Na}{A string specifying the missing data handling method (\code{"DE"}, \code{"FIML"}, or \code{"MI"}). Defaults to \code{"DE"}.}
+\item{Na}{Character. Missing data method: \code{"DE"}, \code{"FIML"}, or \code{"MI"}. Defaults to \code{"DE"}.}
 
-\item{bootstrap}{An integer specifying the number of bootstrap samples for the \code{"DE"} method. Defaults to \code{1000}.}
+\item{ci_method}{Character. Confidence interval method: \code{"bootstrap"} or \code{"mc"}. If \code{NULL}, defaults to:
+\code{"mc"} for \code{"MI"}, \code{"bootstrap"} for others.}
 
-\item{iseed}{An integer for setting the random seed. Defaults to \code{123}.}
+\item{bootstrap}{Integer. Number of bootstrap samples (used for \code{"bootstrap"} CI). Defaults to \code{1000}.}
 
-\item{boot_ci_type}{Character. The type of bootstrap confidence interval to use for standardized results.}
+\item{iseed}{Integer. Random seed used in bootstrapping. Defaults to \code{123}.}
 
-\item{R}{An integer specifying the number of Monte Carlo repetitions. Defaults to \code{20000L}.}
+\item{boot_ci_type}{Character. Type of bootstrap CI: \code{"perc"}, \code{"bc"}, or \code{"bca.simple"}.}
 
-\item{fixed.x}{Logical. If \code{TRUE}, the x variables are fixed. Default is \code{FALSE}.}
+\item{R}{Integer. Number of Monte Carlo repetitions. Defaults to \code{20000L}.}
 
-\item{alpha}{A numeric vector specifying the significance levels for confidence intervals. Defaults to \code{c(0.001, 0.01, 0.05)}.}
+\item{fixed.x}{Logical. Whether to treat predictors as fixed. Defaults to \code{FALSE}.}
 
-\item{m}{An integer specifying the number of imputations for the \code{"MI"} method. Defaults to \code{5}.}
+\item{alpha}{Numeric vector. Significance levels for CI. Defaults to \code{c(0.01, 0.05)}.}
 
-\item{method}{A string specifying the imputation method for the \code{"MI"} method (e.g., \code{"pmm"}). Defaults to \code{"pmm"}.}
+\item{m}{Integer. Number of imputations for MI. Defaults to \code{5}.}
 
-\item{decomposition}{A string specifying the decomposition method for covariance matrices. Defaults to \code{"eigen"}.}
+\item{method}{Character. Imputation method for \code{mice}. Defaults to \code{"pmm"}.}
 
-\item{pd}{Logical. If \code{TRUE}, checks the positive definiteness of covariance matrices. Defaults to \code{TRUE}.}
+\item{decomposition}{Character. Decomposition method for covariance matrices. Defaults to \code{"eigen"}.}
 
-\item{tol}{A numeric value for the tolerance used in positive definiteness checks. Defaults to \code{1e-06}.}
+\item{pd}{Logical. Whether to check for positive definiteness. Defaults to \code{TRUE}.}
 
-\item{seed}{An integer for setting the random seed during Monte Carlo simulations. Defaults to \code{123}.}
+\item{tol}{Numeric. Tolerance for positive definiteness. Defaults to \code{1e-06}.}
 
-\item{alphastd}{A numeric value specifying the significance level for standardized confidence intervals. Defaults to \code{0.05}.}
+\item{seed}{Integer. Random seed used in Monte Carlo simulation. Defaults to \code{123}.}
 
-\item{se}{A string specifying the method for computing standard errors (\code{"standard"} or \code{"bootstrap"}). Defaults to \code{"standard"}.}
+\item{MCmethod}{Character. If \code{Na = "FIML"} and \code{ci_method = "mc"}, choose \code{"mc"} (default) or \code{"bootSD"}.}
+
+\item{alphastd}{Numeric. Significance level for standardized results. Defaults to \code{0.05}.}
 }
 \value{
-A list containing the following components:
-\itemize{
-\item \code{prepared_data}: The preprocessed dataset.
-\item \code{model_summary}: Summary statistics of the fitted SEM model.
-\item \code{lavaan_fit}: The fitted SEM model object.
-\item \code{sem_model}: The constructed SEM model syntax.
-\item \code{mi_result}: Monte Carlo results for the multiple imputation method (if applicable).
-\item \code{fiml_result}: Monte Carlo results for the FIML method (if applicable).
-\item \code{std_result}: Standardized results for the \code{"DE"} method (if applicable).
-\item \code{std_mi_result}: Standardized results for the MI method (if applicable).
-\item \code{std_fiml_result}: Standardized results for the FIML method (if applicable).
+A list with class \code{"wsMed"} containing:
+\describe{
+\item{prepared_data}{The preprocessed dataset used for model fitting.}
+\item{sem_model}{Lavaan model syntax used.}
+\item{lavaan_fit}{The fitted lavaan object.}
+\item{model_summary}{Summary statistics from lavaan.}
+\item{ustd_result}{Bootstrap-based unstandardized results (if applicable).}
+\item{mc_de_result}{Monte Carlo results for DE (if applicable).}
+\item{fiml_result}{Monte Carlo results for FIML.}
+\item{mi_result}{Monte Carlo results for MI.}
+\item{std_result}{Standardized bootstrap results (DE or FIML with bootstrap).}
+\item{std_fiml_result}{Standardized MC results for FIML.}
+\item{std_mi_result}{Standardized MC results for MI.}
+\item{input_vars}{Input variable names.}
+\item{paras}{Analysis parameters including alpha, m, method, etc.}
+\item{ci_method}{Chosen CI method.}
+\item{MCmethod}{Chosen MC computation method (for FIML).}
 }
 }
 \description{
-Performs two-condition within-subject mediation analysis using structural equation
-modeling (SEM). This function provides both standardized and unstandardized results for mediation effects.
-It also supports handling missing data using Full Information Maximum Likelihood (FIML) or
-Multiple Imputation (MI), and generates Monte Carlo confidence intervals for the estimated mediation effects.
+Performs two-condition within-subject mediation analysis using structural equation modeling (SEM).
+This function supports multiple types of mediation structures, handles missing data via deletion,
+FIML, or multiple imputation, and provides both bootstrap and Monte Carlo confidence intervals for
+unstandardized and standardized effects.
 }
 \details{
-The \code{wsMed} function is designed for analyzing within-subject mediation models, where the
-mediator and outcome variables are measured before and after an intervention or under multiple
-conditions. Key features include:
+The \code{wsMed} function is designed for analyzing within-subject mediation models where both mediator
+and outcome variables are measured under two conditions (e.g., before vs. after intervention).
+
+Key features:
 \itemize{
-\item \strong{Data preprocessing}: Automatically computes difference scores and averages for mediator and
-outcome variables to facilitate within-subject analysis.
-\item \strong{Model construction}: Supports different mediation model types:
+\item \strong{Data preprocessing}: Automatically computes difference scores and condition-mean scores.
+\item \strong{Model construction}: Supports four types of mediation models:
 \itemize{
-\item \code{"P"}: Parallel mediation.
-\item \code{"CN"}: Chained mediation.
-\item \code{"CP"}/\code{"PC"}: Combined parallel and chained mediation.
+\item \code{"P"}: Parallel mediation
+\item \code{"CN"}: Chained mediation
+\item \code{"CP"}: Chained-to-parallel mediation
+\item \code{"PC"}: Parallel-to-chained mediation
 }
-\item \strong{Missing data handling}:
+\item \strong{Missing data strategies}:
 \itemize{
-\item \code{"DE"}: Deletes rows with missing data.
-\item \code{"FIML"}: Uses Full Information Maximum Likelihood for missing data.
-\item \code{"MI"}: Conducts multiple imputations (requires the \code{mice} package).
+\item \code{"DE"}: Listwise deletion of missing values.
+\item \code{"FIML"}: Full Information Maximum Likelihood.
+\item \code{"MI"}: Multiple imputation using the \pkg{mice} package.
 }
-\item \strong{Monte Carlo analysis}: Generates Monte Carlo confidence intervals for mediation effects.
-\item \strong{Standardized results}: Optionally computes standardized effect sizes and confidence intervals.
+\item \strong{Inference options}:
+\itemize{
+\item \code{ci_method}: Choose \code{"bootstrap"} or \code{"mc"} (Monte Carlo) for confidence interval estimation.
+For \code{"MI"}, only \code{"mc"} is supported.
+\item \code{MCmethod}: For FIML, choose how Monte Carlo is performed:
+\itemize{
+\item \code{"mc"} (default): uses \code{semmcci::MC()}
+\item \code{"bootSD"}: uses custom simulation with bootstrap SD correction.
+}
+}
+\item \strong{Standardized results}: Optional standardized estimates with bootstrap or Monte Carlo CI.
 }
 \subsection{Workflow}{
 
-The function follows these main steps:
+The function proceeds through the following steps:
 \enumerate{
-\item Data preprocessing.
-\item Model construction.
-\item Model fitting.
-\item Monte Carlo analysis (optional).
-\item Standardization of results (optional).
-}
-}
-
-\subsection{Supported Model Types}{
-
-The \code{form} parameter allows you to select the type of mediation model:
-\itemize{
-\item \code{"P"}: Parallel mediation.
-\item \code{"CN"}: Chained mediation.
-\item \code{"CP"}/\code{"PC"}: Combined parallel and chained mediation.
-}
-}
-
-\subsection{Missing Data Strategies}{
-
-The \code{Na} parameter determines how missing data are handled:
-\itemize{
-\item \code{"DE"}: Delete rows with missing data (default).
-\item \code{"FIML"}: Use Full Information Maximum Likelihood (requires \code{lavaan}).
-\item \code{"MI"}: Perform multiple imputations (requires the \code{mice} package).
+\item Data preprocessing
+\item Model specification
+\item Model fitting
+\item Confidence interval estimation (bootstrap or Monte Carlo)
+\item Optional standardization of results
 }
 }
 }
 \examples{
-# Simulated example dataset
 data(example_data)
-# example 1
-# parallel mediation model with unstandardized effects
-result1 <- wsMed(
+set.seed(123)
+example_dataN <- mice::ampute(
+ data = example_data,
+  prop = 0.1,
+  )$amp
+
+result <- wsMed(
   data = example_data,
   M_C1 = c("A2", "B2"),
   M_C2 = c("A1", "B1"),
-  Y_C1 = "C2",
-  Y_C2 = "C1",
+  Y_C1 = "C1",
+  Y_C2 = "C2",
   form = "P",
+  Na = "MI",
   standardized = FALSE,
-  bootstrap = 1000,
+  ci_method = "mc",
+  alpha = 0.05,
+  alphastd = 0.05
 )
-
-print(result1)
+print(result)
 
 }

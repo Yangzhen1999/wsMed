@@ -30,7 +30,9 @@ Imports:
     lavaan,
     semmcci,
     mice,
-    semboottools
+    semboottools,
+    MASS,
+    rlang
 VignetteBuilder: knitr
 LazyData: true
 URL: https://github.com/Yangzhen1999/wsMed

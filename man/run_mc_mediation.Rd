@@ -24,6 +24,10 @@ run_mc_mediation(
 \item{R}{Integer. Number of Monte Carlo replications. Default is 20000.}
 
 \item{seed}{Integer. Random seed for reproducibility. Default is 123.}
+
+\item{alpha}{Numeric value for the confidence level of unstandardized Monte Carlo intervals. Default is 0.05.}
+
+\item{alphastd}{Numeric value for the confidence level of standardized Monte Carlo intervals. Default is 0.05.}
 }
 \value{
 A list with unstandardized and (if requested) standardized results.

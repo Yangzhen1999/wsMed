@@ -16,7 +16,7 @@ extract_all_parameters <- function(fit) {
   free_rows <- pt[pt$free > 0, ]
   free_params <- paste0(free_rows$lhs, free_rows$op, free_rows$rhs)
 
-  def_rows <- subset(pe, op == ":=")
+  def_rows <- subset(pe, pe[["op"]] == ":=")
   def_names <- def_rows$lhs
 
   extract_symbols <- function(rhs_expr) {

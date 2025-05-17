@@ -8,6 +8,8 @@
 #' @param standardized Logical. If TRUE, standardized results will also be returned. Default is FALSE.
 #' @param R Integer. Number of Monte Carlo replications. Default is 20000.
 #' @param seed Integer. Random seed for reproducibility. Default is 123.
+#' @param alpha Numeric value for the confidence level of unstandardized Monte Carlo intervals. Default is 0.05.
+#' @param alphastd Numeric value for the confidence level of standardized Monte Carlo intervals. Default is 0.05.
 #'
 #' @return A list with unstandardized and (if requested) standardized results.
 #' Each result includes Monte Carlo estimates, SEs, and CIs.

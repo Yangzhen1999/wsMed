@@ -5,14 +5,14 @@
 #' This version supports both intercept-based standardization and
 #' path-based standardization.
 #'
-#' @param theta_star A matrix of Monte Carlo samples (R × p).
+#' @param theta_star A matrix of Monte Carlo samples.
 #' @param definitions A named list of parameter definitions (e.g., list(indirect := "a * b")).
 #' @param std_map A named character vector mapping intercept labels (e.g., a1) to variable names (e.g., M1diff).
 #' @param sd_boot_list A list of bootstrap SD samples for intercept variables.
 #' @param sd_var_boot A list of bootstrap SD samples for variables involved in slope paths.
 #' @param path_std_map A named list mapping path labels to a vector of (predictor, outcome) variable names.
 #'
-#' @return A data frame of R rows (simulations) × all parameters (standardized free + defined).
+#' @return A data frame of R rows (simulations) * all parameters (standardized free + defined).
 #' @export
 evaluate_definitions_v3 <- function(theta_star,
                                     definitions,
@@ -93,7 +93,7 @@ evaluate_definitions_v3 <- function(theta_star,
           val <- tryCatch(
             eval(parse(text = expr), envir = env),
             error = function(e) {
-              warning(paste0("❌ Row ", i, ", ", def_names[j], ": ", e$message))
+              warning(paste0("Row ", i, ", ", def_names[j], ": ", e$message))
               NA_real_
             }
           )
@@ -115,7 +115,7 @@ evaluate_definitions_v3 <- function(theta_star,
 #' @description Evaluates user-defined parameter expressions from Monte Carlo samples
 #' without any standardization.
 #'
-#' @param theta_star A matrix of Monte Carlo samples (R × p).
+#' @param theta_star A matrix of Monte Carlo samples.
 #' @param definitions A named list of algebraic definitions (as strings).
 #'
 #' @return A data frame with R rows (simulations) and p + d columns
@@ -155,7 +155,7 @@ evaluate_definitions_unstd_v2 <- function(theta_star, definitions) {
           val <- tryCatch(
             eval(parse(text = expr), envir = env),
             error = function(e) {
-              warning(paste0("❌ Row ", i, ", ", def_names[j], ": ", e$message))
+              warning(paste0("Row ", i, ", ", def_names[j], ": ", e$message))
               NA_real_
             }
           )

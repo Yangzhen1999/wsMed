@@ -6,13 +6,20 @@
 \usage{
 get_sd_target_variables(fit, definition_map, data)
 }
+\arguments{
+\item{fit}{A \code{lavaan} model object. Must be fitted with labels for defined parameters.}
+
+\item{definition_map}{A named list returned from \code{resolve_all_dependencies()}, mapping defined parameters (e.g., "indirect1") to their algebraic components (e.g., c("a1", "b1")).}
+
+\item{data}{A data frame used to fit the model, typically the original observed dataset. Used to validate the existence of variables.}
+}
+\value{
+A character vector of variable names whose standard deviations are needed to standardize the intercept estimates in Monte Carlo confidence interval analysis.
+}
 \description{
-This function extracts the variable names from the definition map
-that are required for standardization, i.e., variables whose
-standard deviations are needed when computing standardized estimates
-from Monte Carlo simulations.
+Extracts variable names from a fitted SEM model and a definition map that are required
+for computing standardized estimates in Monte Carlo simulations.
+Specifically, it identifies intercept terms (e.g., \code{~1}) involved in user-defined parameters
+such as indirect effects (e.g., \code{indirect := a * b}) that require standard deviations for standardization.
 }
-\details{
-It cross-references the variables involved in user-defined parameters
-(e.g., indirect := a * b) with the variables present in the observed dataset.
-}
+\keyword{internal}

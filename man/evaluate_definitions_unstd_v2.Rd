@@ -7,7 +7,7 @@
 evaluate_definitions_unstd_v2(theta_star, definitions)
 }
 \arguments{
-\item{theta_star}{A matrix of Monte Carlo samples (R × p).}
+\item{theta_star}{A matrix of Monte Carlo samples.}
 
 \item{definitions}{A named list of algebraic definitions (as strings).}
 }

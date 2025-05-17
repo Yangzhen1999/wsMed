@@ -1,13 +1,18 @@
-#' Extract Target Variables for Standardization
+#' @title Extract Target Variables for Standardization
 #'
-#' This function extracts the variable names from the definition map
-#' that are required for standardization, i.e., variables whose
-#' standard deviations are needed when computing standardized estimates
-#' from Monte Carlo simulations.
+#' @description
+#' Extracts variable names from a fitted SEM model and a definition map that are required
+#' for computing standardized estimates in Monte Carlo simulations.
+#' Specifically, it identifies intercept terms (e.g., `~1`) involved in user-defined parameters
+#' such as indirect effects (e.g., `indirect := a * b`) that require standard deviations for standardization.
 #'
-#' It cross-references the variables involved in user-defined parameters
-#' (e.g., indirect := a * b) with the variables present in the observed dataset.
+#' @param fit A \code{lavaan} model object. Must be fitted with labels for defined parameters.
+#' @param definition_map A named list returned from \code{resolve_all_dependencies()}, mapping defined parameters (e.g., "indirect1") to their algebraic components (e.g., c("a1", "b1")).
+#' @param data A data frame used to fit the model, typically the original observed dataset. Used to validate the existence of variables.
 #'
+#' @return A character vector of variable names whose standard deviations are needed to standardize the intercept estimates in Monte Carlo confidence interval analysis.
+#' @keywords internal
+
 get_sd_target_variables <- function(fit, definition_map, data) {
   pt <- as.data.frame(fit@ParTable)
   intercept_vars <- unique(pt$lhs[pt$op == "~1" & pt$free > 0])

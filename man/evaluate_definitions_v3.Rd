@@ -14,7 +14,7 @@ evaluate_definitions_v3(
 )
 }
 \arguments{
-\item{theta_star}{A matrix of Monte Carlo samples (R × p).}
+\item{theta_star}{A matrix of Monte Carlo samples.}
 
 \item{definitions}{A named list of parameter definitions (e.g., list(indirect := "a * b")).}
 
@@ -27,7 +27,7 @@ evaluate_definitions_v3(
 \item{path_std_map}{A named list mapping path labels to a vector of (predictor, outcome) variable names.}
 }
 \value{
-A data frame of R rows (simulations) × all parameters (standardized free + defined).
+A data frame of R rows (simulations) * all parameters (standardized free + defined).
 }
 \description{
 Evaluates user-defined parameters (defined via expressions)

@@ -94,6 +94,7 @@ RunMCMIAnalysis <- function(data_missing,
                             tol = 1e-06) {
   # Step 1: 初始化结果变量
   mi_result <- NULL
+  first_imputed_data <- NULL
 
   # Step 2: 检查是否启用 Monte Carlo (MC)
   if (Na == "MI") {
@@ -111,6 +112,7 @@ RunMCMIAnalysis <- function(data_missing,
 
     # 获取处理后的插补数据集列表
     processed_data_list <- prepared_data$processed_data_list
+    first_imputed_data <- processed_data_list[[1]]
 
     # 调用 MCMI2 进行 Monte Carlo 分析
     mi_result <- MCMI2(
@@ -128,5 +130,8 @@ RunMCMIAnalysis <- function(data_missing,
   }
 
   # 返回分析结果
-  return(mi_result)
+  return(list(
+    mc_result = mi_result,
+    first_imputed_data = first_imputed_data
+  ))
 }

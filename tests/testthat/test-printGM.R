@@ -1,3 +1,5 @@
+
+
 library(testthat)
 
 ####  测试 `printGM()` 兼容所有 `GenerateModel*()` 生成的 SEM 语法**

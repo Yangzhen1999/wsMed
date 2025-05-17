@@ -8,6 +8,8 @@
 #' @param seed Integer. Random seed.
 #' @return A named list of numeric vectors (bootstrapped SD samples).
 #' @keywords internal
+#' @importFrom stats setNames
+#' @importFrom utils str
 bootstrap_sd_list <- function(data, var_names, nboot = 20000, seed = NULL) {
   if (!is.null(seed)) set.seed(seed)
   out <- list()
