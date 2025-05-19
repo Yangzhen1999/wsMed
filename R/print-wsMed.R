@@ -64,7 +64,7 @@
 #'   form = "P",
 #'   Na = "FIML",
 #'   standardized = FALSE,
-#'   #'   ci_method = "mc",
+#'   ci_method = "mc",
 #'   alpha = 0.05,
 #'   alphastd = 0.05
 #' )
@@ -75,8 +75,9 @@
 #' @importFrom stats quantile sd
 #' @importFrom utils str
 #' @importFrom knitr kable
+#' @importFrom utils combn
+#' @method print wsMed
 #' @export
-
 
 print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 
@@ -205,7 +206,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
         "rmsea.ci.lower", "rmsea.ci.upper", "srmr"
       )])
     )
-
+    cat("\n")
     cat("\n*************** MODEL FIT INDICES ***************\n")
     print_table_dynamic(fit_indices)
 
@@ -263,6 +264,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
     intercepts <- lav_param[lav_param$op == "~1", ]
     intercepts <- intercepts[!grepl("M\\davg", intercepts$lhs), ]
     if (nrow(intercepts) > 0) {
+      cat("\n")
       cat(paste0("\n*************** INTERCEPTS (", title_prefix, ") ***************\n"))
 
       name_match <- ifelse(
@@ -287,6 +289,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
     # VARIANCES
     variances <- lav_param[lav_param$op == "~~" & lav_param$lhs == lav_param$rhs, ]
     if (nrow(variances) > 0) {
+      cat("\n")
       cat(paste0("\n*************** VARIANCES (", title_prefix, ") ***************\n"))
 
       fallback <- paste0(variances$lhs, "~~", variances$rhs)
@@ -335,7 +338,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
   # total and direct effect
   print_mc_effect_summary <- function(mc_result, alpha = 0.05, title_prefix = "MC") {
     if (!inherits(mc_result, "semmcci")) return()
-
+    cat("\n")
     cat(paste0("\n*************** TOTAL AND DIRECT EFFECTS (", title_prefix, ") ***************\n"))
 
     # 提取估计和 SE
@@ -377,6 +380,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
     print_table_dynamic(effect_df)
 
     # 间接效应部分
+    cat("\n")
     cat(paste0("\n*************** INDIRECT EFFECTS (", title_prefix, ") ***************\n"))
     indirect_idx <- grep("^indirect\\d+$", mc_df$name)
     total_ind_idx <- which(names(est) == "total_indirect")
@@ -467,7 +471,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 
   print_mc_contrast_effects <- function(mc_result, title_prefix = "MC") {
     if (!inherits(mc_result, "semmcci")) return()
-
+    cat("\n")
     cat(paste0("\n*************** CONTRAST INDIRECT EFFECTS (", title_prefix, ") ***************\n"))
 
     # 提取估计与方差
@@ -591,8 +595,8 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 
       for (label in d_labels) {
         # e.g., "d1" → index 1; "d12" → indices 1,2
-        digits <- unlist(strsplit(sub("d", "", label), split = ""))
-        indices <- as.numeric(digits)
+        digit_chars <- unlist(strsplit(sub("d", "", label), split = ""))
+        indices <- as.numeric(digit_chars)
 
         if (length(indices) == 1 && indices <= length(Mdiff_vars)) {
           moderation_key <- rbind(moderation_key, data.frame(
@@ -614,111 +618,104 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
   }
 
   # 前后测系数
-  print_mc_prepost_effects <- function(mc_result, title_prefix = "MC") {
-    if (!inherits(mc_result, "semmcci")) {
-      message("Input is not a 'semmcci' object. Exiting.")
-      return()
-    }
+  print_mc_prepost_effects <- function(mc_result, title_prefix = "MC", digits= 3) {
 
+    if (!inherits(mc_result, "semmcci")) return()
+    cat("\n")
     cat(paste0("\n*************** C1-C2 COEFFICIENTS (", title_prefix, ") ***************\n"))
 
-    # 提取估计与标准误
     est <- mc_result$thetahat$est
-    se <- tryCatch({
-      apply(mc_result$thetahatstar, 2, sd)
-    }, error = function(e) {
-      stop("Error in computing standard errors from thetahatstar: ", e$message)
-    })
+    se <- apply(mc_result$thetahatstar, 2, sd)
 
-    # CI 设置
     alpha <- mc_result$args$alpha
-    probs <- sort(unique(c(alpha / 2, 1 - alpha / 2)))
+    probs <- sort(c(alpha / 2, 1 - alpha / 2))
+    ci_vals <- t(apply(mc_result$thetahatstar, 2, quantile, probs = probs, na.rm = TRUE))
 
-    ci_vals <- tryCatch({
-      apply(mc_result$thetahatstar, 2, quantile, probs = probs, na.rm = TRUE)
-    }, error = function(e) {
-      stop("Error in computing quantiles from thetahatstar: ", e$message)
-    })
-    ci_vals <- t(ci_vals)
-
-    # CI列命名
     ci_names <- paste0(
-      sprintf("%.1f", probs * 100), "%CI.",
-      ifelse(probs < 0.5, "Lo", "Up")
+      sprintf("%.1f", probs * 100),
+      ifelse(probs < 0.5, "%CI.Lo", "%CI.Up")
     )
-
     colnames(ci_vals) <- ci_names
 
-    # 整合为数据框
     mc_df <- data.frame(
-      name = names(est),
-      Estimate = as.numeric(est),
-      SE = as.numeric(se),
+      name     = names(est),
+      Estimate = est,
+      SE       = se,
       stringsAsFactors = FALSE
     )
+    mc_df <- cbind(mc_df, ci_vals)
 
-    ci_df <- as.data.frame(ci_vals)
+    # 筛选前后测系数（如 X0_b1, X1_b2, ...）
+    prepost_idx <- grep("^X[01]_b\\d+$", mc_df$name)
+    if (length(prepost_idx) == 0) return(invisible(NULL))
 
-    # 检查 CI 是否为 numeric
-    check_ci_types <- sapply(ci_df, function(x) is.numeric(x))
-    if (any(!check_ci_types)) {
-      warning("Some CI columns are not numeric: ", paste(names(ci_df)[!check_ci_types], collapse = ", "))
-      str(ci_df[!check_ci_types])
-      stop("Non-numeric CI columns detected.")
+    prepost_table <- data.frame(
+      Name     = mc_df$name[prepost_idx],
+      Estimate = as.numeric(mc_df$Estimate[prepost_idx]),
+      SE       = as.numeric(mc_df$SE[prepost_idx]),
+      stringsAsFactors = FALSE
+    )
+    for (ci_name in ci_names) {
+      prepost_table[[ci_name]] <- as.numeric(mc_df[[ci_name]][prepost_idx])
     }
 
-    mc_df <- cbind(mc_df, ci_df)
-
-    # 仅保留前后测系数
-    idx <- grep("^X[01]_b\\d+$", mc_df$name)
-    if (length(idx) == 0) {
-      message("No C1-C2 coefficient parameters found (X0_b*, X1_b*).")
-      return(invisible(NULL))
-    }
-
-    prepost_table <- mc_df[idx, ]
-    colnames(prepost_table)[1] <- "Name"
-
-    tryCatch({
-      print_table_dynamic(prepost_table)
-    }, error = function(e) {
-      message("Error during print_table_dynamic():")
-      str(prepost_table)
-      stop(e)
-    })
+    print_table_dynamic(prepost_table, digits_local = digits)
   }
-  if (!is.null(x$mi_result))    print_mc_prepost_effects(x$mi_result, title_prefix = "MC (MI)")
+  if (!is.null(x$mi_result))    print_mc_prepost_effects(x$mi_result, title_prefix = "MC (MI)", digits = digits)
   if (!is.null(x$fiml_result))  print_mc_prepost_effects(x$fiml_result, title_prefix = "MC (FIML)")
   if (!is.null(x$mc_de_result)) print_mc_prepost_effects(x$mc_de_result, title_prefix = "MC (DE)")
 
-  # 前后测系数 Key（更新版）
   # 前后测系数 Key（精简版，仅包含 X1_bi 和 X0_bi）
-  if (!is.null(x$prepared_data)) {
-    Mdiff_vars <- grep("M\\ddiff", colnames(x$prepared_data), value = TRUE)
-    pre_post_key <- data.frame(Coefficient = character(), Path = character(), stringsAsFactors = FALSE)
+  # 前后测系数 Key（适用于 MI, FIML, MC(DE)）
+  if (!is.null(x$prepared_data) &&
+      (!is.null(x$mi_result) || !is.null(x$fiml_result) || !is.null(x$mc_de_result))) {
 
+    mc_obj <- x$mi_result %||% x$fiml_result %||% x$mc_de_result
+    if (!inherits(mc_obj, "semmcci")) return()
+
+    Mdiff_vars <- grep("M\\ddiff", colnames(x$prepared_data), value = TRUE)
+    existing_labels <- names(mc_obj$thetahat$est)
+
+    pre_post_key <- data.frame()
+
+    # 添加一阶路径（如 b1, b2, ...）
     for (i in seq_along(Mdiff_vars)) {
-      pre_post_key <- rbind(
-        pre_post_key,
-        data.frame(
-          Coefficient = paste0("X1_b", i),
-          Path        = paste0(Mdiff_vars[i], " -> Ydiff"),
-          stringsAsFactors = FALSE
-        ),
-        data.frame(
-          Coefficient = paste0("X0_b", i),
-          Path        = paste0(Mdiff_vars[i], " -> Ydiff"),
-          stringsAsFactors = FALSE
-        )
+      label <- paste0("b", i)
+      if (label %in% existing_labels) {
+        pre_post_key <- rbind(pre_post_key, data.frame(
+          Coefficient = label,
+          Path = paste0(Mdiff_vars[i], " -> Ydiff")
+        ))
+      }
+    }
+
+    # 添加二阶及以上路径（如 b12, b13, b123 等）
+    if (length(Mdiff_vars) > 1) {
+      all_combinations <- unlist(
+        lapply(2:length(Mdiff_vars), function(k) combn(seq_along(Mdiff_vars), k, simplify = FALSE)),
+        recursive = FALSE
       )
+
+      for (idx_vec in all_combinations) {
+        label <- paste0("b", paste0(idx_vec, collapse = ""))
+        if (label %in% existing_labels) {
+          path <- paste(Mdiff_vars[idx_vec], collapse = " -> ")
+          path <- paste0(path, " -> Ydiff")
+          pre_post_key <- rbind(pre_post_key, data.frame(
+            Coefficient = label,
+            Path = path
+          ))
+        }
+      }
     }
 
     print(knitr::kable(pre_post_key, align = c("c", "c"), row.names = FALSE))
   }
 
+
   print_mc_std_result <- function(std_result, title_prefix = "MC") {
     if (!is.data.frame(std_result)) return()
-
+    cat("\n")
     cat(paste0("\n*************** MONTE CARLO CONFIDENCE INTERVALS (STANDARDIZED) (", title_prefix, ") ***************\n"))
 
     # 删除方差项与截距项
@@ -764,13 +761,11 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 
   if(!is.null(x$ustd_result)){cat("\n")
     ustd_result <- x$ustd_result
-    cat("\n*************** MODEL FIT INDICES ***************\n")
-    print_table_dynamic(fit_indices)
-
     # 回归路径部分
     delta <- isTRUE(delta)
     regressions <- ustd_result[ustd_result$op == "~", ]
     if (nrow(regressions) > 0) {
+      cat("\n")
       cat("\n*************** REGRESSION PATHS, INTERCEPTS AND VARIANCES ***************\n")
 
       # 创建基础列
@@ -877,6 +872,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 
     # 打印合并后的表格
     if (nrow(combined_effects) > 0) {
+      cat("\n")
       cat("\n")
       cat("\n*************** TOTAL AND DIRECT EFFECT ***************\n")
       print_table_dynamic(combined_effects)
@@ -1143,7 +1139,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
         }
       }
 
-
+      cat("\n")
       #cat("\n*************** C1-C2 COEFFICIENTS KEY ***************\n")
       print(kable(pre_post_key, align = c("c", "c"), row.names = FALSE))
     }
@@ -1189,6 +1185,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
     cat("Bootstrap P: Asymmetric bootstrap p-value (only for perc)\n")
 
   }
+
   if (!is.null(x$std_result)) {
     cat("\n")
     cat("\n*************** STANDARDIZED RESULTS ***************\n")
@@ -1250,59 +1247,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 }
 
 
-#' @title Sort Parameters for Printing in SEM Output
-#' @description Sorts a parameter table by conceptual priority for presentation purposes.
-#' This function is designed to support formatted output of mediation and SEM results
-#' by organizing parameters such as a-paths, b-paths, indirect effects, contrasts, etc.
-#'
-#' @param df A data frame that contains a column named \code{Parameter} (e.g., from Monte Carlo CI output).
-#' @return A reordered version of the same data frame, with rows sorted according to
-#' a predefined logical structure:
-#' \enumerate{
-#'   \item a-paths (e.g., a1, a2, ...)
-#'   \item b-paths (e.g., b1, b2, ...)
-#'   \item d-paths (e.g., d1, d2, ...)
-#'   \item indirect effects (e.g., ind1, ind2, ...)
-#'   \item direct effect
-#'   \item total indirect
-#'   \item total effect
-#'   \item contrasts (e.g., ind1-ind2, ind2-ind3)
-#'   \item X-condition path terms (e.g., X1_b1, X0_b1, ...)
-#' }
-#'
-#' @details This is an internal helper function used by \code{print.WsMed()} to ensure that printed
-#' tables of standardized or unstandardized estimates appear in a logical and human-readable order.
-#'
-#' @examples
-#' df <- data.frame(Parameter = c("b2", "a1", "direct effect", "ind2", "total effect"))
-#' sort_parameters(df)
-#'
-#' @keywords internal
-#' @export
 
 
-sort_parameters <- function(df) {
-  if (!"Parameter" %in% colnames(df)) return(df)
-
-  # 获取参数名
-  param <- df$Parameter
-
-  # 定义排序优先级规则
-  priority <- rep(99, length(param))
-  priority[grepl("^a\\d+$", param)] <- 1
-  priority[grepl("^b\\d+$", param)] <- 2
-  priority[grepl("^d\\d+$", param)] <- 3
-  priority[grepl("^ind\\d+$", param)] <- 4
-  priority[grepl("^direct effect$", param)] <- 5
-  priority[grepl("^total ind$", param)] <- 6
-  priority[grepl("^total effect$", param)] <- 7
-  priority[grepl("^ind\\d+-ind\\d+$", param)] <- 8
-  priority[grepl("^X[01]_b\\d+$", param)] <- 9
-
-  df$..sort_order <- priority
-  df <- df[order(df$..sort_order, param), , drop = FALSE]
-  df$..sort_order <- NULL
-  return(df)
-}
 
 

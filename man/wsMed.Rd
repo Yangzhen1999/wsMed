@@ -20,14 +20,14 @@ wsMed(
   R = 20000L,
   fixed.x = FALSE,
   alpha = 0.05,
+  alphastd = 0.05,
   m = 5,
   method = "pmm",
   decomposition = "eigen",
   pd = TRUE,
   tol = 1e-06,
   seed = 123,
-  MCmethod = NULL,
-  alphastd = 0.05
+  MCmethod = NULL
 )
 }
 \arguments{
@@ -62,6 +62,8 @@ wsMed(
 
 \item{alpha}{Numeric vector. Significance levels for CI. Defaults to \code{c(0.01, 0.05)}.}
 
+\item{alphastd}{Numeric. Significance level for standardized results. Defaults to \code{0.05}.}
+
 \item{m}{Integer. Number of imputations for MI. Defaults to \code{5}.}
 
 \item{method}{Character. Imputation method for \code{mice}. Defaults to \code{"pmm"}.}
@@ -75,8 +77,6 @@ wsMed(
 \item{seed}{Integer. Random seed used in Monte Carlo simulation. Defaults to \code{123}.}
 
 \item{MCmethod}{Character. If \code{Na = "FIML"} and \code{ci_method = "mc"}, choose \code{"mc"} (default) or \code{"bootSD"}.}
-
-\item{alphastd}{Numeric. Significance level for standardized results. Defaults to \code{0.05}.}
 }
 \value{
 A list with class \code{"wsMed"} containing:

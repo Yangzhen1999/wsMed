@@ -28,7 +28,7 @@ RunMCMIAnalysis(
 \item{m}{An integer specifying the number of imputations to perform. Default is \code{5}.}
 
 \item{method}{A character string specifying the imputation method. Default is \code{"pmm"}
-(predictive mean matching). Other methods supported by \code{\link[=mice]{mice()}} can be used.}
+(predictive mean matching).}
 
 \item{seed}{An integer specifying the random seed for reproducibility. Default is \code{123}.}
 

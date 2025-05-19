@@ -128,14 +128,14 @@ wsMed <- function(data,
                    R = 20000L,  # Monte Carlo 重复次数
                    fixed.x = FALSE,
                    alpha = 0.05,  # 显著性水平
+                   alphastd = 0.05,
                    m = 5,  # 插补次数
                    method = "pmm",  # 插补方法
                    decomposition = "eigen",
                    pd = TRUE,
                    tol = 1e-06,
                    seed = 123,
-                   MCmethod = NULL,
-                   alphastd = 0.05) {
+                   MCmethod = NULL) {
 
   # 输入验证
   {

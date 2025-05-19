@@ -11,9 +11,9 @@ vignette: >
 
 This document presents a comparison between the **MEMORE 3.0 (SPSS Plugin)** and **wsMed (R Package)** outputs.
 
-## parallel mediation 
+## parallel mediation
 
-We analyze a **three-mediator parallel mediation model**, comparing the results obtained from both methods. 
+We analyze a **three-mediator parallel mediation model**, comparing the results obtained from both methods.
 
 ### MEMORE 3.0 Analysis Report
 
@@ -25,12 +25,11 @@ cat("```\n", paste(txt_content, collapse = "\n"), "\n```")
 ### wsMed Analysis Report
 
 ```{r, echo=FALSE}
-devtools::load_all()
 library(wsMed)
 result1 <- wsMed(
   data = example_data, #dataset
-  M_C1 = c("A1","B1","C1"), # A1/B1 is A/B mediator variable in condition 1 
-  M_C2 = c("A2","B2","C2"), # A2/B2 is A/B mediator variable in condition 2 
+  M_C1 = c("A1","B1","C1"), # A1/B1 is A/B mediator variable in condition 1
+  M_C2 = c("A2","B2","C2"), # A2/B2 is A/B mediator variable in condition 2
   Y_C1 = "D1", # C1 is outcome variable in condition 1
   Y_C2 = "D2", # C2 is outcome variable in condition 2
   form = "P", # Parallel mediation
@@ -42,7 +41,7 @@ printGM(result1)
 
 ## chained/serial mediation
 
-We analyze a **Serial Mediation (`Serial = 1`)**, as MEMORE 3.0 supports only `Serial = 1`. 
+We analyze a **Serial Mediation (`Serial = 1`)**.
 
 ### MEMORE 3.0 Analysis Report
 
@@ -56,8 +55,8 @@ cat("```\n", paste(txt_content, collapse = "\n"), "\n```")
 ```{r}
 result2 <- wsMed(
   data = example_data, #dataset
-  M_C1 = c("A1","B1"), # A1/B1 is A/B mediator variable in condition 1 
-  M_C2 = c("A2","B2"), # A2/B2 is A/B mediator variable in condition 2 
+  M_C1 = c("A1","B1"), # A1/B1 is A/B mediator variable in condition 1
+  M_C2 = c("A2","B2"), # A2/B2 is A/B mediator variable in condition 2
   Y_C1 = "C1", # C1 is outcome variable in condition 1
   Y_C2 = "C2", # C2 is outcome variable in condition 2
   form = "CN", # Parallel mediation

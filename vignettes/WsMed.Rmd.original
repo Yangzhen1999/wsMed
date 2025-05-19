@@ -4,6 +4,7 @@ date: "`r Sys.Date()`"
 output:
   rmarkdown::html_vignette:
     number_sections: true
+    keep_md: true
 vignette: >
   %\VignetteIndexEntry{wsMed Function Documentation}
   %\VignetteEngine{knitr::rmarkdown}
@@ -16,55 +17,69 @@ The `wsMed` function is designed for two condition within-subject mediation anal
 
 ------------------------------------------------------------------------
 
-# Workflow
-
-The workflow of the `wsMed` function is illustrated below:
-
-<p align="center">
-
-<img src="WsMed.svg" alt="wsMed workflow" width="100%"/>
-
-</p>
+# Main Function
 
 The main steps include:
 
-1.  Data preprocessing: Prepare the input data by computing difference and mean variables.
+1. **Input Validation**
+   Validate the dataset and key arguments (e.g., mediation structure, missing data method, etc.).
 
-2.  Model construction: Generate SEM models based on the specified mediation type.
+2. **Data Preprocessing**
+   Compute difference scores (`Mdiff`, `Ydiff`) and centered averages (`Mavg`) from the two-condition design.
 
-3.  Model fitting: Fit the SEM model and handle missing data based on the chosen method.
+3. **Model Construction**
+   Generate SEM syntax according to the specified mediation structure:
+   - `"P"`: Parallel mediation
+   - `"CN"`: Chained (serial) mediation
+   - `"CP"`: Chained + Parallel
+   - `"PC"`: Parallel + Chained
 
-4.  Monte Carlo analysis: Perform simulations using either FIML or multiple imputations (MI).
+4. **Model Fitting and Inference**
+   Fit the SEM model with handling of missing data via one of the following methods:
+   - `"DE"`: Listwise deletion
+   - `"FIML"`: Full Information Maximum Likelihood
+   - `"MI"`: Multiple Imputation
 
-5.  Standardization (optional): Compute standardized results.
+   Inference options include:
+   - **Bootstrap CI** (`ci_method = "bootstrap"` or `"both"`)
+   - **Monte Carlo CI** (`ci_method = "mc"` or `"both"`), using either
+     - analytical method (`MCmethod = "mc"`)
+     - or bootstrapped SD (`MCmethod = "bootSD"`)
+
+5. **Standardization (Optional)**
+   If `standardized = TRUE`, computes standardized effects and their confidence intervals using either bootstrap or Monte Carlo-based methods.
+
+---
 
 # Parameter Descriptions
 
-The `wsMed` function accepts the following parameters:
+The `wsMed()` function accepts the following parameters:
 
-| **Parameter** | **Type** | **Default** | **Description** |
-|-----------|-----------|-----------|----------------------------------------|
-| `data` | Data frame | Required | The input dataset. |
-| `M_C1` | String vector | Required | Names of the mediator variables in Condition 1. |
-| `M_C2` | String vector | Required | Names of the mediator variables in Condition 2. |
-| `Y_C1` | String | Required | Name of the outcome variable in Condition 1. |
-| `Y_C2` | String | Required | Name of the outcome variable in Condition 2. |
-| `form` | String | `"P"` | Model type: `"P"` (parallel), `"CN"` (chained), `"CP"`(chained+ parallel), or `"PC"`(parallel+chained). |
-| `standardized` | Boolean | `FALSE` | Whether to standardize the results. |
-| `Na` | String | `"DE"` | Missing data handling method: `"DE"`, `"FIML"`, or `"MI"`. |
-| `bootstrap` | Integer | `1000` | Bootstrap resampling iterations (only for `"DE"` method). |
-| `iseed` | Integer | `123` | Integer for setting the random seed. |
-| `se` | String | `"standard"` | Method for computing standard errors (`"standard"` or `"bootstrap"`). |
-| `R` | Integer | `20000L` | Number of Monte Carlo repetitions. |
-| `alpha` | Numeric vector | `c(0.01, 0.05)` | Significance levels. |
-| `m` | Integer | `5` | Number of imputations for the `"MI"` method. |
-| `method` | String | `"pmm"` | Imputation method for the `"MI"` method. |
-| `decomposition` | String | `"eigen"` | Decomposition method for covariance matrices. |
-| `pd` | Boolean | `TRUE` | Checks the positive definiteness of covariance matrices. |
-| `tol` | Numeric | `1e-06` | Tolerance used in positive definiteness checks. |
-| `seed` | Integer | `123` | Random seed during Monte Carlo simulations. |
-| `alphastd` | Numeric | `c(0.01, 0.05)` | Significance level for standardized confidence intervals. |
-| `fixed.x` | Boolean | `FALSE` | Whether x variables are fixed. |
+| **Parameter**       | **Type**        | **Default** | **Description**                                                                 |
+|---------------------|-----------------|-------------|---------------------------------------------------------------------------------|
+| `data`              | Data frame      | Required    | The input dataset.                                                              |
+| `M_C1`              | String vector   | Required    | Mediator variables under Condition 1.                                           |
+| `M_C2`              | String vector   | Required    | Mediator variables under Condition 2.                                           |
+| `Y_C1`              | String          | Required    | Outcome variable under Condition 1.                                             |
+| `Y_C2`              | String          | Required    | Outcome variable under Condition 2.                                             |
+| `form`              | String          | `"P"`       | Model type: `"P"`, `"CN"`, `"CP"`, or `"PC"`.                                   |
+| `standardized`      | Boolean         | `FALSE`     | Whether to compute standardized results.                                        |
+| `Na`                | String          | `"DE"`      | Missing data method: `"DE"`, `"FIML"`, or `"MI"`.                               |
+| `ci_method`         | String / NULL   | `NULL`      | CI method: `"bootstrap"`, `"mc"`, or `"both"`. If `NULL`, defaults to `"bootstrap"` for `"DE"`/`"FIML"` and `"mc"` for `"MI"`|
+| `bootstrap`         | Integer         | `1000`      | Number of bootstrap samples.                                                    |
+| `iseed`             | Integer         | `123`       | Random seed for bootstrap sampling.                                             |
+| `boot_ci_type`      | String          | `"perc"`    | Bootstrap CI type: `"perc"`, `"bc"`, `"bca.simple"`.                            |
+| `R`                 | Integer         | `20000L`    | Number of Monte Carlo repetitions.                                              |
+| `alpha`             | Numeric         | `0.05`      | Significance level for unstandardized CIs.                                      |
+| `m`                 | Integer         | `5`         | Number of imputations (for `"MI"` method).                                      |
+| `method`            | String          | `"pmm"`     | Imputation method (e.g., `"pmm"`, `"norm"`) used in `mice()`.                   |
+| `decomposition`     | String          | `"eigen"`   | Matrix decomposition method: `"eigen"`, `"chol"`, or `"svd"`.                   |
+| `pd`                | Boolean         | `TRUE`      | Check positive definiteness of covariance matrix.                               |
+| `tol`               | Numeric         | `1e-06`     | Tolerance used in positive definiteness checks.                                 |
+| `seed`              | Integer         | `123`       | Random seed for Monte Carlo simulation.                                         |
+| `MCmethod`          | String / NULL   | `NULL`      | Monte Carlo method: `"mc"` or `"bootSD"`.                                       |
+| `alphastd`          | Numeric         | `0.05`      | Significance level for standardized confidence intervals.                       |
+| `fixed.x`           | Boolean         | `FALSE`     | Whether exogenous variables are fixed.                                          |
 
 
 The dataset should be in wide format, where each participant has separate columns for measurements in different conditions. Specifically, each mediator variable (e.g., M1) should be split into two columns: one for Condition 1 and one for Condition 2. Similarly, the outcome variable should also have separate columns for each condition. This structure ensures that within-subject changes can be properly analyzed.
@@ -73,29 +88,27 @@ The dataset should be in wide format, where each participant has separate column
 # Simulated example dataset
 s_data <- data.frame(
   ID = 1:100,
-  M1_C1 = rnorm(100), M2_C1 = rnorm(100),
-  M1_C2 = rnorm(100), M2_C1 = rnorm(100),
+  M1_C1 = rnorm(100), M1_C2 = rnorm(100),
+  M2_C1 = rnorm(100), M2_C2 = rnorm(100),
   Y_C1 = rnorm(100),  Y_C2 = rnorm(100)
 )
 head(s_data)
 ```
 
 # Calling wsMed
-
 ```{r, include=FALSE}
 devtools::load_all()
-library(wsMed) 
+library(wsMed)
 ```
 
 ## For a complete dataset without missing values
 
 ### example 1
-
 ```{r}
 result1 <- wsMed(
   data = example_data, #dataset
-  M_C1 = c("A1","B1"), # A1/B1 is A/B mediator variable in condition 1 
-  M_C2 = c("A2","B2"), # A2/B2 is A/B mediator variable in condition 2 
+  M_C1 = c("A1","B1"), # A1/B1 is A/B mediator variable in condition 1
+  M_C2 = c("A2","B2"), # A2/B2 is A/B mediator variable in condition 2
   Y_C1 = "C1", # C1 is outcome variable in condition 1
   Y_C2 = "C2", # C2 is outcome variable in condition 2
   form = "P", # Parallel mediation
@@ -103,33 +116,87 @@ result1 <- wsMed(
 print(result1)
 ```
 
+By default, `wsMed()` uses **bootstrap** confidence intervals when `ci_method` is not specified. You can also specify ci_method = "mc" to compute Monte Carlo confidence intervals instead of bootstrap:
+
+```{r,eval = FALSE}
+result1 <- wsMed(
+  data = example_data, #dataset
+  M_C1 = c("A1","B1"), # A1/B1 is A/B mediator variable in condition 1
+  M_C2 = c("A2","B2"), # A2/B2 is A/B mediator variable in condition 2
+  Y_C1 = "C1", # C1 is outcome variable in condition 1
+  Y_C2 = "C2", # C2 is outcome variable in condition 2
+  form = "P", # Parallel mediation
+  ci_method = "mc" # use Monte Carlo confidence intervals
+)
+print(result1)
+```
+
 ### example2
+You can further control the behavior of `wsMed()` through additional arguments:
+
+- Set `standardized = TRUE` to compute **standardized effects** and their confidence intervals.
+- Use `bootstrap` and `iseed` to control the **number of bootstrap samples** and **random seed**.
+- Adjust `alpha` for the **significance level of unstandardized CIs**, and `alphastd` for **standardized CIs**.
 
 ```{r}
-library(wsMed) 
+library(wsMed)
 result2 <- wsMed(
   data = example_data, #dataset
-  M_C1 = c("A1","B1","C1"), # A1/B1/C1 is A/B/C mediator variable in condition 1 
-  M_C2 = c("A2","B2","C2"), # A2/B2/C2 is A/B/C mediator variable in condition 2 
+  M_C1 = c("A1","B1","C1"), # A1/B1/C1 is A/B/C mediator variable in condition 1
+  M_C2 = c("A2","B2","C2"), # A2/B2/C2 is A/B/C mediator variable in condition 2
   Y_C1 = "D1", # D1 is outcome variable in condition 1
   Y_C2 = "D2", # D2 is outcome variable in condition 2
   form = "P", # Parallel mediation
   standardized = TRUE, # Compute standardized effects
-  bootstrap = 1000, # Bootstrap for confidence intervals
+  alpha =  0.05,  # Significance level
+  alphastd = 0.05, # Significance level for standardized
+  bootstrap = 2000, # Bootstrap for confidence intervals
   iseed = 123 # Random seed for bootstrap
 )
 print(result2)
 ```
 
+- You can also specify `ci_method = "mc"` to use **Monte Carlo confidence intervals** instead of bootstrap.
+- Set `R` to control the **number of Monte Carlo repetitions** (default = 20000).
+
+```{r,eval = FALSE}
+library(wsMed)
+result2 <- wsMed(
+  data = example_data, #dataset
+  M_C1 = c("A1","B1","C1"), # A1/B1/C1 is A/B/C mediator variable in condition 1
+  M_C2 = c("A2","B2","C2"), # A2/B2/C2 is A/B/C mediator variable in condition 2
+  Y_C1 = "D1", # D1 is outcome variable in condition 1
+  Y_C2 = "D2", # D2 is outcome variable in condition 2
+  form = "P", # Parallel mediation
+  standardized = TRUE, # Compute standardized effects
+  ci_method = "mc", # Use Monte Carlo method for missing data
+  standardized = TRUE, # Compute standardized effects based on Monte Carlo method
+  R = 10000L,   # the number of Monte Carlo repetitions
+  alpha =  0.05,  # Significance level
+  alphastd = 0.05 # Significance level for standardized
+)
+print(result2)
+```
+
 ## For a dataset with missing data
+The `wsMed()` function supports three missing data handling strategies via the `Na` argument:
+
+- `"DE"`: Listwise deletion (default).
+- `"FIML"`: Full Information Maximum Likelihood.
+- `"MI"`: Multiple Imputation using the `mice` package.
+
+**Note**:
+- For **`Na = "DE"`** and **`Na = "FIML"`**, the default is **bootstrap confidence intervals**, but you can specify `ci_method = "mc"` to use **Monte Carlo** confidence intervals instead.
+- For **`Na = "MI"`**, only **Monte Carlo** confidence intervals are supported. Bootstrap is **not available** when using multiple imputation.
+
 
 ```{r}
 library(knitr)
 data(example_data)
-set.seed(123) 
+set.seed(123)
 example_dataN <- mice::ampute(
-  data = example_data,       
-  prop = 0.1,      
+  data = example_data,
+  prop = 0.1,
 )$amp
 ```
 
@@ -138,7 +205,7 @@ example_dataN <- mice::ampute(
 Use 'DE' method for missing data for parallel mediation
 
 ```{r}
-library(wsMed) 
+library(wsMed)
 result3 <- wsMed(
   data = example_data,# a dataset with missing data
   M_C1 = c("A1","B1"),# A1/B1 is A/B mediator variable in condition 1
@@ -146,9 +213,9 @@ result3 <- wsMed(
   Y_C1 = "C1", # C1 is outcome variable in condition 1
   Y_C2 = "C2", # C2 is outcome variable in condition 2
   form = "P",# Parallel mediation
-  Na = "DE",# directly delete the missing data
+  Na = "DE",# Listwise deletion for the missing data
 )
-print(result3,level = 0.99)
+print(result3,digits =4)  # Set number of decimal places to 4 in the output
 ```
 
 ### example 4
@@ -165,7 +232,7 @@ result4 <- wsMed(
   form = "CN", # chained mediation
   Na = "MI", # Use Multiple Imputation ("MI") for handling missing data
   standardized = TRUE, # Compute standardized effects based on Monte Carlo method
-  R = 20000L,  # the number of Monte Carlo repetitions 
+  R = 20000L,  # the number of Monte Carlo repetitions
   alpha =  0.05,  # Significance level
   alphastd = 0.05 # Significance level for standardized
 )
@@ -184,7 +251,8 @@ result5 <- wsMed(
   Y_C1 = "D1",# D1 is outcome variable in condition 1
   Y_C2 = "D2",# D2 is outcome variable in condition 2
   form = "CP",# chained + parallel mediation, M1 is chained mediator by default
-  Na = "FIML",# Use Full Information Maximum Likelihood ("FIML")  for handling missing data 
+  Na = "FIML",# Use Full Information Maximum Likelihood ("FIML")  for handling missing data
+  ci_method = "mc", # Use Monte Carlo method for missing data
   standardized = TRUE, # Compute standardized effects based on Monte Carlo method
   R = 10000L,   # the number of Monte Carlo repetitions
   alpha =  0.05,  # Significance level

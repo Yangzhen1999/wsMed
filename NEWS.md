@@ -1,6 +1,6 @@
 # Package News
 
-## wsMed 0.1.2 (2025-05-07)
+## wsMed 0.3.1 (2025-05-19)
 
 ### New Features
 - Added NEWS.md for tracking package changes.
@@ -9,6 +9,8 @@
 - Replaced `standardizedSolution_boot_ci()` with `semboottools::standardizedSolution_boot()`
 - Added bootstrap p-values and support for CI type selection
 - Improved `print.wsMed()` output with detailed notes
+- Added: `MCStd2()` function for fully standardized Monte Carlo inference
+- Improved: Print method now supports `delta = TRUE` to show original SE and CI
 
 ### Enhancements
 - Improved documentation and package description.
