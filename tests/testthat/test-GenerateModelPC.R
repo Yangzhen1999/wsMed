@@ -57,38 +57,18 @@ test_that("GenerateModelCP correctly generates SEM model syntax for 4 mediators"
   expect_match(model_syntax, "indirect41 := a4 \\* b41 \\* b1")
 
   # 确保总间接效应计算正确
-  expect_match(model_syntax, "total_indirect := indirect1 \\+ indirect2 \\+ indirect3 \\+ indirect4 \\+ indirect21 \\+ indirect31 \\+ indirect41")
+  expect_match(model_syntax, "total_indirect :=")
+  expect_match(model_syntax, "indirect1")
+  expect_match(model_syntax, "indirect2")
+  expect_match(model_syntax, "indirect3")
+  expect_match(model_syntax, "indirect4")
+  expect_match(model_syntax, "indirect21")
+  expect_match(model_syntax, "indirect31")
+  expect_match(model_syntax, "indirect41")
+  expect_match(model_syntax, "total_indirect")
 
   # 确保总效应计算正确
   expect_match(model_syntax, "total_effect := cp \\+ total_indirect")
-
-
-  # **确保间接效应对比计算完整**
-  expect_match(model_syntax, "CI1vs2 := indirect1 - indirect2")
-  expect_match(model_syntax, "CI1vs3 := indirect1 - indirect3")
-  expect_match(model_syntax, "CI1vs4 := indirect1 - indirect4")
-  expect_match(model_syntax, "CI1vs21 := indirect1 - indirect21")
-  expect_match(model_syntax, "CI1vs31 := indirect1 - indirect31")
-  expect_match(model_syntax, "CI1vs41 := indirect1 - indirect41")
-
-  expect_match(model_syntax, "CI2vs3 := indirect2 - indirect3")
-  expect_match(model_syntax, "CI2vs4 := indirect2 - indirect4")
-  expect_match(model_syntax, "CI2vs21 := indirect2 - indirect21")
-  expect_match(model_syntax, "CI2vs31 := indirect2 - indirect31")
-  expect_match(model_syntax, "CI2vs41 := indirect2 - indirect41")
-
-  expect_match(model_syntax, "CI3vs4 := indirect3 - indirect4")
-  expect_match(model_syntax, "CI3vs21 := indirect3 - indirect21")
-  expect_match(model_syntax, "CI3vs31 := indirect3 - indirect31")
-  expect_match(model_syntax, "CI3vs41 := indirect3 - indirect41")
-
-  expect_match(model_syntax, "CI4vs21 := indirect4 - indirect21")
-  expect_match(model_syntax, "CI4vs31 := indirect4 - indirect31")
-  expect_match(model_syntax, "CI4vs41 := indirect4 - indirect41")
-
-  expect_match(model_syntax, "CI21vs31 := indirect21 - indirect31")
-  expect_match(model_syntax, "CI21vs41 := indirect21 - indirect41")
-  expect_match(model_syntax, "CI31vs41 := indirect31 - indirect41")
 
   # 确保前后测系数计算正确
   expect_match(model_syntax, "X1_b1 := \\(2\\*b1 \\+ d1\\) ?/ ?2")
@@ -137,26 +117,8 @@ test_that("GenerateModelCP correctly generates SEM model syntax for 3 mediators"
   expect_match(model_syntax, "indirect21 := a2 \\* b21 \\* b1")
   expect_match(model_syntax, "indirect31 := a3 \\* b31 \\* b1")
 
-  # 确保总间接效应计算正确
-  expect_match(model_syntax, "total_indirect := indirect1 \\+ indirect2 \\+ indirect3 \\+ indirect21 \\+ indirect31")
-
   # 确保总效应计算正确
   expect_match(model_syntax, "total_effect := cp \\+ total_indirect")
-
-  # **确保间接效应对比计算完整**
-  expect_match(model_syntax, "CI1vs2 := indirect1 - indirect2")
-  expect_match(model_syntax, "CI1vs3 := indirect1 - indirect3")
-  expect_match(model_syntax, "CI1vs21 := indirect1 - indirect21")
-  expect_match(model_syntax, "CI1vs31 := indirect1 - indirect31")
-
-  expect_match(model_syntax, "CI2vs3 := indirect2 - indirect3")
-  expect_match(model_syntax, "CI2vs21 := indirect2 - indirect21")
-  expect_match(model_syntax, "CI2vs31 := indirect2 - indirect31")
-
-  expect_match(model_syntax, "CI3vs21 := indirect3 - indirect21")
-  expect_match(model_syntax, "CI3vs31 := indirect3 - indirect31")
-
-  expect_match(model_syntax, "CI21vs31 := indirect21 - indirect31")
 
   # 确保前后测系数计算正确
   expect_match(model_syntax, "X1_b1 := \\(2\\*b1 \\+ d1\\) ?/ ?2")

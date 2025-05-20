@@ -51,7 +51,7 @@
 #' @param standardized Logical. Whether to compute standardized estimates. Defaults to `FALSE`.
 #' @param Na Character. Missing data method: `"DE"`, `"FIML"`, or `"MI"`. Defaults to `"DE"`.
 #' @param ci_method Character. Confidence interval method: `"bootstrap"` or `"mc"`. If `NULL`, defaults to:
-#' `"mc"` for `"MI"`, `"bootstrap"` for others.
+#' `"mc"` for `"MI"` amd `"FIML"`, `"bootstrap"` for `"DE"`.
 #' @param MCmethod Character. If `Na = "FIML"` and `ci_method = "mc"`, choose `"mc"` (default) or `"bootSD"`.
 #' @param bootstrap Integer. Number of bootstrap samples (used for `"bootstrap"` CI). Defaults to `1000`.
 #' @param iseed Integer. Random seed used in bootstrapping. Defaults to `123`.
@@ -66,7 +66,10 @@
 #' @param seed Integer. Random seed used in Monte Carlo simulation. Defaults to `123`.
 #' @param alphastd Numeric. Significance level for standardized results. Defaults to `0.05`.
 #' @param fixed.x Logical. Whether to treat predictors as fixed. Defaults to `FALSE`.
-#'
+#' @param C_C1 Character vector of within-subject control variable names (condition 1).
+#' @param C_C2 Character vector of within-subject control variable names (condition 2).
+#' @param C Character vector of between-subject control variable names.
+
 #' @return A list with class `"wsMed"` containing:
 #' \describe{
 #'   \item{prepared_data}{The preprocessed dataset used for model fitting.}
@@ -112,30 +115,32 @@
 #' @importFrom semboottools standardizedSolution_boot
 #' @export
 
-
 wsMed <- function(data,
-                   M_C1,
-                   M_C2,
-                   Y_C1,
-                   Y_C2,
-                   form = "P",
-                   standardized = FALSE,
-                   Na = "DE",
-                   ci_method = NULL, # 用户不输入时留空
-                   bootstrap = 1000,
-                   iseed = 123,
-                   boot_ci_type = "perc",
-                   R = 20000L,  # Monte Carlo 重复次数
-                   fixed.x = FALSE,
-                   alpha = 0.05,  # 显著性水平
-                   alphastd = 0.05,
-                   m = 5,  # 插补次数
-                   method = "pmm",  # 插补方法
-                   decomposition = "eigen",
-                   pd = TRUE,
-                   tol = 1e-06,
-                   seed = 123,
-                   MCmethod = NULL) {
+                  M_C1,
+                  M_C2,
+                  Y_C1,
+                  Y_C2,
+                  C_C1 = NULL,
+                  C_C2 = NULL,
+                  C     = NULL,
+                  form = "P",
+                  standardized = FALSE,
+                  Na = "DE",
+                  ci_method = NULL, # 用户不输入时留空
+                  bootstrap = 1000,
+                  iseed = 123,
+                  boot_ci_type = "perc",
+                  R = 20000L,  # Monte Carlo 重复次数
+                  fixed.x = FALSE,
+                  alpha = 0.05,  # 显著性水平
+                  alphastd = 0.05,
+                  m = 5,  # 插补次数
+                  method = "pmm",  # 插补方法
+                  decomposition = "eigen",
+                  pd = TRUE,
+                  tol = 1e-06,
+                  seed = 123,
+                  MCmethod = NULL) {
 
   # 输入验证
   {
@@ -193,7 +198,7 @@ wsMed <- function(data,
     if (is.null(ci_method)) {
       ci_method <- switch(Na,
                           "MI" = "mc",
-                          "FIML" = "bootstrap",
+                          "FIML" = "mc",
                           "DE" = "bootstrap")
     } else {
       ci_method <- match.arg(ci_method, choices = c("bootstrap", "mc", "both"))
@@ -250,22 +255,25 @@ wsMed <- function(data,
                                M_C1 = M_C1,
                                M_C2 = M_C2,
                                Y_C1 = Y_C1,
-                               Y_C2 = Y_C2)
+                               Y_C2 = Y_C2,
+                               C_C1 = C_C1,
+                               C_C2 = C_C2,
+                               C     = C)
 
   # Step 2: 构建模型
   # P is parallel mediation, CN is chained mediation, CP/PC is parallel + chain mediation
   {
     if (form == "P") {
-    sem_model <- GenerateModelP(prepared_data)
-  } else if (form == "CP") {
-    sem_model <- GenerateModelCP(prepared_data)
-  } else if (form == "PC") {
-    sem_model <- GenerateModelPC(prepared_data)
-  } else if (form == "CN") {
-    sem_model <- GenerateModelCN(prepared_data)
-  } else {
-    stop("Invalid 'form' parameter. Use 'CP', 'PC' or 'CN'.")
-  }
+      sem_model <- GenerateModelP(prepared_data)
+    } else if (form == "CP") {
+      sem_model <- GenerateModelCP(prepared_data)
+    } else if (form == "PC") {
+      sem_model <- GenerateModelPC(prepared_data)
+    } else if (form == "CN") {
+      sem_model <- GenerateModelCN(prepared_data)
+    } else {
+      stop("Invalid 'form' parameter. Use 'CP', 'PC' or 'CN'.")
+    }
   }
 
   # Step 3: 选择方法
@@ -274,6 +282,7 @@ wsMed <- function(data,
   fiml_result <- NULL
   mi_result <- NULL
   mc_de_result  <-  NULL
+
 
   # Step 4: 拟合模型
   if (Na == "DE") {
@@ -299,7 +308,7 @@ wsMed <- function(data,
         level = 1-alpha,
         object = fit_u,
         boot_ci_type = boot_ci_type,
-        boot_pvalue = TRUE
+        boot_pvalue = TRUE,
       )
     }
     # Monte Carlo CI
@@ -370,6 +379,9 @@ wsMed <- function(data,
       M_C2 = M_C2,
       Y_C1 = Y_C1,
       Y_C2 = Y_C2,
+      C_C1 = C_C1,
+      C_C2 = C_C2,
+      C = C,
       sem_model = sem_model,
       Na = Na,
       R = R,
@@ -382,11 +394,11 @@ wsMed <- function(data,
     prepared_data <- mi_output$first_imputed_data
 
     fit <- lavaan::sem(
-    model = sem_model,
-    data = prepared_data,
-    fixed.x = fixed.x,
-    warn = FALSE
-  )}
+      model = sem_model,
+      data = prepared_data,
+      fixed.x = fixed.x,
+      warn = FALSE
+    )}
 
   # Step 5: 标准化结果
   # 初始化结果变量
@@ -459,7 +471,10 @@ wsMed <- function(data,
     M_C1 = M_C1,
     M_C2 = M_C2,
     Y_C1 = Y_C1,
-    Y_C2 = Y_C2
+    Y_C2 = Y_C2,
+    C_C1 = C_C1,
+    C_C2 = C_C2,
+    C = C
   )
 
   paras <- list(
@@ -475,7 +490,6 @@ wsMed <- function(data,
 
   out <- list(
     prepared_data = prepared_data,
-    model_summary = summary(fit, fit.measures = TRUE, standardized = standardized),
     lavaan_fit = fit,
     sem_model = sem_model,
     mc_de_result = mc_de_result,
@@ -499,6 +513,6 @@ wsMed <- function(data,
   )
   class(out) <- "wsMed"
   return(out)
-  }
+}
 
 

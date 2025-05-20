@@ -32,36 +32,45 @@ test_data_4m <- data.frame(
   Ydiff = rnorm(100)
 )
 
+test_data_2m$Cb1 <- rnorm(100)
+test_data_2m$Cw1diff <- rnorm(100)
+test_data_2m$Cw1avg  <- rnorm(100)
+test_data_3m$Cb1 <- rnorm(100)
+test_data_3m$Cw1diff <- rnorm(100)
+test_data_3m$Cw1avg  <- rnorm(100)
+test_data_4m$Cb1 <- rnorm(100)
+test_data_4m$Cw1diff <- rnorm(100)
+test_data_4m$Cw1avg  <- rnorm(100)
+
 
 test_that("GenerateModelP correctly generates SEM model syntax for 2 mediators", {
+  # 增加模拟控制变量
+  test_data_2m$Cb1 <- rnorm(100)
+  test_data_2m$Cw1diff <- rnorm(100)
+  test_data_2m$Cw1avg  <- rnorm(100)
+
   model_syntax <- GenerateModelP(test_data_2m)
 
-  # 检查模型语法是否为字符类型
   expect_type(model_syntax, "character")
-
-  # 检查是否包含 Ydiff ~ cp
   expect_match(model_syntax, "Ydiff ~ cp\\*1")
-
-  # 检查是否正确生成 Mdiff 和 Mavg 相关的回归项
   expect_match(model_syntax, "b1\\*M1diff")
   expect_match(model_syntax, "b2\\*M2diff")
   expect_match(model_syntax, "d1\\*M1avg")
   expect_match(model_syntax, "d2\\*M2avg")
 
-  # 检查是否正确生成间接效应
   expect_match(model_syntax, "indirect1 := a1 \\* b1")
   expect_match(model_syntax, "indirect2 := a2 \\* b2")
-
-  # 检查是否正确生成总间接效应
   expect_match(model_syntax, "total_indirect := indirect1 \\+ indirect2")
   expect_match(model_syntax, "total_effect := cp \\+ total_indirect")
-
-  # 检查是否生成了间接效应对比项
   expect_match(model_syntax, "CI1vs2 := indirect1 - indirect2")
 
-  # 检查是否正确生成前后测系数
   expect_match(model_syntax, "X1_b1 := \\(2\\*b1 \\+ d1\\) / 2")
   expect_match(model_syntax, "X1_b2 := \\(2\\*b2 \\+ d2\\) / 2")
+
+  # 新增：检查控制变量是否出现在模型中
+  expect_match(model_syntax, "Cb1")
+  expect_match(model_syntax, "Cw1diff")
+  expect_match(model_syntax, "Cw1avg")
 })
 test_that("GenerateModelP correctly generates SEM model syntax for 3 mediators", {
   model_syntax <- GenerateModelP(test_data_3m)
@@ -95,6 +104,10 @@ test_that("GenerateModelP correctly generates SEM model syntax for 3 mediators",
   expect_match(model_syntax, "X1_b1 := \\(2\\*b1 \\+ d1\\) / 2")
   expect_match(model_syntax, "X1_b2 := \\(2\\*b2 \\+ d2\\) / 2")
   expect_match(model_syntax, "X1_b3 := \\(2\\*b3 \\+ d3\\) / 2")
+
+  expect_match(model_syntax, "Cb1")
+  expect_match(model_syntax, "Cw1diff")
+  expect_match(model_syntax, "Cw1avg")
 })
 test_that("GenerateModelP correctly generates SEM model syntax for 4 mediators", {
   # 运行 GenerateModelP()
@@ -139,5 +152,9 @@ test_that("GenerateModelP correctly generates SEM model syntax for 4 mediators",
   expect_match(model_syntax, "X1_b2 := \\(2\\*b2 \\+ d2\\) / 2")
   expect_match(model_syntax, "X1_b3 := \\(2\\*b3 \\+ d3\\) / 2")
   expect_match(model_syntax, "X1_b4 := \\(2\\*b4 \\+ d4\\) / 2")
+
+  expect_match(model_syntax, "Cb1")
+  expect_match(model_syntax, "Cw1diff")
+  expect_match(model_syntax, "Cw1avg")
 })
 

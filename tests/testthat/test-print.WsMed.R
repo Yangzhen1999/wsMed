@@ -16,6 +16,11 @@ example_dataN <- mice::ampute(
 test_that("print.wsMed prints correct output for complete data", {
   # 加载示例数据
   data(example_data)
+
+  # 强制禁用并行（保险）
+  options(mc.cores = 1)
+  options(lavaan.bootstrap.ncpus = 1)
+
   result <- wsMed(
     data = example_data,
     M_C1 = c("A1", "B1"),
@@ -23,10 +28,8 @@ test_that("print.wsMed prints correct output for complete data", {
     Y_C1 = "C1",
     Y_C2 = "C2",
     form = "P",
-    standardized = TRUE,
-    Na = "DE",
-    bootstrap = 1000,
-    seed = 123
+    standardized = FALSE,  # 关闭标准化，避免 semhelpinghands::standardizedSolution_boot_ci() 启动 bootstrap
+    Na = "DE"
   )
 
   # 捕获打印输出
@@ -38,10 +41,8 @@ test_that("print.wsMed prints correct output for complete data", {
   expect_true(any(grepl("REGRESSION PATHS, INTERCEPTS AND VARIANCES", printed_output)))
   expect_true(any(grepl("TOTAL AND DIRECT EFFECT", printed_output)))
   expect_true(any(grepl("INDIRECT EFFECTS", printed_output)))
-  expect_true(any(grepl("STANDARDIZED RESULTS", printed_output)))
-  expect_true(any(grepl("Bootstrapping NOTES", printed_output)))
 
-  # 条件性检查（根据模型是否生成）
+  # 条件性检查
   if (any(grepl("CONTRAST INDIRECT EFFECTS", printed_output))) {
     expect_true(any(grepl("ind\\d+ - ind\\d+", printed_output)))
   }

@@ -51,34 +51,48 @@
 #' # Generate SEM model syntax
 #' sem_model <- GenerateModelP(prepared_data)
 #' cat(sem_model)
-#'
+#' @importFrom stats na.omit
 #' @export
 
 GenerateModelP <- function(prepared_data) {
-  Mdiff_vars <- grep("M\\ddiff", colnames(prepared_data), value = TRUE)
-  Mavg_vars <- grep("M\\davg", colnames(prepared_data), value = TRUE)
+  # 提取变量
+  Mdiff_vars <- grep("^M\\ddiff$", colnames(prepared_data), value = TRUE)
+  Mavg_vars  <- grep("^M\\davg$",  colnames(prepared_data), value = TRUE)
 
-  regression_y <- paste(
-    "Ydiff ~ cp*1", 
-    paste(
-      c(
-        paste0("b", seq_along(Mdiff_vars), "*", Mdiff_vars),   
-        paste0("d", seq_along(Mavg_vars), "*", Mavg_vars)    
-      ),
-      collapse = " + "   
-    ),
-    sep = " + "   
+  # 提取控制变量
+  between_covs <- grep("^Cb\\d+$", colnames(prepared_data), value = TRUE)
+  within_covs  <- grep("^Cw\\d+(diff|avg)$", colnames(prepared_data), value = TRUE)
+  control_vars <- c(between_covs, within_covs)
+
+  # 控制变量公式
+  controls_formula <- if (length(control_vars) > 0) {
+    paste(control_vars, collapse = " + ")
+  } else {
+    NULL
+  }
+
+  # 构造 Y 回归
+  y_terms <- c(
+    "cp*1",
+    paste0("b", seq_along(Mdiff_vars), "*", Mdiff_vars),
+    paste0("d", seq_along(Mavg_vars), "*", Mavg_vars)
   )
+  if (!is.null(controls_formula)) {
+    y_terms <- c(y_terms, controls_formula)
+  }
 
-  
+  regression_y <- paste("Ydiff ~", paste(y_terms, collapse = " + "))
+
+  # 构造每个 Mdiff 回归
   regression_m <- paste(
     sapply(seq_along(Mdiff_vars), function(i) {
-      paste0(Mdiff_vars[i], " ~ a", i, "*1")
+      rhs <- c("a" = paste0("a", i, "*1"), controls_formula)
+      paste0(Mdiff_vars[i], " ~ ", paste(rhs, collapse = " + "))
     }),
     collapse = "\n"
   )
 
- 
+  # 构造间接效应
   indirect_effects <- paste(
     sapply(seq_along(Mdiff_vars), function(i) {
       paste0("indirect", i, " := a", i, " * b", i)
@@ -86,30 +100,28 @@ GenerateModelP <- function(prepared_data) {
     collapse = "\n"
   )
 
- 
+  # 构造总间接效应
   total_indirect <- paste0(
     "total_indirect := ",
     paste(paste0("indirect", seq_along(Mdiff_vars)), collapse = " + ")
   )
 
- 
+  # 构造总效应
   total_effect <- "total_effect := cp + total_indirect"
- 
+
+  # 构造间接效应对比（两两组合）
   indirect_contrasts <- ""
   if (length(Mdiff_vars) > 1) {
     indirect_combinations <- utils::combn(seq_along(Mdiff_vars), 2)
     indirect_contrasts <- paste(
       apply(indirect_combinations, 2, function(pair) {
-        paste0(
-          "CI", pair[1],"vs", pair[2],
-          " := indirect", pair[1], " - indirect", pair[2]
-        )
+        paste0("CI", pair[1], "vs", pair[2], " := indirect", pair[1], " - indirect", pair[2])
       }),
       collapse = "\n"
     )
   }
 
- 
+  # 构造前后测系数
   pre_post_coefficients <- paste(
     sapply(seq_along(Mdiff_vars), function(i) {
       x1_bi <- paste0("X1_b", i, " := (2*b", i, " + d", i, ") / 2")
@@ -119,7 +131,7 @@ GenerateModelP <- function(prepared_data) {
     collapse = "\n"
   )
 
- 
+  # 合并模型语法
   sem_model <- paste(
     regression_y,
     regression_m,

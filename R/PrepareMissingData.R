@@ -29,7 +29,10 @@
 #' Must match the length of `M_C1`.
 #' @param Y_C1 A character string representing the column name of the outcome variable "before" the intervention.
 #' @param Y_C2 A character string representing the column name of the outcome variable "after" the intervention.
-#'
+#' @param C_C1 Character vector of within-subject control variable names (condition 1).
+#' @param C_C2 Character vector of within-subject control variable names (condition 2).
+#' @param C Character vector of between-subject control variable names.
+
 #' @return A list containing:
 #' - `processed_data_list`: A list of `m` data frames, each representing an imputed and processed dataset,
 #' ready for within-subject mediation analysis.
@@ -70,7 +73,11 @@ PrepareMissingData <- function(data_missing,
                                M_C1,
                                M_C2,
                                Y_C1,
-                               Y_C2) {
+                               Y_C2,
+                               C_C1 = NULL,
+                               C_C2 = NULL,
+                               C = NULL) {
+  # 检查输入
   if (length(M_C1) != length(M_C2)) {
     stop("Error in PrepareMissingData: M_C1 and M_C2 must have the same length.")
   }
@@ -79,22 +86,26 @@ PrepareMissingData <- function(data_missing,
     stop("Error in PrepareMissingData: Y_C1 or Y_C2 is missing in the dataset.")
   }
 
+  # 执行多重插补
   imputed_result <- ImputeData(
     data_missing = data_missing,
     m = m,
     method = method,
     seed = seed
   )
-
   imputed_data_list <- imputed_result$imputed_data_list
 
+  # 对每一个插补数据集进行 PrepareData 处理（包含控制变量）
   processed_data_list <- lapply(imputed_data_list, function(imputed_data) {
     PrepareData(
       data = imputed_data,
       M_C1 = M_C1,
       M_C2 = M_C2,
       Y_C1 = Y_C1,
-      Y_C2 = Y_C2
+      Y_C2 = Y_C2,
+      C_C1 = C_C1,
+      C_C2 = C_C2,
+      C = C
     )
   })
 
@@ -104,3 +115,4 @@ PrepareMissingData <- function(data_missing,
     imputation_summary = imputed_result$summary
   ))
 }
+

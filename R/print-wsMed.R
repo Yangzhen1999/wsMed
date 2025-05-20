@@ -82,7 +82,7 @@
 print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 
   print_table_dynamic <- function(data, digits_local = digits, width = 10) {
-    # 安全转换 digits_local
+    # 安全处理 digits
     digits_local <- suppressWarnings(as.numeric(digits_local)[1])
     if (is.na(digits_local)) digits_local <- 3
 
@@ -94,51 +94,56 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
     while (current_col <= total_columns) {
       sub_data <- data[, current_col:min(current_col + columns_per_row - 1, total_columns), drop = FALSE]
 
+      # 识别数值列（数值列右对齐，字符列左对齐）
       numeric_cols <- vapply(sub_data, is.numeric, logical(1))
+      align_vec <- ifelse(numeric_cols, "r", "l")
 
+      # 格式化数值列
       sub_data[numeric_cols] <- lapply(sub_data[numeric_cols], function(col) {
         formatC(as.numeric(col), format = "f", digits = digits_local, width = width, flag = " ")
       })
 
+      # 转换所有列为字符，确保对齐生效
       sub_data[] <- lapply(sub_data, as.character)
-      print(knitr::kable(sub_data, align = rep("r", ncol(sub_data)), row.names = FALSE))
+
+      # 打印子集表格（动态对齐）
+      print(knitr::kable(sub_data, align = align_vec, row.names = FALSE))
 
       current_col <- current_col + columns_per_row
     }
   }
-
   print_table_dynamic2 <- function(data, digits_local = digits, width = 10) {
-    # 动态设置 columns_per_row
+    # 动态设置列数（根据精度）
     columns_per_row <- ifelse(digits_local <= 4, 9, 6)
 
-    # 确保数据是数据框格式
+    # 确保是数据框
     data <- as.data.frame(data)
-
-    # 获取总列数
     total_columns <- ncol(data)
     current_col <- 1
 
-    # 循环按列分块打印
     while (current_col <= total_columns) {
-      # 当前需要打印的列范围
+      # 当前子集
       sub_data <- data[, current_col:min(current_col + columns_per_row - 1, total_columns), drop = FALSE]
 
-      # 格式化当前子集的数值列
+      # 数值列格式化
       numeric_cols <- sapply(sub_data, is.numeric)
       sub_data[numeric_cols] <- lapply(sub_data[numeric_cols], function(col) {
         formatC(col, format = "f", digits = digits_local, width = width, flag = " ")
       })
 
-      # 强制将所有列转为字符，以确保对齐效果
+      # 所有列转字符（避免因 knitr::kable 自动调整）
       sub_data[] <- lapply(sub_data, as.character)
 
-      # 打印当前子集表格
-      print(knitr::kable(sub_data, align = rep("r", ncol(sub_data)), row.names = FALSE))
+      # 设置对齐方式：字符列左对齐，数字列右对齐
+      align_vec <- ifelse(numeric_cols, "r", "l")
 
-      # 更新当前列索引
+      # 打印子表
+      print(knitr::kable(sub_data, align = align_vec, row.names = FALSE))
+
       current_col <- current_col + columns_per_row
     }
   }
+
 
   # VALIDATION AND INPUT EXTRACTION
   if (!inherits(x, "wsMed")) {
@@ -154,10 +159,26 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
     # 原始变量列表
     original_vars <- list(
       Y = c(Y_C2 = input_vars$Y_C2, Y_C1 = input_vars$Y_C1),
+
       M = lapply(seq_along(input_vars$M_C1), function(i) {
         c(M_C2 = input_vars$M_C2[i], M_C1 = input_vars$M_C1[i])
-      })
+      }),
+
+      C_between = if (!is.null(input_vars$C)) {
+        input_vars$C
+      } else {
+        character(0)
+      },
+
+      C_within = if (!is.null(input_vars$C_C1) && !is.null(input_vars$C_C2)) {
+        lapply(seq_along(input_vars$C_C1), function(i) {
+          c(C_C2 = input_vars$C_C2[i], C_C1 = input_vars$C_C1[i])
+        })
+      } else {
+        list()
+      }
     )
+
 
     # 计算变量名称与计算公式
     computed_vars <- data.frame(
@@ -174,19 +195,76 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
     )
 
     sample_size <- nrow(x$prepared_data)
+    # --- 控制变量处理 ---
+
+    control_vars <- list()
+    if (!is.null(input_vars$C)) {
+      control_vars$Cb <- data.frame(
+        Variable = paste0("Cb", seq_along(input_vars$C)),
+        Formula = paste0(input_vars$C, " Centered")
+      )
+    }
+    if (!is.null(input_vars$C_C1) && !is.null(input_vars$C_C2)) {
+      Cw_diff <- data.frame(
+        Variable = paste0("Cw", seq_along(input_vars$C_C1), "diff"),
+        Formula = mapply(function(a, b) paste0(b, " - ", a, " Centered"), input_vars$C_C1, input_vars$C_C2)
+      )
+      Cw_avg <- data.frame(
+        Variable = paste0("Cw", seq_along(input_vars$C_C1), "avg"),
+        Formula = mapply(function(a, b) paste0("( ", a, " + ", b, " ) / 2 Centered"), input_vars$C_C1, input_vars$C_C2)
+      )
+      control_vars$Cw <- rbind(Cw_diff, Cw_avg)
+    }
+
+    # 合并变量结果
+    if (length(control_vars) > 0) {
+      computed_vars <- rbind(
+        computed_vars,
+        do.call(rbind, control_vars)
+      )
+    }
 
     # 打印原始变量与计算变量
     cat("\n*************** VARIABLES ***************\n")
     cat("Original Variables:\n")
-    cat("  Y  =", paste(original_vars$Y, collapse = " "), "\n")
+
+    # Outcome
+    cat("  Outcome (Y):\n")
+    cat("    Condition 1:", input_vars$Y_C1, "\n")
+    cat("    Condition 2:", input_vars$Y_C2, "\n")
+
+    # Mediators
+    cat("  Mediators (M):\n")
     for (i in seq_along(original_vars$M)) {
-      cat(paste0("  M", i, " = "), paste(original_vars$M[[i]], collapse = " "), "\n")
+      cat(paste0("    M", i, ":\n"))
+      cat("      Condition 1:", input_vars$M_C1[i], "\n")
+      cat("      Condition 2:", input_vars$M_C2[i], "\n")
     }
 
+    # Between-subject covariates
+    if (length(original_vars$C_between) > 0) {
+      cat("  Between-subject Covariates:\n")
+      for (i in seq_along(original_vars$C_between)) {
+        cat(paste0("    Cb", i, ": ", original_vars$C_between[i], "\n"))
+      }
+    }
+
+    # Within-subject covariates
+    if (length(original_vars$C_within) > 0) {
+      cat("  Within-subject Covariates:\n")
+      for (i in seq_along(original_vars$C_within)) {
+        cat(paste0("    Cw", i, ":\n"))
+        cat("      Condition 1:", original_vars$C_within[[i]]["C_C1"], "\n")
+        cat("      Condition 2:", original_vars$C_within[[i]]["C_C2"], "\n")
+      }
+    }
+
+    # Computed variable formulas
     cat("\nComputed Variables:\n")
     print_table_dynamic(computed_vars)
 
     cat("\nSample Size:", sample_size, "\n")
+
   }
 
   # PART 2: MODEL FIT INDICES
@@ -219,50 +297,56 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
   print_mc_regression_summary <- function(mc_result, lav_fit, alpha = 0.05, title_prefix = "MC") {
     if (!inherits(mc_result, "semmcci")) return()
 
-    # --- Print header
     cat("\n")
     cat(paste0("\n*************** REGRESSION PATHS (", title_prefix, ") ***************\n"))
 
-    # 1. Extract lavaan structure
     lav_param <- lavaan::parameterEstimates(lav_fit, ci = FALSE)
     regressions <- lav_param[lav_param$op == "~", ]
-
-    # 2. Extract Monte Carlo results
     est <- mc_result$thetahat$est
     se <- apply(mc_result$thetahatstar, 2, sd)
 
-    # CI computation
     probs <- sort(c(alpha / 2, 1 - alpha / 2))
     ci_vals <- apply(mc_result$thetahatstar, 2, quantile, probs = probs)
     ci_vals <- t(ci_vals)
-    ci_names <- paste0(
-      sprintf("%.1f", probs * 100),
-      ifelse(probs < 0.5, "%CI.Lo", "%CI.Up")
-    )
+    ci_names <- paste0(sprintf("%.1f", probs * 100), ifelse(probs < 0.5, "%CI.Lo", "%CI.Up"))
     colnames(ci_vals) <- ci_names
 
-    # Merge everything
     mc_df <- data.frame(name = names(est), Estimate = est, SE = se, stringsAsFactors = FALSE)
     mc_df <- cbind(mc_df, ci_vals)
 
     # REGRESSION PATHS
     labels <- regressions$label
-    idx <- match(labels, mc_df$name)
-    reg_table <- data.frame(
-      Path = paste(regressions$lhs, "~", regressions$rhs),
-      Label = labels,
+    fallback_labels <- paste0(regressions$lhs, "~", regressions$rhs)
+    final_labels <- ifelse(is.na(labels) | labels == "", fallback_labels, labels)
+    idx <- match(final_labels, mc_df$name)
+
+    all_reg <- data.frame(
+      Path     = paste(regressions$lhs, "~", regressions$rhs),
+      Label    = final_labels,
       Estimate = mc_df$Estimate[idx],
-      SE = mc_df$SE[idx],
+      SE       = mc_df$SE[idx],
       stringsAsFactors = FALSE
     )
+
     for (ci_name in ci_names) {
-      reg_table[[ci_name]] <- mc_df[[ci_name]][idx]
+      all_reg[[ci_name]] <- mc_df[[ci_name]][idx]
     }
-    print_table_dynamic2(reg_table)
+
+    # 区分控制变量路径与主模型路径
+    is_control <- grepl("^Cb\\d+$|^Cw\\d+(diff|avg)$", regressions$rhs)
+    reg_main <- all_reg[!is_control, , drop = FALSE]
+    reg_ctrl <- all_reg[is_control, , drop = FALSE]
+
+    if (nrow(reg_main) > 0) print_table_dynamic2(reg_main)
+    if (nrow(reg_ctrl) > 0) {
+      cat("\n(CONTROL VARIABLES)")
+      print_table_dynamic2(reg_ctrl[, !(names(reg_ctrl) %in% "Label"), drop = FALSE])
+    }
+
 
     # INTERCEPTS
     intercepts <- lav_param[lav_param$op == "~1", ]
-    intercepts <- intercepts[!grepl("M\\davg", intercepts$lhs), ]
+    intercepts <- intercepts[!grepl("^Cb\\d+$|^Cw\\d+(diff|avg)$", intercepts$lhs), ]
     if (nrow(intercepts) > 0) {
       cat("\n")
       cat(paste0("\n*************** INTERCEPTS (", title_prefix, ") ***************\n"))
@@ -275,9 +359,9 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
       idx <- match(name_match, mc_df$name)
       intercept_table <- data.frame(
         Intercept = paste0(intercepts$lhs, "~1"),
-        Label = intercepts$label,
-        Estimate = mc_df$Estimate[idx],
-        SE = mc_df$SE[idx],
+        Label     = intercepts$label,
+        Estimate  = mc_df$Estimate[idx],
+        SE        = mc_df$SE[idx],
         stringsAsFactors = FALSE
       )
       for (ci_name in ci_names) {
@@ -288,6 +372,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 
     # VARIANCES
     variances <- lav_param[lav_param$op == "~~" & lav_param$lhs == lav_param$rhs, ]
+    variances <- variances[!grepl("^Cb\\d+$|^Cw\\d+(diff|avg)$", variances$lhs), ]
     if (nrow(variances) > 0) {
       cat("\n")
       cat(paste0("\n*************** VARIANCES (", title_prefix, ") ***************\n"))
@@ -297,7 +382,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
       variance_table <- data.frame(
         Variance = fallback,
         Estimate = mc_df$Estimate[idx],
-        SE = mc_df$SE[idx],
+        SE       = mc_df$SE[idx],
         stringsAsFactors = FALSE
       )
       for (ci_name in ci_names) {
@@ -306,6 +391,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
       print_table_dynamic(variance_table)
     }
   }
+
   # MI 情况
   if (!is.null(x$mi_result) && inherits(x$mi_result, "semmcci")) {
     print_mc_regression_summary(
@@ -767,31 +853,56 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
     if (nrow(regressions) > 0) {
       cat("\n")
       cat("\n*************** REGRESSION PATHS, INTERCEPTS AND VARIANCES ***************\n")
+      # 分离控制变量路径
+      is_control_path <- grepl("^Cb\\d+$|^Cw\\d+(diff|avg)$", regressions$rhs)
+      main_paths <- regressions[!is_control_path, ]
+      control_paths <- regressions[is_control_path, ]
 
-      # 创建基础列
-      regression_table <- data.frame(
-        Path     = paste(regressions$lhs, "~", regressions$rhs),
-        Label    = regressions$label,
-        Estimate = regressions$est,
-        bSE      = regressions$boot.se,
-        bp       = regressions$boot.p,
-        bCI.Lo   = regressions$boot.ci.lower,
-        bCI.Up   = regressions$boot.ci.upper
-      )
-
-      # 如果 delta = TRUE，则添加原始估计列
-      if (delta) {
-        regression_table$SE      <- regressions$se
-        regression_table$`P-value` <- regressions$pvalue
-        regression_table$CI.Lo   <- regressions$ci.lower
-        regression_table$CI.Up   <- regressions$ci.upper
+      # 主模型路径表
+      if (nrow(main_paths) > 0) {
+        regression_table <- data.frame(
+          Path     = paste(main_paths$lhs, "~", main_paths$rhs),
+          Label    = main_paths$label,
+          Estimate = main_paths$est,
+          bSE      = main_paths$boot.se,
+          bp       = main_paths$boot.p,
+          bCI.Lo   = main_paths$boot.ci.lower,
+          bCI.Up   = main_paths$boot.ci.upper
+        )
+        if (delta) {
+          regression_table$SE       <- main_paths$se
+          regression_table$`P-value` <- main_paths$pvalue
+          regression_table$CI.Lo    <- main_paths$ci.lower
+          regression_table$CI.Up    <- main_paths$ci.upper
+        }
+        print_table_dynamic2(regression_table)
       }
 
-      print_table_dynamic2(regression_table)
+      # 控制变量路径表
+      if (nrow(control_paths) > 0) {
+        cat("\n(CONTROL VARIABLES)\n")
+        control_table <- data.frame(
+          Path     = paste(control_paths$lhs, "~", control_paths$rhs),
+          Label    = control_paths$label,
+          Estimate = control_paths$est,
+          bSE      = control_paths$boot.se,
+          bp       = control_paths$boot.p,
+          bCI.Lo   = control_paths$boot.ci.lower,
+          bCI.Up   = control_paths$boot.ci.upper
+        )
+        if (delta) {
+          control_table$SE       <- control_paths$se
+          control_table$`P-value` <- control_paths$pvalue
+          control_table$CI.Lo    <- control_paths$ci.lower
+          control_table$CI.Up    <- control_paths$ci.upper
+        }
+        print_table_dynamic2(control_table)
+      }
     }
 
-    # 截距部分（修改版本，支持 delta 参数）
+    # 截距部分
     intercepts <- ustd_result[ustd_result$op == "~1", ]
+    intercepts <- intercepts[!grepl("^Cb\\d+$|^Cw\\d+(diff|avg)$", intercepts$lhs), ]
     if (nrow(intercepts) > 0) {
       intercept_table <- data.frame(
         Intercept = paste0(intercepts$lhs, "~1"),
@@ -803,20 +914,19 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
         bCI.Up    = intercepts$boot.ci.upper
       )
 
-      # 如果 delta=TRUE，添加原始估计列
       if (delta) {
-        intercept_table$SE       <- intercepts$se
+        intercept_table$SE        <- intercepts$se
         intercept_table$`P-value` <- intercepts$pvalue
-        intercept_table$CI.Lo    <- intercepts$ci.lower
-        intercept_table$CI.Up    <- intercepts$ci.upper
+        intercept_table$CI.Lo     <- intercepts$ci.lower
+        intercept_table$CI.Up     <- intercepts$ci.upper
       }
 
       print_table_dynamic2(intercept_table)
     }
 
-
-    # 方差部分（支持 delta 控制原始估计输出）
+    # 方差部分
     variances <- ustd_result[ustd_result$op == "~~" & ustd_result$lhs == ustd_result$rhs, ]
+    variances <- variances[!grepl("^Cb\\d+$|^Cw\\d+(diff|avg)$", variances$lhs), ]
     if (nrow(variances) > 0) {
       variance_table <- data.frame(
         Variance = paste0(variances$lhs, "~~", variances$rhs),
@@ -827,12 +937,11 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
         bCI.Up   = variances$boot.ci.upper
       )
 
-      # 添加原始估计值（delta = TRUE）
       if (delta) {
-        variance_table$SE       <- variances$se
+        variance_table$SE        <- variances$se
         variance_table$`P-value` <- variances$pvalue
-        variance_table$CI.Lo    <- variances$ci.lower
-        variance_table$CI.Up    <- variances$ci.upper
+        variance_table$CI.Lo     <- variances$ci.lower
+        variance_table$CI.Up     <- variances$ci.upper
       }
 
       print_table_dynamic(variance_table)
@@ -1245,7 +1354,6 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 
   invisible(x)
 }
-
 
 
 

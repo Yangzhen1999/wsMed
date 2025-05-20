@@ -34,6 +34,9 @@
 #' Default is `"eigen"`. Options include `"chol"`, `"eigen"`, or `"svd"`.
 #' @param pd A logical value indicating whether to ensure positive definiteness of the covariance matrix. Default is `TRUE`.
 #' @param tol A numeric value specifying the tolerance for positive definiteness checks. Default is `1e-06`.
+#' @param C_C1 Character vector of within-subject control variable names (condition 1).
+#' @param C_C2 Character vector of within-subject control variable names (condition 2).
+#' @param C Character vector of between-subject control variable names.
 #'
 #' @return A `semmcci` object containing the Monte Carlo analysis results, including:
 #' - `thetahat`: The pooled parameter estimates.
@@ -85,6 +88,9 @@ RunMCMIAnalysis <- function(data_missing,
                             M_C2,
                             Y_C1,
                             Y_C2,
+                            C_C1 = NULL,
+                            C_C2 = NULL,
+                            C = NULL,
                             sem_model,
                             Na = "MI",
                             R = 20000L,
@@ -92,13 +98,11 @@ RunMCMIAnalysis <- function(data_missing,
                             decomposition = "eigen",
                             pd = TRUE,
                             tol = 1e-06) {
-  # Step 1: 初始化结果变量
+
   mi_result <- NULL
   first_imputed_data <- NULL
 
-  # Step 2: 检查是否启用 Monte Carlo (MC)
   if (Na == "MI") {
-    # 插补并处理数据
     prepared_data <- PrepareMissingData(
       data_missing = data_missing,
       m = m,
@@ -107,14 +111,15 @@ RunMCMIAnalysis <- function(data_missing,
       M_C1 = M_C1,
       M_C2 = M_C2,
       Y_C1 = Y_C1,
-      Y_C2 = Y_C2
+      Y_C2 = Y_C2,
+      C_C1 = C_C1,
+      C_C2 = C_C2,
+      C = C
     )
 
-    # 获取处理后的插补数据集列表
     processed_data_list <- prepared_data$processed_data_list
     first_imputed_data <- processed_data_list[[1]]
 
-    # 调用 MCMI2 进行 Monte Carlo 分析
     mi_result <- MCMI2(
       sem_model = sem_model,
       imputations = processed_data_list,
@@ -129,9 +134,9 @@ RunMCMIAnalysis <- function(data_missing,
     stop("MI is set to FALSE. Currently, only MI = TRUE is supported.")
   }
 
-  # 返回分析结果
   return(list(
     mc_result = mi_result,
     first_imputed_data = first_imputed_data
   ))
 }
+

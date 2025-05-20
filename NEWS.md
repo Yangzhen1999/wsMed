@@ -1,6 +1,6 @@
 # Package News
 
-## wsMed 0.3.1 (2025-05-19)
+## wsMed 0.4.1 (2025-05-20)
 
 ### New Features
 - Added NEWS.md for tracking package changes.

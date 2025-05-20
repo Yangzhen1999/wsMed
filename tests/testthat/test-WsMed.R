@@ -41,20 +41,33 @@ data(example_data)
     expect_error(wsMed(data = valid_data, M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"), Y_C1 = "C1", Y_C2 = "C2", Na = "Invalid"), "Error: Invalid 'Na' parameter. Use 'DE', 'FIML', or 'MI'")
   })
 
-  test_that("wsMed handle the missing data", {
+  test_that("wsMed handles missing data correctly", {
+    # 设置数据
     valid_data <- example_data
     valid_data_with_na <- valid_data
     valid_data_with_na$A1[1] <- NA
 
-    # 数据中存在缺失值，但 Na = "DE"
+    # 设置 options 限制并行（可选保险）
+    options(mc.cores = 1)
+    options(lavaan.bootstrap.ncpus = 1)
+
+    # 情况 1：数据中存在缺失值，但 Na = "DE"，应发出 warning
     expect_warning(
-      wsMed(data = valid_data_with_na, M_C1 = c("A1"), M_C2 = c("A2"), Y_C1 = "C1", Y_C2 = "C2", Na = "DE"),
+      wsMed(
+        data = valid_data_with_na,
+        M_C1 = "A1", M_C2 = "A2", Y_C1 = "C1", Y_C2 = "C2",
+        Na = "DE"
+      ),
       regexp = "The dataset contains missing values\\. Consider using 'Na = MI' or 'Na = FIML' to handle them"
     )
 
-    # 数据中没有缺失值，但 Na = "MI"
+    # 情况 2：数据无缺失，但 Na = "MI"，应发出 message
     expect_message(
-      wsMed(data = valid_data, M_C1 = c("A1"), M_C2 = c("A2"), Y_C1 = "C1", Y_C2 = "C2", Na = "MI"),
+      wsMed(
+        data = valid_data,
+        M_C1 = "A1", M_C2 = "A2", Y_C1 = "C1", Y_C2 = "C2",
+        Na = "MI"
+      ),
       regexp = "No missing values detected in the data\\. Switching to 'DE'\\."
     )
   })

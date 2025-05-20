@@ -12,7 +12,10 @@ PrepareMissingData(
   M_C1,
   M_C2,
   Y_C1,
-  Y_C2
+  Y_C2,
+  C_C1 = NULL,
+  C_C2 = NULL,
+  C = NULL
 )
 }
 \arguments{
@@ -33,6 +36,12 @@ Must match the length of \code{M_C1}.}
 \item{Y_C1}{A character string representing the column name of the outcome variable "before" the intervention.}
 
 \item{Y_C2}{A character string representing the column name of the outcome variable "after" the intervention.}
+
+\item{C_C1}{Character vector of within-subject control variable names (condition 1).}
+
+\item{C_C2}{Character vector of within-subject control variable names (condition 2).}
+
+\item{C}{Character vector of between-subject control variable names.}
 }
 \value{
 A list containing:

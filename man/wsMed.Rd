@@ -10,6 +10,9 @@ wsMed(
   M_C2,
   Y_C1,
   Y_C2,
+  C_C1 = NULL,
+  C_C2 = NULL,
+  C = NULL,
   form = "P",
   standardized = FALSE,
   Na = "DE",
@@ -41,6 +44,12 @@ wsMed(
 
 \item{Y_C2}{Character. Outcome variable under condition 2.}
 
+\item{C_C1}{Character vector of within-subject control variable names (condition 1).}
+
+\item{C_C2}{Character vector of within-subject control variable names (condition 2).}
+
+\item{C}{Character vector of between-subject control variable names.}
+
 \item{form}{Character. Mediation model type: \code{"P"}, \code{"CN"}, \code{"CP"}, or \code{"PC"}. Defaults to \code{"P"}.}
 
 \item{standardized}{Logical. Whether to compute standardized estimates. Defaults to \code{FALSE}.}
@@ -48,7 +57,7 @@ wsMed(
 \item{Na}{Character. Missing data method: \code{"DE"}, \code{"FIML"}, or \code{"MI"}. Defaults to \code{"DE"}.}
 
 \item{ci_method}{Character. Confidence interval method: \code{"bootstrap"} or \code{"mc"}. If \code{NULL}, defaults to:
-\code{"mc"} for \code{"MI"}, \code{"bootstrap"} for others.}
+\code{"mc"} for \code{"MI"} amd \code{"FIML"}, \code{"bootstrap"} for \code{"DE"}.}
 
 \item{bootstrap}{Integer. Number of bootstrap samples (used for \code{"bootstrap"} CI). Defaults to \code{1000}.}
 
