@@ -56,8 +56,8 @@
 
 GenerateModelP <- function(prepared_data) {
   # 提取变量
-  Mdiff_vars <- grep("^M\\ddiff$", colnames(prepared_data), value = TRUE)
-  Mavg_vars  <- grep("^M\\davg$",  colnames(prepared_data), value = TRUE)
+  Mdiff_vars <- sort(grep("M\\d+diff", colnames(prepared_data), value = TRUE))
+  Mavg_vars  <- sort(grep("M\\d+avg",  colnames(prepared_data), value = TRUE))
 
   # 提取控制变量
   between_covs <- grep("^Cb\\d+$", colnames(prepared_data), value = TRUE)
@@ -86,7 +86,7 @@ GenerateModelP <- function(prepared_data) {
   # 构造每个 Mdiff 回归
   regression_m <- paste(
     sapply(seq_along(Mdiff_vars), function(i) {
-      rhs <- c("a" = paste0("a", i, "*1"), controls_formula)
+      rhs <- c(paste0("a", i, "*1"), controls_formula)
       paste0(Mdiff_vars[i], " ~ ", paste(rhs, collapse = " + "))
     }),
     collapse = "\n"
@@ -95,7 +95,7 @@ GenerateModelP <- function(prepared_data) {
   # 构造间接效应
   indirect_effects <- paste(
     sapply(seq_along(Mdiff_vars), function(i) {
-      paste0("indirect", i, " := a", i, " * b", i)
+      paste0("indirect_", i, " := a", i, " * b", i)
     }),
     collapse = "\n"
   )
@@ -103,7 +103,7 @@ GenerateModelP <- function(prepared_data) {
   # 构造总间接效应
   total_indirect <- paste0(
     "total_indirect := ",
-    paste(paste0("indirect", seq_along(Mdiff_vars)), collapse = " + ")
+    paste(paste0("indirect_", seq_along(Mdiff_vars)), collapse = " + ")
   )
 
   # 构造总效应
@@ -115,7 +115,10 @@ GenerateModelP <- function(prepared_data) {
     indirect_combinations <- utils::combn(seq_along(Mdiff_vars), 2)
     indirect_contrasts <- paste(
       apply(indirect_combinations, 2, function(pair) {
-        paste0("CI", pair[1], "vs", pair[2], " := indirect", pair[1], " - indirect", pair[2])
+        paste0(
+          "CI_", pair[1], "_vs_", pair[2],
+          " := indirect_", pair[1], " - indirect_", pair[2]
+        )
       }),
       collapse = "\n"
     )
@@ -145,3 +148,4 @@ GenerateModelP <- function(prepared_data) {
 
   return(sem_model)
 }
+

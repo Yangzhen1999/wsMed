@@ -468,7 +468,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
     # 间接效应部分
     cat("\n")
     cat(paste0("\n*************** INDIRECT EFFECTS (", title_prefix, ") ***************\n"))
-    indirect_idx <- grep("^indirect\\d+$", mc_df$name)
+    indirect_idx <- grep("^indirect_", mc_df$name)
     total_ind_idx <- which(names(est) == "total_indirect")
 
     ind_names <- gsub("^indirect", "ind", mc_df$name[indirect_idx])
@@ -520,45 +520,74 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
     )
   }
   # 动态生成 Indirect Key (兼容 MC 输出)
+  # 动态生成 Indirect Key（兼容 MC 输出）
   if (!is.null(x$prepared_data)) {
-    Mdiff_vars <- grep("M\\ddiff", colnames(x$prepared_data), value = TRUE)
+    Mdiff_vars <- grep("^M\\d+diff$", colnames(x$prepared_data), value = TRUE)
+    Mdiff_vars <- Mdiff_vars[order(as.numeric(gsub("\\D", "", Mdiff_vars)))]
 
     if (length(Mdiff_vars) == 0) {
       warning("No mediator variables found. Unable to generate Indirect Key.")
     } else {
-      # 使用 MC 结果作为来源
       mc_obj <- x$mi_result %||% x$fiml_result %||% x$mc_de_result
+
       if (!is.null(mc_obj) && inherits(mc_obj, "semmcci")) {
         param_names <- names(mc_obj$thetahat$est)
-        indirect_names <- grep("^indirect\\d+", param_names, value = TRUE)
 
-        if (length(indirect_names) > 0) {
-          indirect_key <- data.frame()
-          for (ind in indirect_names) {
-            # 取出编号部分（如 "indirect12" -> "1", "2"）
-            indices <- unlist(strsplit(gsub("indirect", "", ind), split = ""))
-            indices <- as.numeric(indices)
+        # 仅保留合法形式的 indirect_x_x_x 名称
+        indirect_names <- grep("^indirect_\\d+$|^indirect(_\\d+)+$", param_names, value = TRUE)
 
-            if (all(!is.na(indices)) && all(indices <= length(Mdiff_vars))) {
-              path_vars <- Mdiff_vars[indices]
-              path <- paste(c("X", path_vars, "Ydiff"), collapse = " -> ")
-              ind_name <- gsub("indirect", "ind", ind)
-              indirect_key <- rbind(indirect_key, data.frame(Ind = ind_name, Path = path))
-            }
+
+        extract_path_indices <- function(ind_name, total_mediators) {
+          clean <- gsub("^indirect_?", "", ind_name)
+
+          # 判断是否是下划线分隔
+          if (grepl("_", clean)) {
+            parts <- strsplit(clean, "_")[[1]]
+          } else {
+            # 无下划线的处理：如 "15" 是 M15，而不是 M1->M5
+            parts <- clean
           }
 
-          if (nrow(indirect_key) > 0) {
-            print(kable(indirect_key, align = c("c", "c"), row.names = FALSE))
+          # 如果下划线分隔，处理多个 index
+          if (length(parts) > 1) {
+            nums <- suppressWarnings(as.numeric(parts))
+          } else {
+            # 若是无下划线格式，如 "15"，尝试匹配 M15 的下标
+            num <- suppressWarnings(as.numeric(parts))
+            nums <- if (!is.na(num) && num <= total_mediators) num else NULL
           }
+
+          # 过滤非法索引
+          if (any(is.na(nums)) || any(nums > total_mediators)) return(NULL)
+          return(nums)
+        }
+
+
+        indirect_key <- data.frame()
+        for (ind in indirect_names) {
+          indices <- extract_path_indices(ind, length(Mdiff_vars))
+          if (!is.null(indices)) {
+            path_vars <- Mdiff_vars[indices]
+            path <- paste(c("X", path_vars, "Ydiff"), collapse = " -> ")
+            ind_name <- gsub("indirect_", "ind_", ind)
+            indirect_key <- rbind(indirect_key, data.frame(
+              Ind = ind_name,
+              Path = path,
+              stringsAsFactors = FALSE
+            ))
+          }
+        }
+
+        if (nrow(indirect_key) > 0) {
+          print(knitr::kable(indirect_key, align = c("c", "c"), row.names = FALSE))
         }
       }
     }
   }
 
+
   print_mc_contrast_effects <- function(mc_result, title_prefix = "MC") {
     if (!inherits(mc_result, "semmcci")) return()
-    cat("\n")
-    cat(paste0("\n*************** CONTRAST INDIRECT EFFECTS (", title_prefix, ") ***************\n"))
 
     # 提取估计与方差
     est <- mc_result$thetahat$est
@@ -584,18 +613,16 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
     )
     mc_df <- cbind(mc_df, ci_vals)
 
+
     # 筛选 Contrast Indirect Effects（通常形如 CI1vs2）
     contrast_idx <- grep("^CI\\d+vs\\d+$", mc_df$name)
     if (length(contrast_idx) == 0) return(invisible(NULL))
 
-    contrast_names <- sapply(mc_df$name[contrast_idx], function(name) {
-      indices <- unlist(regmatches(name, gregexpr("\\d+", name)))
-      if (length(indices) == 2) {
-        paste0("ind", indices[1], " - ind", indices[2])
-      } else {
-        name
-      }
-    })
+    cat("\n")
+    cat(paste0("\n*************** CONTRAST INDIRECT EFFECTS (", title_prefix, ") ***************\n"))
+
+    contrast_names <- gsub("^CI_", "ind_", mc_df$name[contrast_idx])
+    contrast_names <- gsub("_vs_", " - ind_", contrast_names)
 
     contrast_table <- data.frame(
       Name = contrast_names,
@@ -644,16 +671,17 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
     )
     mc_df <- cbind(mc_df, ci_vals)
 
-    # 筛选 moderation 效应（如 d1, d12 等）
-    mod_idx <- grep("^d\\d+", mc_df$name)
+    # 匹配 d1, d2, ... 和 d_1_2, d_2_3 等形式
+    mod_idx <- grep("^d(\\d+|_\\d+_\\d+)$", mc_df$name)
     if (length(mod_idx) == 0) return(invisible(NULL))
 
+    cat("\n")
     cat(paste0("\n*************** MODERATION EFFECTS of X (", title_prefix, ") ***************\n"))
 
     mod_table <- data.frame(
-      Name = mc_df$name[mod_idx],
+      Name     = mc_df$name[mod_idx],
       Estimate = mc_df$Estimate[mod_idx],
-      SE = mc_df$SE[mod_idx],
+      SE       = mc_df$SE[mod_idx],
       stringsAsFactors = FALSE
     )
     for (ci_name in ci_names) {
@@ -662,51 +690,64 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 
     print_table_dynamic(mod_table)
   }
+
   if (!is.null(x$mi_result))    print_mc_moderation_effects(x$mi_result, title_prefix = "MC (MI)")
   if (!is.null(x$fiml_result))  print_mc_moderation_effects(x$fiml_result, title_prefix = "MC (FIML)")
   if (!is.null(x$mc_de_result)) print_mc_moderation_effects(x$mc_de_result, title_prefix = "MC (DE)")
 
 
   # Moderation Effects Key (适配 MC 对象)
+  # Moderation Effects Key (显示路径 + 被调节路径)
   if (!is.null(x$prepared_data)) {
-    Mavg_vars <- grep("M\\davg", colnames(x$prepared_data), value = TRUE)
-    Mdiff_vars <- grep("M\\ddiff", colnames(x$prepared_data), value = TRUE)
-    moderation_key <- data.frame()
+    # 强制按顺序排列
+    Mavg_vars  <- grep("^M\\d+avg$",  colnames(x$prepared_data), value = TRUE)
+    Mavg_vars  <- Mavg_vars[order(as.numeric(gsub("\\D", "", Mavg_vars)))]
+    Mdiff_vars <- grep("^M\\d+diff$", colnames(x$prepared_data), value = TRUE)
+    Mdiff_vars <- Mdiff_vars[order(as.numeric(gsub("\\D", "", Mdiff_vars)))]
+    mod_key <- data.frame()
 
-    # 从 MC 对象中提取 label
     mc_obj <- x$mi_result %||% x$fiml_result %||% x$mc_de_result
     if (!is.null(mc_obj) && inherits(mc_obj, "semmcci")) {
       all_labels <- names(mc_obj$thetahat$est)
-      d_labels <- grep("^d\\d+", all_labels, value = TRUE)
+
+      # 捕捉 d1、d12、d_1_2 等形式
+      d_labels <- grep("^d(\\d+|_\\d+(?:_\\d+)*)$", all_labels, value = TRUE)
 
       for (label in d_labels) {
-        # e.g., "d1" → index 1; "d12" → indices 1,2
-        digit_chars <- unlist(strsplit(sub("d", "", label), split = ""))
-        indices <- as.numeric(digit_chars)
+        raw <- sub("^d", "", label)
+        raw <- sub("^_", "", raw)
+        indices <- suppressWarnings(as.numeric(strsplit(raw, "_")[[1]]))
+
+        if (any(is.na(indices))) next
 
         if (length(indices) == 1 && indices <= length(Mdiff_vars)) {
-          moderation_key <- rbind(moderation_key, data.frame(
+          mod_key <- rbind(mod_key, data.frame(
             Coefficient = label,
-            Path = paste0(Mdiff_vars[indices], " -> Ydiff")
+            Path = paste0(Mavg_vars[indices], " → Ydiff"),
+            PathBeingModerated = paste0(Mdiff_vars[indices], " → Ydiff")
           ))
         } else if (length(indices) == 2 && all(indices <= length(Mdiff_vars))) {
-          moderation_key <- rbind(moderation_key, data.frame(
+          mod_key <- rbind(mod_key, data.frame(
             Coefficient = label,
-            Path = paste0(Mdiff_vars[indices[1]], " -> ", Mdiff_vars[indices[2]])
+            Path = paste0(Mavg_vars[indices[1]], " → ", Mdiff_vars[indices[2]]),
+            PathBeingModerated = paste0(Mdiff_vars[indices[1]], " → ", Mdiff_vars[indices[2]])
           ))
         }
       }
 
-      if (nrow(moderation_key) > 0) {
-        print(kable(moderation_key, align = c("c", "c"), row.names = FALSE))
+      if (nrow(mod_key) > 0) {
+        cat("\n")
+        cat("*************** MODERATION EFFECTS KEY ***************\n")
+        print(knitr::kable(mod_key, align = "c", row.names = FALSE))
       }
     }
   }
 
-  # 前后测系数
-  print_mc_prepost_effects <- function(mc_result, title_prefix = "MC", digits= 3) {
 
+  # 前后测系数
+  print_mc_prepost_effects <- function(mc_result, title_prefix = "MC", digits = 3) {
     if (!inherits(mc_result, "semmcci")) return()
+
     cat("\n")
     cat(paste0("\n*************** C1-C2 COEFFICIENTS (", title_prefix, ") ***************\n"))
 
@@ -731,8 +772,8 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
     )
     mc_df <- cbind(mc_df, ci_vals)
 
-    # 筛选前后测系数（如 X0_b1, X1_b2, ...）
-    prepost_idx <- grep("^X[01]_b\\d+$", mc_df$name)
+    # 修改为同时匹配 X1_b1、X0_b2、X1_b_1_2 等命名
+    prepost_idx <- grep("^X[01]_b(\\d+|(_\\d+)+)$", mc_df$name)
     if (length(prepost_idx) == 0) return(invisible(NULL))
 
     prepost_table <- data.frame(
@@ -747,11 +788,13 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 
     print_table_dynamic(prepost_table, digits_local = digits)
   }
+
+
   if (!is.null(x$mi_result))    print_mc_prepost_effects(x$mi_result, title_prefix = "MC (MI)", digits = digits)
   if (!is.null(x$fiml_result))  print_mc_prepost_effects(x$fiml_result, title_prefix = "MC (FIML)")
   if (!is.null(x$mc_de_result)) print_mc_prepost_effects(x$mc_de_result, title_prefix = "MC (DE)")
 
-  # 前后测系数 Key（精简版，仅包含 X1_bi 和 X0_bi）
+  # 前后测系数 Key（适用于 MI, FIML, MC(DE)）
   # 前后测系数 Key（适用于 MI, FIML, MC(DE)）
   if (!is.null(x$prepared_data) &&
       (!is.null(x$mi_result) || !is.null(x$fiml_result) || !is.null(x$mc_de_result))) {
@@ -759,12 +802,14 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
     mc_obj <- x$mi_result %||% x$fiml_result %||% x$mc_de_result
     if (!inherits(mc_obj, "semmcci")) return()
 
-    Mdiff_vars <- grep("M\\ddiff", colnames(x$prepared_data), value = TRUE)
+    Mdiff_vars <- grep("^M\\d+diff$", colnames(x$prepared_data), value = TRUE)
+    Mdiff_vars <- Mdiff_vars[order(as.numeric(gsub("\\D", "", Mdiff_vars)))]
+
     existing_labels <- names(mc_obj$thetahat$est)
 
     pre_post_key <- data.frame()
 
-    # 添加一阶路径（如 b1, b2, ...）
+    # 添加一阶路径（如 b1, b2）
     for (i in seq_along(Mdiff_vars)) {
       label <- paste0("b", i)
       if (label %in% existing_labels) {
@@ -775,28 +820,26 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
       }
     }
 
-    # 添加二阶及以上路径（如 b12, b13, b123 等）
-    if (length(Mdiff_vars) > 1) {
-      all_combinations <- unlist(
-        lapply(2:length(Mdiff_vars), function(k) combn(seq_along(Mdiff_vars), k, simplify = FALSE)),
-        recursive = FALSE
-      )
+    # 添加新格式下的多阶路径（如 b_1_2, b_1_2_3）
+    b_labels <- grep("^b_\\d+(?:_\\d+)+$", existing_labels, value = TRUE)
+    for (label in b_labels) {
+      parts <- strsplit(gsub("^b_", "", label), "_")[[1]]
+      indices <- suppressWarnings(as.numeric(parts))
+      if (any(is.na(indices)) || any(indices > length(Mdiff_vars))) next
 
-      for (idx_vec in all_combinations) {
-        label <- paste0("b", paste0(idx_vec, collapse = ""))
-        if (label %in% existing_labels) {
-          path <- paste(Mdiff_vars[idx_vec], collapse = " -> ")
-          path <- paste0(path, " -> Ydiff")
-          pre_post_key <- rbind(pre_post_key, data.frame(
-            Coefficient = label,
-            Path = path
-          ))
-        }
-      }
+      path <- paste(Mdiff_vars[indices], collapse = " -> ")
+      path <- paste0(path, " -> Ydiff")
+      pre_post_key <- rbind(pre_post_key, data.frame(
+        Coefficient = label,
+        Path = path
+      ))
     }
 
-    print(knitr::kable(pre_post_key, align = c("c", "c"), row.names = FALSE))
+    if (nrow(pre_post_key) > 0) {
+      print(knitr::kable(pre_post_key, align = c("c", "c"), row.names = FALSE))
+    }
   }
+
 
 
   print_mc_std_result <- function(std_result, title_prefix = "MC") {
@@ -994,7 +1037,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 
     if (nrow(indirect_effects) > 0 || nrow(total_indirect_effect) > 0) {
       # 缩写名称
-      indirect_names <- gsub("indirect", "ind", indirect_effects$lhs)
+      indirect_names <- grep("^indirect(_?\\d+)+$", param_names, value = TRUE)
       total_ind_name <- "total ind"
 
       # 构建基本表格（bootstrap）
@@ -1049,13 +1092,13 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
         # 遍历所有间接效应名称（如 indirect1, indirect12）
         for (ind in indirect_effects$lhs) {
           # 提取路径中的索引
-          indices <- unlist(strsplit(gsub("indirect", "", ind), split = ""))
+          indices <- as.numeric(strsplit(gsub("indirect_", "", ind), split = "_")[[1]])
           indices <- as.numeric(indices)  # 转换为数字
 
           if (all(!is.na(indices))) {
             # 匹配对应的变量名称，生成路径
             path_vars <- Mdiff_vars[indices]
-            path <- paste(c("X", path_vars, "Ydiff"), collapse = " -> ")
+            path <- paste(c("X", Mdiff_vars[indices], "Ydiff"), collapse = " -> ")
 
             # 添加到 Indirect Key 表格
             ind_name <- gsub("indirect", "ind", ind)  # 缩写名称
@@ -1075,14 +1118,9 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
     contrast_effects <- ustd_result[grep("^CI", ustd_result$lhs), ]
     if (nrow(contrast_effects) > 0) {
       # 修改对比效应的名称
-      contrast_names <- sapply(contrast_effects$lhs, function(name) {
-        indices <- unlist(regmatches(name, gregexpr("\\d+", name)))  # 提取数字组
-        if (length(indices) == 2) {
-          paste0("ind", indices[1], " - ind", indices[2])
-        } else {
-          name
-        }
-      })
+      contrast_names <- gsub("^CI_", "ind_", contrast_effects$lhs)
+      contrast_names <- gsub("_vs_", " - ind_", contrast_names)
+
 
       # 构建基础表格（仅 bootstrap）
       contrast_table <- data.frame(
@@ -1141,48 +1179,56 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 
     # Moderation Effects Key
     if (!is.null(x$prepared_data)) {
-      Mavg_vars <- grep("M\\davg", colnames(x$prepared_data), value = TRUE)
-      Mdiff_vars <- grep("M\\ddiff", colnames(x$prepared_data), value = TRUE)
+      Mavg_vars  <- grep("M\\d+avg", colnames(x$prepared_data), value = TRUE)
+      Mdiff_vars <- grep("M\\d+diff", colnames(x$prepared_data), value = TRUE)
       moderation_key <- data.frame()
 
-      # Add all moderation effects based on labels starting with "d"
-      d_labels <- grep("^d", param_estimates$label, value = TRUE)
+      param_labels <- param_estimates$label
+      d_labels <- grep("^d(_|\\d+)", param_labels, value = TRUE)
+
       for (label in d_labels) {
-        if (nchar(label) == 2) {
-          # Single moderation effects (e.g., d1, d2, ...)
-          index <- as.numeric(substr(label, 2, 2))
-          if (!is.na(index) && index <= length(Mdiff_vars)) {
+        # 支持 d1, d2, d_1_2 格式
+        if (grepl("^d\\d+$", label)) {
+          # 一阶路径：d1, d2, ...
+          idx <- as.numeric(sub("^d", "", label))
+          if (!is.na(idx) && idx <= length(Mdiff_vars)) {
             moderation_key <- rbind(moderation_key, data.frame(
               Coefficient = label,
-              Path = paste0(Mdiff_vars[index], " -> Ydiff")
+              Path = paste0(Mavg_vars[idx], " → Ydiff"),
+              PathBeingModerated = paste0(Mdiff_vars[idx], " → Ydiff")
             ))
           }
-        } else if (nchar(label) > 2) {
-          # Cross-variable moderation effects (e.g., d12, d23, ...)
-          indices <- as.numeric(unlist(strsplit(substr(label, 2, nchar(label)), split = "")))
-          if (all(!is.na(indices)) && all(indices <= length(Mdiff_vars)) && length(indices) == 2) {
+        } else if (grepl("^d_\\d+(_\\d+)+$", label)) {
+          # 多阶路径：d_1_2, d_1_3, ...
+          raw <- gsub("^d_", "", label)
+          indices <- as.numeric(strsplit(raw, "_")[[1]])
+          if (length(indices) == 2 && all(!is.na(indices)) && all(indices <= length(Mdiff_vars))) {
             moderation_key <- rbind(moderation_key, data.frame(
               Coefficient = label,
-              Path = paste0(Mdiff_vars[indices[1]], " -> ", Mdiff_vars[indices[2]])
+              Path = paste0(Mavg_vars[indices[1]], " → ", Mdiff_vars[indices[2]]),
+              PathBeingModerated = paste0(Mdiff_vars[indices[1]], " → ", Mdiff_vars[indices[2]])
             ))
           }
         }
       }
 
       if (nrow(moderation_key) > 0) {
-        print(kable(moderation_key, align = c("c", "c"), row.names = FALSE))
+        cat("\n*************** MODERATION EFFECTS KEY ***************\n")
+        print(knitr::kable(moderation_key, align = "c", row.names = FALSE))
       }
     }
 
 
+
     # 前后测系数对比
     # C1-C2 COEFFICIENTS
-    pre_post_coeff <- ustd_result[grep("^X[01]_b", ustd_result$lhs), ]
+    # 匹配前后测系数（包括一阶 X1_b1、X0_b1 和多阶 X1_b_1_2、X0_b_1_2 等）
+    pre_post_coeff <- ustd_result[grep("^X[01]_b(\\d+|(_\\d+)+)$", ustd_result$lhs), ]
     if (nrow(pre_post_coeff) > 0) {
       cat("\n")
       cat("\n*************** C1-C2 COEFFICIENTS ***************\n")
 
-      # 基础：bootstrap 推断结果
+      # 构建 bootstrap 部分表格
       prepost_table <- data.frame(
         Name = pre_post_coeff$lhs,
         Effect = pre_post_coeff$est,
@@ -1192,7 +1238,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
         bCI.Up = pre_post_coeff$boot.ci.upper
       )
 
-      # 如果 delta = TRUE，补充 delta-method 推断结果
+      # 添加 delta-method 信息（若启用）
       if (delta) {
         prepost_table$SE <- pre_post_coeff$se
         prepost_table$z <- pre_post_coeff$z
@@ -1203,6 +1249,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 
       print_table_dynamic(prepost_table)
     }
+
 
     # 前后测系数 Key
     if (!is.null(x$prepared_data)) {
@@ -1237,7 +1284,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
       if (length(Mdiff_vars) > 1) {
         for (i in 1:(length(Mdiff_vars) - 1)) {
           for (j in (i + 1):length(Mdiff_vars)) {
-            label <- paste0("b", i, j)
+            label <- paste0("b_", i, "_", j)
             if (label %in% existing_labels) {
               pre_post_key <- rbind(pre_post_key, data.frame(
                 Coefficient = label,
@@ -1305,7 +1352,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 
     std_result$label <- gsub("^cp$", "direct effect", std_result$label)
     std_result$label <- gsub("^total_effect$", "Total effect", std_result$label)
-    std_result$label <- gsub("^indirect", "ind", std_result$label)
+    std_result$label <- gsub("^indirect_", "ind", std_result$label)
     std_result$label <- gsub("^total_indirect$", "total ind", std_result$label)
     std_result$label <- gsub("^CI(\\d+)vs(\\d+)$", "ind\\1-ind\\2", std_result$label)
     std_result$label <- ifelse(

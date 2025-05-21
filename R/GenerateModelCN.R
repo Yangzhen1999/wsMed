@@ -60,20 +60,18 @@
 #' @export
 
 GenerateModelCN <- function(prepared_data) {
-  # 提取主要变量
-  Mdiff_vars <- grep("^M\\ddiff$", colnames(prepared_data), value = TRUE)
-  Mavg_vars <- grep("^M\\davg$", colnames(prepared_data), value = TRUE)
+  Mdiff_vars <- sort(grep("^M\\d+diff$", colnames(prepared_data), value = TRUE))
+  Mavg_vars  <- sort(grep("^M\\d+avg$",  colnames(prepared_data), value = TRUE))
   n <- length(Mdiff_vars)
-
   if (n < 1) stop("The function requires at least one mediator.")
 
-  # 提取控制变量
+  # 控制变量
   between_covs <- grep("^Cb\\d+$", colnames(prepared_data), value = TRUE)
   within_covs  <- grep("^Cw\\d+(diff|avg)$", colnames(prepared_data), value = TRUE)
   control_vars <- c(between_covs, within_covs)
   control_rhs  <- if (length(control_vars) > 0) paste(control_vars, collapse = " + ") else NULL
 
-  # 回归模型：Ydiff
+  # 构造 Ydiff 的回归方程
   y_rhs <- c(
     "cp*1",
     paste0("b", 1:n, "*", Mdiff_vars),
@@ -82,38 +80,42 @@ GenerateModelCN <- function(prepared_data) {
   )
   regression_y <- paste("Ydiff ~", paste(na.omit(y_rhs), collapse = " + "))
 
-  # 回归模型：每个 Mdiff
-  regression_m <- c()
+  # 构造每个 Mdiff 的回归方程
+  regression_m <- character(n)
   for (i in 1:n) {
     if (i == 1) {
       rhs <- c(paste0("a1*1"), control_rhs)
-      regression_m <- c(regression_m, paste(Mdiff_vars[i], "~", paste(rhs, collapse = " + ")))
     } else {
-      chain_b <- paste0("b", (i - 1):1, i, "*", Mdiff_vars[(i - 1):1], collapse = " + ")
-      chain_d <- paste0("d", (i - 1):1, i, "*", Mavg_vars[(i - 1):1], collapse = " + ")
+      chain_b <- paste(
+        sapply((i - 1):1, function(j) paste0("b_", j, "_", i, "*", Mdiff_vars[j])),
+        collapse = " + "
+      )
+      chain_d <- paste(
+        sapply((i - 1):1, function(j) paste0("d_", j, "_", i, "*", Mavg_vars[j])),
+        collapse = " + "
+      )
       rhs <- c(paste0("a", i, "*1"), chain_b, chain_d, control_rhs)
-      regression_m <- c(regression_m, paste(Mdiff_vars[i], "~", paste(na.omit(rhs), collapse = " + ")))
     }
+    regression_m[i] <- paste(Mdiff_vars[i], "~", paste(na.omit(rhs), collapse = " + "))
   }
 
-  # 间接效应路径表达式生成
+  # 构造间接效应
   generate_path_effects <- function(paths) {
     paste0("a", paths[1], " * ", paste(
       c(
-        sapply(1:(length(paths) - 1), function(i) paste0("b", paths[i], paths[i + 1])),
+        sapply(1:(length(paths) - 1), function(i) paste0("b_", paths[i], "_", paths[i + 1])),
         paste0("b", paths[length(paths)])
       ),
       collapse = " * "
     ))
   }
 
-  # 所有间接效应
   indirect_effects <- c()
   indirect_effect_labels <- c()
-  for (length_path in 1:n) {
-    path_combinations <- utils::combn(1:n, length_path, simplify = FALSE)
+  for (len in 1:n) {
+    path_combinations <- utils::combn(1:n, len, simplify = FALSE)
     for (path in path_combinations) {
-      label <- paste0("indirect", paste(path, collapse = ""))
+      label <- paste0("indirect_", paste(path, collapse = "_"))
       if (length(path) == 1) {
         indirect_effects <- c(indirect_effects, paste0(label, " := a", path, " * b", path))
       } else {
@@ -123,20 +125,20 @@ GenerateModelCN <- function(prepared_data) {
     }
   }
 
-  # 总间接效应与总效应
   total_indirect <- paste0("total_indirect := ", paste(indirect_effect_labels, collapse = " + "))
   total_effect <- "total_effect := cp + total_indirect"
 
-  # 间接效应对比
+  # 对比效应
   compare_indirect_effect <- ""
   if (length(indirect_effect_labels) > 1) {
     comparisons <- c()
     for (i in seq_along(indirect_effect_labels)) {
       for (j in seq_along(indirect_effect_labels)) {
         if (i < j) {
+          label_i <- gsub("indirect_", "", indirect_effect_labels[i])
+          label_j <- gsub("indirect_", "", indirect_effect_labels[j])
           comparisons <- c(comparisons, paste0(
-            "CI", gsub("indirect", "", indirect_effect_labels[i]), "vs",
-            gsub("indirect", "", indirect_effect_labels[j]), " := ",
+            "CI_", label_i, "_vs_", label_j, " := ",
             indirect_effect_labels[i], " - ", indirect_effect_labels[j]
           ))
         }
@@ -145,22 +147,72 @@ GenerateModelCN <- function(prepared_data) {
     compare_indirect_effect <- paste(comparisons, collapse = "\n")
   }
 
-  # 前后测路径转换公式
-  pre_post_coefficients <- paste(
-    c(
-      sapply(seq_along(Mdiff_vars), function(i) {
-        paste0("X1_b", i, " := (2*b", i, " + d", i, ")/2\n",
-               "X0_b", i, " := X1_b", i, " - d", i)
-      }),
-      sapply(2:n, function(i) {
-        paste0("X1_b", i - 1, i, " := (2*b", i - 1, i, " + d", i - 1, i, ")/2\n",
-               "X0_b", i - 1, i, " := X1_b", i - 1, i, " - d", i - 1, i)
-      })
-    ),
-    collapse = "\n"
-  )
 
-  # 整合所有模型语句
+  first_order <- sapply(1:n, function(i) {
+    x1 <- paste0("X1_b", i)
+    x0 <- paste0("X0_b", i)
+    paste0(
+      x1, " := (2*b", i, " + d", i, ")/2\n",
+      x0, " := ", x1, " - d", i
+    )
+  })
+
+  # 提取所有路径中出现的 b_ 和 d_ 标签（从 indirect_effects 中提取）
+  # 新版：同时匹配一阶和多阶（b1、b_1_2、b_1_2_3...）
+  b_labels <- unique(unlist(regmatches(indirect_effects, gregexpr("b[0-9_]+", indirect_effects))))
+  d_labels <- unique(unlist(regmatches(indirect_effects, gregexpr("d[0-9_]+", indirect_effects))))
+  all_labels <- union(b_labels, d_labels)
+
+  # 为这些有效 label 构造对应的前后测公式
+  higher_order <- sapply(all_labels, function(label) {
+    x1 <- paste0("X1_", label)
+    x0 <- paste0("X0_", label)
+    paste0(
+      x1, " := (2*", label, " + ", gsub("^b", "d", label), ")/2\n",
+      x0, " := ", x1, " - ", gsub("^b", "d", label)
+    )
+  })
+
+
+  # [DEBUG] 收集所有模型文本
+  model_text <- c(regression_y, regression_m, indirect_effects)
+  cat("\n[DEBUG] 模型文本总数：", length(model_text), "\n")
+
+  # [DEBUG] 提取所有使用过的 b 和 d 标签
+  used_b_labels <- unique(unlist(regmatches(model_text, gregexpr("b(\\d+|(_\\d+)+)", model_text))))
+  used_d_labels <- unique(unlist(regmatches(model_text, gregexpr("d(\\d+|(_\\d+)+)", model_text))))
+  cat("[DEBUG] 提取到 b 标签：", paste(used_b_labels, collapse = ", "), "\n")
+  cat("[DEBUG] 提取到 d 标签：", paste(used_d_labels, collapse = ", "), "\n")
+
+  # [DEBUG] 提取共享键
+  b_label_keys <- gsub("^b", "", used_b_labels)
+  d_label_keys <- gsub("^d", "", used_d_labels)
+  shared_keys <- intersect(b_label_keys, d_label_keys)
+  cat("[DEBUG] 共享键：", paste(shared_keys, collapse = ", "), "\n")
+
+  # [DEBUG] 如果没有共享键则警告
+  if (length(shared_keys) == 0) {
+    warning("[WARNING] 未找到配对的 b 和 d 标签，前后测转换系数将为空。")
+  }
+
+  # [DEBUG] 生成每个 X1_b... 与 X0_b... 的定义
+  # 生成对应的 X1_bx 与 X0_bx
+  pre_post_lines <- sapply(all_labels, function(label) {
+    if (!grepl("^b", label)) return(NULL)  # 只对 b 标签生成
+    d_label <- gsub("^b", "d", label)
+    x1_name <- paste0("X1_", label)
+    x0_name <- paste0("X0_", label)
+    paste0(
+      x1_name, " := (2*", label, " + ", d_label, ")/2\n",
+      x0_name, " := ", x1_name, " - ", d_label
+    )
+  })
+
+
+  pre_post_coefficients <- paste(pre_post_lines, collapse = "\n")
+
+
+  # 拼接所有模型部分
   sem_model <- paste(
     regression_y,
     paste(regression_m, collapse = "\n"),
@@ -174,3 +226,4 @@ GenerateModelCN <- function(prepared_data) {
 
   return(sem_model)
 }
+
