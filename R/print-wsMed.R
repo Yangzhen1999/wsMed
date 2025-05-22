@@ -76,6 +76,7 @@
 #' @importFrom utils str
 #' @importFrom knitr kable
 #' @importFrom utils combn
+#' @importFrom stats coef
 #' @method print wsMed
 #' @export
 
@@ -520,7 +521,6 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
     )
   }
   # 动态生成 Indirect Key (兼容 MC 输出)
-  # 动态生成 Indirect Key（兼容 MC 输出）
   if (!is.null(x$prepared_data)) {
     Mdiff_vars <- grep("^M\\d+diff$", colnames(x$prepared_data), value = TRUE)
     Mdiff_vars <- Mdiff_vars[order(as.numeric(gsub("\\D", "", Mdiff_vars)))]
@@ -531,7 +531,9 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
       mc_obj <- x$mi_result %||% x$fiml_result %||% x$mc_de_result
 
       if (!is.null(mc_obj) && inherits(mc_obj, "semmcci")) {
-        param_names <- names(mc_obj$thetahat$est)
+        param_names <- tryCatch({
+          if (!is.null(mc_obj)) names(coef(mc_obj)) else character(0)
+        }, error = function(e) character(0))
 
         # 仅保留合法形式的 indirect_x_x_x 名称
         indirect_names <- grep("^indirect_\\d+$|^indirect(_\\d+)+$", param_names, value = TRUE)
@@ -723,14 +725,14 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
         if (length(indices) == 1 && indices <= length(Mdiff_vars)) {
           mod_key <- rbind(mod_key, data.frame(
             Coefficient = label,
-            Path = paste0(Mavg_vars[indices], " → Ydiff"),
-            PathBeingModerated = paste0(Mdiff_vars[indices], " → Ydiff")
+            Path = paste0(Mavg_vars[indices], " -> Ydiff"),
+            PathBeingModerated = paste0(Mdiff_vars[indices], " -> Ydiff")
           ))
         } else if (length(indices) == 2 && all(indices <= length(Mdiff_vars))) {
           mod_key <- rbind(mod_key, data.frame(
             Coefficient = label,
-            Path = paste0(Mavg_vars[indices[1]], " → ", Mdiff_vars[indices[2]]),
-            PathBeingModerated = paste0(Mdiff_vars[indices[1]], " → ", Mdiff_vars[indices[2]])
+            Path = paste0(Mavg_vars[indices[1]], " -> ", Mdiff_vars[indices[2]]),
+            PathBeingModerated = paste0(Mdiff_vars[indices[1]], " -> ", Mdiff_vars[indices[2]])
           ))
         }
       }
@@ -1037,6 +1039,15 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 
     if (nrow(indirect_effects) > 0 || nrow(total_indirect_effect) > 0) {
       # 缩写名称
+      param_names <- tryCatch({
+        if (!is.null(x$ustd_result)) {
+          unique(x$ustd_result$label)
+        } else {
+          character(0)
+        }
+      }, error = function(e) character(0))
+
+
       indirect_names <- grep("^indirect(_?\\d+)+$", param_names, value = TRUE)
       total_ind_name <- "total ind"
 
@@ -1194,8 +1205,8 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
           if (!is.na(idx) && idx <= length(Mdiff_vars)) {
             moderation_key <- rbind(moderation_key, data.frame(
               Coefficient = label,
-              Path = paste0(Mavg_vars[idx], " → Ydiff"),
-              PathBeingModerated = paste0(Mdiff_vars[idx], " → Ydiff")
+              Path = paste0(Mavg_vars[idx], " -> Ydiff"),
+              PathBeingModerated = paste0(Mdiff_vars[idx], " -> Ydiff")
             ))
           }
         } else if (grepl("^d_\\d+(_\\d+)+$", label)) {
@@ -1205,8 +1216,8 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
           if (length(indices) == 2 && all(!is.na(indices)) && all(indices <= length(Mdiff_vars))) {
             moderation_key <- rbind(moderation_key, data.frame(
               Coefficient = label,
-              Path = paste0(Mavg_vars[indices[1]], " → ", Mdiff_vars[indices[2]]),
-              PathBeingModerated = paste0(Mdiff_vars[indices[1]], " → ", Mdiff_vars[indices[2]])
+              Path = paste0(Mavg_vars[indices[1]], " -> ", Mdiff_vars[indices[2]]),
+              PathBeingModerated = paste0(Mdiff_vars[indices[1]], " -> ", Mdiff_vars[indices[2]])
             ))
           }
         }

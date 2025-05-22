@@ -44,7 +44,7 @@ test_that("print.wsMed prints correct output for complete data", {
 
   # 条件性检查
   if (any(grepl("CONTRAST INDIRECT EFFECTS", printed_output))) {
-    expect_true(any(grepl("ind\\d+ - ind\\d+", printed_output)))
+    expect_true(any(grepl("ind_\\d+ - ind_\\d+", printed_output)))
   }
 
   if (any(grepl("MODERATION EFFECTS of X", printed_output))) {
@@ -87,7 +87,7 @@ test_that("print.wsMed handles missing data correctly with MI", {
     expect_true(TRUE)
   }
   if (any(grepl("CONTRAST INDIRECT EFFECTS", printed_output))) {
-    expect_true(any(grepl("ind\\d+ - ind\\d+", printed_output)))
+    expect_true(any(grepl("ind_\\d+ - ind_\\d+", printed_output)))
   }
   if (any(grepl("MODERATION EFFECTS of X", printed_output))) {
     expect_true(any(grepl("d\\d+", printed_output)))
@@ -137,7 +137,7 @@ test_that("print.wsMed correctly handles FIML missing data method", {
 
   # 可选部分
   if (any(grepl("CONTRAST INDIRECT EFFECTS", printed_output))) {
-    expect_true(any(grepl("ind\\d+ - ind\\d+", printed_output)))
+    expect_true(any(grepl("ind_\\d+ - ind_\\d+", printed_output)))
   }
 
   if (any(grepl("MODERATION EFFECTS of X", printed_output))) {

@@ -174,28 +174,18 @@ GenerateModelCN <- function(prepared_data) {
   })
 
 
-  # [DEBUG] 收集所有模型文本
-  model_text <- c(regression_y, regression_m, indirect_effects)
-  cat("\n[DEBUG] 模型文本总数：", length(model_text), "\n")
 
-  # [DEBUG] 提取所有使用过的 b 和 d 标签
+  model_text <- c(regression_y, regression_m, indirect_effects)
+
+
   used_b_labels <- unique(unlist(regmatches(model_text, gregexpr("b(\\d+|(_\\d+)+)", model_text))))
   used_d_labels <- unique(unlist(regmatches(model_text, gregexpr("d(\\d+|(_\\d+)+)", model_text))))
-  cat("[DEBUG] 提取到 b 标签：", paste(used_b_labels, collapse = ", "), "\n")
-  cat("[DEBUG] 提取到 d 标签：", paste(used_d_labels, collapse = ", "), "\n")
 
-  # [DEBUG] 提取共享键
+
   b_label_keys <- gsub("^b", "", used_b_labels)
   d_label_keys <- gsub("^d", "", used_d_labels)
   shared_keys <- intersect(b_label_keys, d_label_keys)
-  cat("[DEBUG] 共享键：", paste(shared_keys, collapse = ", "), "\n")
 
-  # [DEBUG] 如果没有共享键则警告
-  if (length(shared_keys) == 0) {
-    warning("[WARNING] 未找到配对的 b 和 d 标签，前后测转换系数将为空。")
-  }
-
-  # [DEBUG] 生成每个 X1_b... 与 X0_b... 的定义
   # 生成对应的 X1_bx 与 X0_bx
   pre_post_lines <- sapply(all_labels, function(label) {
     if (!grepl("^b", label)) return(NULL)  # 只对 b 标签生成
@@ -207,7 +197,6 @@ GenerateModelCN <- function(prepared_data) {
       x0_name, " := ", x1_name, " - ", d_label
     )
   })
-
 
   pre_post_coefficients <- paste(pre_post_lines, collapse = "\n")
 
