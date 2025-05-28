@@ -86,16 +86,25 @@ PrepareMissingData <- function(data_missing,
     stop("Error in PrepareMissingData: Y_C1 or Y_C2 is missing in the dataset.")
   }
 
-  # 执行多重插补
+  # -------- Step 1: 选出需要插补的变量列 --------
+  relevant_vars <- c(Y_C1, Y_C2, M_C1, M_C2)
+
+  if (!is.null(C)) relevant_vars <- c(relevant_vars, C)
+  if (!is.null(C_C1) && !is.null(C_C2)) relevant_vars <- c(relevant_vars, C_C1, C_C2)
+
+  relevant_vars <- unique(relevant_vars)
+  data_reduced <- data_missing[, relevant_vars, drop = FALSE]
+
+  # -------- Step 2: 执行多重插补 --------
   imputed_result <- ImputeData(
-    data_missing = data_missing,
+    data_missing = data_reduced,
     m = m,
     method = method,
     seed = seed
   )
   imputed_data_list <- imputed_result$imputed_data_list
 
-  # 对每一个插补数据集进行 PrepareData 处理（包含控制变量）
+  # -------- Step 3: 处理每一个插补后的数据集 --------
   processed_data_list <- lapply(imputed_data_list, function(imputed_data) {
     PrepareData(
       data = imputed_data,
@@ -115,4 +124,5 @@ PrepareMissingData <- function(data_missing,
     imputation_summary = imputed_result$summary
   ))
 }
+
 

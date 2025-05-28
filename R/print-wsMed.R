@@ -581,6 +581,9 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
         }
 
         if (nrow(indirect_key) > 0) {
+          cat("\n")
+          cat("\n")
+          cat("*************** INDIRECT EFFECTS KEY ***************\n")
           print(knitr::kable(indirect_key, align = c("c", "c"), row.names = FALSE))
         }
       }
@@ -617,7 +620,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 
 
     # 筛选 Contrast Indirect Effects（通常形如 CI1vs2）
-    contrast_idx <- grep("^CI\\d+vs\\d+$", mc_df$name)
+    contrast_idx <- grep("^CI", mc_df$name)
     if (length(contrast_idx) == 0) return(invisible(NULL))
 
     cat("\n")
@@ -638,6 +641,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 
     print_table_dynamic(contrast_table)
   }
+
   # MI/FIML/DE 的 Monte Carlo 结果（假设存在）
   if (!is.null(x$mi_result)) {
     print_mc_contrast_effects(x$mi_result, title_prefix = "MC (MI)")
@@ -739,6 +743,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 
       if (nrow(mod_key) > 0) {
         cat("\n")
+        cat("\n")
         cat("*************** MODERATION EFFECTS KEY ***************\n")
         print(knitr::kable(mod_key, align = "c", row.names = FALSE))
       }
@@ -838,6 +843,9 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
     }
 
     if (nrow(pre_post_key) > 0) {
+      cat("\n")
+      cat("\n")
+      cat("*************** C1-C2 COEFFICIENTS KEY ***************\n")
       print(knitr::kable(pre_post_key, align = c("c", "c"), row.names = FALSE))
     }
   }
