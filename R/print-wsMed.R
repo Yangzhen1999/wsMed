@@ -584,7 +584,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
           cat("\n")
           cat("\n")
           cat("*************** INDIRECT EFFECTS KEY ***************\n")
-          print(knitr::kable(indirect_key, align = c("c", "c"), row.names = FALSE))
+          print(knitr::kable(indirect_key, align = c("l", "l"), row.names = FALSE))
         }
       }
     }
@@ -618,7 +618,6 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
     )
     mc_df <- cbind(mc_df, ci_vals)
 
-
     # 筛选 Contrast Indirect Effects（通常形如 CI1vs2）
     contrast_idx <- grep("^CI", mc_df$name)
     if (length(contrast_idx) == 0) return(invisible(NULL))
@@ -626,11 +625,26 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
     cat("\n")
     cat(paste0("\n*************** CONTRAST INDIRECT EFFECTS (", title_prefix, ") ***************\n"))
 
-    contrast_names <- gsub("^CI_", "ind_", mc_df$name[contrast_idx])
-    contrast_names <- gsub("_vs_", " - ind_", contrast_names)
+    # --- 格式化函数让减号对齐 ---
+    align_minus <- function(names_vector) {
+      split_names <- strsplit(names_vector, " - ")
+      max_left <- max(nchar(sapply(split_names, `[`, 1)))
+      max_right <- max(nchar(sapply(split_names, `[`, 2)))
+      sapply(split_names, function(parts) {
+        left <- formatC(parts[1], width = max_left, flag = "-")
+        right <- formatC(parts[2], width = max_right, flag = "-")
+        paste0(left, " - ", right)
+      })
+    }
 
+    # 构造对比名称并对齐
+    contrast_names_raw <- gsub("^CI_", "ind_", mc_df$name[contrast_idx])
+    contrast_names_raw <- gsub("_vs_", " - ind_", contrast_names_raw)
+    contrast_names_aligned <- align_minus(contrast_names_raw)
+
+    # 构建表格
     contrast_table <- data.frame(
-      Name = contrast_names,
+      Name = contrast_names_aligned,
       Estimate = mc_df$Estimate[contrast_idx],
       SE = mc_df$SE[contrast_idx],
       stringsAsFactors = FALSE
@@ -641,7 +655,6 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 
     print_table_dynamic(contrast_table)
   }
-
   # MI/FIML/DE 的 Monte Carlo 结果（假设存在）
   if (!is.null(x$mi_result)) {
     print_mc_contrast_effects(x$mi_result, title_prefix = "MC (MI)")
@@ -745,7 +758,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
         cat("\n")
         cat("\n")
         cat("*************** MODERATION EFFECTS KEY ***************\n")
-        print(knitr::kable(mod_key, align = "c", row.names = FALSE))
+        print(knitr::kable(mod_key, align = "l", row.names = FALSE))
       }
     }
   }
@@ -846,7 +859,7 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
       cat("\n")
       cat("\n")
       cat("*************** C1-C2 COEFFICIENTS KEY ***************\n")
-      print(knitr::kable(pre_post_key, align = c("c", "c"), row.names = FALSE))
+      print(knitr::kable(pre_post_key, align = c("l", "l"), row.names = FALSE))
     }
   }
 

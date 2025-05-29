@@ -140,7 +140,9 @@ wsMed <- function(data,
                   pd = TRUE,
                   tol = 1e-06,
                   seed = 123,
-                  MCmethod = NULL) {
+                  MCmethod = NULL,
+                  store_boot_args = list(),
+                  ...) {
 
   # 输入验证
   {
@@ -297,12 +299,21 @@ wsMed <- function(data,
 
     # bootstrap CI
     if (ci_method %in% c("bootstrap", "both")) {
-      fit_u <- semboottools::store_boot(
-        fit,
-        do_bootstrapping = TRUE,
-        R = bootstrap,
-        iseed = iseed
-      )
+
+      if (length(store_boot_args) == 0) {
+        store_boot_args <- list(
+          parallel = "snow"
+        )
+      }
+
+      store_boot_args1 <- utils::modifyList(store_boot_args,
+                                            list(R = bootstrap,
+                                                 iseed = iseed,
+                                                 object = fit,
+                                                 do_bootstrapping = TRUE))
+
+      fit_u <- do.call(semboottools::store_boot,
+                       store_boot_args1)
 
       ustd_result <- semboottools::parameterEstimates_boot(
         level = 1-alpha,
