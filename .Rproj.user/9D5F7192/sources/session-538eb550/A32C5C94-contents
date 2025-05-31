@@ -1,0 +1,111 @@
+model <- "
+  y ~ b1*m + cp*1
+  m ~ a1*1
+"
+fit <- sem(model, data = dat, fixed.x = FALSE)
+
+# 原始截距
+parameterEstimates(fit)[parameterEstimates(fit)$op == "~1", ]
+
+# 标准化截距
+standardizedSolution(fit)[standardizedSolution(fit)$op == "~1", ]
+
+# implied covariance matrix
+lavInspect(fit, "implied")$cov
+
+class(result6$mi_result)
+
+这部分有问题,不能正确的提取
+这里就不对,现在的逻辑是只有bootstrap的时候才会生成这个note,这里应该修改为调用的是perc还是bc或者什么
+还是要修改这个部分, 把CI分为两个部分, 非标准化部分的Confidence level,应该提取alpha计算,标准化的提取alphastd计算,
+我的print函数中digits部分还在生效吗?
+
+
+set.seed(123)
+example_dataN <- mice::ampute(
+  data = example_data,  # 输入完整数据
+  prop = 0.1  # 缺失值比例 (10%)
+)$amp
+
+# 2. 定义 SEM 结构方程模型
+sem_model <- "
+    Ydiff ~ cp * 1 + b1 * M1diff
+    M1diff ~ a1 * 1
+    indirect := a1 * b1
+    total := cp + indirect
+  "
+
+# 3. 运行 `RunMCMIAnalysis` 进行 Monte Carlo 多重插补分析
+result <- RunMCMIAnalysis(
+  data_missing = example_dataN,
+  m = 3,  # 设定较小的插补次数以加快测试
+  method = "pmm",
+  seed = 123,
+  M_C1 = c("A2", "B2"),
+  M_C2 = c("A1", "B1"),
+  Y_C1 = "C2",
+  Y_C2 = "C1",
+  sem_model = sem_model,
+  R = 1000,  # Monte Carlo 采样次数
+  alpha = c(0.05, 0.01)
+)
+
+更新版本号, 然后build这个package
+
+
+
+
+result1 <- wsMed(
+  data = example_data, #dataset
+  M_C1 = c("A1","B1"), # A1/B1 is A/B mediator variable in condition 1
+  M_C2 = c("A2","B2"), # A2/B2 is A/B mediator variable in condition 2
+  Y_C1 = "C1", # C1 is outcome variable in condition 1
+  Y_C2 = "C2", # C2 is outcome variable in condition 2
+  form = "P", # Parallel mediation
+)
+print(result1)
+
+
+result4 <- wsMed(
+  data = example_dataN,
+  M_C1 = c("A1","B1","C1"),# A1/B1/C1 is A/B/C mediator variable in condition 1
+  M_C2 = c("A2","B2","C2"),# A2/B2/C2 is A/B/C mediator variable in condition 2
+  Y_C1 = "D1", # D1 is outcome variable in condition 1
+  Y_C2 = "D2", # D2 is outcome variable in condition 2
+  form = "CN", # chained mediation
+  Na = "MI", # Use Multiple Imputation ("MI") for handling missing data
+  standardized = TRUE, # Compute standardized effects based on Monte Carlo method
+  R = 2000L,  # the number of Monte Carlo repetitions
+  alpha =  0.05,  # Significance level
+  alphastd = 0.05 # Significance level for standardized
+)
+print(result4,digits = 4)
+
+
+result2 <- wsMed(
+  data = example_data, #dataset
+  M_C1 = c("A1","B1","C1"), # A1/B1/C1 is A/B/C mediator variable in condition 1
+  M_C2 = c("A2","B2","C2"), # A2/B2/C2 is A/B/C mediator variable in condition 2
+  Y_C1 = "D1", # D1 is outcome variable in condition 1
+  Y_C2 = "D2", # D2 is outcome variable in condition 2
+  form = "P", # Parallel mediation
+  standardized = TRUE, # Compute standardized effects
+  bootstrap = 1000, # Bootstrap for confidence intervals
+  iseed = 123 # Random seed for bootstrap
+)
+print(result2)
+
+result5 <- wsMed(
+  data = example_dataN,
+  M_C1 = c("A1","B1","C1"),# A1/B1/C1 is A/B/C mediator variable in condition 1
+  M_C2 = c("A2","B2","C2"),# A2/B2/C2 is A/B/C mediator variable in condition 2
+  Y_C1 = "D1",# D1 is outcome variable in condition 1
+  Y_C2 = "D2",# D2 is outcome variable in condition 2
+  form = "CP",# chained + parallel mediation, M1 is chained mediator by default
+  Na = "FIML",# Use Full Information Maximum Likelihood ("FIML")  for handling missing data
+  standardized = TRUE,# Compute standardized effects based on Monte Carlo method
+  ci_method = "mc",
+  R = 10000L,   # the number of Monte Carlo repetitions
+  alpha =  0.05,  # Significance level
+  alphastd = 0.05 # Significance level for standardized
+)

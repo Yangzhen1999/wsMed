@@ -1,0 +1,130 @@
+compute_fit_632 <- function(data, model, seed = NULL, verbose = TRUE,
+                                       weights = c(chisq = 0.4, srmr = 0.3, aic = 0.2, loglik = 0.1),
+                                       ...) {
+  if (!is.null(seed)) set.seed(seed)
+  n <- nrow(data)
+  idx_boot <- sample(seq_len(n), size = n, replace = TRUE)
+  data_boot <- data[idx_boot, , drop = FALSE]
+
+  if (verbose) cat("Fitting model on bootstrap sample...\n")
+  fit_boot <- tryCatch(
+    lavaan::sem(model = model, data = data_boot, fixed.x = FALSE, ...),
+    error = function(e) NULL
+  )
+  if (is.null(fit_boot) || !lavaan::inspect(fit_boot, "converged")) {
+    return(list(success = FALSE, stage = "fit_boot"))
+  }
+
+  if (verbose) cat("Fitting model on original data...\n")
+  fit_test <- tryCatch(
+    lavaan::sem(model = model, data = data, fixed.x = FALSE, ...),
+    error = function(e) NULL
+  )
+  if (is.null(fit_test) || !lavaan::inspect(fit_test, "converged")) {
+    return(list(success = FALSE, stage = "fit_test"))
+  }
+
+  # 所有候选指标
+  all_metrics <- c("chisq", "srmr", "aic", "loglik")
+
+  # 尝试提取指标
+  train_vals <- tryCatch(fitMeasures(fit_boot, all_metrics), error = function(e) NULL)
+  test_vals  <- tryCatch(fitMeasures(fit_test, all_metrics), error = function(e) NULL)
+
+  if (is.null(train_vals) || is.null(test_vals)) {
+    return(list(success = FALSE, stage = "metric_failure"))
+  }
+
+  # 保留在两个模型中都存在的指标
+  common_metrics <- intersect(names(train_vals), names(test_vals))
+  if (length(common_metrics) == 0) {
+    return(list(success = FALSE, stage = "no_common_metrics"))
+  }
+
+  train_vals <- train_vals[common_metrics]
+  test_vals  <- test_vals[common_metrics]
+  fit_632    <- 0.368 * train_vals + 0.632 * test_vals
+
+  # 若包含 loglik，需反向处理（越大越好）
+  if ("loglik" %in% names(fit_632)) {
+    fit_632["loglik"] <- -fit_632["loglik"]
+  }
+
+  # 使用存在的指标的权重
+  active_weights <- weights[names(fit_632)]
+  final_score <- sum(fit_632 * active_weights)
+  
+  coef = lavaan::coef(fit_boot)
+  vcov = lavaan::vcov(fit_boot)
+  
+  return(list(
+    success = TRUE,
+    available_metrics = names(fit_632),
+    metrics_train = train_vals,
+    metrics_test = test_vals,
+    metrics_632 = fit_632,
+    used_weights = active_weights,
+    combined_score = final_score,
+    coef = lavaan::coef(fit_boot),
+    vcov = lavaan::vcov(fit_boot)
+  ))
+}
+
+model <- "
+  Ydiff ~ cp*1 + b1*M1diff
+  M1diff ~ a1*1
+  indirect  := a1 * b1
+  direct := cp
+  total := cp + a1 * b1
+"
+
+set.seed(123)  # for reproducibility
+M1diff <- rnorm(300)
+Ydiff <- 0.5 * M1diff + rnorm(300)
+dat <- data.frame(M1diff, Ydiff)
+
+results <- lapply(1:100, function(i) {
+  compute_fit_632(data = dat, model = model, seed = 123 + i, verbose = FALSE)
+})
+print(results)
+
+valid <- Filter(function(res) res$success, results)
+scores <- sapply(valid, function(x) x$combined_score)
+best_idx <- which.min(scores)
+best_model <- valid[[best_idx]]
+# 提取 coef 和 vcov
+best_coef <- best_model$coef
+best_vcov <- best_model$vcov
+print(best_coef)
+print(best_vcov)
+
+model <- "
+  Ydiff ~ cp*1 + b1*M1diff
+  M1diff ~ a1*1
+  indirect  := a1 * b1
+  direct := cp
+  total := cp + a1 * b1
+"
+
+set.seed(123)  # for reproducibility
+M1diff <- rnorm(300)
+Ydiff <- 0.5 * M1diff + rnorm(300)
+
+dat <- data.frame(M1diff, Ydiff)
+
+library(lavaan)
+fit <- sem(model, data = dat,fixed.x = FALSE, warn = FALSE)
+vcov(fit)
+coef(fit)
+
+# 原始截距
+parameterEstimates(fit)[parameterEstimates(fit)$op == "~1", ]
+
+# 标准化截距
+standardizedSolution(fit)[standardizedSolution(fit)$op == "~1", ]
+
+# implied covariance matrix
+lavInspect(fit, "implied")$cov
+
+
+

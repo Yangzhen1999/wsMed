@@ -1,0 +1,171 @@
+#' @title Generate Combined Parallel and Chained Mediation Model
+#'
+#' @description Dynamically generates a structural equation modeling (SEM) syntax for
+#' combined parallel and chained mediation analysis based on the prepared dataset. The function computes regression
+#' equations for mediators and the outcome variable, indirect effects for both parallel and chained mediation paths,
+#' total effects, contrasts between indirect effects, and coefficients in different X conditions.
+#'
+#' @details This function is used to construct SEM models that combine parallel and chained mediation analysis.
+#' It automatically parses variable names from the prepared dataset and dynamically creates
+#' the necessary model syntax, including:
+#'
+#' - **Outcome regression**: Defines the relationship between the difference scores of
+#' the outcome (`Ydiff`), the chained mediator (`M1diff`), and the parallel mediators (`M2diff`, `M3diff`, etc.).
+#'
+#' - **Mediator regressions**: Defines the sequential regression models for the chained mediator and each parallel mediator.
+#'
+#' - **Indirect effects**: Computes the indirect effects for both chained and parallel mediation paths,
+#' including multi-step indirect effects involving both chained and parallel mediators.
+#'
+#' - **Total indirect effect**: Calculates the sum of all indirect effects from chained and parallel mediation paths.
+#'
+#' - **Total effect**: Combines the direct effect (`cp`) and the total indirect effect.
+#'
+#' - **Contrasts of indirect effects**: Optionally calculates the pairwise contrasts between
+#' the indirect effects for different mediation paths.
+#'
+#' - **Coefficients in different 'X' conditions**: Calculates path coefficients in different `X`
+#' conditions to observe the moderation effect of `X`.
+#'
+#' This model is suitable for designs where mediators include both a sequential chain (chained mediation)
+#' and independent parallel mediators.
+#'
+#' @param prepared_data A data frame returned by [PrepareData()], containing the processed
+#' within-subject mediator and outcome variables. The data frame must include columns for
+#' difference scores (`Mdiff`) and average scores (`Mavg`) of mediators, as well as the
+#' outcome difference score (`Ydiff`).
+#'
+#' @return A character string representing the SEM model syntax for the specified combined parallel and chained mediation analysis.
+#'
+#' @seealso [PrepareData()], [wsMed()], [GenerateModelP()], [GenerateModelCN()]
+#'
+#' @examples
+#' # Example prepared data
+#' prepared_data <- data.frame(
+#'   M1diff = rnorm(100),
+#'   M2diff = rnorm(100),
+#'   M3diff = rnorm(100),
+#'   M1avg = rnorm(100),
+#'   M2avg = rnorm(100),
+#'   M3avg = rnorm(100),
+#'   Ydiff = rnorm(100)
+#' )
+#'
+#' # Generate SEM model syntax
+#' sem_model <- GenerateModelCP(prepared_data)
+#' cat(sem_model)
+#'
+#' @export
+GenerateModelCP <- function(prepared_data) {
+  # 提取变量
+  chain_var <- grep("^M1diff$", colnames(prepared_data), value = TRUE)
+  chain_avg <- grep("^M1avg$", colnames(prepared_data), value = TRUE)
+  all_mdiff <- sort(grep("^M\\d+diff$", colnames(prepared_data), value = TRUE))
+  all_mavg  <- sort(grep("^M\\d+avg$",  colnames(prepared_data), value = TRUE))
+
+
+  parallel_vars  <- setdiff(all_mdiff, chain_var)
+  parallel_avgs  <- setdiff(all_mavg, chain_avg)
+  n <- length(parallel_vars)
+
+  if (length(chain_var) != 1) stop("The chain mediator should contain exactly one variable: M1diff.")
+
+  # 控制变量识别
+  between_covs <- grep("^Cb\\d+$", colnames(prepared_data), value = TRUE)
+  within_covs  <- grep("^Cw\\d+(diff|avg)$", colnames(prepared_data), value = TRUE)
+  control_vars <- c(between_covs, within_covs)
+  control_rhs  <- if (length(control_vars) > 0) paste(control_vars, collapse = " + ") else NULL
+
+  # Ydiff 回归模型
+  y_rhs <- c(
+    paste0("cp*1"),
+    paste0("b1*", chain_var),
+    paste0("b", 2:(n + 1), "*", parallel_vars),
+    paste0("d1*", chain_avg),
+    paste0("d", 2:(n + 1), "*", parallel_avgs),
+    control_rhs
+  )
+  regression_y <- paste("Ydiff ~", paste(na.omit(y_rhs), collapse = " + "))
+
+  # 中介模型：M1diff（链式起点）+ 并行中介
+  regression_m <- c()
+  regression_m <- c(regression_m, paste(chain_var, "~", paste(c("a1*1", control_rhs), collapse = " + ")))
+
+  for (i in seq_along(parallel_vars)) {
+    rhs <- c(
+      paste0("a", i + 1, "*1"),
+      paste0("b1", i + 1, "*", chain_var),
+      paste0("d1", i + 1, "*", chain_avg),
+      control_rhs
+    )
+    regression_m <- c(regression_m, paste(parallel_vars[i], "~", paste(na.omit(rhs), collapse = " + ")))
+  }
+
+  # 间接效应定义
+  indirect_effects <- c("indirect1 := a1 * b1")
+  indirect_effect_labels <- c("indirect1")
+
+  for (i in seq_along(parallel_vars)) {
+    label_direct <- paste0("indirect", i + 1)
+    formula_direct <- paste0("a", i + 1, " * b", i + 1)
+    label_chain <- paste0("indirect1", i + 1)
+    formula_chain <- paste0("a1 * b1", i + 1, " * b", i + 1)
+
+    indirect_effects <- c(
+      indirect_effects,
+      paste0(label_direct, " := ", formula_direct),
+      paste0(label_chain, " := ", formula_chain)
+    )
+    indirect_effect_labels <- c(indirect_effect_labels, label_direct, label_chain)
+  }
+
+  total_indirect <- paste0("total_indirect := ", paste(indirect_effect_labels, collapse = " + "))
+  total_effect <- "total_effect := cp + total_indirect"
+
+  # 间接效应对比
+  compare_indirect_effect <- ""
+  if (length(indirect_effect_labels) > 1) {
+    comparisons <- c()
+    for (i in seq_along(indirect_effect_labels)) {
+      for (j in seq_along(indirect_effect_labels)) {
+        if (i < j) {
+          comparisons <- c(comparisons, paste0(
+            "CI", gsub("indirect", "", indirect_effect_labels[i]), "vs",
+            gsub("indirect", "", indirect_effect_labels[j]), " := ",
+            indirect_effect_labels[i], " - ", indirect_effect_labels[j]
+          ))
+        }
+      }
+    }
+    compare_indirect_effect <- paste(comparisons, collapse = "\n")
+  }
+
+  # 前后测转换系数
+  pre_post_coefficients <- paste(
+    c(
+      paste0("X1_b1 := (2*b1 + d1)/2\nX0_b1 := X1_b1 - d1"),
+      sapply(2:(n + 1), function(i) {
+        paste0("X1_b", i, " := (2*b", i, " + d", i, ")/2\nX0_b", i, " := X1_b", i, " - d", i)
+      }),
+      sapply(seq_along(parallel_vars), function(i) {
+        paste0("X1_b1", i + 1, " := (2*b1", i + 1, " + d1", i + 1, ")/2\n",
+               "X0_b1", i + 1, " := X1_b1", i + 1, " - d1", i + 1)
+      })
+    ),
+    collapse = "\n"
+  )
+
+  # 汇总输出
+  sem_model <- paste(
+    regression_y,
+    paste(regression_m, collapse = "\n"),
+    paste(indirect_effects, collapse = "\n"),
+    total_indirect,
+    total_effect,
+    compare_indirect_effect,
+    pre_post_coefficients,
+    sep = "\n"
+  )
+
+  return(sem_model)
+}

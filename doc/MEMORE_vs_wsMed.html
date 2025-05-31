@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>MEMORE_vs_wsMed</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">MEMORE_vs_wsMed</h1>
+
+
+
+<div id="introduction" class="section level1">
+<h1>introduction</h1>
+<p>This document presents a comparison between the <strong>MEMORE 3.0
+(SPSS Plugin)</strong> and <strong>wsMed (R Package)</strong>
+outputs.</p>
+<div id="parallel-mediation" class="section level2">
+<h2>parallel mediation</h2>
+<p>We analyze a <strong>three-mediator parallel mediation
+model</strong>, comparing the results obtained from both methods.</p>
+<div id="memore-3.0-analysis-report" class="section level3">
+<h3>MEMORE 3.0 Analysis Report</h3>
+<pre><code>## ```
+##  
+## Run MATRIX procedure:
+## 
+## *********************** MEMORE Procedure for SPSS Version 3.0 ***********************
+## 
+##                            Written by Amanda Montoya
+## 
+##                     Documentation available at github.com/akmontoya/MEMORE
+## 
+## **************************** ANALYSIS NOTES AND WARNINGS ****************************
+## 
+## Bootstrap confidence interval method used: Percentile bootstrap.
+## 
+## Number of bootstrap samples for bootstrap confidence intervals:
+##   5000
+## 
+## The following variables were mean centered prior to analysis:
+##  (        A2        +       A1       )        /2
+##  (        B2        +       B1       )        /2
+##  (        C2        +       C1       )        /2
+## 
+## Level of confidence for all confidence intervals in output:
+##       95.00
+## 
+## **************************************************************************************
+## 
+## Model:
+##   1
+## 
+## Variables:
+## Y =   D2       D1
+## M1 =  A2       A1
+## M2 =  B2       B1
+## M3 =  C2       C1
+## 
+## Computed Variables:
+## Ydiff =           D2        -       D1
+## M1diff =          A2        -       A1
+## M2diff =          B2        -       B1
+## M3diff =          C2        -       C1
+## M1avg  = (        A2        +       A1       )        /2                         Centered
+## M2avg  = (        B2        +       B1       )        /2                         Centered
+## M3avg  = (        C2        +       C1       )        /2                         Centered
+## 
+## Sample Size:
+##   100
+## 
+## **************************************************************************************
+## Outcome: Ydiff =  D2        -       D1
+## 
+## Model
+##                Coef         SE          t          p       LLCI       ULCI
+## constant     -.0316      .0170    -1.8586      .0661     -.0653      .0021
+## 
+## Degrees of freedom for all regression coefficient estimates:
+##   99
+## 
+## **************************************************************************************
+## Outcome: M1diff = A2        -       A1
+## 
+## Model
+##                Coef         SE          t          p       LLCI       ULCI
+## constant     -.0271      .0176    -1.5385      .1271     -.0621      .0079
+## 
+## Degrees of freedom for all regression coefficient estimates:
+##   99
+## 
+## **************************************************************************************
+## Outcome: M2diff = B2        -       B1
+## 
+## Model
+##                Coef         SE          t          p       LLCI       ULCI
+## constant      .0145      .0181      .8024      .4243     -.0213      .0503
+## 
+## Degrees of freedom for all regression coefficient estimates:
+##   99
+## 
+## **************************************************************************************
+## Outcome: M3diff = C2        -       C1
+## 
+## Model
+##                Coef         SE          t          p       LLCI       ULCI
+## constant      .0153      .0163      .9404      .3493     -.0170      .0477
+## 
+## Degrees of freedom for all regression coefficient estimates:
+##   99
+## 
+## **************************************************************************************
+## Outcome: Ydiff =  D2        -       D1
+## 
+## Model Summary
+##           R       R-sq        MSE          F        df1        df2          p
+##       .1978      .0391      .0296      .6312     6.0000    93.0000      .7049
+## 
+## Model
+##                Coef         SE          t          p       LLCI       ULCI
+## constant     -.0315      .0176    -1.7875      .0771     -.0665      .0035
+## M1diff       -.0501      .1009     -.4968      .6205     -.2505      .1502
+## M2diff       -.0844      .1022     -.8252      .4114     -.2874      .1187
+## M3diff       -.0167      .1084     -.1536      .8782     -.2320      .1987
+## M1avg        -.0305      .1015     -.3002      .7647     -.2320      .1711
+## M2avg        -.0060      .0945     -.0633      .9497     -.1936      .1816
+## M3avg        -.1552      .1090    -1.4239      .1578     -.3716      .0612
+## 
+## Degrees of freedom for all regression coefficient estimates:
+##   93
+## 
+## ************************* TOTAL, DIRECT, AND INDIRECT EFFECTS *************************
+## 
+## Total effect of X on Y
+##      Effect         SE          t         df          p       LLCI       ULCI
+##      -.0316      .0170    -1.8586    99.0000      .0661     -.0653      .0021
+## 
+## Direct effect of X on Y
+##      Effect         SE          t         df          p       LLCI       ULCI
+##      -.0315      .0176    -1.7875    93.0000      .0771     -.0665      .0035
+## 
+## Indirect Effect of X on Y through M
+##           Effect     BootSE   BootLLCI   BootULCI
+## Ind1       .0014      .0030     -.0049      .0078
+## Ind2      -.0012      .0029     -.0088      .0035
+## Ind3      -.0003      .0028     -.0072      .0050
+## Total     -.0001      .0054     -.0130      .0092
+## 
+## Indirect Key
+## Ind1  &#39;X&#39;      -&gt;       M1diff   -&gt;       Ydiff
+## Ind2  &#39;X&#39;      -&gt;       M2diff   -&gt;       Ydiff
+## Ind3  &#39;X&#39;      -&gt;       M3diff   -&gt;       Ydiff
+## 
+## Pairwise Contrasts Between Specific Indirect Effects
+##           Effect     BootSE   BootLLCI   BootULCI
+## (C1)       .0026      .0039     -.0053      .0113
+## (C2)       .0016      .0043     -.0067      .0114
+## (C3)      -.0010      .0038     -.0089      .0068
+## 
+## Contrast Key:
+## (C1)  Ind1      -       Ind2
+## (C2)  Ind1      -       Ind3
+## (C3)  Ind2      -       Ind3
+## 
+## ------ END MATRIX -----
+##  
+## ```</code></pre>
+</div>
+<div id="wsmed-analysis-report" class="section level3">
+<h3>wsMed Analysis Report</h3>
+<pre><code>## 
+## *************** VARIABLES ***************
+## Original Variables:
+##   Outcome (Y):
+##     Condition 1: D1 
+##     Condition 2: D2 
+##   Mediators (M):
+##     M1:
+##       Condition 1: A1 
+##       Condition 2: A2 
+##     M2:
+##       Condition 1: B1 
+##       Condition 2: B2 
+##     M3:
+##       Condition 1: C1 
+##       Condition 2: C2 
+## 
+## Computed Variables:
+## 
+## 
+## |Variable |Formula                  |
+## |:--------|:------------------------|
+## |Ydiff    |D2 - D1                  |
+## |M1diff   |A2 - A1                  |
+## |M2diff   |B2 - B1                  |
+## |M3diff   |C2 - C1                  |
+## |M1avg    |( A2 + A1 ) / 2 Centered |
+## |M2avg    |( B2 + B1 ) / 2 Centered |
+## |M3avg    |( C2 + C1 ) / 2 Centered |
+## 
+## Sample Size: 100 
+## 
+## 
+## *************** MODEL FIT INDICES ***************
+## 
+## 
+## |Measure            |   Value|
+## |:------------------|-------:|
+## |Chi-Square         | 16.2749|
+## |Degrees of Freedom | 12.0000|
+## |p-Value            |  0.1790|
+## |CFI                |  0.0000|
+## |TLI                | -1.8293|
+## |RMSEA              |  0.0597|
+## |RMSEA Lower CI     |  0.0000|
+## |RMSEA Upper CI     |  0.1258|
+## |SRMR               |  0.0720|
+## 
+## 
+## 
+## *************** REGRESSION PATHS, INTERCEPTS AND VARIANCES ***************
+## 
+## 
+## |Path           |Label | Estimate|    bSE|     bp|  bCI.Lo| bCI.Up|
+## |:--------------|:-----|--------:|------:|------:|-------:|------:|
+## |Ydiff ~ M1diff |b1    |  -0.0501| 0.0957| 0.5780| -0.2392| 0.1374|
+## |Ydiff ~ M2diff |b2    |  -0.0844| 0.1039| 0.4380| -0.2823| 0.1204|
+## |Ydiff ~ M3diff |b3    |  -0.0167| 0.1231| 0.8520| -0.2694| 0.2163|
+## |Ydiff ~ M1avg  |d1    |  -0.0305| 0.0955| 0.7360| -0.2103| 0.1647|
+## |Ydiff ~ M2avg  |d2    |  -0.0060| 0.0829| 0.9700| -0.1706| 0.1564|
+## |Ydiff ~ M3avg  |d3    |  -0.1552| 0.1159| 0.1900| -0.3802| 0.0675|
+## 
+## 
+## |Intercept |Label | Estimate|    bSE|     bp|  bCI.Lo| bCI.Up|
+## |:---------|:-----|--------:|------:|------:|-------:|------:|
+## |Ydiff~1   |cp    |  -0.0315| 0.0163| 0.0500| -0.0654| 0.0004|
+## |M1diff~1  |a1    |  -0.0271| 0.0173| 0.1220| -0.0618| 0.0074|
+## |M2diff~1  |a2    |   0.0145| 0.0187| 0.4080| -0.0244| 0.0510|
+## |M3diff~1  |a3    |   0.0153| 0.0160| 0.3640| -0.0155| 0.0458|
+## |M1avg~1   |      |  -0.0000| 0.0180| 0.9740| -0.0342| 0.0370|
+## |M2avg~1   |      |   0.0000| 0.0199| 0.9500| -0.0392| 0.0387|
+## |M3avg~1   |      |  -0.0000| 0.0175| 0.9760| -0.0335| 0.0360|
+## 
+## 
+## |Variance       | Estimate|    bSE|     bp| bCI.Lo| bCI.Up|
+## |:--------------|--------:|------:|------:|------:|------:|
+## |Ydiff~~Ydiff   |   0.0275| 0.0035| 0.0000| 0.0191| 0.0326|
+## |M1diff~~M1diff |   0.0308| 0.0037| 0.0000| 0.0234| 0.0378|
+## |M2diff~~M2diff |   0.0323| 0.0042| 0.0000| 0.0241| 0.0409|
+## |M3diff~~M3diff |   0.0264| 0.0038| 0.0000| 0.0192| 0.0340|
+## |M1avg~~M1avg   |   0.0339| 0.0047| 0.0000| 0.0246| 0.0430|
+## |M2avg~~M2avg   |   0.0407| 0.0051| 0.0000| 0.0301| 0.0503|
+## |M3avg~~M3avg   |   0.0306| 0.0045| 0.0000| 0.0222| 0.0394|
+## 
+## 
+## 
+## *************** TOTAL AND DIRECT EFFECT ***************
+## 
+## 
+## |Name          |  Effect|    bSE|     bp|  bCI.Lo| bCI.Up|
+## |:-------------|-------:|------:|------:|-------:|------:|
+## |Total effect  | -0.0316| 0.0165| 0.0520| -0.0645| 0.0004|
+## |Direct effect | -0.0315| 0.0163| 0.0500| -0.0654| 0.0004|
+## 
+## 
+## *************** INDIRECT EFFECTS ***************
+## 
+## 
+## |Name       |  Effect|    bSE|     bp|  bCI.Lo| bCI.Up|
+## |:----------|-------:|------:|------:|-------:|------:|
+## |indirect_1 |  0.0014| 0.0031| 0.6720| -0.0041| 0.0087|
+## |indirect_2 | -0.0012| 0.0029| 0.6860| -0.0081| 0.0036|
+## |indirect_3 | -0.0003| 0.0027| 0.8560| -0.0071| 0.0048|
+## |total ind  | -0.0001| 0.0055| 0.9940| -0.0137| 0.0097|
+## 
+## 
+## |  Ind  |         Path         |
+## |:-----:|:--------------------:|
+## | ind_1 | X -&gt; M1diff -&gt; Ydiff |
+## | ind_2 | X -&gt; M2diff -&gt; Ydiff |
+## | ind_3 | X -&gt; M3diff -&gt; Ydiff |
+## 
+## 
+## *************** CONTRAST INDIRECT EFFECTS ***************
+## 
+## 
+## |Name          |  Effect|    bSE|     bp|  bCI.Lo| bCI.Up|
+## |:-------------|-------:|------:|------:|-------:|------:|
+## |ind_1 - ind_2 |  0.0026| 0.0040| 0.4520| -0.0054| 0.0114|
+## |ind_1 - ind_3 |  0.0016| 0.0042| 0.6460| -0.0056| 0.0115|
+## |ind_2 - ind_3 | -0.0010| 0.0037| 0.8100| -0.0081| 0.0067|
+## 
+## 
+## *************** MODERATION EFFECTS of X ***************
+## 
+## 
+## |Name |  Effect|    bSE|     bp|  bCI.Lo| bCI.Up|
+## |:----|-------:|------:|------:|-------:|------:|
+## |d1   | -0.0305| 0.0955| 0.7360| -0.2103| 0.1647|
+## |d2   | -0.0060| 0.0829| 0.9700| -0.1706| 0.1564|
+## |d3   | -0.1552| 0.1159| 0.1900| -0.3802| 0.0675|
+## 
+## *************** MODERATION EFFECTS KEY ***************
+## 
+## 
+## | Coefficient |     Path      | PathBeingModerated |
+## |:-----------:|:-------------:|:------------------:|
+## |     d1      | M1avg → Ydiff |   M1diff → Ydiff   |
+## |     d2      | M2avg → Ydiff |   M2diff → Ydiff   |
+## |     d3      | M3avg → Ydiff |   M3diff → Ydiff   |
+## 
+## 
+## *************** C1-C2 COEFFICIENTS ***************
+## 
+## 
+## |Name  |  Effect|    bSE|     bp|  bCI.Lo| bCI.Up|
+## |:-----|-------:|------:|------:|-------:|------:|
+## |X1_b1 | -0.0654| 0.1116| 0.5460| -0.2968| 0.1384|
+## |X0_b1 | -0.0349| 0.1021| 0.6820| -0.2270| 0.1691|
+## |X1_b2 | -0.0874| 0.1211| 0.4740| -0.3133| 0.1533|
+## |X0_b2 | -0.0814| 0.1017| 0.4100| -0.2890| 0.1178|
+## |X1_b3 | -0.0942| 0.1507| 0.5020| -0.3941| 0.2098|
+## |X0_b3 |  0.0609| 0.1196| 0.6040| -0.1796| 0.2867|
+## 
+## 
+## 
+## | Coefficient |      Path       |
+## |:-----------:|:---------------:|
+## |     b1      | M1diff -&gt; Ydiff |
+## |     b2      | M2diff -&gt; Ydiff |
+## |     b3      | M3diff -&gt; Ydiff |
+## 
+## 
+## *************** Bootstrapping NOTES ***************
+## 
+## Bootstrap confidence interval type used:  perc 
+## Number of bootstrap samples:  1000 
+## Confidence level (unstandardized):  95 %
+## Confidence level (standardized):    95 %
+## Random seed used:  123 
+## Boot SE: Standard deviation of bootstrap estimates
+## Bootstrap P: Asymmetric bootstrap p-value (only for perc)
+## 
+## 
+## *************** STANDARDIZED RESULTS ***************
+## 
+## 
+## |Label         | Estimate (Std)| Boot SE| Bootstrap P| Boot CI Lower| Boot CI Upper|
+## |:-------------|--------------:|-------:|-----------:|-------------:|-------------:|
+## |a1            |        -0.1546|  0.1005|      0.1220|       -0.3635|        0.0458|
+## |a2            |         0.0806|  0.1061|      0.4080|       -0.1382|        0.2896|
+## |a3            |         0.0945|  0.1018|      0.3640|       -0.0919|        0.2978|
+## |b1            |        -0.0519|  0.0968|      0.5780|       -0.2406|        0.1408|
+## |b2            |        -0.0894|  0.1089|      0.4380|       -0.2950|        0.1274|
+## |b3            |        -0.0160|  0.1158|      0.8520|       -0.2396|        0.2282|
+## |d1            |        -0.0331|  0.1005|      0.7360|       -0.2235|        0.1777|
+## |d2            |        -0.0071|  0.0969|      0.9700|       -0.1885|        0.1882|
+## |d3            |        -0.1601|  0.1168|      0.1900|       -0.3811|        0.0767|
+## |ind1          |         0.0080|  0.0181|      0.6720|       -0.0236|        0.0498|
+## |ind2          |        -0.0072|  0.0169|      0.6860|       -0.0475|        0.0204|
+## |ind3          |        -0.0015|  0.0159|      0.8560|       -0.0403|        0.0283|
+## |direct effect |        -0.1858|  0.0984|      0.0500|       -0.3959|        0.0021|
+## |total ind     |        -0.0007|  0.0317|      0.9940|       -0.0761|        0.0579|
+## |X0_b1         |        -0.0353|  0.1046|      0.6860|       -0.2352|        0.1781|
+## |X0_b2         |        -0.0858|  0.1072|      0.4020|       -0.3031|        0.1244|
+## |X0_b3         |         0.0641|  0.1133|      0.5760|       -0.1611|        0.2833|
+## |X1_b1         |        -0.0684|  0.1134|      0.5320|       -0.2891|        0.1492|
+## |X1_b2         |        -0.0930|  0.1301|      0.4860|       -0.3227|        0.1695|
+## |X1_b3         |        -0.0960|  0.1442|      0.4880|       -0.3685|        0.2085|
+## |CI_1_vs_2     |         0.0152|  0.0232|      0.4520|       -0.0319|        0.0642|
+## |CI_1_vs_3     |         0.0095|  0.0243|      0.6460|       -0.0324|        0.0647|
+## |CI_2_vs_3     |        -0.0057|  0.0216|      0.8100|       -0.0479|        0.0415|
+## |Total effect  |        -0.1865|  0.0986|      0.0520|       -0.3972|        0.0022|</code></pre>
+<pre><code>## 
+## Outcome Difference Model (Ydiff):
+## Ydiff ~ cp*1 + b1*M1diff + b2*M2diff + b3*M3diff + d1*M1avg + d2*M2avg + d3*M3avg 
+## 
+## Mediator Difference Model (Chained Mediator - M1diff):
+## M1diff ~ a1*1 
+## 
+## Mediator Difference Model (Parallel Mediators - M2diff, M3diff, ...):
+## M2diff ~ a2*1
+## M3diff ~ a3*1 
+## 
+## Indirect Effects:
+## indirect_1 := a1 * b1
+## indirect_2 := a2 * b2
+## indirect_3 := a3 * b3 
+## 
+## Total Indirect Effect:
+## total_indirect := indirect_1 + indirect_2 + indirect_3 
+## 
+## Total Effect:
+## total_effect := cp + total_indirect 
+## 
+## C1-C2 Coefficients:
+## X1_b1 := (2*b1 + d1) / 2
+## X0_b1 := X1_b1 - d1
+## X1_b2 := (2*b2 + d2) / 2
+## X0_b2 := X1_b2 - d2
+## X1_b3 := (2*b3 + d3) / 2
+## X0_b3 := X1_b3 - d3</code></pre>
+</div>
+</div>
+<div id="chainedserial-mediation" class="section level2">
+<h2>chained/serial mediation</h2>
+<p>We analyze a <strong>Serial Mediation
+(<code>Serial = 1</code>)</strong>.</p>
+<div id="memore-3.0-analysis-report-1" class="section level3">
+<h3>MEMORE 3.0 Analysis Report</h3>
+<pre><code>## ```
+##  
+## Run MATRIX procedure:
+## 
+## *********************** MEMORE Procedure for SPSS Version 3.0 ***********************
+## 
+##                            Written by Amanda Montoya
+## 
+##                     Documentation available at github.com/akmontoya/MEMORE
+## 
+## **************************** ANALYSIS NOTES AND WARNINGS ****************************
+## 
+## Bootstrap confidence interval method used: Percentile bootstrap.
+## 
+## Number of bootstrap samples for bootstrap confidence intervals:
+##   5000
+## 
+## The following variables were mean centered prior to analysis:
+##  (        A2        +       A1       )        /2
+##  (        B2        +       B1       )        /2
+## 
+## Level of confidence for all confidence intervals in output:
+##       95.00
+## 
+## **************************************************************************************
+## 
+## Model:
+##   1
+## 
+## Variables:
+## Y =   C2       C1
+## M1 =  A2       A1
+## M2 =  B2       B1
+## 
+## Computed Variables:
+## Ydiff =           C2        -       C1
+## M1diff =          A2        -       A1
+## M2diff =          B2        -       B1
+## M1avg  = (        A2        +       A1       )        /2                         Centered
+## M2avg  = (        B2        +       B1       )        /2                         Centered
+## 
+## Sample Size:
+##   100
+## 
+## **************************************************************************************
+## Outcome: Ydiff =  C2        -       C1
+## 
+## Model
+##                Coef         SE          t          p       LLCI       ULCI
+## constant      .0153      .0163      .9404      .3493     -.0170      .0477
+## 
+## Degrees of freedom for all regression coefficient estimates:
+##   99
+## 
+## **************************************************************************************
+## Outcome: M1diff = A2        -       A1
+## 
+## Model
+##                Coef         SE          t          p       LLCI       ULCI
+## constant     -.0271      .0176    -1.5385      .1271     -.0621      .0079
+## 
+## Degrees of freedom for all regression coefficient estimates:
+##   99
+## 
+## **************************************************************************************
+## Outcome: M2diff = B2        -       B1
+## 
+## Model Summary
+##           R       R-sq        MSE          F        df1        df2          p
+##       .2351      .0553      .0314     2.8371     2.0000    97.0000      .0635
+## 
+## Model
+##               coeff         SE          t          p       LLCI       ULCI
+## constant      .0208      .0179     1.1603      .2488     -.0148      .0564
+## M1diff        .2333      .1010     2.3086      .0231      .0327      .4338
+## M1avg        -.0578      .0963     -.6002      .5498     -.2489      .1333
+## 
+## Degrees of freedom for all regression coefficient estimates:
+##   97
+## 
+## **************************************************************************************
+## Outcome: Ydiff =  C2        -       C1
+## 
+## Model Summary
+##           R       R-sq        MSE          F        df1        df2          p
+##       .1720      .0296      .0269      .7238     4.0000    95.0000      .5778
+## 
+## Model
+##                Coef         SE          t          p       LLCI       ULCI
+## constant      .0160      .0167      .9563      .3413     -.0172      .0492
+## M1diff       -.0360      .0962     -.3744      .7089     -.2270      .1549
+## M2diff       -.1123      .0967    -1.1607      .2487     -.3043      .0798
+## M1avg        -.0617      .0931     -.6619      .5097     -.2466      .1233
+## M2avg        -.0733      .0875     -.8374      .4044     -.2469      .1004
+## 
+## Degrees of freedom for all regression coefficient estimates:
+##   95
+## 
+## ************************* TOTAL, DIRECT, AND INDIRECT EFFECTS *************************
+## 
+## Total effect of X on Y
+##      Effect         SE          t         df          p       LLCI       ULCI
+##       .0153      .0163      .9404    99.0000      .3493     -.0170      .0477
+## 
+## Direct effect of X on Y
+##      Effect         SE          t         df          p       LLCI       ULCI
+##       .0160      .0167      .9563    95.0000      .3413     -.0172      .0492
+## 
+## Indirect Effect of X on Y through M
+##           Effect     BootSE   BootLLCI   BootULCI
+## Ind1       .0010      .0031     -.0045      .0084
+## Ind2      -.0023      .0036     -.0111      .0033
+## Ind3       .0007      .0010     -.0008      .0034
+## Total     -.0006      .0048     -.0109      .0095
+## 
+## Indirect Key
+## Ind1  &#39;X&#39;      -&gt;       M1diff   -&gt;       Ydiff
+## Ind2  &#39;X&#39;      -&gt;       M2diff   -&gt;       Ydiff
+## Ind3  &#39;X&#39;      -&gt;       M1diff   -&gt;       M2diff   -&gt;       YDiff
+## 
+## Pairwise Contrasts Between Specific Indirect Effects
+##           Effect     BootSE   BootLLCI   BootULCI
+## (C1)       .0033      .0042     -.0042      .0128
+## (C2)       .0003      .0034     -.0063      .0083
+## (C3)      -.0030      .0041     -.0132      .0035
+## 
+## Contrast Key:
+## (C1)  Ind1      -       Ind2
+## (C2)  Ind1      -       Ind3
+## (C3)  Ind2      -       Ind3
+## 
+## ------ END MATRIX -----
+##  
+## ```</code></pre>
+</div>
+<div id="wsmed-analysis-report-1" class="section level3">
+<h3>wsMed Analysis Report</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>result2 <span class="ot">&lt;-</span> <span class="fu">wsMed</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  <span class="at">data =</span> example_data, <span class="co">#dataset</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="at">M_C1 =</span> <span class="fu">c</span>(<span class="st">&quot;A1&quot;</span>,<span class="st">&quot;B1&quot;</span>), <span class="co"># A1/B1 is A/B mediator variable in condition 1</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="at">M_C2 =</span> <span class="fu">c</span>(<span class="st">&quot;A2&quot;</span>,<span class="st">&quot;B2&quot;</span>), <span class="co"># A2/B2 is A/B mediator variable in condition 2</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="at">Y_C1 =</span> <span class="st">&quot;C1&quot;</span>, <span class="co"># C1 is outcome variable in condition 1</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="at">Y_C2 =</span> <span class="st">&quot;C2&quot;</span>, <span class="co"># C2 is outcome variable in condition 2</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>  <span class="at">form =</span> <span class="st">&quot;CN&quot;</span>, <span class="co"># Parallel mediation</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>  <span class="at">standardized =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>)</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="fu">print</span>(result2,<span class="at">digits=</span><span class="dv">4</span>)</span></code></pre></div>
+<pre><code>## 
+## *************** VARIABLES ***************
+## Original Variables:
+##   Outcome (Y):
+##     Condition 1: C1 
+##     Condition 2: C2 
+##   Mediators (M):
+##     M1:
+##       Condition 1: A1 
+##       Condition 2: A2 
+##     M2:
+##       Condition 1: B1 
+##       Condition 2: B2 
+## 
+## Computed Variables:
+## 
+## 
+## |Variable |Formula                  |
+## |:--------|:------------------------|
+## |Ydiff    |C2 - C1                  |
+## |M1diff   |A2 - A1                  |
+## |M2diff   |B2 - B1                  |
+## |M1avg    |( A2 + A1 ) / 2 Centered |
+## |M2avg    |( B2 + B1 ) / 2 Centered |
+## 
+## Sample Size: 100 
+## 
+## 
+## *************** MODEL FIT INDICES ***************
+## 
+## 
+## |Measure            |   Value|
+## |:------------------|-------:|
+## |Chi-Square         |  5.7511|
+## |Degrees of Freedom |  3.0000|
+## |p-Value            |  0.1244|
+## |CFI                |  0.4941|
+## |TLI                | -0.5177|
+## |RMSEA              |  0.0958|
+## |RMSEA Lower CI     |  0.0000|
+## |RMSEA Upper CI     |  0.2138|
+## |SRMR               |  0.0502|
+## 
+## 
+## 
+## *************** REGRESSION PATHS, INTERCEPTS AND VARIANCES ***************
+## 
+## 
+## |Path            |Label | Estimate|    bSE|     bp|  bCI.Lo| bCI.Up|
+## |:---------------|:-----|--------:|------:|------:|-------:|------:|
+## |Ydiff ~ M1diff  |b1    |  -0.0360| 0.0942| 0.6380| -0.2431| 0.1217|
+## |Ydiff ~ M2diff  |b2    |  -0.1123| 0.1127| 0.3280| -0.3369| 0.1166|
+## |Ydiff ~ M1avg   |d1    |  -0.0617| 0.0752| 0.4660| -0.2035| 0.0981|
+## |Ydiff ~ M2avg   |d2    |  -0.0733| 0.0858| 0.3660| -0.2546| 0.0854|
+## |M2diff ~ M1diff |b_1_2 |   0.2333| 0.1081| 0.0240|  0.0277| 0.4459|
+## |M2diff ~ M1avg  |d_1_2 |  -0.0578| 0.0844| 0.4860| -0.2318| 0.1019|
+## 
+## 
+## |Intercept |Label | Estimate|    bSE|     bp|  bCI.Lo| bCI.Up|
+## |:---------|:-----|--------:|------:|------:|-------:|------:|
+## |Ydiff~1   |cp    |   0.0160| 0.0166| 0.3620| -0.0160| 0.0476|
+## |M1diff~1  |a1    |  -0.0271| 0.0173| 0.1220| -0.0618| 0.0074|
+## |M2diff~1  |a2    |   0.0208| 0.0181| 0.2560| -0.0166| 0.0557|
+## |M1avg~1   |      |  -0.0000| 0.0180| 0.9740| -0.0342| 0.0370|
+## |M2avg~1   |      |   0.0000| 0.0199| 0.9500| -0.0392| 0.0387|
+## 
+## 
+## |Variance       | Estimate|    bSE|     bp| bCI.Lo| bCI.Up|
+## |:--------------|--------:|------:|------:|------:|------:|
+## |Ydiff~~Ydiff   |   0.0256| 0.0037| 0.0000| 0.0178| 0.0323|
+## |M2diff~~M2diff |   0.0305| 0.0039| 0.0000| 0.0224| 0.0380|
+## |M1diff~~M1diff |   0.0308| 0.0037| 0.0000| 0.0234| 0.0378|
+## |M1avg~~M1avg   |   0.0339| 0.0047| 0.0000| 0.0246| 0.0430|
+## |M2avg~~M2avg   |   0.0407| 0.0051| 0.0000| 0.0301| 0.0503|
+## 
+## 
+## 
+## *************** TOTAL AND DIRECT EFFECT ***************
+## 
+## 
+## |Name          | Effect|    bSE|     bp|  bCI.Lo| bCI.Up|
+## |:-------------|------:|------:|------:|-------:|------:|
+## |Total effect  | 0.0153| 0.0161| 0.3560| -0.0156| 0.0462|
+## |Direct effect | 0.0160| 0.0166| 0.3620| -0.0160| 0.0476|
+## 
+## 
+## *************** INDIRECT EFFECTS ***************
+## 
+## 
+## |Name         |  Effect|    bSE|     bp|  bCI.Lo| bCI.Up|
+## |:------------|-------:|------:|------:|-------:|------:|
+## |indirect_1   |  0.0010| 0.0033| 0.6840| -0.0052| 0.0086|
+## |indirect_2   | -0.0023| 0.0037| 0.4960| -0.0115| 0.0036|
+## |indirect_1_2 |  0.0007| 0.0011| 0.4100| -0.0007| 0.0033|
+## |total ind    | -0.0006| 0.0050| 0.9860| -0.0110| 0.0094|
+## 
+## 
+## |   Ind   |              Path              |
+## |:-------:|:------------------------------:|
+## |  ind_1  |      X -&gt; M1diff -&gt; Ydiff      |
+## |  ind_2  |      X -&gt; M2diff -&gt; Ydiff      |
+## | ind_1_2 | X -&gt; M1diff -&gt; M2diff -&gt; Ydiff |
+## 
+## 
+## *************** CONTRAST INDIRECT EFFECTS ***************
+## 
+## 
+## |Name            |  Effect|    bSE|     bp|  bCI.Lo| bCI.Up|
+## |:---------------|-------:|------:|------:|-------:|------:|
+## |ind_1 - ind_2   |  0.0033| 0.0045| 0.3840| -0.0049| 0.0139|
+## |ind_1 - ind_1_2 |  0.0003| 0.0036| 0.8740| -0.0068| 0.0083|
+## |ind_2 - ind_1_2 | -0.0030| 0.0043| 0.4240| -0.0142| 0.0038|
+## 
+## 
+## *************** MODERATION EFFECTS of X ***************
+## 
+## 
+## |Name  |  Effect|    bSE|     bp|  bCI.Lo| bCI.Up|
+## |:-----|-------:|------:|------:|-------:|------:|
+## |d1    | -0.0617| 0.0752| 0.4660| -0.2035| 0.0981|
+## |d2    | -0.0733| 0.0858| 0.3660| -0.2546| 0.0854|
+## |d_1_2 | -0.0578| 0.0844| 0.4860| -0.2318| 0.1019|
+## 
+## *************** MODERATION EFFECTS KEY ***************
+## 
+## 
+## | Coefficient |      Path      | PathBeingModerated |
+## |:-----------:|:--------------:|:------------------:|
+## |     d1      | M1avg → Ydiff  |   M1diff → Ydiff   |
+## |     d2      | M2avg → Ydiff  |   M2diff → Ydiff   |
+## |    d_1_2    | M1avg → M2diff |  M1diff → M2diff   |
+## 
+## 
+## *************** C1-C2 COEFFICIENTS ***************
+## 
+## 
+## |Name     |  Effect|    bSE|     bp|  bCI.Lo| bCI.Up|
+## |:--------|-------:|------:|------:|-------:|------:|
+## |X1_b1    | -0.0668| 0.0994| 0.4980| -0.2674| 0.1104|
+## |X0_b1    | -0.0052| 0.1035| 0.8240| -0.2395| 0.1656|
+## |X1_b2    | -0.1489| 0.1395| 0.2820| -0.4216| 0.1150|
+## |X0_b2    | -0.0757| 0.0982| 0.4600| -0.2734| 0.1213|
+## |X1_b_1_2 |  0.2044| 0.1095| 0.0700| -0.0263| 0.4032|
+## |X0_b_1_2 |  0.2622| 0.1224| 0.0240|  0.0370| 0.5138|
+## 
+## 
+## 
+## | Coefficient |       Path       |
+## |:-----------:|:----------------:|
+## |     b1      | M1diff -&gt; Ydiff  |
+## |     b2      | M2diff -&gt; Ydiff  |
+## |    b_1_2    | M1diff -&gt; M2diff |
+## 
+## 
+## *************** Bootstrapping NOTES ***************
+## 
+## Bootstrap confidence interval type used:  perc 
+## Number of bootstrap samples:  1000 
+## Confidence level (unstandardized):  95 %
+## Confidence level (standardized):    95 %
+## Random seed used:  123 
+## Boot SE: Standard deviation of bootstrap estimates
+## Bootstrap P: Asymmetric bootstrap p-value (only for perc)
+## 
+## 
+## *************** STANDARDIZED RESULTS ***************
+## 
+## 
+## |Label         | Estimate (Std)| Boot SE| Bootstrap P| Boot CI Lower| Boot CI Upper|
+## |:-------------|--------------:|-------:|-----------:|-------------:|-------------:|
+## |a1            |        -0.1546|  0.1005|      0.1220|       -0.3635|        0.0458|
+## |a2            |         0.1159|  0.1025|      0.2560|       -0.0923|        0.3128|
+## |b1            |        -0.0388|  0.1000|      0.6380|       -0.2392|        0.1456|
+## |b2            |        -0.1239|  0.1230|      0.3280|       -0.3526|        0.1284|
+## |d1            |        -0.0697|  0.0851|      0.4660|       -0.2406|        0.0973|
+## |d2            |        -0.0908|  0.1022|      0.3660|       -0.2840|        0.1027|
+## |ind1          |         0.0060|  0.0201|      0.6840|       -0.0321|        0.0546|
+## |ind2          |        -0.0144|  0.0226|      0.4960|       -0.0695|        0.0218|
+## |direct effect |         0.0983|  0.1050|      0.3620|       -0.0980|        0.3054|
+## |total ind     |        -0.0040|  0.0310|      0.9860|       -0.0671|        0.0570|
+## |X0_b1         |        -0.0039|  0.1113|      0.8520|       -0.2414|        0.1894|
+## |X0_b2         |        -0.0785|  0.1073|      0.4780|       -0.2882|        0.1340|
+## |X1_b1         |        -0.0737|  0.1060|      0.4860|       -0.2784|        0.1230|
+## |X1_b2         |        -0.1693|  0.1548|      0.2800|       -0.4519|        0.1320|
+## |b_1_2         |         0.2278|  0.1028|      0.0240|        0.0269|        0.4257|
+## |CI_1_vs_1_2   |         0.0016|  0.0224|      0.8740|       -0.0432|        0.0498|
+## |CI_1_vs_2     |         0.0204|  0.0271|      0.3840|       -0.0315|        0.0813|
+## |CI_2_vs_1_2   |        -0.0187|  0.0260|      0.4240|       -0.0806|        0.0236|
+## |d_1_2         |        -0.0592|  0.0848|      0.4860|       -0.2298|        0.1061|
+## |ind1_2        |         0.0044|  0.0065|      0.4100|       -0.0046|        0.0209|
+## |Total effect  |         0.0943|  0.1022|      0.3560|       -0.0923|        0.3033|
+## |X0_b_1_2      |         0.2574|  0.1156|      0.0220|        0.0368|        0.4893|
+## |X1_b_1_2      |         0.1982|  0.1067|      0.0760|       -0.0258|        0.3974|</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">printGM</span>(result2)</span></code></pre></div>
+<pre><code>## 
+## Outcome Difference Model (Ydiff):
+## Ydiff ~ cp*1 + b1*M1diff + b2*M2diff + d1*M1avg + d2*M2avg 
+## 
+## Mediator Difference Model (Chained Mediator - M1diff):
+## M1diff ~ a1*1 
+## 
+## Mediator Difference Model (Parallel Mediators - M2diff, M3diff, ...):
+## M2diff ~ a2*1 + b_1_2*M1diff + d_1_2*M1avg 
+## 
+## Indirect Effects:
+## indirect_1 := a1 * b1
+## indirect_2 := a2 * b2
+## indirect_1_2 := a1 * b_1_2 * b2 
+## 
+## Total Indirect Effect:
+## total_indirect := indirect_1 + indirect_2 + indirect_1_2 
+## 
+## Total Effect:
+## total_effect := cp + total_indirect 
+## 
+## C1-C2 Coefficients:
+## X1_b1 := (2*b1 + d1)/2
+## X0_b1 := X1_b1 - d1
+## X1_b2 := (2*b2 + d2)/2
+## X0_b2 := X1_b2 - d2
+## X1_b_1_2 := (2*b_1_2 + d_1_2)/2
+## X0_b_1_2 := X1_b_1_2 - d_1_2</code></pre>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

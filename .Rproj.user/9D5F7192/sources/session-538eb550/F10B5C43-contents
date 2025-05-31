@@ -1,0 +1,173 @@
+#' @title Evaluate Standardized Monte Carlo Expressions
+#'
+#' @description Evaluates user-defined parameters (defined via expressions)
+#' and standardized free parameters from Monte Carlo simulated samples.
+#' This version supports both intercept-based standardization and
+#' path-based standardization.
+#'
+#' @param theta_star A matrix of Monte Carlo samples.
+#' @param definitions A named list of parameter definitions (e.g., list(indirect := "a * b")).
+#' @param std_map A named character vector mapping intercept labels (e.g., a1) to variable names (e.g., M1diff).
+#' @param sd_boot_list A list of bootstrap SD samples for intercept variables.
+#' @param sd_var_boot A list of bootstrap SD samples for variables involved in slope paths.
+#' @param path_std_map A named list mapping path labels to a vector of (predictor, outcome) variable names.
+#'
+#' @return A data frame of R rows (simulations) * all parameters (standardized free + defined).
+#' @export
+evaluate_definitions_v3 <- function(theta_star,
+                                    definitions,
+                                    std_map,
+                                    sd_boot_list,
+                                    sd_var_boot,
+                                    path_std_map) {
+  R <- nrow(theta_star)
+  free_names <- colnames(theta_star)
+  def_names <- names(definitions)
+
+  results <- matrix(NA_real_, nrow = R, ncol = length(free_names) + length(definitions))
+  colnames(results) <- c(free_names, def_names)
+
+  extract_symbols <- function(expr) {
+    tokens <- unlist(strsplit(expr, "[^a-zA-Z0-9_]+"))
+    tokens <- tokens[nzchar(tokens)]
+    tokens <- tokens[!grepl("^[0-9.]+$", tokens)]
+    unique(tokens)
+  }
+  deps <- lapply(definitions, extract_symbols)
+
+  for (i in seq_len(R)) {
+    theta <- as.list(as.data.frame(theta_star[i, , drop = FALSE]))
+    env <- theta
+
+    env$std <- function(param, x = NULL, y = NULL) {
+      if (!is.null(x) && (!is.character(x) || nchar(x) == 0)) x <- NULL
+      if (!is.null(y) && (!is.character(y) || nchar(y) == 0)) y <- NULL
+      val <- theta[[param]]
+      if (is.null(val)) stop("Missing value for param: ", param)
+
+      if (is.null(x) && is.null(y)) {
+        varname <- std_map[[param]]
+        if (is.null(varname)) stop("Missing std_map for: ", param)
+        if (is.null(sd_boot_list[[varname]])) stop("No bootstrap SD for: ", varname)
+        return(val / sample(sd_boot_list[[varname]], 1))
+      } else {
+        if (is.null(sd_var_boot[[x]])) stop("Missing SD for predictor: ", x)
+        if (is.null(sd_var_boot[[y]])) stop("Missing SD for outcome: ", y)
+        sd_x <- sample(sd_var_boot[[x]], 1)
+        sd_y <- sample(sd_var_boot[[y]], 1)
+        return(val * sd_x / sd_y)
+      }
+    }
+
+    for (param in names(theta)) {
+      if (param %in% names(std_map)) {
+        varname <- std_map[[param]]
+        sd_val <- sample(sd_boot_list[[varname]], 1)
+        std_val <- theta[[param]] / sd_val
+        env[[param]] <- std_val
+        results[i, param] <- std_val
+      } else if (param %in% names(path_std_map)) {
+        x <- path_std_map[[param]][1]
+        y <- path_std_map[[param]][2]
+        sd_x <- sample(sd_var_boot[[x]], 1)
+        sd_y <- sample(sd_var_boot[[y]], 1)
+        std_val <- theta[[param]] * sd_x / sd_y
+        env[[param]] <- std_val
+        results[i, param] <- std_val
+      } else {
+        results[i, param] <- NA
+      }
+    }
+
+    done <- rep(FALSE, length(definitions))
+    names(done) <- def_names
+
+    repeat {
+      updated <- FALSE
+      for (j in seq_along(definitions)) {
+        if (done[j]) next
+        expr <- definitions[[j]]
+        needed <- deps[[j]]
+        ready <- sapply(needed, function(v) !(v %in% def_names) || !is.null(env[[v]]))
+        if (all(ready)) {
+          val <- tryCatch(
+            eval(parse(text = expr), envir = env),
+            error = function(e) {
+              warning(paste0("Row ", i, ", ", def_names[j], ": ", e$message))
+              NA_real_
+            }
+          )
+          results[i, def_names[j]] <- val
+          env[[def_names[j]]] <- val
+          done[j] <- TRUE
+          updated <- TRUE
+        }
+      }
+      if (!updated) break
+    }
+  }
+
+  return(as.data.frame(results))
+}
+
+#' @title Evaluate Unstandardized Monte Carlo Definitions
+#'
+#' @description Evaluates user-defined parameter expressions from Monte Carlo samples
+#' without any standardization.
+#'
+#' @param theta_star A matrix of Monte Carlo samples.
+#' @param definitions A named list of algebraic definitions (as strings).
+#'
+#' @return A data frame with R rows (simulations) and p + d columns
+#'   (p = number of free parameters, d = number of defined parameters).
+#' @export
+evaluate_definitions_unstd_v2 <- function(theta_star, definitions) {
+  R <- nrow(theta_star)
+  def_names <- names(definitions)
+  def_results <- matrix(NA_real_, nrow = R, ncol = length(definitions))
+  colnames(def_results) <- def_names
+
+  extract_symbols <- function(expr) {
+    tokens <- unlist(strsplit(expr, "[^a-zA-Z0-9_]+"))
+    tokens <- tokens[nzchar(tokens)]
+    tokens <- tokens[!grepl("^[0-9.]+$", tokens)]
+    unique(tokens)
+  }
+  all_defined <- def_names
+  deps <- lapply(definitions, extract_symbols)
+
+  for (i in seq_len(R)) {
+    theta <- as.list(as.data.frame(theta_star[i, , drop = FALSE]))
+    env <- theta
+
+    done <- rep(FALSE, length(definitions))
+    names(done) <- def_names
+
+    repeat {
+      updated <- FALSE
+      for (j in seq_along(definitions)) {
+        if (done[j]) next
+        expr <- definitions[[j]]
+        needed <- deps[[j]]
+        ready <- sapply(needed, function(v) !(v %in% all_defined) || !is.null(env[[v]]))
+
+        if (all(ready)) {
+          val <- tryCatch(
+            eval(parse(text = expr), envir = env),
+            error = function(e) {
+              warning(paste0("Row ", i, ", ", def_names[j], ": ", e$message))
+              NA_real_
+            }
+          )
+          def_results[i, j] <- val
+          env[[def_names[j]]] <- val
+          done[j] <- TRUE
+          updated <- TRUE
+        }
+      }
+      if (!updated) break
+    }
+  }
+
+  return(as.data.frame(cbind(theta_star, def_results)))
+}

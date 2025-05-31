@@ -1,0 +1,226 @@
+rm(list = ls())
+
+library(testthat)
+library(lavaan)
+library(semboottools)
+
+data(example_data)
+  set.seed(123)
+  example_dataN <- mice::ampute(
+    data = example_data,
+    prop = 0.1,
+  )$amp
+
+  test_that("wsMed input validation works as expected", {
+    valid_data <- example_data
+
+    # 1. M_C1 或 M_C2 为空
+    expect_error(wsMed(data = valid_data, M_C1 = NULL, M_C2 = c("A2"), Y_C1 = "C1", Y_C2 = "C2"), "Error: 'M_C1' and 'M_C2' cannot be NULL")
+
+    # 2. Y_C1 或 Y_C2 为空
+    expect_error(wsMed(data = valid_data, M_C1 = c("A1"), M_C2 = c("A2"), Y_C1 = NULL, Y_C2 = "C2"), "Error: 'Y_C1' and 'Y_C2' cannot be NULL")
+
+    # 3. M_C1 和 M_C2 长度不一致
+    expect_error(wsMed(data = valid_data, M_C1 = c("A1"), M_C2 = c("A2", "B2"), Y_C1 = "C1", Y_C2 = "C2"), "Error: The lengths of 'M_C1' and 'M_C2' must match")
+
+    # 4. 数据中缺少列
+    expect_error(wsMed(data = valid_data, M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"), Y_C1 = "Nonexistent", Y_C2 = "C2"), "Error: Missing columns in data: Nonexistent")
+
+    # 5. form 参数无效
+    expect_error(wsMed(data = valid_data, M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"), Y_C1 = "C1", Y_C2 = "C2", form = "Invalid"), "Error: Invalid 'form' parameter. Use 'P', 'CN', 'CP', or 'PC'")
+
+    # 6. Na 参数无效
+    expect_error(wsMed(data = valid_data, M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"), Y_C1 = "C1", Y_C2 = "C2", Na = "Invalid"), "Error: Invalid 'Na' parameter. Use 'DE', 'FIML', or 'MI'")
+
+    # 验证其他参数
+    expect_error(wsMed(data = valid_data, M_C1 = NULL, M_C2 = c("A2"), Y_C1 = "C1", Y_C2 = "C2"), "Error: 'M_C1' and 'M_C2' cannot be NULL")
+    expect_error(wsMed(data = valid_data, M_C1 = c("A1"), M_C2 = c("A2"), Y_C1 = NULL, Y_C2 = "C2"), "Error: 'Y_C1' and 'Y_C2' cannot be NULL")
+    expect_error(wsMed(data = valid_data, M_C1 = c("A1"), M_C2 = c("A2", "B2"), Y_C1 = "C1", Y_C2 = "C2"), "Error: The lengths of 'M_C1' and 'M_C2' must match")
+    expect_error(wsMed(data = valid_data, M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"), Y_C1 = "Nonexistent", Y_C2 = "C2"), "Error: Missing columns in data: Nonexistent")
+    expect_error(wsMed(data = valid_data, M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"), Y_C1 = "C1", Y_C2 = "C2", form = "Invalid"), "Error: Invalid 'form' parameter. Use 'P', 'CN', 'CP', or 'PC'")
+    expect_error(wsMed(data = valid_data, M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"), Y_C1 = "C1", Y_C2 = "C2", Na = "Invalid"), "Error: Invalid 'Na' parameter. Use 'DE', 'FIML', or 'MI'")
+  })
+
+  test_that("wsMed handle the missing data", {
+    valid_data <- example_data
+    valid_data_with_na <- valid_data
+    valid_data_with_na$A1[1] <- NA
+
+    # 数据中存在缺失值，但 Na = "DE"
+    expect_warning(
+      wsMed(data = valid_data_with_na, M_C1 = c("A1"), M_C2 = c("A2"), Y_C1 = "C1", Y_C2 = "C2", Na = "DE"),
+      regexp = "The dataset contains missing values\\. Consider using 'Na = MI' or 'Na = FIML' to handle them"
+    )
+
+    # 数据中没有缺失值，但 Na = "MI"
+    expect_message(
+      wsMed(data = valid_data, M_C1 = c("A1"), M_C2 = c("A2"), Y_C1 = "C1", Y_C2 = "C2", Na = "MI"),
+      regexp = "No missing values detected in the data\\. Switching to 'DE'\\."
+    )
+  })
+
+  test_that("wsMed validates number of mediators correctly", {
+    data(example_data)
+
+    # Case 1: CN requires at least 2 mediators
+    expect_error(
+      wsMed(
+        data = example_data,
+        M_C1 = c("A2"),  # 只有 1 个中介变量
+        M_C2 = c("A1"),
+        Y_C1 = "C2",
+        Y_C2 = "C1",
+        form = "CN"
+      ),
+      "Error: For 'CN' models, the number of mediators must be at least 2."
+    )
+
+    # Case 2: PC requires at least 3 mediators
+    expect_error(
+      wsMed(
+        data = example_data,
+        M_C1 = c("A2", "B2"),  # 只有 2 个中介变量
+        M_C2 = c("A1", "B1"),
+        Y_C1 = "C2",
+        Y_C2 = "C1",
+        form = "PC"
+      ),
+      "Error: For 'PC' and 'CP' models, the number of mediators must be at least 3."
+    )
+
+    # Case 3: CP requires at least 3 mediators
+    expect_error(
+      wsMed(
+        data = example_data,
+        M_C1 = c("A2", "B2"),  # 只有 2 个中介变量
+        M_C2 = c("A1", "B1"),
+        Y_C1 = "C2",
+        Y_C2 = "C1",
+        form = "CP"
+      ),
+      "Error: For 'PC' and 'CP' models, the number of mediators must be at least 3."
+    )
+
+    # Case 4: Valid mediator counts for CN
+    expect_silent(
+      wsMed(
+        data = example_data,
+        M_C1 = c("A2", "B2"),  # 满足 CN 要求的 2 个中介变量
+        M_C2 = c("A1", "B1"),
+        Y_C1 = "C2",
+        Y_C2 = "C1",
+        form = "CN"
+      )
+    )
+
+    # Case 5: Valid mediator counts for PC
+    expect_silent(
+      wsMed(
+        data = example_data,
+        M_C1 = c("A2", "B2", "C2"),  # 满足 PC 要求的 3 个中介变量
+        M_C2 = c("A1", "B1", "C1"),
+        Y_C1 = "D2",
+        Y_C2 = "D1",
+        form = "PC"
+      )
+    )
+
+    # Case 6: Valid mediator counts for CP
+    expect_silent(
+      wsMed(
+        data = example_data,
+        M_C1 = c("A2", "B2", "C2"),  # 满足 CP 要求的 3 个中介变量
+        M_C2 = c("A1", "B1", "C1"),
+        Y_C1 = "D2",
+        Y_C2 = "D1",
+        form = "CP"
+      )
+    )
+  })
+
+  test_that("wsMed generates correct results for DE, FIML, and MI", {
+    scenarios <- list(
+      DE = wsMed(
+        data = example_data,
+        M_C1 = c("A2", "B2"),
+        M_C2 = c("A1", "B1"),
+        Y_C1 = "C2",
+        Y_C2 = "C1",
+        form = "P",
+        standardized = TRUE,
+        Na = "DE",
+        bootstrap = 1001
+      ),
+      FIML = wsMed(
+        data = example_dataN,
+        M_C1 = c("A2", "B2"),
+        M_C2 = c("A1", "B1"),
+        Y_C1 = "C2",
+        Y_C2 = "C1",
+        form = "P",
+        Na = "FIML",
+        ci_method = "mc",
+        standardized = TRUE,
+        R = 1000
+      ),
+      MI = wsMed(
+        data = example_dataN,
+        M_C1 = c("A2", "B2"),
+        M_C2 = c("A1", "B1"),
+        Y_C1 = "C2",
+        Y_C2 = "C1",
+        form = "P",
+        Na = "MI",
+        standardized = TRUE,
+        R = 1000
+      )
+    )
+
+    for (name in names(scenarios)) {
+      result <- scenarios[[name]]
+
+      expect_true(!is.null(result))
+      expect_s3_class(result$prepared_data, "data.frame")
+      expect_true(all(c("Ydiff", "M1diff", "M1avg") %in% colnames(result$prepared_data)))
+      expect_type(result$sem_model, "character")
+      expect_true(grepl("Ydiff ~", result$sem_model))
+      expect_s4_class(result$lavaan_fit, "lavaan")
+
+      fit_measures <- lavaan::fitMeasures(result$lavaan_fit)
+      expect_true(all(c("cfi", "rmsea", "srmr") %in% names(fit_measures)))
+
+      expect_true(is.logical(result$standardized))
+      expect_true("alpha" %in% names(result))
+      expect_true("alphastd" %in% names(result))
+
+      if (result$standardized) {
+        if (name == "DE") {
+          skip_if(is.null(result$std_result), "std_result is NULL for DE")
+          expect_s3_class(result$std_result, "data.frame")
+          expect_true(all(c("label", "est.std") %in% colnames(result$std_result)))
+        }
+
+        if (name == "FIML") {
+          skip_if(is.null(result$std_fiml_result), "std_fiml_result is NULL for FIML")
+          expect_s3_class(result$std_fiml_result, "data.frame")
+          expect_true("Parameter" %in% colnames(result$std_fiml_result))
+
+          ci_cols <- grep("%", colnames(result$std_fiml_result), value = TRUE)
+          expect_true(length(ci_cols) >= 2)
+          expect_true(all(result$std_fiml_result[[ci_cols[1]]] <= result$std_fiml_result[[ci_cols[2]]]))
+        }
+
+        if (name == "MI") {
+          skip_if(is.null(result$std_mi_result), "std_mi_result is NULL for MI")
+          expect_s3_class(result$std_mi_result, "data.frame")
+          expect_true("Parameter" %in% colnames(result$std_mi_result))
+
+          ci_cols <- grep("%", colnames(result$std_mi_result), value = TRUE)
+          expect_true(length(ci_cols) >= 2)
+          expect_true(all(result$std_mi_result[[ci_cols[1]]] <= result$std_mi_result[[ci_cols[2]]]))
+        }
+      }
+    }
+  })
+
+

@@ -1,0 +1,356 @@
+library(haven)
+install.packages("labelled")   # 如果尚未安装
+library(labelled)
+
+df_iweek_clean[labelled_vars] <- lapply(df_iweek_clean[labelled_vars], function(x) {
+  as_factor(x)  # haven::as_factor: 把 haven_labelled 转为普通 factor
+})
+
+# 如果需要 numeric（如 Group 参与建模，可以这么做）
+# df_iweek_clean$Group <- as.numeric(as_factor(df_iweek$Group))
+
+# 将 id 转为 factor（或干脆去掉）
+df_iweek_clean$id <- as.factor(df_iweek_clean$id)
+result4$mi_result[result4$mi_result$name == "indirect_3_1", "97.5%CI.Up"]
+class(result4$mi_result)
+
+
+ci_upper <- summary_df[summary_df$name == "indirect_3_1", "97.5%CI.Up"]
+quantile(result4$mi_result$thetahatstar[, "indirect_3_1"], probs = 0.975)
+
+
+print(result4)
+
+
+# 自动生成带 _T1 和 _T2 后缀的完整变量名
+t1_vars <- paste0(var_prefixes, "_T1")
+t2_vars <- paste0(var_prefixes, "_T2")
+
+# 合并所有变量名
+selected_vars <- c(t1_vars, t2_vars)
+# 假设你的原始数据叫 df
+df_selected <- datf[, selected_vars]
+head(df_selected)
+
+# 查看数据结构
+str(data)
+
+result10 <- wsMed(
+  data = example_data, #dataset
+  # 中介变量：
+  M_C1 <- c("TSRQ_auto_T1", "ISI_T1", "WEMBS_total_T1")
+  M_C2 <- c("TSRQ_auto_T2", "ISI_T2", "WEMBS_total_T2")
+  C <- c("Q7", "BMI")  # 被试间控制
+  C_C1 <- c("BPNS_T1", "OSMUF_IPHONESM_week_T1")
+  C_C2 <- c("BPNS_T2", "OSMUF_IPHONESM_week_T2")
+  Y_C1 = "C1", # C1 is outcome variable in condition 1
+  Y_C2 = "C2", # C2 is outcome variable in condition 2
+  form = "CN", # Parallel mediation
+  C_C1 = "D1", # within-subject covariate (e.g., measured under D1)
+  C_C2 = "D2", # within-subject covariate (e.g., measured under C2)
+  C = "D3", # between-subject covariates
+)
+
+print(result10)
+
+print(result8)
+result6$mc_de_result
+
+print(result6)
+
+print(result6)
+
+sapply(df_iweek, class)
+
+p
+print(result5)
+df_iweek_clean$WEMBS_total_T1
+假如我的被试间变量是01形式的变量,比如性别, 做中心化处理是否不对
+我需要改一下这个函数, 因为只有一个中介变量的时候, 这一项是不存在的,不需要打印标题
+我觉得这个摘要有点太偏向介绍package了,其实我更想偏向如何做被试内multiple mediation 
+
+
+我还希望强调, 这篇文章从理论和实践的角度讲解被试内multiple mediation, 理论上讲解如何建模和计算各类效应, 实践上使用wsMed,生成完整的结果并且如何解读.
+你觉得怎么写既符合学术论文规范, 又能够更好的展示这篇文章的主旨,我们可以先来梳理下逻辑
+
+当前的局限性在于multiple mediation的方法和工具主要是针对被试间中介的, 并不适用于被试内,被试内中介在方法和工具还有很大的空白, 比如
+
+
+任有如何建模处理多种multiple mediation 模型,如何处理协变量 如何处理有效处理缺失值, 如何标准化间接效应并生成合适的置信区间这些方法上的问题以及相应的工具技术实现,
+本文在方法上, 提出如何基于difference scores approach对multiple mediation进行建模parallel/serial/combined, 以及如何处理控制变量. 
+
+但其实这是一个tutorial的期刊
+这个结构很好
+不是, 我要的是X1_b1、X0_b1,X1_b_1_2 ,X0_b_1_2
+
+
+
+ prepared_data <- data.frame(
+   M1diff = rnorm(100),
+   M2diff = rnorm(100),
+   M3diff = rnorm(100),
+   M1avg = rnorm(100),
+   M2avg = rnorm(100),
+   M3avg = rnorm(100),
+   Ydiff = rnorm(100)
+ )
+#'
+#' # Generate SEM model syntax
+ sem_model <- GenerateModelCN(prepared_data)
+ printGM(sem_model)
+ 
+ 还是不能生成二阶以上的
+ 是要生成X0_b_1_2_3,X0_b_1_2_3_4这样的
+ 请你生成带有调试信息的版本,帮我找问题在哪
+#' cat(sem_model)
+#'
+#'
+#'
+head(df_final)
+head(dat)
+dat <- cbind(dat, ID = df_final$id)
+
+id_group1 <- df_final$id[df_final$Group == 1]
+dat$ID <- id_group1
+dat<- dat %>% select(-ID)
+summary(dat)
+
+head(dat)
+dat <- df_selected
+resultd <- wsMed(
+ data = dat, #dataset
+ M_C1 <- c(
+   "TSRQ_auto_T1",       # 自主动机
+   "WEMBS_total_T1",     # 主观幸福感
+   "IPAQ_sitting_T1", # 静坐时间
+   "ISI_T1",
+   "SMUF_day_T1"
+ ),  # A1/B1 is A/B mediator variable in condition 1
+ 
+ M_C2 <- c(
+   "TSRQ_auto_T2",
+   "WEMBS_total_T2",
+   "IPAQ_sitting_T2",
+   "ISI_T2",
+   "SMUF_day_T2"
+ ),
+ Y_C1 = "DASSS_T1", # C1 is outcome variable in condition 1
+ Y_C2 = "DASSS_T2", # C2 is outcome variable in condition 2
+ form = "CN", # Parallel mediatio
+ C_C1 = c(
+   "HES_total_T1"
+ ),
+ C_C2 = c(
+   "HES_total_T2"
+ ),
+ C = c("Q7","Q8","Q9","BMI"), # between-subject covariates
+ Na = "MI",
+ seed = 123
+ )
+
+print(resultd)
+
+result_opt1 <- wsMed(
+  data = df_iweek_clean,
+  M_C1 = c("SMUF_day_T1",),
+  M_C2 = c("SMUF_day_T2"),
+  Y_C1 = "DASSA_T1",
+  Y_C2 = "DASSA_T2",
+  form = "P",
+  C = c("Q7", "BMI"),
+  C_C1 = c("IPAQ_sitting_T1"),
+  C_C2 = c("IPAQ_sitting_T2"),
+  Na = "MI",
+  ci_method = "mc",
+  seed = 123
+)
+
+print(result_opt)
+
+
+# 定义所有需要保留的列
+M_C1 <- c(
+  "TSRQ_auto_T1",
+  "WEMBS_total_T1",
+  "IPAQ_sitting_T1",
+  "ISI_T1",
+  "SMUF_day_T1"
+)
+
+M_C2 <- c(
+  "TSRQ_auto_T2",
+  "WEMBS_total_T2",
+  "IPAQ_sitting_T2",
+  "ISI_T2",
+  "SMUF_day_T2"
+)
+
+Y_C1 <- c("DASSA_T1","DASSS_T1","DASSD_T1")
+Y_C2 <- c("DASSA_T2","DASSS_T2","DASSD_T2")
+
+C_C1 <- c(
+  "HES_total_T1",
+  "BPNS_T1"
+)
+
+C_C2 <- c(
+  "HES_total_T2",
+  "BPNS_T2"
+)
+
+C <- c("Q7", "Q8", "Q9", "BMI")
+
+# 合并所有变量名
+keep_vars <- unique(c(M_C1, M_C2, Y_C1, Y_C2, C_C1, C_C2, C))
+
+# 提取子集数据
+df_selected <- df_iweek_clean[, keep_vars]
+head(df_selected)
+summary(df_selected)
+
+
+# 可选：检查缺失变量
+missing_vars <- setdiff(keep_vars, colnames(df_iweek_clean))
+if (length(missing_vars) > 0) {
+  warning("以下变量在原数据中找不到：", paste(missing_vars, collapse = ", "))
+}
+
+
+ prepared_data <- PrepareData(
+   data = df_selected,
+   M_C1 = c(
+     "TSRQ_auto_T1",       
+     "WEMBS_total_T1",   
+     "IPAQ_sitting_T1", 
+     "SMUF_day_T1"
+   ),   
+   M_C2 = c(
+     "TSRQ_auto_T2",
+     "WEMBS_total_T2",
+     "IPAQ_sitting_T2",
+     "ISI_T2",
+     "SMUF_day_T2"
+   ),
+   Y_C1 = "DASSA_T1",  
+   Y_C2 = "DASSA_T2", # C2 is outcome variable in condition 2
+   C_C1 = c(
+     "HES_total_T1"
+   ),
+   C_C2 = c(
+     "HES_total_T2"
+   ),
+   C = c("Q7","Q8","Q9","BMI") # between-subject covariates
+   )
+ 
+ sem_model <- GenerateModelCN(prepared_data)
+ printGM(sem_model)
+ 
+ 
+ fit <- lavaan::sem(
+   model = sem_model,
+   data = prepared_data,
+   missing = "fiml",
+   fixed.x = FALSE,
+   warn = FALSE
+ )
+ 
+ # Bootstrap CI
+ if (ci_method %in% c("bootstrap", "both")) {
+   fit_u <- semboottools::store_boot(
+     fit,
+     do_bootstrapping = TRUE,
+     R = 2000,
+     iseed = 234
+   )
+   
+   ustd_result <- semboottools::parameterEstimates_boot(
+     object = fit_u,
+     boot_pvalue = TRUE
+   )
+   
+   
+   # 命名映射向量：names(old) = new
+   rename_vars <- c(
+     ID                = "ID",
+     TSRQ_auto_T1      = "AutMot_T1",
+     TSRQ_auto_T2      = "AutMot_T2",
+     WEMBS_total_T1    = "WellBeing_T1",
+     WEMBS_total_T2    = "WellBeing_T2",
+     IPAQ_sitting_T1   = "Sitting_T1",
+     IPAQ_sitting_T2   = "Sitting_T2",
+     ISI_T1            = "Insomnia_T1",
+     ISI_T2            = "Insomnia_T2",
+     SMUF_day_T1       = "SMUse_T1",
+     SMUF_day_T2       = "SMUse_T2",
+     DASSA_T1          = "Anxiety_T1",
+     DASSA_T2          = "Anxiety_T2",
+     DASSS_T1          = "Stress_T1",
+     DASSS_T2          = "Stress_T2",
+     DASSD_T1          = "Depress_T1",
+     DASSD_T2          = "Depress_T2",
+     HES_total_T1      = "Eat_T1",
+     HES_total_T2      = "Eat_T2",
+     BPNS_T1           = "Needs_T1",
+     BPNS_T2           = "Needs_T2",
+     Q7                = "Age",
+     Q8                = "Height",
+     Q9                = "Weight",
+     BMI               = "BMI"
+   )
+   
+   # 使用 dplyr::rename 或 base R 方法重命名列
+   library(dplyr)
+   
+   dat_renamed <- dat %>% rename(any_of(rename_vars))
+   dat <- dat_renamed
+   summary(dat)
+   head(dat)
+   dat_renamed <- dat_renamed[, c("ID", setdiff(names(dat_renamed), "ID"))]
+   
+   head(dat)
+   
+   output_text <- capture.output(print(result4))
+   writeLines(output_text, "C:/Users/Administrator/Downloads/model3.txt")
+   这个部分也需要修改
+   
+   
+   summary(dat)
+   
+  system.time( result1 <- wsMed2(
+     data = example_data,
+     M_C1 = c("A1","B1"), 
+     M_C2 = c("A2","B2"),  
+     Y_C1 = "C1", 
+     Y_C2 = "C2",  
+     form = "P",  
+   ))
+   print(result1)
+   
+   
+   ``` r
+   library(wsMed)
+   
+   # Load example data
+   data(example_data)
+   set.seed(123)
+   example_dataN <- mice::ampute(
+     data = example_data,
+     prop = 0.1,
+   )$amp
+   
+   # Perform within-subject mediation analysis (Parallel mediation model)
+   result <- wsMed(
+     data = example_dataN, #dataset
+     M_C1 = c("A1","B1"), # A1/B1 is A/B mediator variable in condition 1
+     M_C2 = c("A2","B2"), # A2/B2 is A/B mediator variable in condition 2
+     Y_C1 = "C1", # C1 is outcome variable in condition 1
+     Y_C2 = "C2", # C2 is outcome variable in condition 2
+     form = "P", # Parallel mediation
+     C_C1 = "D1", # within-subject covariate (e.g., measured under D1)
+     C_C2 = "D2", # within-subject covariate (e.g., measured under C2)
+     C = "D3", # between-subject covariates
+     Na = "MI" # Use multiple imputation for missing data
+   )
+   
+   # Print summary results
+   print(result)

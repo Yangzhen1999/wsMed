@@ -1,0 +1,168 @@
+---
+  editor_options: 
+  markdown: 
+  wrap: sentence
+---
+  
+  # wsMed
+  
+  <!-- badges: start -->
+  
+  <!-- badges: end -->
+  
+`wsMed` performs within-subject mediation analysis for two-condition designs using SEM, supporting multiple mediators, four mediation structures, flexible missing data handling (DE, MI, FIML), both bootstrap and Monte Carlo confidence inference, modeling of within- and between-subject covariates, and standardized and unstandardized estimates with confidence intervals.
+
+## Installation
+
+You can install the development version of wsMed from [GitHub](https://github.com/) with:
+  
+  ``` r
+# install.packages("pak")
+pak::pak("Yangzhen1999/wsMed")
+```
+
+Alternatively, if you prefer using devtools, you can install wsMed as follows:
+  
+  ``` r
+# install.packages("devtools")
+devtools::install_github("Yangzhen1999/wsMed")
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+  
+  ``` r
+library(wsMed)
+
+# Load example data
+data(example_data)
+set.seed(123)
+example_dataN <- mice::ampute(
+  data = example_data,
+  prop = 0.1,
+)$amp
+
+# Perform within-subject mediation analysis (Parallel mediation model)
+result <- wsMed(
+  data = example_dataN, #dataset
+  M_C1 = c("A1","B1"), # A1/B1 is A/B mediator variable in condition 1
+  M_C2 = c("A2","B2"), # A2/B2 is A/B mediator variable in condition 2
+  Y_C1 = "C1", # C1 is outcome variable in condition 1
+  Y_C2 = "C2", # C2 is outcome variable in condition 2
+  form = "P", # Parallel mediation
+  C_C1 = "D1", # within-subject covariate (e.g., measured under D1)
+  C_C2 = "D2", # within-subject covariate (e.g., measured under C2)
+  C = "D3", # between-subject covariates
+  Na = "MI" # Use multiple imputation for missing data
+)
+
+# Print summary results
+print(result)
+```
+
+## Features
+
+`wsMed` is a comprehensive and user-friendly package for **within-subject mediation analysis**.
+
+### **1. Four Types of Mediation Models**
+
+`wsMed` supports a variety of mediation models, each suitable for different experimental designs:
+  
+  -   **Parallel Mediation** (`"P"`) -- Multiple independent mediators acting simultaneously.
+<p align="center">
+  
+  <img src="man/figures/PM.png" alt="serial within-subject mediation model" width="70%"/>
+  
+  </p>
+  
+  -   **Chained/Serial Mediation** (`"CN"`) -- Sequential mediators in a chain.
+<p align="center">
+  
+  <img src="man/figures/CNM.png" alt="serial within-subject mediation model" width="70%"/>
+  
+  </p>
+  
+  -   **Chained + Parallel Mediation** (`"CP"`) -- A combination of chained and parallel mediators.
+<p align="center">
+  
+  <img src="man/figures/CPM.png" alt="serial within-subject mediation model" width="90%"/>
+  
+  </p>
+    
+  -   **Parallel + Chained Mediation** (`"PC"`) -- Parallel mediators influencing a chained mediator.
+
+<p align="center">
+  
+  <img src="man/figures/PCM.png" alt="serial within-subject mediation model" width="90%"/>
+  
+  </p>
+  
+  Each model can handle **any number of mediators**, providing flexibility for complex studies.
+
+How to choose and build models can be found in the tutorial on models.
+
+### **2. Comprehensive Output**
+
+`wsMed` provides a comprehensive and structured summary of within-subject mediation analysis results. The output is organized into clearly labeled sections:
+
+- **VARIABLES**: Lists all original variables, including the outcome, mediators, and covariates, as well as the derived variables such as within-subject difference scores (e.g., `Ydiff`, `M1diff`) and centered averages (e.g., `M1avg`, `Cw1avg`).
+- **MODEL FIT INDICES**: Presents global model fit statistics from structural equation modeling, including chi-square, degrees of freedom, CFI, TLI, RMSEA, and SRMR.
+- **REGRESSION PATHS**: Summarizes estimated regression coefficients for all paths, including:
+  - Effects of mediator change scores (e.g., `b1`, `b2`, …),
+  - Moderation effects via centered averages (e.g., `d1`, `d2`, …),
+  - Covariate effects on both the outcome and mediators.
+- **INTERCEPTS**: Reports estimated intercepts for all endogenous variables in the model.
+- **VARIANCES**: Provides residual variances for the outcome and mediator variables.
+- **Total and Direct Effects**: Includes estimates, standard errors, *z*-values, *p*-values, and confidence intervals for the overall and direct effects of the independent variable.
+- **Indirect Effects**: Reports full inference results for each mediation path, including standard errors, confidence intervals, and significance tests.
+- **Contrast Indirect Effects**: Provides pairwise comparisons between indirect effects from different mediation routes.
+- **Moderation Effects of X**: Tests whether the mediation effects are moderated by the independent variable across conditions.
+- **Condition 1 vs. Condition 2 Coefficients**: Compares the strength of path coefficients between the two within-subject conditions.
+- **Standardized Results**: Displays standardized path estimates and their confidence intervals to facilitate interpretation and comparison across variables.
+
+### **3. Missing Data Handling**
+
+`wsMed` offers **flexible strategies for handling missing data**: - **Listwise Deletion** (`"DE"`) -- Removes rows with missing values.
+
+- **Full Information Maximum Likelihood** (`"FIML"`) -- Uses SEM to handle missing data in the analysis.
+
+- **Multiple Imputation** (`"MI"`) -- Imputes missing data using the `mice` package, providing more robust results.
+
+### **4. Standardized and Unstandardized Estimates**
+
+-   **Unstandardized Effects**: Raw coefficients for each path in the mediation model, providing the **direct** and **indirect** effects between variables.
+
+-   **Standardized Effects**: Standardized coefficients that express the effect sizes without depending on the measurement scale of the variables. These provide a clearer understanding of the relative importance of each mediator in the model.
+
+### **5. Confidence Intervals (CIs)**
+
+`wsMed` supports two types of confidence intervals (CIs) for both raw and standardized estimates:
+
+- **Monte Carlo CIs**:  
+  Available for all missing data methods (**DE**, **FIML**, **MI**).  
+  Mandatory for **MI**; optional for **DE** and **FIML** (`ci_method = "MC"`).
+
+- **Bootstrap CIs**:  
+  Available when missing data is handled via **DE** or **FIML**.  
+  Default under **DE** unless Monte Carlo is specified.
+
+Users can specify the number of repetitions (`R` for Monte Carlo, `bootstrap` for resampling) and confidence levels (`alpha`, `alphastd`) for flexible inference across model parameters.
+
+
+### **6. Covariate Handling**
+
+`wsMed` supports covariates measured at both within-subject and between-subject levels:
+
+- **Within-subject covariates**: Variables measured under both conditions (e.g., pre vs. post) in the same way as mediators and outcomes. These are supplied via `C_C1` and `C_C2`, and are processed into difference scores and centered averages.
+
+- **Between-subject covariates**: Time-invariant or single-time-point variables (e.g., age, gender, BMI), passed via the `C` argument. These are directly included as predictors of mediators and the outcome.
+
+All covariates can simultaneously predict changes in mediators and outcome, and their effects are reported alongside main path coefficients.
+
+
+### **7. User-Friendly and Efficient**
+
+With `wsMed`, **all you need to do is call the `wsMed` function**, and the package will handle everything for you.
+This makes `wsMed` accessible to both **beginners** and **advanced users**, providing a streamlined process for complex within subject mediation analysis.
+

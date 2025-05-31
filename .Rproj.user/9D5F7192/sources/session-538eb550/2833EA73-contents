@@ -1,0 +1,1054 @@
+wsMed <- function(data,
+                  M_C1,
+                  M_C2,
+                  Y_C1,
+                  Y_C2,
+                  C_C1 = NULL,
+                  C_C2 = NULL,
+                  C     = NULL,
+                  form = "P",
+                  standardized = FALSE,
+                  Na = "DE",
+                  ci_method = NULL, # 用户不输入时留空
+                  bootstrap = 1000,
+                  iseed = 123,
+                  boot_ci_type = "perc",
+                  R = 20000L,  # Monte Carlo 重复次数
+                  fixed.x = FALSE,
+                  alpha = 0.05,  # 显著性水平
+                  alphastd = 0.05,
+                  m = 5,  # 插补次数
+                  method = "pmm",  # 插补方法
+                  decomposition = "eigen",
+                  pd = TRUE,
+                  tol = 1e-06,
+                  seed = 123,
+                  MCmethod = NULL) {
+
+  # 输入验证
+  {
+    # 检查 data
+    if (is.null(data) || length(data) == 0) {
+      stop("Error: 'data' cannot be NULL or empty.")
+    }
+    if (!is.data.frame(data)) {
+      stop("Error: 'data' must be a data frame.")
+    }
+
+    # 检查 M_C1 和 M_C2
+    if (is.null(M_C1) || is.null(M_C2)) {
+      stop("Error: 'M_C1' and 'M_C2' cannot be NULL. Please provide valid column names.")
+    }
+    if (length(M_C1) != length(M_C2)) {
+      stop("Error: The lengths of 'M_C1' and 'M_C2' must match.")
+    }
+
+    # 检查 Y_C1 和 Y_C2
+    if (is.null(Y_C1) || is.null(Y_C2)) {
+      stop("Error: 'Y_C1' and 'Y_C2' cannot be NULL. Please provide valid column names.")
+    }
+
+    # 检查必需列
+    required_columns <- c(M_C1, M_C2, Y_C1, Y_C2)
+    missing_columns <- required_columns[!required_columns %in% colnames(data)]
+    if (length(missing_columns) > 0) {
+      stop(paste("Error: Missing columns in data:", paste(missing_columns, collapse = ", ")))
+    }
+
+    # 验证 form 参数
+    if (!form %in% c("P", "CN", "CP", "PC")) {
+      stop("Error: Invalid 'form' parameter. Use 'P', 'CN', 'CP', or 'PC'.")
+    }
+
+    # 验证 Na 参数
+    if (!Na %in% c("DE", "FIML", "MI")) {
+      stop("Error: Invalid 'Na' parameter. Use 'DE', 'FIML', or 'MI'.")
+    }
+
+    # 验证 bootstrap, R, 和 m
+    if (!is.numeric(bootstrap) || bootstrap < 0) {
+      stop("Error: 'bootstrap' must be a non-negative integer.")
+    }
+    if (!is.numeric(R) || R <= 0) {
+      stop("Error: 'R' must be a positive integer.")
+    }
+    if (!is.numeric(m) || m <= 0) {
+      stop("Error: 'm' must be a positive integer.")
+    }
+
+
+    # 设置默认 ci_method 并验证合法性
+    if (is.null(ci_method)) {
+      ci_method <- switch(Na,
+                          "MI" = "mc",
+                          "FIML" = "mc",
+                          "DE" = "bootstrap")
+    } else {
+      ci_method <- match.arg(ci_method, choices = c("bootstrap", "mc", "both"))
+
+      # 加入逻辑限制提示
+      if (Na == "MI" && ci_method == "bootstrap") {
+        warning("CI method 'bootstrap' is not supported with MI. Defaulting to 'mc'.")
+        ci_method <- "mc"
+      } else if (Na == "MI" && ci_method == "both") {
+        warning("For MI, only Monte Carlo CI is available. Bootstrap CI will be skipped.")
+      }
+    }
+
+
+    # 检查 MCmethod 合法性
+    # 设置默认 MCmethod 并验证
+    if (is.null(MCmethod)) {
+      MCmethod <- "mc"  # 默认使用 semmcci::MC()
+    } else {
+      if (!MCmethod %in% c("mc", "bootSD")) {
+        stop("MCmethod must be either 'mc', 'bootSD', or NULL.")
+      }
+    }
+
+
+    # 处理缺失值
+    if (Na %in% c("MI", "FIML")) {
+      total_missing <- sum(is.na(data))
+      if (total_missing == 0) {
+        message("No missing values detected in the data. Switching to 'DE'.")
+        Na <- "DE"
+      }
+    }
+    if (Na == "DE") {
+      total_missing <- sum(is.na(data))
+      if (total_missing > 0) {
+        warning("The dataset contains missing values. Consider using 'Na = MI' or 'Na = FIML' to handle them")
+      }
+    }
+
+    # 验证调节变量数量
+    num_mediators <- length(M_C1)
+    if (form == "CN" && num_mediators < 2) {
+      stop("Error: For 'CN' models, the number of mediators must be at least 2.")
+    }
+    if (form %in% c("PC", "CP") && num_mediators < 3) {
+      stop("Error: For 'PC' and 'CP' models, the number of mediators must be at least 3.")
+    }
+  }
+
+
+  # Step 1: 数据预处理
+  prepared_data <- PrepareData(data = data,
+                               M_C1 = M_C1,
+                               M_C2 = M_C2,
+                               Y_C1 = Y_C1,
+                               Y_C2 = Y_C2,
+                               C_C1 = C_C1,
+                               C_C2 = C_C2,
+                               C     = C)
+
+  # Step 2: 构建模型
+  # P is parallel mediation, CN is chained mediation, CP/PC is parallel + chain mediation
+  {
+    if (form == "P") {
+      sem_model <- GenerateModelP(prepared_data)
+    } else if (form == "CP") {
+      sem_model <- GenerateModelCP(prepared_data)
+    } else if (form == "PC") {
+      sem_model <- GenerateModelPC(prepared_data)
+    } else if (form == "CN") {
+      sem_model <- GenerateModelCN(prepared_data)
+    } else {
+      stop("Invalid 'form' parameter. Use 'CP', 'PC' or 'CN'.")
+    }
+  }
+
+  # Step 3: 选择方法
+  ustd_result <- NULL
+  mi_output  <- NULL
+  fiml_result <- NULL
+  mi_result <- NULL
+  mc_de_result  <-  NULL
+
+  get_parallel_default <- function() {
+    if (.Platform$OS.type == "windows") {
+      return("snow")
+    } else {
+      return("multicore")
+    }
+  }
+
+  # Step 4: 拟合模型
+  if (Na == "DE") {
+    # 删除缺失值的模型拟合
+    fit <- lavaan::sem(
+      model = sem_model,
+      data = prepared_data,
+      fixed.x = fixed.x,
+      missing = "listwise",
+      warn = FALSE
+    )
+
+    # bootstrap CI
+    if (ci_method %in% c("bootstrap", "both")) {
+      fit_u <- semboottools::store_boot(
+        fit,
+        do_bootstrapping = TRUE,
+        R = bootstrap,
+        iseed = iseed,
+        parallel = get_parallel_default()
+      )
+
+      ustd_result <- semboottools::parameterEstimates_boot(
+        level = 1-alpha,
+        object = fit_u,
+        boot_ci_type = boot_ci_type,
+        boot_pvalue = TRUE,
+      )
+    }
+    # Monte Carlo CI
+    if (ci_method %in% c("mc", "both")) {
+      mc_de_result <- MC(
+        lav = fit,
+        R = R,
+        alpha = alpha
+      )
+    }
+  }
+  else if (Na == "FIML") {
+    # 使用 FIML 方法处理缺失值
+    fit <- lavaan::sem(
+      model = sem_model,
+      data = prepared_data,
+      missing = "fiml",
+      fixed.x = fixed.x,
+      warn = FALSE
+    )
+
+    # Bootstrap CI
+    if (ci_method %in% c("bootstrap", "both")) {
+      fit_u <- semboottools::store_boot(
+        fit,
+        do_bootstrapping = TRUE,
+        R = bootstrap,
+        iseed = iseed,
+        parallel = get_parallel_default()
+      )
+
+      ustd_result <- semboottools::parameterEstimates_boot(
+        object = fit_u,
+        level = 1-alpha,
+        boot_ci_type = boot_ci_type,
+        boot_pvalue = TRUE
+      )
+    }
+
+    # Monte Carlo CI
+    if (ci_method %in% c("mc", "both")) {
+      if (MCmethod == "mc") {
+        fiml_result <- MC(
+          lav = fit,
+          R = R,
+          alpha = alpha
+        )
+      } else if (MCmethod == "bootSD") {
+        mc_fiml_result <- run_mc_mediation(
+          fit = fit,
+          data = prepared_data,
+          standardized = standardized,
+          R = R,
+          seed = seed,
+          alpha = alpha,
+          alphastd = alphastd
+        )
+        fiml_result <- summarize_mc_ci(mc_fiml_result$unstd_result)
+      }
+    }
+  }
+  else if (Na == "MI") {
+    mi_output <- RunMCMIAnalysis(
+      data_missing = data,
+      m = m,
+      method = method,
+      seed = seed,
+      M_C1 = M_C1,
+      M_C2 = M_C2,
+      Y_C1 = Y_C1,
+      Y_C2 = Y_C2,
+      sem_model = sem_model,
+      Na = Na,
+      R = R,
+      alpha = alpha,
+      decomposition = decomposition,
+      pd = pd,
+      tol = tol
+    )
+    mi_result <- mi_output$mc_result
+    prepared_data <- mi_output$first_imputed_data
+
+    fit <- lavaan::sem(
+      model = sem_model,
+      data = prepared_data,
+      fixed.x = fixed.x,
+      warn = FALSE
+    )}
+
+  # Step 5: 标准化结果
+  # 初始化结果变量
+  std_result <- NULL
+  std_mi_result <- NULL
+  std_fiml_result <- NULL
+
+  if (standardized) {
+    tryCatch({
+      if (Na %in% c("DE", "FIML") &&
+          ci_method %in% c("bootstrap", "both") &&
+          exists("fit_u")) {
+
+        boot_ci_type <- match.arg(boot_ci_type, choices = c("perc", "bc", "bca.simple"))
+
+        std_result <- semboottools::standardizedSolution_boot(
+          object = fit_u,
+          level = max(1 - alphastd),
+          type = "std.all",
+          boot_ci_type = boot_ci_type,
+          save_boot_est_std = TRUE,
+          boot_pvalue = TRUE
+        )
+
+        if (is.null(std_result)) {
+          warning("Standardized solution for DE/FIML (bootstrap) returned NULL.")
+        }
+      }
+
+
+      # FIML（Monte Carlo 标准化）
+      if (Na == "FIML" && ci_method == "mc") {
+        if (!exists("fiml_result") || is.null(fiml_result)) {
+          warning("FIML MC result is NULL, cannot compute standardized solution.")
+        } else {
+          if (MCmethod == "mc") {
+            std_fiml_result <- tryCatch(
+              MCStd2(fiml_result, alpha = alphastd),
+              error = function(e) {
+                warning("MCStd2 failed for FIML: ", e$message)
+                NULL
+              }
+            )
+          } else if (MCmethod == "bootSD") {
+            # 注意：此时 fiml_result 是 summarize_mc_ci() 的输出
+            if (!("std_result" %in% names(fiml_result)) || is.null(fiml_result$std_result)) {
+              warning("No std_result found in fiml_result for bootSD MC method.")
+              std_fiml_result <- NULL
+            } else {
+              std_fiml_result <- fiml_result$std_result
+            }
+          }
+        }
+      }
+
+      if (Na == "MI") {
+        if (is.null(mi_result)) {
+          warning("MI result is NULL, cannot compute standardized solution.")
+        } else {
+          std_mi_result <- MCStd2(mi_result,alpha = alphastd)
+        }
+      }
+    }, error = function(e) {
+      warning("Error during standardized solution generation: ", e$message)
+    })
+
+  }
+
+  input_vars <- list(
+    M_C1 = M_C1,
+    M_C2 = M_C2,
+    Y_C1 = Y_C1,
+    Y_C2 = Y_C2
+  )
+
+  paras <- list(
+    alpha = alpha,  # 显著性水平
+    m = m,  # 插补次数
+    method = method,  # 插补方法
+    decomposition = decomposition,
+    pd = pd,
+    tol = tol,
+    seed = seed,
+    alphastd = alphastd
+  )
+
+  out <- list(
+    prepared_data = prepared_data,
+    lavaan_fit = fit,
+    sem_model = sem_model,
+    mc_de_result = mc_de_result,
+    mi_result = mi_result,
+    fiml_result = fiml_result,
+    std_result = std_result,
+    boot_ci_type = boot_ci_type,
+    bootstrap = bootstrap,
+    ustd_result = ustd_result,
+    std_mi_result = std_mi_result,
+    std_fiml_result = std_fiml_result,
+    input_vars = input_vars,
+    alphastd = alphastd,
+    alpha = alpha,
+    Na = Na,
+    iseed = iseed,
+    paras = paras,
+    standardized = standardized,
+    MCmethod = MCmethod,
+    ci_method = ci_method
+  )
+  class(out) <- "wsMed"
+  return(out)
+}
+
+result1 <- wsMed(
+  data = example_data, #dataset
+  M_C1 = c("A1","B1"), # A1/B1 is A/B mediator variable in condition 1
+  M_C2 = c("A2","B2"), # A2/B2 is A/B mediator variable in condition 2
+  Y_C1 = "C1", # C1 is outcome variable in condition 1
+  Y_C2 = "C2", # C2 is outcome variable in condition 2
+  C_C1 = "D1",
+  C_C2 = "D2",
+  C = "A3",
+  form = "P", # Parallel mediation
+)
+
+print(result1)
+result1$ustd_result
+printGM(result1$sem_model)
+
+
+
+PrepareData <- function(data, M_C1, M_C2, Y_C1, Y_C2,C_C1,C_C2,C) {
+  if (length(M_C1) != length(M_C2)) {
+    stop("The number of M_C1 and M_C2 variables must match.")
+  }
+
+  if (!(Y_C1 %in% colnames(data)) || !(Y_C2 %in% colnames(data))) {
+    stop("Y variables not found in the dataset.")
+  }
+
+  data$Ydiff <- data[[Y_C2]] - data[[Y_C1]]
+
+  diffs <- list()
+  avgs <- list()
+
+  for (i in seq_along(M_C1)) {
+    M1 <- M_C1[i]
+    M2 <- M_C2[i]
+
+    if (!(M1 %in% colnames(data)) || !(M2 %in% colnames(data))) {
+      stop(paste0("M variables for ", M1, " and ", M2, " not found in the dataset."))
+    }
+
+    diff_name <- paste0("M", i, "diff")
+    avg_name <- paste0("M", i, "avg")
+    diffs[[diff_name]] <- data[[M2]] - data[[M1]]
+    M1_centered <- data[[M1]] - mean(data[[M1]], na.rm = TRUE)
+    M2_centered <- data[[M2]] - mean(data[[M2]], na.rm = TRUE)
+    avgs[[avg_name]] <- (M1_centered + M2_centered) / 2
+  }
+
+  data <- cbind(data, do.call(cbind, diffs), do.call(cbind, avgs))
+
+  cols_to_return <- c("Ydiff", names(diffs), names(avgs))
+  return(data[, cols_to_return])
+}
+
+PrepareData <- function(data, M_C1, M_C2, Y_C1, Y_C2,
+                        C_C1 = NULL, C_C2 = NULL, C = NULL) {
+  # 检查中介变量匹配
+  if (length(M_C1) != length(M_C2)) {
+    stop("The number of M_C1 and M_C2 variables must match.")
+  }
+
+  if (!(Y_C1 %in% colnames(data)) || !(Y_C2 %in% colnames(data))) {
+    stop("Y variables not found in the dataset.")
+  }
+
+  # 构造 Ydiff
+  data$Ydiff <- data[[Y_C2]] - data[[Y_C1]]
+
+  # 中介变量差值与中心均值
+  diffs <- list()
+  avgs <- list()
+  for (i in seq_along(M_C1)) {
+    M1 <- M_C1[i]
+    M2 <- M_C2[i]
+
+    if (!(M1 %in% colnames(data)) || !(M2 %in% colnames(data))) {
+      stop(paste0("M variables for ", M1, " and ", M2, " not found in the dataset."))
+    }
+
+    diff_name <- paste0("M", i, "diff")
+    avg_name <- paste0("M", i, "avg")
+
+    diffs[[diff_name]] <- data[[M2]] - data[[M1]]
+
+    M1_centered <- data[[M1]] - mean(data[[M1]], na.rm = TRUE)
+    M2_centered <- data[[M2]] - mean(data[[M2]], na.rm = TRUE)
+    avgs[[avg_name]] <- (M1_centered + M2_centered) / 2
+  }
+
+  # 被试间控制变量中心化并命名为 Cb1, Cb2, ...
+  between_centered <- list()
+  if (!is.null(C)) {
+    for (i in seq_along(C)) {
+      var <- C[i]
+      if (!var %in% colnames(data)) {
+        stop(paste0("Between-subject covariate ", var, " not found in the dataset."))
+      }
+      new_name <- paste0("Cb", i)
+      between_centered[[new_name]] <- data[[var]] - mean(data[[var]], na.rm = TRUE)
+    }
+  }
+
+  # 被试内控制变量处理（diff + avg），命名为 Cw1diff, Cw1avg, ...
+  within_diffs <- list()
+  within_avgs <- list()
+  if (!is.null(C_C1) && !is.null(C_C2)) {
+    if (length(C_C1) != length(C_C2)) {
+      stop("The number of C_C1 and C_C2 variables must match.")
+    }
+
+    for (i in seq_along(C_C1)) {
+      W1 <- C_C1[i]
+      W2 <- C_C2[i]
+
+      if (!(W1 %in% colnames(data)) || !(W2 %in% colnames(data))) {
+        stop(paste0("Within-subject covariate pair ", W1, "/", W2, " not found."))
+      }
+
+      diff_name <- paste0("Cw", i, "diff")
+      avg_name <- paste0("Cw", i, "avg")
+
+      wdiff <- data[[W2]] - data[[W1]]
+      wavg <- (data[[W1]] + data[[W2]]) / 2
+
+      within_diffs[[diff_name]] <- wdiff - mean(wdiff, na.rm = TRUE)
+      within_avgs[[avg_name]] <- wavg - mean(wavg, na.rm = TRUE)
+    }
+  }
+
+  # 合并所有结果
+  all_vars <- c(diffs, avgs, between_centered, within_diffs, within_avgs)
+  data <- cbind(data, as.data.frame(all_vars))
+
+  # 返回结果列
+  cols_to_return <- c("Ydiff", names(diffs), names(avgs),
+                      names(between_centered), names(within_diffs), names(within_avgs))
+  return(data[, cols_to_return, drop = FALSE])
+}
+
+
+
+dat <- PrepareData(
+  data = example_data,
+  M_C1 = c("A1", "B1","A3"),
+  M_C2 = c("A2", "B2","B3"),
+  Y_C1 = "C1",
+  Y_C2 = "C2",
+  C_C1 = "D1",
+  C_C2 = "D2",
+  C = c("C3","D3")
+)
+
+
+
+ sem_model <- "
+    Ydiff ~ cp * 1 + b1 * M1diff
+    M1diff ~ a1 * 1
+    indirect := a1 * b1
+    total := cp + indirect
+  "
+
+  # Perform Monte Carlo analysis with multiple imputation
+  result <- RunMCMIAnalysis(
+    data_missing =  example_dataN,
+    m = 5,
+    method = "pmm",
+    seed = 123,
+    M_C1 = c("A1", "B1","A3"),
+    M_C2 = c("A2", "B2","B3"),
+    Y_C1 = "C1",
+    Y_C2 = "C2",
+    C_C1 = "D1",
+    C_C2 = "D2",
+    C = c("C3","D3"),
+    sem_model = sem_model6,
+    R = 1000,
+    alpha = c(0.05, 0.01)
+  )
+
+ sem_model6
+ mi_result <- result$mc_result
+
+#修改版
+GenerateModelP <- function(prepared_data) {
+  # 提取变量
+  Mdiff_vars <- grep("^M\\ddiff$", colnames(prepared_data), value = TRUE)
+  Mavg_vars  <- grep("^M\\davg$",  colnames(prepared_data), value = TRUE)
+
+  # 提取控制变量
+  between_covs <- grep("^Cb\\d+$", colnames(prepared_data), value = TRUE)
+  within_covs  <- grep("^Cw\\d+(diff|avg)$", colnames(prepared_data), value = TRUE)
+  control_vars <- c(between_covs, within_covs)
+
+  # 控制变量公式
+  controls_formula <- if (length(control_vars) > 0) {
+    paste(control_vars, collapse = " + ")
+  } else {
+    NULL
+  }
+
+  # 构造 Y 回归
+  y_terms <- c(
+    "cp*1",
+    paste0("b", seq_along(Mdiff_vars), "*", Mdiff_vars),
+    paste0("d", seq_along(Mavg_vars), "*", Mavg_vars)
+  )
+  if (!is.null(controls_formula)) {
+    y_terms <- c(y_terms, controls_formula)
+  }
+
+  regression_y <- paste("Ydiff ~", paste(y_terms, collapse = " + "))
+
+  # 构造每个 Mdiff 回归
+  regression_m <- paste(
+    sapply(seq_along(Mdiff_vars), function(i) {
+      rhs <- c("a" = paste0("a", i, "*1"), controls_formula)
+      paste0(Mdiff_vars[i], " ~ ", paste(rhs, collapse = " + "))
+    }),
+    collapse = "\n"
+  )
+
+  # 构造间接效应
+  indirect_effects <- paste(
+    sapply(seq_along(Mdiff_vars), function(i) {
+      paste0("indirect", i, " := a", i, " * b", i)
+    }),
+    collapse = "\n"
+  )
+
+  # 构造总间接效应
+  total_indirect <- paste0(
+    "total_indirect := ",
+    paste(paste0("indirect", seq_along(Mdiff_vars)), collapse = " + ")
+  )
+
+  # 构造总效应
+  total_effect <- "total_effect := cp + total_indirect"
+
+  # 构造间接效应对比（两两组合）
+  indirect_contrasts <- ""
+  if (length(Mdiff_vars) > 1) {
+    indirect_combinations <- utils::combn(seq_along(Mdiff_vars), 2)
+    indirect_contrasts <- paste(
+      apply(indirect_combinations, 2, function(pair) {
+        paste0("CI", pair[1], "vs", pair[2], " := indirect", pair[1], " - indirect", pair[2])
+      }),
+      collapse = "\n"
+    )
+  }
+
+  # 构造前后测系数
+  pre_post_coefficients <- paste(
+    sapply(seq_along(Mdiff_vars), function(i) {
+      x1_bi <- paste0("X1_b", i, " := (2*b", i, " + d", i, ") / 2")
+      x0_bi <- paste0("X0_b", i, " := X1_b", i, " - d", i)
+      paste(x1_bi, x0_bi, sep = "\n")
+    }),
+    collapse = "\n"
+  )
+
+  # 合并模型语法
+  sem_model <- paste(
+    regression_y,
+    regression_m,
+    indirect_effects,
+    total_indirect,
+    total_effect,
+    indirect_contrasts,
+    pre_post_coefficients,
+    sep = "\n"
+  )
+
+  return(sem_model)
+}
+GenerateModelCN <- function(prepared_data) {
+  # 提取主要变量
+  Mdiff_vars <- grep("^M\\ddiff$", colnames(prepared_data), value = TRUE)
+  Mavg_vars <- grep("^M\\davg$", colnames(prepared_data), value = TRUE)
+  n <- length(Mdiff_vars)
+
+  if (n < 1) stop("The function requires at least one mediator.")
+
+  # 提取控制变量
+  between_covs <- grep("^Cb\\d+$", colnames(prepared_data), value = TRUE)
+  within_covs  <- grep("^Cw\\d+(diff|avg)$", colnames(prepared_data), value = TRUE)
+  control_vars <- c(between_covs, within_covs)
+  control_rhs  <- if (length(control_vars) > 0) paste(control_vars, collapse = " + ") else NULL
+
+  # 回归模型：Ydiff
+  y_rhs <- c(
+    "cp*1",
+    paste0("b", 1:n, "*", Mdiff_vars),
+    paste0("d", 1:n, "*", Mavg_vars),
+    control_rhs
+  )
+  regression_y <- paste("Ydiff ~", paste(na.omit(y_rhs), collapse = " + "))
+
+  # 回归模型：每个 Mdiff
+  regression_m <- c()
+  for (i in 1:n) {
+    if (i == 1) {
+      rhs <- c(paste0("a1*1"), control_rhs)
+      regression_m <- c(regression_m, paste(Mdiff_vars[i], "~", paste(rhs, collapse = " + ")))
+    } else {
+      chain_b <- paste0("b", (i - 1):1, i, "*", Mdiff_vars[(i - 1):1], collapse = " + ")
+      chain_d <- paste0("d", (i - 1):1, i, "*", Mavg_vars[(i - 1):1], collapse = " + ")
+      rhs <- c(paste0("a", i, "*1"), chain_b, chain_d, control_rhs)
+      regression_m <- c(regression_m, paste(Mdiff_vars[i], "~", paste(na.omit(rhs), collapse = " + ")))
+    }
+  }
+
+  # 间接效应路径表达式生成
+  generate_path_effects <- function(paths) {
+    paste0("a", paths[1], " * ", paste(
+      c(
+        sapply(1:(length(paths) - 1), function(i) paste0("b", paths[i], paths[i + 1])),
+        paste0("b", paths[length(paths)])
+      ),
+      collapse = " * "
+    ))
+  }
+
+  # 所有间接效应
+  indirect_effects <- c()
+  indirect_effect_labels <- c()
+  for (length_path in 1:n) {
+    path_combinations <- utils::combn(1:n, length_path, simplify = FALSE)
+    for (path in path_combinations) {
+      label <- paste0("indirect", paste(path, collapse = ""))
+      if (length(path) == 1) {
+        indirect_effects <- c(indirect_effects, paste0(label, " := a", path, " * b", path))
+      } else {
+        indirect_effects <- c(indirect_effects, paste0(label, " := ", generate_path_effects(path)))
+      }
+      indirect_effect_labels <- c(indirect_effect_labels, label)
+    }
+  }
+
+  # 总间接效应与总效应
+  total_indirect <- paste0("total_indirect := ", paste(indirect_effect_labels, collapse = " + "))
+  total_effect <- "total_effect := cp + total_indirect"
+
+  # 间接效应对比
+  compare_indirect_effect <- ""
+  if (length(indirect_effect_labels) > 1) {
+    comparisons <- c()
+    for (i in seq_along(indirect_effect_labels)) {
+      for (j in seq_along(indirect_effect_labels)) {
+        if (i < j) {
+          comparisons <- c(comparisons, paste0(
+            "CI", gsub("indirect", "", indirect_effect_labels[i]), "vs",
+            gsub("indirect", "", indirect_effect_labels[j]), " := ",
+            indirect_effect_labels[i], " - ", indirect_effect_labels[j]
+          ))
+        }
+      }
+    }
+    compare_indirect_effect <- paste(comparisons, collapse = "\n")
+  }
+
+  # 前后测路径转换公式
+  pre_post_coefficients <- paste(
+    c(
+      sapply(seq_along(Mdiff_vars), function(i) {
+        paste0("X1_b", i, " := (2*b", i, " + d", i, ")/2\n",
+               "X0_b", i, " := X1_b", i, " - d", i)
+      }),
+      sapply(2:n, function(i) {
+        paste0("X1_b", i - 1, i, " := (2*b", i - 1, i, " + d", i - 1, i, ")/2\n",
+               "X0_b", i - 1, i, " := X1_b", i - 1, i, " - d", i - 1, i)
+      })
+    ),
+    collapse = "\n"
+  )
+
+  # 整合所有模型语句
+  sem_model <- paste(
+    regression_y,
+    paste(regression_m, collapse = "\n"),
+    paste(indirect_effects, collapse = "\n"),
+    total_indirect,
+    total_effect,
+    compare_indirect_effect,
+    pre_post_coefficients,
+    sep = "\n"
+  )
+
+  return(sem_model)
+}
+GenerateModelCP <- function(prepared_data) {
+  # 提取变量
+  chain_var <- grep("^M1diff$", colnames(prepared_data), value = TRUE)
+  chain_avg <- grep("^M1avg$", colnames(prepared_data), value = TRUE)
+  all_mdiff <- grep("^M\\ddiff$", colnames(prepared_data), value = TRUE)
+  all_mavg  <- grep("^M\\davg$", colnames(prepared_data), value = TRUE)
+
+  parallel_vars  <- setdiff(all_mdiff, chain_var)
+  parallel_avgs  <- setdiff(all_mavg, chain_avg)
+  n <- length(parallel_vars)
+
+  if (length(chain_var) != 1) stop("The chain mediator should contain exactly one variable: M1diff.")
+
+  # 控制变量识别
+  between_covs <- grep("^Cb\\d+$", colnames(prepared_data), value = TRUE)
+  within_covs  <- grep("^Cw\\d+(diff|avg)$", colnames(prepared_data), value = TRUE)
+  control_vars <- c(between_covs, within_covs)
+  control_rhs  <- if (length(control_vars) > 0) paste(control_vars, collapse = " + ") else NULL
+
+  # Ydiff 回归模型
+  y_rhs <- c(
+    paste0("cp*1"),
+    paste0("b1*", chain_var),
+    paste0("b", 2:(n + 1), "*", parallel_vars),
+    paste0("d1*", chain_avg),
+    paste0("d", 2:(n + 1), "*", parallel_avgs),
+    control_rhs
+  )
+  regression_y <- paste("Ydiff ~", paste(na.omit(y_rhs), collapse = " + "))
+
+  # 中介模型：M1diff（链式起点）+ 并行中介
+  regression_m <- c()
+  regression_m <- c(regression_m, paste(chain_var, "~", paste(c("a1*1", control_rhs), collapse = " + ")))
+
+  for (i in seq_along(parallel_vars)) {
+    rhs <- c(
+      paste0("a", i + 1, "*1"),
+      paste0("b1", i + 1, "*", chain_var),
+      paste0("d1", i + 1, "*", chain_avg),
+      control_rhs
+    )
+    regression_m <- c(regression_m, paste(parallel_vars[i], "~", paste(na.omit(rhs), collapse = " + ")))
+  }
+
+  # 间接效应定义
+  indirect_effects <- c("indirect1 := a1 * b1")
+  indirect_effect_labels <- c("indirect1")
+
+  for (i in seq_along(parallel_vars)) {
+    label_direct <- paste0("indirect", i + 1)
+    formula_direct <- paste0("a", i + 1, " * b", i + 1)
+    label_chain <- paste0("indirect1", i + 1)
+    formula_chain <- paste0("a1 * b1", i + 1, " * b", i + 1)
+
+    indirect_effects <- c(
+      indirect_effects,
+      paste0(label_direct, " := ", formula_direct),
+      paste0(label_chain, " := ", formula_chain)
+    )
+    indirect_effect_labels <- c(indirect_effect_labels, label_direct, label_chain)
+  }
+
+  total_indirect <- paste0("total_indirect := ", paste(indirect_effect_labels, collapse = " + "))
+  total_effect <- "total_effect := cp + total_indirect"
+
+  # 间接效应对比
+  compare_indirect_effect <- ""
+  if (length(indirect_effect_labels) > 1) {
+    comparisons <- c()
+    for (i in seq_along(indirect_effect_labels)) {
+      for (j in seq_along(indirect_effect_labels)) {
+        if (i < j) {
+          comparisons <- c(comparisons, paste0(
+            "CI", gsub("indirect", "", indirect_effect_labels[i]), "vs",
+            gsub("indirect", "", indirect_effect_labels[j]), " := ",
+            indirect_effect_labels[i], " - ", indirect_effect_labels[j]
+          ))
+        }
+      }
+    }
+    compare_indirect_effect <- paste(comparisons, collapse = "\n")
+  }
+
+  # 前后测转换系数
+  pre_post_coefficients <- paste(
+    c(
+      paste0("X1_b1 := (2*b1 + d1)/2\nX0_b1 := X1_b1 - d1"),
+      sapply(2:(n + 1), function(i) {
+        paste0("X1_b", i, " := (2*b", i, " + d", i, ")/2\nX0_b", i, " := X1_b", i, " - d", i)
+      }),
+      sapply(seq_along(parallel_vars), function(i) {
+        paste0("X1_b1", i + 1, " := (2*b1", i + 1, " + d1", i + 1, ")/2\n",
+               "X0_b1", i + 1, " := X1_b1", i + 1, " - d1", i + 1)
+      })
+    ),
+    collapse = "\n"
+  )
+
+  # 汇总输出
+  sem_model <- paste(
+    regression_y,
+    paste(regression_m, collapse = "\n"),
+    paste(indirect_effects, collapse = "\n"),
+    total_indirect,
+    total_effect,
+    compare_indirect_effect,
+    pre_post_coefficients,
+    sep = "\n"
+  )
+
+  return(sem_model)
+}
+GenerateModelPC <- function(prepared_data) {
+  # 提取变量
+  chain_var <- grep("^M1diff$", colnames(prepared_data), value = TRUE)
+  chain_avg <- grep("^M1avg$", colnames(prepared_data), value = TRUE)
+  all_mdiff <- grep("^M\\ddiff$", colnames(prepared_data), value = TRUE)
+  all_mavg  <- grep("^M\\davg$", colnames(prepared_data), value = TRUE)
+
+  parallel_vars <- setdiff(all_mdiff, chain_var)
+  parallel_avgs <- setdiff(all_mavg, chain_avg)
+  n <- length(parallel_vars)
+
+  if (length(chain_var) != 1) {
+    stop("The chain mediator should contain exactly one variable: M1diff.")
+  }
+
+  # 控制变量
+  between_covs <- grep("^Cb\\d+$", colnames(prepared_data), value = TRUE)
+  within_covs  <- grep("^Cw\\d+(diff|avg)$", colnames(prepared_data), value = TRUE)
+  control_vars <- c(between_covs, within_covs)
+  control_rhs  <- if (length(control_vars) > 0) paste(control_vars, collapse = " + ") else NULL
+
+  # 构建 Y 回归
+  y_rhs <- c(
+    "cp*1",
+    paste0("b1*", chain_var),
+    if (n > 0) paste0("b", seq(2, n + 1), "*", parallel_vars),
+    paste0("d1*", chain_avg),
+    if (n > 0) paste0("d", seq(2, n + 1), "*", parallel_avgs),
+    control_rhs
+  )
+  regression_y <- paste("Ydiff ~", paste(na.omit(y_rhs), collapse = " + "))
+
+  # 构建 M 回归
+  regression_m <- c()
+
+  # 链式中介 M1diff
+  chain_predictors <- if (n > 0) {
+    c(
+      paste0("b", seq(2, n + 1), "1*", parallel_vars),
+      paste0("d", seq(2, n + 1), "1*", parallel_avgs)
+    )
+  } else {
+    character(0)
+  }
+
+  rhs_chain <- c("a1*1", chain_predictors, control_rhs)
+  regression_m <- c(paste(chain_var, "~", paste(na.omit(rhs_chain), collapse = " + ")))
+
+  # 并行中介 M2diff, M3diff...
+  for (i in seq_along(parallel_vars)) {
+    rhs <- c(paste0("a", i + 1, "*1"), control_rhs)
+    regression_m <- c(regression_m, paste(parallel_vars[i], "~", paste(na.omit(rhs), collapse = " + ")))
+  }
+
+  # 构建间接效应
+  indirect_effects <- c()
+  indirect_effect_labels <- c()
+
+  for (i in seq_along(parallel_vars)) {
+    label_direct <- paste0("indirect", i + 1)
+    formula_direct <- paste0("a", i + 1, " * b", i + 1)
+    label_cross <- paste0("indirect", i + 1, "1")
+    formula_cross <- paste0("a", i + 1, " * b", i + 1, "1 * b1")
+
+    indirect_effects <- c(
+      indirect_effects,
+      paste0(label_direct, " := ", formula_direct),
+      paste0(label_cross, " := ", formula_cross)
+    )
+    indirect_effect_labels <- c(indirect_effect_labels, label_direct, label_cross)
+  }
+
+  # M1 自身路径
+  indirect_effects <- c(indirect_effects, "indirect1 := a1 * b1")
+  indirect_effect_labels <- c(indirect_effect_labels, "indirect1")
+
+  # 构建总效应与对比
+  total_indirect <- paste0(
+    "total_indirect := ",
+    paste(indirect_effect_labels, collapse = " + ")
+  )
+  total_effect <- "total_effect := cp + total_indirect"
+
+  compare_indirect_effect <- ""
+  if (length(indirect_effect_labels) > 1) {
+    comparisons <- c()
+    for (i in seq_along(indirect_effect_labels)) {
+      for (j in seq_along(indirect_effect_labels)) {
+        if (i < j) {
+          comparisons <- c(comparisons, paste0(
+            "CI", gsub("indirect", "", indirect_effect_labels[i]), "vs",
+            gsub("indirect", "", indirect_effect_labels[j]), " := ",
+            indirect_effect_labels[i], " - ", indirect_effect_labels[j]
+          ))
+        }
+      }
+    }
+    compare_indirect_effect <- paste(comparisons, collapse = "\n")
+  }
+
+  # 前后测系数转换
+  pre_post_coefficients <- paste(
+    c(
+      paste0("X1_b1 := (2*b1 + d1)/2\nX0_b1 := X1_b1 - d1"),
+      sapply(2:(n + 1), function(i) {
+        paste0("X1_b", i, " := (2*b", i, " + d", i, ")/2\nX0_b", i, " := X1_b", i, " - d", i)
+      }),
+      sapply(2:(n + 1), function(i) {
+        paste0("X1_b", i, "1 := (2*b", i, "1 + d", i, "1)/2\nX0_b", i, "1 := X1_b", i, "1 - d", i, "1")
+      })
+    ),
+    collapse = "\n"
+  )
+
+  # 合并为完整模型语法
+  sem_model <- paste(
+    regression_y,
+    paste(regression_m, collapse = "\n"),
+    paste(indirect_effects, collapse = "\n"),
+    total_indirect,
+    total_effect,
+    compare_indirect_effect,
+    pre_post_coefficients,
+    sep = "\n"
+  )
+
+  return(sem_model)
+}
+
+
+
+
+sem_model6 <- GenerateModelP(dat)
+printGM(sem_model6)
+
+data(example_data)
+set.seed(123)
+example_dataN <- mice::ampute(
+  data = example_data,
+  prop = 0.1,
+)$amp
+
+
+
+knitr::knit("vignettes/WsMed.Rmd.original", output = "vignettes/WsMed.Rmd")
+这里可以更细致一点,
+outcome variable
+mediator
+within-subject covariates Cw1 =  D2 D1
+Between-subject covariates C1:D3

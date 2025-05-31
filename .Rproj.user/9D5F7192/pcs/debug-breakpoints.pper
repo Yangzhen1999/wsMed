@@ -1,0 +1,36 @@
+{
+    "debugBreakpointsState": {
+        "breakpoints": [
+            {
+                "id": 7,
+                "path": "C:/Users/Administrator/Downloads/mediate.R",
+                "line_number": 848,
+                "function_steps": "",
+                "function_name": "mediate",
+                "state": 2,
+                "editor_state": 2,
+                "editor_line_number": 848,
+                "is_pending_debug_completion": false,
+                "needs_updated_steps": false,
+                "type": 0,
+                "is_package_breakpoint": false,
+                "package_name": ""
+            },
+            {
+                "id": 8,
+                "path": "C:/Users/Administrator/wsMed/tests/draft for main and print.R",
+                "line_number": 119,
+                "function_steps": "",
+                "function_name": "toplevel",
+                "state": 1,
+                "editor_state": 1,
+                "editor_line_number": 119,
+                "is_pending_debug_completion": false,
+                "needs_updated_steps": true,
+                "type": 1,
+                "is_package_breakpoint": false,
+                "package_name": ""
+            }
+        ]
+    }
+}

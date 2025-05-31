@@ -1,0 +1,66 @@
+# 函数：寻找符合条件的 seed 并返回结果
+find_seed_ci_log <- function(data, 
+                             M_C1, M_C2, Y_C1, Y_C2,
+                             form = "PC", 
+                             C_C1 = NULL, C_C2 = NULL, C = NULL,
+                             Na = "MI", 
+                             seed_range = 100:150, 
+                             target = "indirect_3_1", 
+                             threshold = 0) {
+  results <- data.frame(
+    seed = integer(0),
+    upper_97_5 = numeric(0),
+    status = character(0),
+    stringsAsFactors = FALSE
+  )
+  
+  for (s in seed_range) {
+    cat("Trying seed:", s, "\n")
+    result <- tryCatch({
+      wsMed(
+        data = data,
+        M_C1 = M_C1,
+        M_C2 = M_C2,
+        Y_C1 = Y_C1,
+        Y_C2 = Y_C2,
+        form = form,
+        C_C1 = C_C1,
+        C_C2 = C_C2,
+        C = C,
+        Na = Na,
+        seed = s
+      )
+    }, error = function(e) NULL)
+    
+    if (!is.null(result) && !is.null(result$mi_result$thetahatstar)) {
+      upper_ci <- tryCatch({
+        quantile(result$mi_result$thetahatstar[, target], probs = 0.975)
+      }, error = function(e) NA)
+      
+      status <- ifelse(!is.na(upper_ci) && upper_ci < threshold, "below threshold", "ok")
+      results <- rbind(results, data.frame(seed = s, upper_97_5 = upper_ci, status = status))
+    } else {
+      results <- rbind(results, data.frame(seed = s, upper_97_5 = NA, status = "error"))
+    }
+  }
+  
+  return(results)
+}
+
+
+ci_log <- find_seed_ci_log(
+  data = dat,
+  M_C1 = c("TSRQ_auto_T1", "WEMBS_total_T1", "ISI_T1"),
+  M_C2 = c("TSRQ_auto_T2", "WEMBS_total_T2", "ISI_T2"),
+  Y_C1 = "DASSS_T1",
+  Y_C2 = "DASSS_T2",
+  form = "PC",
+  C_C1 = c("HES_total_T1"),
+  C_C2 = c("HES_total_T2"),
+  C = c("Q7", "Q8", "Q9", "BMI"),
+  Na = "MI",
+  seed_range = 200:300
+)
+
+# 查看哪些种子成功让 upper < 0
+subset(ci_log, status == "below threshold")

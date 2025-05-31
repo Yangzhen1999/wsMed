@@ -1,0 +1,220 @@
+devtools::load_all()
+library(semboottools)
+library(wsMed)
+print
+result11 <- wsMed(
+  data = example_dataN,
+  M_C1 = c("A1","B1","C1","A3"),# A1/B1/C1 is A/B/C mediator variable in condition 1
+  M_C2 = c("A2","B2","C2","B3"),# A2/B2/C2 is A/B/C mediator variable in condition 2
+  Y_C1 = "D1", # D1 is outcome variable in condition 1
+  Y_C2 = "D2", # D2 is outcome variable in condition 2
+  form = "CN", # chained mediation
+  Na = "MI",
+  alpha = 0.05,
+  alphastd = 0.05
+)
+
+print(result11)
+print(result5)
+
+print(result2)
+
+result2 <- wsMed(
+  data = example_data, #dataset
+  M_C1 = c("A1","B1"), # A1/B1/C1 is A/B/C mediator variable in condition 1
+  M_C2 = c("A2","B2"), # A2/B2/C2 is A/B/C mediator variable in condition 2
+  Y_C1 = "C1", # D1 is outcome variable in condition 1
+  Y_C2 = "C2", # D2 is outcome variable in condition 2
+  form = "CN", # Parallel mediation
+  standardized = TRUE, # Compute standardized effects
+  bootstrap = 2000, # Bootstrap for confidence intervals
+  boot_ci_type = "perc",
+  alpha =  0.01,
+  iseed = 123 # Random seed for bootstrap
+)
+
+#' @examples
+#' data(example_data)
+ result <- wsMed(
+   data = example_data,
+   M_C1 = c("A2", "B2"),
+   M_C2 = c("A1", "B1"),
+   Y_C1 = "C1",
+   Y_C2 = "C1",
+   form = "P",
+   Na = "DE",
+   standardized = TRUE,
+   bootstrap = 1001
+ )
+#' print(result)
+
+result3 <- wsMed(
+  data = example_data, #dataset
+  M_C1 = c("A1","B1","C1"), # A1/B1/C1 is A/B/C mediator variable in condition 1
+  M_C2 = c("A2","B2","C2"), # A2/B2/C2 is A/B/C mediator variable in condition 2
+  Y_C1 = "D1", # D1 is outcome variable in condition 1
+  Y_C2 = "D2", # D2 is outcome variable in condition 2
+  form = "CP", # Parallel mediation
+  standardized = TRUE, # Compute standardized effects
+  bootstrap = 2000, # Bootstrap for confidence intervals
+  boot_ci_type = "perc",
+  iseed = 123 # Random seed for bootstrap
+)
+
+
+
+result4 <- wsMed(
+  data = example_data, #dataset
+  M_C1 = c("A1","B1","C1"), # A1/B1/C1 is A/B/C mediator variable in condition 1
+  M_C2 = c("A2","B2","C2"), # A2/B2/C2 is A/B/C mediator variable in condition 2
+  Y_C1 = "D1", # D1 is outcome variable in condition 1
+  Y_C2 = "D2", # D2 is outcome variable in condition 2
+  form = "PC", # Parallel mediation
+  standardized = TRUE, # Compute standardized effects
+  bootstrap = 2000, # Bootstrap for confidence intervals
+  boot_ci_type = "perc",
+  iseed = 123 # Random seed for bootstrap
+)
+
+print(result1)
+
+
+
+result4 <- wsMed5(
+  data = example_data, #dataset
+  M_C1 = c("A1","B1","C1"), # A1/B1/C1 is A/B/C mediator variable in condition 1
+  M_C2 = c("A2","B2","C2"), # A2/B2/C2 is A/B/C mediator variable in condition 2
+  Y_C1 = "D1", # D1 is outcome variable in condition 1
+  Y_C2 = "D2", # D2 is outcome variable in condition 2
+  form = "P", # Parallel mediation
+)
+#' # Example dataset with missing values
+data(example_data)
+ set.seed(123)
+ example_dataN <- mice::ampute(
+   data = example_data,
+   prop = 0.1
+ )$amp
+
+print(result5)
+
+data(example_data)
+set.seed(123)
+example_dataN <- mice::ampute(
+  data = example_data,
+  prop = 0.1,
+)$amp
+result5 <- wsMed(
+  data = example_dataN,
+  M_C1 = c("A1","B1","C1"),# A1/B1/C1 is A/B/C mediator variable in condition 1
+  M_C2 = c("A2","B2","C2"),# A2/B2/C2 is A/B/C mediator variable in condition 2
+  Y_C1 = "D1", # D1 is outcome variable in condition 1
+  Y_C2 = "D2", # D2 is outcome variable in condition 2
+  form = "P", # chained mediation
+  Na = "FIML", # Use Multiple Imputation ("MI") for handling missing data
+  standardized = TRUE
+)
+
+class(result5$std_fiml_result)
+
+print(result1)
+print(result2)
+print(result3)
+print(result4)
+print(result5)
+result8 <- wsMed(
+  data = dataE,
+  M_C1 = c("A1","B1"),# A1/B1/C1 is A/B/C mediator variable in condition 1
+  M_C2 = c("A2","B2"),# A2/B2/C2 is A/B/C mediator variable in condition 2
+  Y_C1 = "C1", # D1 is outcome variable in condition 1
+  Y_C2 = "C2", # D2 is outcome variable in condition 2
+  form = "P", # chained mediation
+  Na = "FIML", # Use Multiple Imputation ("MI") for handling missing data
+  standardized = TRUE,
+  R = 20000L,  # the number of Monte Carlo repetitions
+  alpha =  0.05,  # Significance level
+  alphastd = 0.05 # Significance level for standardized
+)
+print(result8)
+p
+print(result9)
+result9$mi_result
+summary(result9$lavaan_fit)
+
+result8$fiml_result2
+result8$fiml_result
+result8$std_fiml_result
+
+result9$mi_result
+result9$std_mi_result
+
+result7 <- wsMed(
+  data = dataE,
+  M_C1 = c("A1","B1"),# A1/B1/C1 is A/B/C mediator variable in condition 1
+  M_C2 = c("A2","B2"),# A2/B2/C2 is A/B/C mediator variable in condition 2
+  Y_C1 = "C1", # D1 is outcome variable in condition 1
+  Y_C2 = "C2", # D2 is outcome variable in condition 2
+  form = "P", # chained mediation
+  Na = "FIML", # Use Multiple Imputation ("MI") for handling missing data
+  standardized = TRUE,
+  R = 20000L,  # the number of Monte Carlo repetitions
+  alpha =  0.05,  # Significance level
+  alphastd = 0.05 # Significance level for standardized
+)
+
+result7$mi_result
+
+result6$mi_result
+
+result8 <- wsMed(
+  data = example_data,
+  M_C1 = c("A1","B1"),# A1/B1/C1 is A/B/C mediator variable in condition 1
+  M_C2 = c("A2","B2"),# A2/B2/C2 is A/B/C mediator variable in condition 2
+  Y_C1 = "C1", # D1 is outcome variable in condition 1
+  Y_C2 = "C2", # D2 is outcome variable in condition 2
+  form = "P", # chained mediation
+  Na = "DE", # Use Multiple Imputation ("MI") for handling missing data
+  standardized = TRUE,
+)
+
+result6$std_mi_result
+result7$std_result
+result7$std_fiml_result
+result7$std_fiml_result
+result7$std_fiml_result2
+
+head( example_dataN)
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Define the number of rows for the dataset
+num_rows <- 100  # Adjust this number as needed
+
+# Generate the dataset with random values between 1 and 10
+dataE <- data.frame(
+  A1 = sample(10:15, num_rows, replace = TRUE),
+  A2 = sample(20:25, num_rows, replace = TRUE),  # A2 is always larger than A1
+
+  # B1 and B2 with a large difference
+  B1 = sample(15:20, num_rows, replace = TRUE),
+  B2 = sample(25:30, num_rows, replace = TRUE),  # B2 is always larger than B1
+
+  # C1 and C2 with a large difference
+  C1 = sample(20:25, num_rows, replace = TRUE),
+  C2 = sample(30:35, num_rows, replace = TRUE),  # C2 is always larger than C1
+
+  # Outcome variables
+  D1 = sample(30:40, num_rows, replace = TRUE),
+  D2 = sample(35:45, num_rows, replace = TRUE)
+)
+
+# View the first few rows of the generated data
+head(dataE)
+data(dataE)
+set.seed(123)
+dataE <- mice::ampute(
+  data = dataE,
+  prop = 0.1,
+)$amp
+summary(dataE)
