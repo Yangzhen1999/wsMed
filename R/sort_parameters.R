@@ -26,7 +26,8 @@
 #' sort_parameters(df)
 #'
 #' @keywords internal
-#' @export
+#' @keywords internal
+
 
 
 sort_parameters <- function(df) {

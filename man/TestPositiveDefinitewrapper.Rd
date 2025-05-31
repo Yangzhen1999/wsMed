@@ -31,3 +31,4 @@ if all of its eigenvalues are positive.
 \references{
 \href{https://en.wikipedia.org/wiki/Definite_matrix}{Wikipedia: Definite matrix}
 }
+\keyword{internal}

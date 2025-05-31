@@ -23,3 +23,4 @@ The function extracts the model's RAM representation via \code{Lav2RAM2}, applie
 restores the standardized GLIST via \code{RAM2Lav2}, and retrieves standardized user-defined parameter estimates
 with \code{lav_model_get_parameters()}.
 }
+\keyword{internal}

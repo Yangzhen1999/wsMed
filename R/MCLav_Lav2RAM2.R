@@ -15,7 +15,7 @@
 #'
 #' @details This function reorganizes the lavaan-style matrices into the RAM representation,
 #' commonly used for model standardization and transformation.
-#' @export
+#' @keywords internal
 Lav2RAM2 <- function(lav_mod) {
   ov_names <- rownames(lav_mod$theta)
   lv_names <- rownames(lav_mod$psi)

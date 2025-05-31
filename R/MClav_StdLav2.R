@@ -11,6 +11,7 @@
 #' @details The function extracts the model's RAM representation via `Lav2RAM2`, applies `StdRAM2` standardization,
 #' restores the standardized GLIST via `RAM2Lav2`, and retrieves standardized user-defined parameter estimates
 #' with `lav_model_get_parameters()`.
+#' @keywords internal
 
 StdLav2 <- function(est, object) {
   lav_model <- object@Model

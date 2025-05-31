@@ -37,3 +37,4 @@ Each result includes Monte Carlo estimates, SEs, and CIs.
 Performs Monte Carlo simulation to estimate confidence intervals for both
 unstandardized and (optionally) standardized mediation parameters, based on fitted SEM models.
 }
+\keyword{internal}

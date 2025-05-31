@@ -20,7 +20,8 @@
 #'
 #' @examples NULL
 #'
-#' @export
+#' @keywords internal
+
 
 ThetaHatStarWrapper <- function(R = 20000L,
                           scale,

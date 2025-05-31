@@ -18,6 +18,7 @@
 #'
 #' @details The function standardizes the sampling distribution using `StdLav2()` on each Monte Carlo draw,
 #' then summarizes the distribution into SEs and quantile-based confidence intervals.
+#' @keywords internal
 
 MCStd2 <- function(mc,
                    alpha = c(0.001, 0.01, 0.05)) {

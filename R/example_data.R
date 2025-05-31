@@ -1,5 +1,5 @@
 #' @title Example Data for within subject mediation
-#'
+#' @keywords internal
 #' @description A simulated dataset containing variables for within-subject mediation analysis.
 #' The dataset includes four within-subject variables (A, B, C, D), each measured at three levels:
 #' - **A1, A2, A3**: Levels of within-subject variable A (e.g., mediator conditions).

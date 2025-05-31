@@ -10,6 +10,7 @@
 #' @return A modified lavaan-style matrix list with updated `lambda`, `beta`, `theta`, `psi`, and `alpha`.
 #'
 #' @details This function restores the internal lavaan model matrix structure from a RAM representation.
+#' @keywords internal
 
 RAM2Lav2 <- function(ram, lav_mod, standardized = FALSE) {
   ov_names <- rownames(lav_mod$theta)

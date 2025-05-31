@@ -15,6 +15,7 @@
 #'
 #' @details The function computes the implied covariance matrix \eqn{\Sigma = (I - A)^{-1} S (I - A)^{-T}},
 #' extracts standard deviations, and performs standardization via \eqn{D^{-1}} scaling.
+#' @keywords internal
 
 StdRAM2 <- function(ram_est) {
   a_mat <- ram_est$A

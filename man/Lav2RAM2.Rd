@@ -26,3 +26,4 @@ including the A (asymmetric paths), S (symmetric paths), F (filter matrix), and 
 This function reorganizes the lavaan-style matrices into the RAM representation,
 commonly used for model standardization and transformation.
 }
+\keyword{internal}

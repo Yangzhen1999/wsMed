@@ -13,7 +13,7 @@
 #'
 #' @return A list with unstandardized and (if requested) standardized results.
 #' Each result includes Monte Carlo estimates, SEs, and CIs.
-#' @export
+#' @keywords internal
 run_mc_mediation <- function(fit,
                              data,
                              standardized = FALSE,
@@ -88,7 +88,6 @@ run_mc_mediation <- function(fit,
 #' @param path_std_map A named list returned by [build_path_std_map()].
 #' @return A character vector of variable names.
 #' @keywords internal
-#' @export
 get_all_variables_from_path_map <- function(path_std_map) {
   unique(unlist(path_std_map))
 }

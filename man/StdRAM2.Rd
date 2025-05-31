@@ -26,3 +26,4 @@ using the implied covariance matrix. Intercepts are also standardized.
 The function computes the implied covariance matrix \eqn{\Sigma = (I - A)^{-1} S (I - A)^{-T}},
 extracts standard deviations, and performs standardization via \eqn{D^{-1}} scaling.
 }
+\keyword{internal}

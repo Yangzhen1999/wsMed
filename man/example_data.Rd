@@ -38,4 +38,4 @@ The dataset includes four within-subject variables (A, B, C, D), each measured a
 data(example_data)
 head(example_data)
 }
-\keyword{datasets}
+\keyword{internal}

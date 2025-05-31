@@ -27,3 +27,4 @@ A data frame with one row per parameter and the following columns:
 Computes summary statistics for Monte Carlo simulation results, including
 the mean estimate, standard error (SE), and confidence intervals (CIs).
 }
+\keyword{internal}

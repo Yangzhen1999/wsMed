@@ -128,3 +128,4 @@ result <- RunMCMIAnalysis(
 \seealso{
 \code{\link[=PrepareMissingData]{PrepareMissingData()}}, \code{\link[=MCMI2]{MCMI2()}}, \code{\link[=wsMed]{wsMed()}}
 }
+\keyword{internal}

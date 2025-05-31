@@ -30,7 +30,9 @@ wsMed(
   pd = TRUE,
   tol = 1e-06,
   seed = 123,
-  MCmethod = NULL
+  MCmethod = NULL,
+  store_boot_args = list(),
+  ...
 )
 }
 \arguments{

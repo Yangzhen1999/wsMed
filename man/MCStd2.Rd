@@ -30,3 +30,4 @@ both point estimates and sampling distributions (including intercepts).
 The function standardizes the sampling distribution using \code{StdLav2()} on each Monte Carlo draw,
 then summarizes the distribution into SEs and quantile-based confidence intervals.
 }
+\keyword{internal}

@@ -17,8 +17,7 @@
 #'   \item{CI_upper}{The upper bound of the confidence interval.}
 #' }
 #'
-#' @export
-
+#' @keywords internal
 summarize_mc_ci <- function(mc_result, alpha = 0.05) {
   stopifnot(is.data.frame(mc_result))
   lower <- alpha / 2

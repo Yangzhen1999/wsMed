@@ -13,7 +13,8 @@
 #' @param path_std_map A named list mapping path labels to a vector of (predictor, outcome) variable names.
 #'
 #' @return A data frame of R rows (simulations) * all parameters (standardized free + defined).
-#' @export
+#' @keywords internal
+
 evaluate_definitions_v3 <- function(theta_star,
                                     definitions,
                                     std_map,
@@ -120,7 +121,7 @@ evaluate_definitions_v3 <- function(theta_star,
 #'
 #' @return A data frame with R rows (simulations) and p + d columns
 #'   (p = number of free parameters, d = number of defined parameters).
-#' @export
+#' @keywords internal
 evaluate_definitions_unstd_v2 <- function(theta_star, definitions) {
   R <- nrow(theta_star)
   def_names <- names(definitions)

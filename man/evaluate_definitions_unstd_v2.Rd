@@ -19,3 +19,4 @@ A data frame with R rows (simulations) and p + d columns
 Evaluates user-defined parameter expressions from Monte Carlo samples
 without any standardization.
 }
+\keyword{internal}

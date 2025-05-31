@@ -35,3 +35,4 @@ and standardized free parameters from Monte Carlo simulated samples.
 This version supports both intercept-based standardization and
 path-based standardization.
 }
+\keyword{internal}

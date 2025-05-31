@@ -23,3 +23,4 @@ Optionally ensures correlations for \code{theta} and \code{psi} matrices.
 \details{
 This function restores the internal lavaan model matrix structure from a RAM representation.
 }
+\keyword{internal}

@@ -78,7 +78,7 @@
 #'   alpha = c(0.05, 0.01)
 #' )
 #'
-#' @export
+#' @keywords internal
 
 RunMCMIAnalysis <- function(data_missing,
                             m = 5,
