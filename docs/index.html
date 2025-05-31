@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>What the Package Does (One Line, Title Case) • wsMed</title>
+<title>Title: Within-Subject Mediation Analysis Using SEM • wsMed</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="What the Package Does (One Line, Title Case)">
-<meta name="description" content="What the package does (one paragraph).">
-<meta property="og:description" content="What the package does (one paragraph).">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Title: Within-Subject Mediation Analysis Using SEM">
+<meta name="description" content="Within-subject mediation analysis using structural equation modeling. Examine how changes in an outcome variable between two conditions are mediated through one or more variables.">
+<meta property="og:description" content="Within-subject mediation analysis using structural equation modeling. Examine how changes in an outcome variable between two conditions are mediated through one or more variables.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,12 +37,12 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials">
 <li><a class="dropdown-item" href="articles/wsMed.html">Introduction to wsMed</a></li>
-    <li><a class="dropdown-item" href="articles/printGM.html">Using printGM() to generate SEM models in detail</a></li>
+    <li><a class="dropdown-item" href="articles/printGM.html">Using printGM() to Generate SEM Models</a></li>
     <li><a class="dropdown-item" href="articles/GenerateModelP.html">Parallel Mediation (P)</a></li>
     <li><a class="dropdown-item" href="articles/GenerateModelCN.html">Chained Mediation (CN)</a></li>
-    <li><a class="dropdown-item" href="articles/GenerateModelCP.html">Combined Parallel and Chained Mediation (CP)</a></li>
-    <li><a class="dropdown-item" href="articles/GenerateModelPC.html">Parallel + Chained Mediation (PC)</a></li>
-    <li><a class="dropdown-item" href="articles/MEMORE_vs_wsMed.html">Comparison of MEMORE 3.0 and wsMed Outputs</a></li>
+    <li><a class="dropdown-item" href="articles/GenerateModelCP.html">Combined Parallel and Chained (CP)</a></li>
+    <li><a class="dropdown-item" href="articles/GenerateModelPC.html">Parallel + Chained (PC)</a></li>
+    <li><a class="dropdown-item" href="articles/MEMORE_vs_wsMed.html">Comparison: MEMORE 3.0 vs wsMed</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
@@ -59,7 +59,7 @@
   <main id="main" class="col-md-9"><p># wsMed</p>
 <p><!-- badges: start --></p>
 <p><!-- badges: end --></p>
-<p>wsMed is an R package for within-subject mediation analysis designed to help researchers examine how changes in an outcome variable between two conditions are mediated through one or more variables. The package supports multiple mediation models, including chained, parallel, and combined chained + parallel mediation, allowing for any number of mediators. It generates both unstandardized and standardized results and provides flexible options for handling missing data, including Multiple Imputation (MI) and Full Information Maximum Likelihood (FIML).</p>
+<p><code>wsMed</code> performs within-subject mediation analysis for two-condition designs using SEM, supporting multiple mediators, four mediation structures, flexible missing data handling (DE, MI, FIML), both bootstrap and Monte Carlo confidence inference, modeling of within- and between-subject covariates, and standardized and unstandardized estimates with confidence intervals.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -81,19 +81,24 @@
 <span></span>
 <span><span class="co"># Load example data</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
+<span><span class="va">example_dataN</span> <span class="op">&lt;-</span> <span class="fu">mice</span><span class="fu">::</span><span class="fu"><a href="https://amices.org/mice/reference/ampute.html" class="external-link">ampute</a></span><span class="op">(</span></span>
+<span>data <span class="op">=</span> <span class="va">example_data</span>,</span>
+<span>prop <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span><span class="op">)</span><span class="op">$</span><span class="va">amp</span></span>
 <span></span>
 <span><span class="co"># Perform within-subject mediation analysis (Parallel mediation model)</span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/wsMed/man/WsMed.html" class="external-link">WsMed</a></span><span class="op">(</span></span>
-<span>data <span class="op">=</span> <span class="va">example_data</span>,</span>
-<span>M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>, <span class="co"># A1/B1 is A/B mediator variable in condition 1 </span></span>
-<span>M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span><span class="op">)</span>,  <span class="co"># A2/B2 is A/B mediator variable in condition 2 </span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
+<span>data <span class="op">=</span> <span class="va">example_dataN</span>, <span class="co">#dataset</span></span>
+<span>M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>,<span class="st">"B1"</span><span class="op">)</span>, <span class="co"># A1/B1 is A/B mediator variable in condition 1</span></span>
+<span>M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>,<span class="st">"B2"</span><span class="op">)</span>, <span class="co"># A2/B2 is A/B mediator variable in condition 2</span></span>
 <span>Y_C1 <span class="op">=</span> <span class="st">"C1"</span>, <span class="co"># C1 is outcome variable in condition 1</span></span>
-<span>Y_C2 <span class="op">=</span> <span class="st">"C2"</span>,  <span class="co"># C2 is outcome variable in condition 2</span></span>
-<span>form <span class="op">=</span> <span class="st">"P"</span>,            <span class="co"># Parallel mediation</span></span>
-<span>standardized <span class="op">=</span> <span class="cn">TRUE</span>,   <span class="co"># Compute standardized effects</span></span>
-<span>Na <span class="op">=</span> <span class="st">"DE"</span>,             <span class="co"># Deletion method for missing data</span></span>
-<span>bootstrap <span class="op">=</span> <span class="fl">1000</span>,      <span class="co"># Bootstrap for confidence intervals</span></span>
-<span>iseed <span class="op">=</span> <span class="fl">123</span>            <span class="co"># Random seed for bootstrap</span></span>
+<span>Y_C2 <span class="op">=</span> <span class="st">"C2"</span>, <span class="co"># C2 is outcome variable in condition 2</span></span>
+<span>form <span class="op">=</span> <span class="st">"P"</span>, <span class="co"># Parallel mediation</span></span>
+<span>C_C1 <span class="op">=</span> <span class="st">"D1"</span>, <span class="co"># within-subject covariate (e.g., measured under D1)</span></span>
+<span>C_C2 <span class="op">=</span> <span class="st">"D2"</span>, <span class="co"># within-subject covariate (e.g., measured under C2)</span></span>
+<span>C <span class="op">=</span> <span class="st">"D3"</span>, <span class="co"># between-subject covariates</span></span>
+<span>Na <span class="op">=</span> <span class="st">"MI"</span> <span class="co"># Use multiple imputation for missing data</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Print summary results</span></span>
@@ -147,57 +152,86 @@
 <h3 id="id_2-comprehensive-output">
 <strong>2. Comprehensive Output</strong><a class="anchor" aria-label="anchor" href="#id_2-comprehensive-output"></a>
 </h3>
-<p><code>wsMed</code> provides <strong>detailed mediation results</strong>. In addition to the basic model fit statistics, it includes:</p>
+<p><code>wsMed</code> provides a comprehensive and structured summary of within-subject mediation analysis results. The output is organized into clearly labeled sections:</p>
 <ul>
 <li>
-<strong>Total and Direct Effects</strong>: Estimates, standardized errors,p-values,z-values and CIs for the overall and direct influence of the independent variable.</li>
+<strong>VARIABLES</strong>: Lists all original variables, including the outcome, mediators, and covariates, as well as the derived variables such as within-subject difference scores (e.g., <code>Ydiff</code>, <code>M1diff</code>) and centered averages (e.g., <code>M1avg</code>, <code>Cw1avg</code>).</li>
 <li>
-<strong>Indirect Effects</strong>: Estimates, standardized errors,p-values,z-values and CIs for each mediated path in the model.</li>
+<strong>MODEL FIT INDICES</strong>: Presents global model fit statistics from structural equation modeling, including chi-square, degrees of freedom, CFI, TLI, RMSEA, and SRMR.</li>
 <li>
-<strong>Contrast Indirect Effects</strong>: Pairwise comparisons of indirect effects between different mediation paths.</li>
+<strong>REGRESSION PATHS</strong>: Summarizes estimated regression coefficients for all paths, including:
+<ul>
+<li>Effects of mediator change scores (e.g., <code>b1</code>, <code>b2</code>, …),</li>
+<li>Moderation effects via centered averages (e.g., <code>d1</code>, <code>d2</code>, …),</li>
+<li>Covariate effects on both the outcome and mediators.</li>
+</ul>
+</li>
 <li>
-<strong>Moderation Effects of ‘X’</strong>: Analysis of whether a moderator influences the mediation paths.</li>
+<strong>INTERCEPTS</strong>: Reports estimated intercepts for all endogenous variables in the model.</li>
 <li>
-<strong>Condition1-Condition2 Coefficients</strong>: Comparison of coefficients between two conditions.</li>
+<strong>VARIANCES</strong>: Provides residual variances for the outcome and mediator variables.</li>
 <li>
-<strong>Standardized Results</strong>: Standardized estimates and confidence intervals, allowing for easier interpretation and comparison across variables.</li>
+<strong>Total and Direct Effects</strong>: Includes estimates, standard errors, <em>z</em>-values, <em>p</em>-values, and confidence intervals for the overall and direct effects of the independent variable.</li>
+<li>
+<strong>Indirect Effects</strong>: Reports full inference results for each mediation path, including standard errors, confidence intervals, and significance tests.</li>
+<li>
+<strong>Contrast Indirect Effects</strong>: Provides pairwise comparisons between indirect effects from different mediation routes.</li>
+<li>
+<strong>Moderation Effects of X</strong>: Tests whether the mediation effects are moderated by the independent variable across conditions.</li>
+<li>
+<strong>Condition 1 vs. Condition 2 Coefficients</strong>: Compares the strength of path coefficients between the two within-subject conditions.</li>
+<li>
+<strong>Standardized Results</strong>: Displays standardized path estimates and their confidence intervals to facilitate interpretation and comparison across variables.</li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="id_3-missing-data-handling">
 <strong>3. Missing Data Handling</strong><a class="anchor" aria-label="anchor" href="#id_3-missing-data-handling"></a>
 </h3>
-<p><code>wsMed</code> offers <strong>flexible strategies for handling missing data</strong>: - <strong>Listwise Deletion</strong> (<code>"DE"</code>) – Removes rows with missing values. - <strong>Full Information Maximum Likelihood</strong> (<code>"FIML"</code>) – Uses SEM to handle missing data in the analysis. - <strong>Multiple Imputation</strong> (<code>"MI"</code>) – Imputes missing data using the <code>mice</code> package, providing more robust results.</p>
+<p><code>wsMed</code> offers <strong>flexible strategies for handling missing data</strong>: - <strong>Listwise Deletion</strong> (<code>"DE"</code>) – Removes rows with missing values.</p>
+<ul>
+<li><p><strong>Full Information Maximum Likelihood</strong> (<code>"FIML"</code>) – Uses SEM to handle missing data in the analysis.</p></li>
+<li><p><strong>Multiple Imputation</strong> (<code>"MI"</code>) – Imputes missing data using the <code>mice</code> package, providing more robust results.</p></li>
+</ul>
 </div>
 <div class="section level3">
 <h3 id="id_4-standardized-and-unstandardized-estimates">
 <strong>4. Standardized and Unstandardized Estimates</strong><a class="anchor" aria-label="anchor" href="#id_4-standardized-and-unstandardized-estimates"></a>
 </h3>
 <ul>
-<li>
-<strong>Unstandardized Effects</strong>: Raw coefficients for each path in the mediation model, providing the <strong>direct</strong> and <strong>indirect</strong> effects between variables.</li>
-<li>
-<strong>Standardized Effects</strong>: Standardized coefficients that express the effect sizes without depending on the measurement scale of the variables. These provide a clearer understanding of the relative importance of each mediator in the model.</li>
+<li><p><strong>Unstandardized Effects</strong>: Raw coefficients for each path in the mediation model, providing the <strong>direct</strong> and <strong>indirect</strong> effects between variables.</p></li>
+<li><p><strong>Standardized Effects</strong>: Standardized coefficients that express the effect sizes without depending on the measurement scale of the variables. These provide a clearer understanding of the relative importance of each mediator in the model.</p></li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="id_5-confidence-intervals-cis">
 <strong>5. Confidence Intervals (CIs)</strong><a class="anchor" aria-label="anchor" href="#id_5-confidence-intervals-cis"></a>
 </h3>
-<p><code>wsMed</code> calculates <strong>confidence intervals (CIs)</strong> for both raw and standardized estimates, with different methods used depending on how missing data is handled:</p>
+<p><code>wsMed</code> supports two types of confidence intervals (CIs) for both raw and standardized estimates:</p>
 <ul>
-<li>
-<strong>Monte Carlo Confidence Intervals</strong>: - Used when Multiple Imputation (MI) or Full Information Maximum Likelihood (FIML) is used for handling missing data.</li>
-<li>Provides robust and reliable confidence intervals based on simulation.</li>
-<li>
-<strong>Bootstrap Confidence Intervals</strong>:</li>
-<li>Used when <strong>Listwise Deletion (DE)</strong> is used to handle missing data or no missing data.</li>
-<li>Provides confidence intervals based on resampling, ensuring accurate estimates for standard and non-standardized results.</li>
+<li><p><strong>Monte Carlo CIs</strong>:<br>
+Available for all missing data methods (<strong>DE</strong>, <strong>FIML</strong>, <strong>MI</strong>).<br>
+Mandatory for <strong>MI</strong>; optional for <strong>DE</strong> and <strong>FIML</strong> (<code>ci_method = "MC"</code>).</p></li>
+<li><p><strong>Bootstrap CIs</strong>:<br>
+Available when missing data is handled via <strong>DE</strong> or <strong>FIML</strong>.<br>
+Default under <strong>DE</strong> unless Monte Carlo is specified.</p></li>
 </ul>
+<p>Users can specify the number of repetitions (<code>R</code> for Monte Carlo, <code>bootstrap</code> for resampling) and confidence levels (<code>alpha</code>, <code>alphastd</code>) for flexible inference across model parameters.</p>
 </div>
 <div class="section level3">
-<h3 id="id_6-user-friendly-and-efficient">
-<strong>6. User-Friendly and Efficient</strong><a class="anchor" aria-label="anchor" href="#id_6-user-friendly-and-efficient"></a>
+<h3 id="id_6-covariate-handling">
+<strong>6. Covariate Handling</strong><a class="anchor" aria-label="anchor" href="#id_6-covariate-handling"></a>
+</h3>
+<p><code>wsMed</code> supports covariates measured at both within-subject and between-subject levels:</p>
+<ul>
+<li><p><strong>Within-subject covariates</strong>: Variables measured under both conditions (e.g., pre vs. post) in the same way as mediators and outcomes. These are supplied via <code>C_C1</code> and <code>C_C2</code>, and are processed into difference scores and centered averages.</p></li>
+<li><p><strong>Between-subject covariates</strong>: Time-invariant or single-time-point variables (e.g., age, gender, BMI), passed via the <code>C</code> argument. These are directly included as predictors of mediators and the outcome.</p></li>
+</ul>
+<p>All covariates can simultaneously predict changes in mediators and outcome, and their effects are reported alongside main path coefficients.</p>
+</div>
+<div class="section level3">
+<h3 id="id_7-user-friendly-and-efficient">
+<strong>7. User-Friendly and Efficient</strong><a class="anchor" aria-label="anchor" href="#id_7-user-friendly-and-efficient"></a>
 </h3>
 <p>With <code>wsMed</code>, <strong>all you need to do is call the <code>wsMed</code> function</strong>, and the package will handle everything for you. This makes <code>wsMed</code> accessible to both <strong>beginners</strong> and <strong>advanced users</strong>, providing a streamlined process for complex within subject mediation analysis.</p>
 </div>
@@ -229,7 +263,8 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>First Last <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/YOUR-ORCID-ID" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Wendie Yang <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0009-0000-8388-6481" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Shu Fai Cheung <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-9871-9448" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 </ul>
 </div>
 
@@ -240,7 +275,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by First Last.</p>
+  <p>Developed by Wendie Yang, Shu Fai Cheung.</p>
 </div>
 
 <div class="pkgdown-footer-right">

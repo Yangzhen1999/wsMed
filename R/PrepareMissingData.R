@@ -22,14 +22,17 @@
 #' @param data_missing A data frame containing the raw dataset with missing values.
 #' @param m An integer specifying the number of imputations to perform. Default is `5`.
 #' @param method A character string specifying the imputation method. Default is `"pmm"`
-#' (predictive mean matching). Other methods supported by [mice()] can be used.
+#' (predictive mean matching).
 #' @param seed An integer specifying the random seed for reproducibility. Default is `123`.
 #' @param M_C1 A character vector of column names representing mediators "before" the intervention.
 #' @param M_C2 A character vector of column names representing mediators "after" the intervention.
 #' Must match the length of `M_C1`.
 #' @param Y_C1 A character string representing the column name of the outcome variable "before" the intervention.
 #' @param Y_C2 A character string representing the column name of the outcome variable "after" the intervention.
-#'
+#' @param C_C1 Character vector of within-subject control variable names (condition 1).
+#' @param C_C2 Character vector of within-subject control variable names (condition 2).
+#' @param C Character vector of between-subject control variable names.
+
 #' @return A list containing:
 #' - `processed_data_list`: A list of `m` data frames, each representing an imputed and processed dataset,
 #' ready for within-subject mediation analysis.
@@ -40,10 +43,10 @@
 #' @examples
 #' # Example dataset with missing values
 #' data(example_data)
-#' set.seed(123)  
+#' set.seed(123)
 #' example_dataN <- mice::ampute(
-#'    data = example_data,        
-#'    prop = 0.1,       
+#'    data = example_data,
+#'    prop = 0.1,
 #'    )$amp
 #'
 #' # Prepare the dataset with multiple imputations
@@ -70,7 +73,11 @@ PrepareMissingData <- function(data_missing,
                                M_C1,
                                M_C2,
                                Y_C1,
-                               Y_C2) {
+                               Y_C2,
+                               C_C1 = NULL,
+                               C_C2 = NULL,
+                               C = NULL) {
+  # 检查输入
   if (length(M_C1) != length(M_C2)) {
     stop("Error in PrepareMissingData: M_C1 and M_C2 must have the same length.")
   }
@@ -79,27 +86,43 @@ PrepareMissingData <- function(data_missing,
     stop("Error in PrepareMissingData: Y_C1 or Y_C2 is missing in the dataset.")
   }
 
+  # -------- Step 1: 选出需要插补的变量列 --------
+  relevant_vars <- c(Y_C1, Y_C2, M_C1, M_C2)
+
+  if (!is.null(C)) relevant_vars <- c(relevant_vars, C)
+  if (!is.null(C_C1) && !is.null(C_C2)) relevant_vars <- c(relevant_vars, C_C1, C_C2)
+
+  relevant_vars <- unique(relevant_vars)
+  data_reduced <- data_missing[, relevant_vars, drop = FALSE]
+
+  # -------- Step 2: 执行多重插补 --------
   imputed_result <- ImputeData(
-    data_missing = data_missing,
+    data_missing = data_reduced,
     m = m,
     method = method,
     seed = seed
   )
-
   imputed_data_list <- imputed_result$imputed_data_list
 
+  # -------- Step 3: 处理每一个插补后的数据集 --------
   processed_data_list <- lapply(imputed_data_list, function(imputed_data) {
     PrepareData(
       data = imputed_data,
       M_C1 = M_C1,
       M_C2 = M_C2,
       Y_C1 = Y_C1,
-      Y_C2 = Y_C2
+      Y_C2 = Y_C2,
+      C_C1 = C_C1,
+      C_C2 = C_C2,
+      C = C
     )
   })
 
   return(list(
+    mids = imputed_result$mids,
     processed_data_list = processed_data_list,
-    imputation_summary = imputed_result$summary   
+    imputation_summary = imputed_result$summary
   ))
 }
+
+

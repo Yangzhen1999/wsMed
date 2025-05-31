@@ -19,7 +19,7 @@
 #' @param data_missing A data frame containing the raw dataset with missing values.
 #' @param m An integer specifying the number of imputations to perform. Default is `5`.
 #' @param method A character string specifying the imputation method. Default is `"pmm"`
-#' (predictive mean matching). Other methods supported by [mice()] can be used.
+#' (predictive mean matching).
 #' @param seed An integer specifying the random seed for reproducibility. Default is `123`.
 #' @param M_C1 A character vector of column names representing mediators "before" the intervention.
 #' @param M_C2 A character vector of column names representing mediators "after" the intervention.
@@ -34,6 +34,9 @@
 #' Default is `"eigen"`. Options include `"chol"`, `"eigen"`, or `"svd"`.
 #' @param pd A logical value indicating whether to ensure positive definiteness of the covariance matrix. Default is `TRUE`.
 #' @param tol A numeric value specifying the tolerance for positive definiteness checks. Default is `1e-06`.
+#' @param C_C1 Character vector of within-subject control variable names (condition 1).
+#' @param C_C2 Character vector of within-subject control variable names (condition 2).
+#' @param C Character vector of between-subject control variable names.
 #'
 #' @return A `semmcci` object containing the Monte Carlo analysis results, including:
 #' - `thetahat`: The pooled parameter estimates.
@@ -45,10 +48,10 @@
 #' @examples
 #' # Example dataset with missing values
 #' data(example_data)
-#' set.seed(123)  
+#' set.seed(123)
 #' example_dataN <- mice::ampute(
-#'    data = example_data,       
-#'    prop = 0.1,       
+#'    data = example_data,
+#'    prop = 0.1,
 #'    )$amp
 #'
 #'
@@ -75,7 +78,7 @@
 #'   alpha = c(0.05, 0.01)
 #' )
 #'
-#' @export
+#' @keywords internal
 
 RunMCMIAnalysis <- function(data_missing,
                             m = 5,
@@ -85,6 +88,9 @@ RunMCMIAnalysis <- function(data_missing,
                             M_C2,
                             Y_C1,
                             Y_C2,
+                            C_C1 = NULL,
+                            C_C2 = NULL,
+                            C = NULL,
                             sem_model,
                             Na = "MI",
                             R = 20000L,
@@ -92,12 +98,11 @@ RunMCMIAnalysis <- function(data_missing,
                             decomposition = "eigen",
                             pd = TRUE,
                             tol = 1e-06) {
-  # Step 1: 初始化结果变量
-  mi_result <- NULL
 
-  # Step 2: 检查是否启用 Monte Carlo (MC)
+  mi_result <- NULL
+  first_imputed_data <- NULL
+
   if (Na == "MI") {
-    # 插补并处理数据
     prepared_data <- PrepareMissingData(
       data_missing = data_missing,
       m = m,
@@ -106,13 +111,15 @@ RunMCMIAnalysis <- function(data_missing,
       M_C1 = M_C1,
       M_C2 = M_C2,
       Y_C1 = Y_C1,
-      Y_C2 = Y_C2
+      Y_C2 = Y_C2,
+      C_C1 = C_C1,
+      C_C2 = C_C2,
+      C = C
     )
 
-    # 获取处理后的插补数据集列表
     processed_data_list <- prepared_data$processed_data_list
+    first_imputed_data <- processed_data_list[[1]]
 
-    # 调用 MCMI2 进行 Monte Carlo 分析
     mi_result <- MCMI2(
       sem_model = sem_model,
       imputations = processed_data_list,
@@ -127,6 +134,9 @@ RunMCMIAnalysis <- function(data_missing,
     stop("MI is set to FALSE. Currently, only MI = TRUE is supported.")
   }
 
-  # 返回分析结果
-  return(mi_result)
+  return(list(
+    mc_result = mi_result,
+    first_imputed_data = first_imputed_data
+  ))
 }
+

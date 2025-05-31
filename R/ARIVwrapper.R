@@ -29,7 +29,7 @@
 #' @return Returns a numeric vector of length one.
 #'
 #
-#' @export
+#' @keywords internal
 ARIVwrapper <- function(between,
                   within,
                   M,

@@ -13,8 +13,7 @@ vignette: >
 The `WsMed()` function returns a list containing `sem_model`. `printGM()` can automatically extract and format the model equations.
 
 ```{r, message=FALSE, warning=FALSE}
-devtools::load_all()
-library(wsMed) 
+library(wsMed)
 result1 <- wsMed(
   data = example_data,
   M_C1 = c("A1","B1","C1"),
@@ -35,7 +34,7 @@ If you already have preprocessed data, you can directly generate the SEM model s
 
 ```{r, message=FALSE, warning=FALSE}
 # Load necessary packages
-library(wsMed) 
+library(wsMed)
 # Load example data
 data(example_data)
 

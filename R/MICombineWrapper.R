@@ -26,7 +26,8 @@
 #'
 #' @examples NULL
 #'
-#' @export
+#' @keywords internal
+
 MICombineWrapper <- function(coefs, vcovs, M, k, adj = FALSE) {
   est <- colMeans(
     do.call(

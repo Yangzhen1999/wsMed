@@ -54,7 +54,6 @@ prepared_data <- data.frame(
 # Generate SEM model syntax
 sem_model <- GenerateModelP(prepared_data)
 cat(sem_model)
-
 }
 \seealso{
 \code{\link[=PrepareData]{PrepareData()}}, \code{\link[=wsMed]{wsMed()}}, \code{\link[=GenerateModelCN]{GenerateModelCN()}}

@@ -57,87 +57,90 @@
 #'
 #' @export
 GenerateModelCP <- function(prepared_data) {
-  chain_var <- grep("M1diff", colnames(prepared_data), value = TRUE)
-  parallel_vars <- setdiff(grep("M\\ddiff", colnames(prepared_data), value = TRUE), chain_var)
-  chain_avg <- grep("M1avg", colnames(prepared_data), value = TRUE)
-  parallel_avgs <- setdiff(grep("M\\davg", colnames(prepared_data), value = TRUE), chain_avg)
+  # 提取变量
+  chain_var <- grep("^M1diff$", colnames(prepared_data), value = TRUE)
+  chain_avg <- grep("^M1avg$", colnames(prepared_data), value = TRUE)
+  all_mdiff <- sort(grep("^M\\d+diff$", colnames(prepared_data), value = TRUE))
+  all_mavg  <- sort(grep("^M\\d+avg$",  colnames(prepared_data), value = TRUE))
 
-  if (length(chain_var) != 1) {
-    stop("The chain mediator should contain exactly one variable: M1diff.")
-  }
 
-  n <- length(parallel_vars)  
+  parallel_vars  <- setdiff(all_mdiff, chain_var)
+  parallel_avgs  <- setdiff(all_mavg, chain_avg)
+  n <- length(parallel_vars)
 
-  regression_y <- paste(
-    "Ydiff ~ cp*1 + b1*", chain_var,
-    paste0(" + ", paste0("b", 2:(n + 1), "*", parallel_vars, collapse = " + ")),
-    paste0(" + d1*", chain_avg),
-    paste0(" + ", paste0("d", 2:(n + 1), "*", parallel_avgs, collapse = " + ")),
-    sep = ""
+  if (length(chain_var) != 1) stop("The chain mediator should contain exactly one variable: M1diff.")
+
+  # 控制变量识别
+  between_covs <- grep("^Cb\\d+$", colnames(prepared_data), value = TRUE)
+  within_covs  <- grep("^Cw\\d+(diff|avg)$", colnames(prepared_data), value = TRUE)
+  control_vars <- c(between_covs, within_covs)
+  control_rhs  <- if (length(control_vars) > 0) paste(control_vars, collapse = " + ") else NULL
+
+  # Ydiff 回归模型
+  y_rhs <- c(
+    paste0("cp*1"),
+    paste0("b1*", chain_var),
+    paste0("b", 2:(n + 1), "*", parallel_vars),
+    paste0("d1*", chain_avg),
+    paste0("d", 2:(n + 1), "*", parallel_avgs),
+    control_rhs
   )
+  regression_y <- paste("Ydiff ~", paste(na.omit(y_rhs), collapse = " + "))
 
+  # 中介模型：M1diff（链式起点）+ 并行中介
   regression_m <- c()
+  regression_m <- c(regression_m, paste(chain_var, "~", paste(c("a1*1", control_rhs), collapse = " + ")))
+
   for (i in seq_along(parallel_vars)) {
-    regression_m <- c(
-      regression_m,
-      paste0(parallel_vars[i], " ~ a", i + 1, "*1 + b1", i + 1, "*", chain_var,
-             " + d1", i + 1, "*", chain_avg)
+    rhs <- c(
+      paste0("a", i + 1, "*1"),
+      paste0("b1", i + 1, "*", chain_var),
+      paste0("d1", i + 1, "*", chain_avg),
+      control_rhs
     )
+    regression_m <- c(regression_m, paste(parallel_vars[i], "~", paste(na.omit(rhs), collapse = " + ")))
   }
-  regression_m <- c(
-    paste0(chain_var, " ~ a1*1"),  
-    regression_m
-  )
 
-  indirect_effects <- c()
-  indirect_effect_labels <- c()
-  indirect_effects <- c(indirect_effects, paste0("indirect1 := a1 * b1"))
-  indirect_effect_labels <- c(indirect_effect_labels, "indirect1")
+  # 间接效应定义
+  indirect_effects <- c("indirect1 := a1 * b1")
+  indirect_effect_labels <- c("indirect1")
 
   for (i in seq_along(parallel_vars)) {
-    label <- paste0("indirect", i + 1)
-    formula <- paste0("a", i + 1, " * b", i + 1)
-    indirect_effects <- c(indirect_effects, paste0(label, " := ", formula))
-    indirect_effect_labels <- c(indirect_effect_labels, label)
+    label_direct <- paste0("indirect", i + 1)
+    formula_direct <- paste0("a", i + 1, " * b", i + 1)
+    label_chain <- paste0("indirect1", i + 1)
+    formula_chain <- paste0("a1 * b1", i + 1, " * b", i + 1)
+
+    indirect_effects <- c(
+      indirect_effects,
+      paste0(label_direct, " := ", formula_direct),
+      paste0(label_chain, " := ", formula_chain)
+    )
+    indirect_effect_labels <- c(indirect_effect_labels, label_direct, label_chain)
   }
 
-  for (i in seq_along(parallel_vars)) {
-    label <- paste0("indirect1", i + 1)
-    formula <- paste0("a1 * b1", i + 1, " * b", i + 1)
-    indirect_effects <- c(indirect_effects, paste0(label, " := ", formula))
-    indirect_effect_labels <- c(indirect_effect_labels, label)
-  }
-
-  total_indirect <- paste0(
-    "total_indirect := ",
-    paste(indirect_effect_labels, collapse = " + ")
-  )
-
+  total_indirect <- paste0("total_indirect := ", paste(indirect_effect_labels, collapse = " + "))
   total_effect <- "total_effect := cp + total_indirect"
 
+  # 间接效应对比
   compare_indirect_effect <- ""
   if (length(indirect_effect_labels) > 1) {
     comparisons <- c()
     for (i in seq_along(indirect_effect_labels)) {
       for (j in seq_along(indirect_effect_labels)) {
         if (i < j) {
-          short_label_i <- gsub("indirect", "", indirect_effect_labels[i])
-          short_label_j <- gsub("indirect", "", indirect_effect_labels[j])
-          comparisons <- c(
-            comparisons,
-            paste0(
-              "CI", short_label_i, "vs", short_label_j,
-              " := ", indirect_effect_labels[i], " - ", indirect_effect_labels[j]
-            )
-          )
+          comparisons <- c(comparisons, paste0(
+            "CI", gsub("indirect", "", indirect_effect_labels[i]), "vs",
+            gsub("indirect", "", indirect_effect_labels[j]), " := ",
+            indirect_effect_labels[i], " - ", indirect_effect_labels[j]
+          ))
         }
       }
     }
     compare_indirect_effect <- paste(comparisons, collapse = "\n")
   }
 
-
-
+  # 前后测转换系数
   pre_post_coefficients <- paste(
     c(
       paste0("X1_b1 := (2*b1 + d1)/2\nX0_b1 := X1_b1 - d1"),
@@ -152,7 +155,114 @@ GenerateModelCP <- function(prepared_data) {
     collapse = "\n"
   )
 
-  
+  # 汇总输出
+  sem_model <- paste(
+    regression_y,
+    paste(regression_m, collapse = "\n"),
+    paste(indirect_effects, collapse = "\n"),
+    total_indirect,
+    total_effect,
+    compare_indirect_effect,
+    pre_post_coefficients,
+    sep = "\n"
+  )
+
+  return(sem_model)
+}
+GenerateModelCP <- function(prepared_data) {
+  chain_var <- grep("^M1diff$", colnames(prepared_data), value = TRUE)
+  chain_avg <- grep("^M1avg$", colnames(prepared_data), value = TRUE)
+  all_mdiff <- sort(grep("^M\\d+diff$", colnames(prepared_data), value = TRUE))
+  all_mavg  <- sort(grep("^M\\d+avg$",  colnames(prepared_data), value = TRUE))
+
+  parallel_vars  <- setdiff(all_mdiff, chain_var)
+  parallel_avgs  <- setdiff(all_mavg, chain_avg)
+  n <- length(parallel_vars)
+
+  if (length(chain_var) != 1) stop("The chain mediator should contain exactly one variable: M1diff.")
+
+  between_covs <- grep("^Cb\\d+$", colnames(prepared_data), value = TRUE)
+  within_covs  <- grep("^Cw\\d+(diff|avg)$", colnames(prepared_data), value = TRUE)
+  control_vars <- c(between_covs, within_covs)
+  control_rhs  <- if (length(control_vars) > 0) paste(control_vars, collapse = " + ") else NULL
+
+  y_rhs <- c(
+    "cp*1",
+    paste0("b1*", chain_var),
+    paste0("b", 2:(n + 1), "*", parallel_vars),
+    paste0("d1*", chain_avg),
+    paste0("d", 2:(n + 1), "*", parallel_avgs),
+    control_rhs
+  )
+  regression_y <- paste("Ydiff ~", paste(na.omit(y_rhs), collapse = " + "))
+
+  regression_m <- c(
+    paste(chain_var, "~", paste(c("a1*1", control_rhs), collapse = " + "))
+  )
+
+  for (i in seq_along(parallel_vars)) {
+    rhs <- c(
+      paste0("a", i + 1, "*1"),
+      paste0("b_1_", i + 1, "*", chain_var),
+      paste0("d_1_", i + 1, "*", chain_avg),
+      control_rhs
+    )
+    regression_m <- c(regression_m, paste(parallel_vars[i], "~", paste(na.omit(rhs), collapse = " + ")))
+  }
+
+  indirect_effects <- c("indirect_1 := a1 * b1")
+  indirect_effect_labels <- c("indirect_1")
+
+  for (i in seq_along(parallel_vars)) {
+    label_direct <- paste0("indirect_", i + 1)
+    formula_direct <- paste0("a", i + 1, " * b", i + 1)
+    label_chain <- paste0("indirect_1_", i + 1)
+    formula_chain <- paste0("a1 * b_1_", i + 1, " * b", i + 1)
+
+    indirect_effects <- c(
+      indirect_effects,
+      paste0(label_direct, " := ", formula_direct),
+      paste0(label_chain, " := ", formula_chain)
+    )
+    indirect_effect_labels <- c(indirect_effect_labels, label_direct, label_chain)
+  }
+
+  total_indirect <- paste0("total_indirect := ", paste(indirect_effect_labels, collapse = " + "))
+  total_effect <- "total_effect := cp + total_indirect"
+
+  compare_indirect_effect <- ""
+  if (length(indirect_effect_labels) > 1) {
+    comparisons <- c()
+    for (i in seq_along(indirect_effect_labels)) {
+      for (j in seq_along(indirect_effect_labels)) {
+        if (i < j) {
+          comparisons <- c(comparisons, paste0(
+            "CI_", gsub("indirect_", "", indirect_effect_labels[i]), "_vs_",
+            gsub("indirect_", "", indirect_effect_labels[j]), " := ",
+            indirect_effect_labels[i], " - ", indirect_effect_labels[j]
+          ))
+        }
+      }
+    }
+    compare_indirect_effect <- paste(comparisons, collapse = "\n")
+  }
+
+  # 前后测转换系数
+  pre_post_coefficients <- paste(
+    c(
+      paste0("X1_b1 := (2*b1 + d1)/2\nX0_b1 := X1_b1 - d1"),
+      sapply(2:(n + 1), function(i) {
+        paste0("X1_b", i, " := (2*b", i, " + d", i, ")/2\nX0_b", i, " := X1_b", i, " - d", i)
+      }),
+      sapply(seq_along(parallel_vars), function(i) {
+        idx <- i + 1
+        paste0("X1_b_1_", idx, " := (2*b_1_", idx, " + d_1_", idx, ")/2\n",
+               "X0_b_1_", idx, " := X1_b_1_", idx, " - d_1_", idx)
+      })
+    ),
+    collapse = "\n"
+  )
+
   sem_model <- paste(
     regression_y,
     paste(regression_m, collapse = "\n"),

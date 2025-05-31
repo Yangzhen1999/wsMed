@@ -34,3 +34,4 @@ NULL
 \seealso{
 \code{\link[=MCMI2]{MCMI2()}}, \code{\link[=RunMCMIAnalysis]{RunMCMIAnalysis()}}
 }
+\keyword{internal}

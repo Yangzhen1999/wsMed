@@ -31,25 +31,7 @@
 #' @importFrom mice mice complete
 #' @export
 
-ImputeData<- function(data_missing, m, method = "pmm", seed = 123, predictorMatrix = NULL) {
-  data_missing[data_missing == -999] <- NA
 
-  valid_vars <- sapply(data_missing, function(col) length(unique(na.omit(col))) > 1)
-
-  if (sum(valid_vars) < 2) {
-    stop("Error in ImputeData: Too few valid variables after removing constants or collinear variables.")
-  }
-  # if don't provide predictorMatrix，use NULL
-  if (is.null(predictorMatrix)) {
-    imp <- mice(data_missing, m = m, method = method, seed = seed)
-  } else {
-    imp <- mice(data_missing, m = m, method = method, seed = seed, predictorMatrix = predictorMatrix)
-  }
-
-  imputed_data_list <- complete(imp, "all")
-  imputed_data_list <- lapply(imputed_data_list, as.data.frame)
-  return(imputed_data_list)
-}
 ImputeData <- function(data_missing, m = 5, method = "pmm", seed = 123, predictorMatrix = NULL) {
   data_missing[data_missing == -999] <- NA
 
@@ -72,7 +54,8 @@ ImputeData <- function(data_missing, m = 5, method = "pmm", seed = 123, predicto
   summary_imp <- summary(imp)
 
   return(list(
-    imputed_data_list = imputed_data_list,  
-    summary = summary_imp                 
+    mids = imp,
+    imputed_data_list = imputed_data_list,
+    summary = summary_imp
   ))
 }

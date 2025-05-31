@@ -12,7 +12,10 @@ PrepareMissingData(
   M_C1,
   M_C2,
   Y_C1,
-  Y_C2
+  Y_C2,
+  C_C1 = NULL,
+  C_C2 = NULL,
+  C = NULL
 )
 }
 \arguments{
@@ -21,7 +24,7 @@ PrepareMissingData(
 \item{m}{An integer specifying the number of imputations to perform. Default is \code{5}.}
 
 \item{method}{A character string specifying the imputation method. Default is \code{"pmm"}
-(predictive mean matching). Other methods supported by \code{\link[=mice]{mice()}} can be used.}
+(predictive mean matching).}
 
 \item{seed}{An integer specifying the random seed for reproducibility. Default is \code{123}.}
 
@@ -33,6 +36,12 @@ Must match the length of \code{M_C1}.}
 \item{Y_C1}{A character string representing the column name of the outcome variable "before" the intervention.}
 
 \item{Y_C2}{A character string representing the column name of the outcome variable "after" the intervention.}
+
+\item{C_C1}{Character vector of within-subject control variable names (condition 1).}
+
+\item{C_C2}{Character vector of within-subject control variable names (condition 2).}
+
+\item{C}{Character vector of between-subject control variable names.}
 }
 \value{
 A list containing:
@@ -65,10 +74,10 @@ are ready for subsequent mediation analysis.
 \examples{
 # Example dataset with missing values
 data(example_data)
-set.seed(123)  
+set.seed(123)
 example_dataN <- mice::ampute(
-   data = example_data,        
-   prop = 0.1,       
+   data = example_data,
+   prop = 0.1,
    )$amp
 
 # Prepare the dataset with multiple imputations

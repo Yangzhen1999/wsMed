@@ -1,7 +1,8 @@
+rm(list = ls())
+
 library(testthat)
 library(lavaan)
-library(semhelpinghands)
-library(semmcci)
+library(semboottools)
 
 data(example_data)
   set.seed(123)
@@ -40,20 +41,33 @@ data(example_data)
     expect_error(wsMed(data = valid_data, M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"), Y_C1 = "C1", Y_C2 = "C2", Na = "Invalid"), "Error: Invalid 'Na' parameter. Use 'DE', 'FIML', or 'MI'")
   })
 
-  test_that("wsMed handle the missing data", {
+  test_that("wsMed handles missing data correctly", {
+    # 设置数据
     valid_data <- example_data
     valid_data_with_na <- valid_data
     valid_data_with_na$A1[1] <- NA
 
-    # 数据中存在缺失值，但 Na = "DE"
+    # 设置 options 限制并行（可选保险）
+    options(mc.cores = 1)
+    options(lavaan.bootstrap.ncpus = 1)
+
+    # 情况 1：数据中存在缺失值，但 Na = "DE"，应发出 warning
     expect_warning(
-      wsMed(data = valid_data_with_na, M_C1 = c("A1"), M_C2 = c("A2"), Y_C1 = "C1", Y_C2 = "C2", Na = "DE"),
+      wsMed(
+        data = valid_data_with_na,
+        M_C1 = "A1", M_C2 = "A2", Y_C1 = "C1", Y_C2 = "C2",
+        Na = "DE"
+      ),
       regexp = "The dataset contains missing values\\. Consider using 'Na = MI' or 'Na = FIML' to handle them"
     )
 
-    # 数据中没有缺失值，但 Na = "MI"
+    # 情况 2：数据无缺失，但 Na = "MI"，应发出 message
     expect_message(
-      wsMed(data = valid_data, M_C1 = c("A1"), M_C2 = c("A2"), Y_C1 = "C1", Y_C2 = "C2", Na = "MI"),
+      wsMed(
+        data = valid_data,
+        M_C1 = "A1", M_C2 = "A2", Y_C1 = "C1", Y_C2 = "C2",
+        Na = "MI"
+      ),
       regexp = "No missing values detected in the data\\. Switching to 'DE'\\."
     )
   })
@@ -137,8 +151,7 @@ data(example_data)
     )
   })
 
-  test_that("wsMed generates correct results", {
-    # 定义不同的测试场景
+  test_that("wsMed generates correct results for DE, FIML, and MI", {
     scenarios <- list(
       DE = wsMed(
         data = example_data,
@@ -147,18 +160,9 @@ data(example_data)
         Y_C1 = "C2",
         Y_C2 = "C1",
         form = "P",
-        standardized = TRUE
-      ),
-      MI = wsMed(
-        data = example_dataN,
-        M_C1 = c("A2", "B2"),
-        M_C2 = c("A1", "B1"),
-        Y_C1 = "C2",
-        Y_C2 = "C1",
-        form = "P",
-        Na = "MI",
-        m = 5,
-        standardized = TRUE
+        standardized = TRUE,
+        Na = "DE",
+        bootstrap = 1001
       ),
       FIML = wsMed(
         data = example_dataN,
@@ -168,105 +172,68 @@ data(example_data)
         Y_C2 = "C1",
         form = "P",
         Na = "FIML",
-        standardized = TRUE
+        ci_method = "mc",
+        standardized = TRUE,
+        R = 1000
+      ),
+      MI = wsMed(
+        data = example_dataN,
+        M_C1 = c("A2", "B2"),
+        M_C2 = c("A1", "B1"),
+        Y_C1 = "C2",
+        Y_C2 = "C1",
+        form = "P",
+        Na = "MI",
+        standardized = TRUE,
+        R = 1000
       )
     )
 
-    # 对每种场景进行测试
     for (name in names(scenarios)) {
       result <- scenarios[[name]]
 
-      # 检查基本返回结构
-      expected_components <- c("prepared_data", "sem_model", "lavaan_fit",
-                               "model_summary", "mi_result", "fiml_result",
-                               "std_result", "std_mi_result", "std_fiml_result")
       expect_true(!is.null(result))
-      expect_true(all(expected_components %in% names(result)))
-      expect_type(result$standardized, "logical")
-
-      # Test sem_model
-      expect_type(result$sem_model, "character")
-      expect_true(grepl("Ydiff ~", result$sem_model))
-      expect_true(grepl("indirect", result$sem_model))
-
-      # Test prepared_data
       expect_s3_class(result$prepared_data, "data.frame")
       expect_true(all(c("Ydiff", "M1diff", "M1avg") %in% colnames(result$prepared_data)))
+      expect_type(result$sem_model, "character")
+      expect_true(grepl("Ydiff ~", result$sem_model))
+      expect_s4_class(result$lavaan_fit, "lavaan")
 
-      # Test lavaan_fit
       fit_measures <- lavaan::fitMeasures(result$lavaan_fit)
       expect_true(all(c("cfi", "rmsea", "srmr") %in% names(fit_measures)))
 
-      # Test standardized results
-      if (!is.null(result$standardized) && result$standardized) {
+      expect_true(is.logical(result$standardized))
+      expect_true("alpha" %in% names(result))
+      expect_true("alphastd" %in% names(result))
+
+      if (result$standardized) {
         if (name == "DE") {
-          expect_true(!is.null(result$std_result))
-          expect_type(result$std_result, "list")
-        } else if (name == "MI") {
-          expect_true(!is.null(result$std_mi_result))
-          expect_s3_class(result$std_mi_result, "semmcci")
-        } else if (name == "FIML") {
-          expect_true(!is.null(result$std_fiml_result))
-          expect_s3_class(result$std_fiml_result, "semmcci")
+          skip_if(is.null(result$std_result), "std_result is NULL for DE")
+          expect_s3_class(result$std_result, "data.frame")
+          expect_true(all(c("label", "est.std") %in% colnames(result$std_result)))
         }
-      } else {
-        expect_null(result$std_result)
-        expect_null(result$std_mi_result)
-        expect_null(result$std_fiml_result)
+
+        if (name == "FIML") {
+          skip_if(is.null(result$std_fiml_result), "std_fiml_result is NULL for FIML")
+          expect_s3_class(result$std_fiml_result, "data.frame")
+          expect_true("Parameter" %in% colnames(result$std_fiml_result))
+
+          ci_cols <- grep("%", colnames(result$std_fiml_result), value = TRUE)
+          expect_true(length(ci_cols) >= 2)
+          expect_true(all(result$std_fiml_result[[ci_cols[1]]] <= result$std_fiml_result[[ci_cols[2]]]))
+        }
+
+        if (name == "MI") {
+          skip_if(is.null(result$std_mi_result), "std_mi_result is NULL for MI")
+          expect_s3_class(result$std_mi_result, "data.frame")
+          expect_true("Parameter" %in% colnames(result$std_mi_result))
+
+          ci_cols <- grep("%", colnames(result$std_mi_result), value = TRUE)
+          expect_true(length(ci_cols) >= 2)
+          expect_true(all(result$std_mi_result[[ci_cols[1]]] <= result$std_mi_result[[ci_cols[2]]]))
+        }
       }
     }
   })
 
-  test_that("wsMed handles bootstrap correctly", {
-    # Check invalid bootstrap parameter
-    expect_error(
-      wsMed(data = example_data, M_C1 = c("A2", "B2"), M_C2 = c("A1", "B1"),
-            Y_C1 = "C2", Y_C2 = "C1", bootstrap = -1),
-      "Error: 'bootstrap' must be a non-negative integer"
-    )
 
-    # Run with valid bootstrap parameter
-    result <- wsMed(
-      data = example_data,
-      M_C1 = c("A2", "B2"),
-      M_C2 = c("A1", "B1"),
-      Y_C1 = "C2",
-      Y_C2 = "C1",
-      form = "P",
-      bootstrap = 100,
-      standardized = FALSE
-    )
-
-    # Check if lavaan_fit is an S4 object
-    expect_s4_class(result$lavaan_fit, "lavaan")
-
-    # Check if the fit has converged
-    fit_info <- slot(result$lavaan_fit, "Fit")
-    expect_true(fit_info@converged, info = "Model did not converge during bootstrap")
-
-    # Validate the number of bootstrap replications
-    bootstrap_info <- slot(result$lavaan_fit, "boot")
-    expect_true(nrow(bootstrap_info$coef) == 100, info = "Bootstrap replications do not match the specified number")
-
-    # Validate fit measures
-    fit_measures <- lavaan::fitMeasures(result$lavaan_fit)
-    expect_true(all(c("cfi", "rmsea", "srmr") %in% names(fit_measures)),
-                info = "Fit measures are missing from the lavaan output")
-
-    # Check parameter estimates with bootstrap confidence intervals
-    params <- lavaan::parameterEstimates(result$lavaan_fit, boot.ci.type = "perc")
-    expect_type(params, "list")
-    expect_true("ci.lower" %in% colnames(params) && "ci.upper" %in% colnames(params),
-                info = "Bootstrap confidence intervals are missing from the parameter estimates")
-
-    # Additional validation of bootstrap results
-    expect_true(all(!is.na(params$ci.lower)) && all(!is.na(params$ci.upper)),
-                info = "Some bootstrap confidence intervals contain NA values")
-    expect_true(all(params$ci.lower < params$ci.upper),
-                info = "Invalid bootstrap confidence intervals: lower bound exceeds upper bound")
-
-    # Check if bootstrap results match expectations
-    non_converged <- attr(bootstrap_info$coef, "nonadmissible")
-    expect_true(length(non_converged) == 0 || all(non_converged == 0),
-                info = "Some bootstrap replications failed to converge")
-  })

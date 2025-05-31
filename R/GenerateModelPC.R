@@ -61,109 +61,91 @@
 #' @export
 
 GenerateModelPC <- function(prepared_data) {
-  chain_var <- grep("M1diff", colnames(prepared_data), value = TRUE)
-  parallel_vars <- setdiff(grep("M\\ddiff", colnames(prepared_data), value = TRUE), chain_var)
-  chain_avg <- grep("M1avg", colnames(prepared_data), value = TRUE)
-  parallel_avgs <- setdiff(grep("M\\davg", colnames(prepared_data), value = TRUE), chain_avg)
+  chain_var <- grep("^M1diff$", colnames(prepared_data), value = TRUE)
+  chain_avg <- grep("^M1avg$", colnames(prepared_data), value = TRUE)
+  all_mdiff <- sort(grep("^M\\d+diff$", colnames(prepared_data), value = TRUE))
+  all_mavg  <- sort(grep("^M\\d+avg$",  colnames(prepared_data), value = TRUE))
 
-  if (length(chain_var) != 1) {
-    stop("The chain mediator should contain exactly one variable: M1diff.")
-  }
+  parallel_vars <- setdiff(all_mdiff, chain_var)
+  parallel_avgs <- setdiff(all_mavg, chain_avg)
+  n <- length(parallel_vars)
 
-  n <- length(parallel_vars)  
+  if (length(chain_var) != 1) stop("The chain mediator should contain exactly one variable: M1diff.")
 
-  regression_y <- paste(
-    "Ydiff ~ cp*1",
-    paste0(" + b1*", chain_var),  
-    if (length(parallel_vars) > 0) paste0(" + b", seq(2, n + 1), "*", parallel_vars, collapse = " + ") else "",
-    paste0(" + d1*", chain_avg),
-    if (length(parallel_avgs) > 0) paste0(" + d", seq(2, n + 1), "*", parallel_avgs, collapse = " + ") else "",
-    sep = ""
+  between_covs <- grep("^Cb\\d+$", colnames(prepared_data), value = TRUE)
+  within_covs  <- grep("^Cw\\d+(diff|avg)$", colnames(prepared_data), value = TRUE)
+  control_vars <- c(between_covs, within_covs)
+  control_rhs  <- if (length(control_vars) > 0) paste(control_vars, collapse = " + ") else NULL
+
+  y_rhs <- c(
+    "cp*1",
+    paste0("b1*", chain_var),
+    if (n > 0) paste0("b", seq(2, n + 1), "*", parallel_vars),
+    paste0("d1*", chain_avg),
+    if (n > 0) paste0("d", seq(2, n + 1), "*", parallel_avgs),
+    control_rhs
   )
+  regression_y <- paste("Ydiff ~", paste(na.omit(y_rhs), collapse = " + "))
 
   regression_m <- c()
 
-  for (i in seq_along(parallel_vars)) {
-    regression_m <- c(
-      regression_m,
-      paste0(parallel_vars[i], " ~ a", i + 1, "*1")
-    )
-  }
-
-  chain_predictors <- c()
-  if (length(parallel_vars) > 0) {
+  if (n > 0) {
     chain_predictors <- c(
-      paste0("b", seq(2, n + 1), "1*", parallel_vars),
-      paste0("d", seq(2, n + 1), "1*", parallel_avgs)
+      paste0("b_", seq(2, n + 1), "_1*", parallel_vars),
+      paste0("d_", seq(2, n + 1), "_1*", parallel_avgs)
     )
+  } else {
+    chain_predictors <- character(0)
   }
-  regression_m <- c(
-    paste0(chain_var, " ~ a1*1", if (length(chain_predictors) > 0) paste0(" + ", paste(chain_predictors, collapse = " + ")) else ""),
-    regression_m
-  )
 
+  rhs_chain <- c("a1*1", chain_predictors, control_rhs)
+  regression_m <- c(paste(chain_var, "~", paste(na.omit(rhs_chain), collapse = " + ")))
+
+  for (i in seq_along(parallel_vars)) {
+    rhs <- c(paste0("a", i + 1, "*1"), control_rhs)
+    regression_m <- c(regression_m, paste(parallel_vars[i], "~", paste(na.omit(rhs), collapse = " + ")))
+  }
 
   indirect_effects <- c()
   indirect_effect_labels <- c()
 
   for (i in seq_along(parallel_vars)) {
-    label <- paste0("indirect", i + 1)
-    formula <- paste0("a", i + 1, " * b", i + 1)
-    indirect_effects <- c(indirect_effects, paste0(label, " := ", formula))
-    indirect_effect_labels <- c(indirect_effect_labels, label)
+    idx <- i + 1
+    label_direct <- paste0("indirect_", idx)
+    formula_direct <- paste0("a", idx, " * b", idx)
+    label_cross <- paste0("indirect_", idx, "_1")
+    formula_cross <- paste0("a", idx, " * b_", idx, "_1 * b1")
+
+    indirect_effects <- c(
+      indirect_effects,
+      paste0(label_direct, " := ", formula_direct),
+      paste0(label_cross, " := ", formula_cross)
+    )
+    indirect_effect_labels <- c(indirect_effect_labels, label_direct, label_cross)
   }
 
-  indirect_effects <- c(indirect_effects, paste0("indirect1 := a1 * b1"))
-  indirect_effect_labels <- c(indirect_effect_labels, "indirect1")
+  indirect_effects <- c(indirect_effects, "indirect_1 := a1 * b1")
+  indirect_effect_labels <- c(indirect_effect_labels, "indirect_1")
 
-  for (i in seq_along(parallel_vars)) {
-    label <- paste0("indirect", i + 1, "1")
-    formula <- paste0("a", i + 1, " * b", i + 1, "1 * b1")
-    indirect_effects <- c(indirect_effects, paste0(label, " := ", formula))
-    indirect_effect_labels <- c(indirect_effect_labels, label)
-  }
-
-  first_label <- "indirect1"
-  other_labels <- setdiff(indirect_effect_labels, first_label)
-
-  total_indirect <- paste0(
-    "total_indirect := ", first_label, " + ", paste(other_labels, collapse = " + ")
-  )
+  total_indirect <- paste0("total_indirect := ", paste(indirect_effect_labels, collapse = " + "))
   total_effect <- "total_effect := cp + total_indirect"
 
   compare_indirect_effect <- ""
   if (length(indirect_effect_labels) > 1) {
     comparisons <- c()
-
-    first_label <- "indirect1"
-    other_labels <- setdiff(indirect_effect_labels, first_label)
-
-    for (label in other_labels) {
-      short_label_i <- gsub("indirect", "", first_label)
-      short_label_j <- gsub("indirect", "", label)
-      comparisons <- c(
-        comparisons,
-        paste0("CI", short_label_i, "vs", short_label_j,
-               " := ", first_label, " - ", label)
-      )
-    }
-
-    for (i in seq_along(other_labels)) {
-      for (j in seq_along(other_labels)) {
+    for (i in seq_along(indirect_effect_labels)) {
+      for (j in seq_along(indirect_effect_labels)) {
         if (i < j) {
-          short_label_i <- gsub("indirect", "", other_labels[i])
-          short_label_j <- gsub("indirect", "", other_labels[j])
-          comparisons <- c(
-            comparisons,
-            paste0("CI", short_label_i, "vs", short_label_j,
-                   " := ", other_labels[i], " - ", other_labels[j])
-          )
+          comparisons <- c(comparisons, paste0(
+            "CI_", gsub("indirect_", "", indirect_effect_labels[i]), "_vs_",
+            gsub("indirect_", "", indirect_effect_labels[j]), " := ",
+            indirect_effect_labels[i], " - ", indirect_effect_labels[j]
+          ))
         }
       }
     }
-
     compare_indirect_effect <- paste(comparisons, collapse = "\n")
-   }
+  }
 
   pre_post_coefficients <- paste(
     c(
@@ -172,7 +154,8 @@ GenerateModelPC <- function(prepared_data) {
         paste0("X1_b", i, " := (2*b", i, " + d", i, ")/2\nX0_b", i, " := X1_b", i, " - d", i)
       }),
       sapply(2:(n + 1), function(i) {
-        paste0("X1_b", i, "1 := (2*b", i, "1 + d", i, "1)/2\nX0_b", i, "1 := X1_b", i, "1 - d", i, "1")
+        paste0("X1_b_", i, "_1 := (2*b_", i, "_1 + d_", i, "_1)/2\n",
+               "X0_b_", i, "_1 := X1_b_", i, "_1 - d_", i, "_1")
       })
     ),
     collapse = "\n"
@@ -191,3 +174,6 @@ GenerateModelPC <- function(prepared_data) {
 
   return(sem_model)
 }
+
+
+

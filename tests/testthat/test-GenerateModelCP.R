@@ -25,137 +25,76 @@ test_data_4m <- data.frame(
   Ydiff = rnorm(100)
 )
 
-test_that("GenerateModelCP correctly generates SEM model syntax for 3 mediators", {
-  model_syntax <- GenerateModelCP(test_data_3m)
+test_data_3m$Cb1 <- rnorm(100)
+test_data_3m$Cw1diff <- rnorm(100)
+test_data_3m$Cw1avg <- rnorm(100)
 
-  # 确保 SEM 语法是字符串
-  expect_type(model_syntax, "character")
+test_data_4m$Cb1 <- rnorm(100)
+test_data_4m$Cb2 <- rnorm(100)
+test_data_4m$Cw1diff <- rnorm(100)
+test_data_4m$Cw1avg  <- rnorm(100)
 
-  # 确保因变量的回归路径正确
-  expect_match(model_syntax, "Ydiff ~ cp\\*1")
-  expect_match(model_syntax, "b1\\*M1diff")
-  expect_match(model_syntax, "b2\\*M2diff")
-  expect_match(model_syntax, "b3\\*M3diff")
 
-  # 确保链式中介和并行中介的回归路径正确
-  expect_match(model_syntax, "M1diff ~ a1\\*1")
-  expect_match(model_syntax, "M2diff ~ a2\\*1 \\+ b12\\*M1diff \\+ d12\\*M1avg")
-  expect_match(model_syntax, "M3diff ~ a3\\*1 \\+ b13\\*M1diff \\+ d13\\*M1avg")
+test_that("GenerateModelCP works correctly for 3 mediators (with covariates)", {
+  model <- GenerateModelCP(test_data_3m)
 
-  # 确保间接效应计算正确
-  expect_match(model_syntax, "indirect1 := a1 \\* b1")
-  expect_match(model_syntax, "indirect2 := a2 \\* b2")
-  expect_match(model_syntax, "indirect3 := a3 \\* b3")
+  expect_type(model, "character")
 
-  # 确保 M1 → M2 → Y 和 M1 → M3 → Y 方向的间接效应正确
-  expect_match(model_syntax, "indirect12 := a1 \\* b12 \\* b2")
-  expect_match(model_syntax, "indirect13 := a1 \\* b13 \\* b3")
+  expect_match(model, "Ydiff ~ cp*1", fixed = TRUE)
+  expect_match(model, "b1*M1diff", fixed = TRUE)
+  expect_match(model, "b2*M2diff", fixed = TRUE)
+  expect_match(model, "b3*M3diff", fixed = TRUE)
+  expect_match(model, "d1*M1avg", fixed = TRUE)
+  expect_match(model, "d2*M2avg", fixed = TRUE)
+  expect_match(model, "d3*M3avg", fixed = TRUE)
 
-  # 确保总间接效应计算正确
-  expect_match(model_syntax, "total_indirect := indirect1 \\+ indirect2 \\+ indirect3 \\+ indirect12 \\+ indirect13")
+  expect_match(model, "M1diff ~ a1*1", fixed = TRUE)
+  expect_match(model, "M2diff ~ a2*1 + b_1_2*M1diff + d_1_2*M1avg", fixed = TRUE)
+  expect_match(model, "M3diff ~ a3*1 + b_1_3*M1diff + d_1_3*M1avg", fixed = TRUE)
 
-  # 确保总效应计算正确
-  expect_match(model_syntax, "total_effect := cp \\+ total_indirect")
+  expect_match(model, "indirect_1 := a1 * b1", fixed = TRUE)
+  expect_match(model, "indirect_2 := a2 * b2", fixed = TRUE)
+  expect_match(model, "indirect_3 := a3 * b3", fixed = TRUE)
+  expect_match(model, "indirect_1_2 := a1 * b_1_2 * b2", fixed = TRUE)
+  expect_match(model, "indirect_1_3 := a1 * b_1_3 * b3", fixed = TRUE)
+  expect_match(model, "total_indirect := indirect_1 +", fixed = TRUE)
+  expect_match(model, "total_indirect", fixed = TRUE)
 
-  # **确保间接效应对比计算完整**
-  expect_match(model_syntax, "CI1vs2 := indirect1 - indirect2")
-  expect_match(model_syntax, "CI1vs3 := indirect1 - indirect3")
-  expect_match(model_syntax, "CI1vs12 := indirect1 - indirect12")
-  expect_match(model_syntax, "CI1vs13 := indirect1 - indirect13")
+  expect_match(model, "X1_b_1_2 := (2*b_1_2 + d_1_2)/2", fixed = TRUE)
+  expect_match(model, "X1_b_1_3 := (2*b_1_3 + d_1_3)/2", fixed = TRUE)
 
-  expect_match(model_syntax, "CI2vs3 := indirect2 - indirect3")
-  expect_match(model_syntax, "CI2vs12 := indirect2 - indirect12")
-  expect_match(model_syntax, "CI2vs13 := indirect2 - indirect13")
-
-  expect_match(model_syntax, "CI3vs12 := indirect3 - indirect12")
-  expect_match(model_syntax, "CI3vs13 := indirect3 - indirect13")
-
-  expect_match(model_syntax, "CI12vs13 := indirect12 - indirect13")
-
-  # 确保前后测系数计算正确
-  expect_match(model_syntax, "X1_b1 := \\(2\\*b1 \\+ d1\\) ?/ ?2")
-  expect_match(model_syntax, "X0_b1 := X1_b1 - d1")
-  expect_match(model_syntax, "X1_b2 := \\(2\\*b2 \\+ d2\\) ?/ ?2")
-  expect_match(model_syntax, "X0_b2 := X1_b2 - d2")
-  expect_match(model_syntax, "X1_b3 := \\(2\\*b3 \\+ d3\\) ?/ ?2")
-  expect_match(model_syntax, "X0_b3 := X1_b3 - d3")
-
-  # 确保 M1 → M2 → Y 和 M1 → M3 → Y 的前后测系数
-  expect_match(model_syntax, "X1_b12 := \\(2\\*b12 \\+ d12\\) ?/ ?2")
-  expect_match(model_syntax, "X0_b12 := X1_b12 - d12")
-  expect_match(model_syntax, "X1_b13 := \\(2\\*b13 \\+ d13\\) ?/ ?2")
-  expect_match(model_syntax, "X0_b13 := X1_b13 - d13")
+  expect_match(model, "Cb1", fixed = TRUE)
+  expect_match(model, "Cw1diff", fixed = TRUE)
+  expect_match(model, "Cw1avg", fixed = TRUE)
 })
 
-test_that("GenerateModelCP correctly generates SEM model syntax for 4 mediators", {
-  model_syntax <- GenerateModelCP(test_data_4m)
+test_that("GenerateModelCP works correctly for 4 mediators (with covariates)", {
+  model <- GenerateModelCP(test_data_4m)
 
-  # 确保 SEM 语法是字符串
-  expect_type(model_syntax, "character")
+  expect_type(model, "character")
 
-  # 确保因变量的回归路径正确
-  expect_match(model_syntax, "Ydiff ~ cp\\*1")
-  expect_match(model_syntax, "b1\\*M1diff")
-  expect_match(model_syntax, "b2\\*M2diff")
-  expect_match(model_syntax, "b3\\*M3diff")
-  expect_match(model_syntax, "b4\\*M4diff")
+  for (i in 1:4) {
+    expect_match(model, paste0("b", i, "*M", i, "diff"), fixed = TRUE)
+    expect_match(model, paste0("d", i, "*M", i, "avg"), fixed = TRUE)
+    expect_match(model, paste0("indirect_", i, " := a", i, " * b", i), fixed = TRUE)
+    expect_match(model, paste0("X1_b", i, " := (2*b", i, " + d", i, ")/2"), fixed = TRUE)
+  }
 
-  # 确保链式中介和并行中介的回归路径正确
-  expect_match(model_syntax, "M1diff ~ a1\\*1")
-  expect_match(model_syntax, "M2diff ~ a2\\*1 \\+ b12\\*M1diff \\+ d12\\*M1avg")
-  expect_match(model_syntax, "M3diff ~ a3\\*1 \\+ b13\\*M1diff \\+ d13\\*M1avg")
-  expect_match(model_syntax, "M4diff ~ a4\\*1 \\+ b14\\*M1diff \\+ d14\\*M1avg")
+  for (i in 2:4) {
+    expect_match(model, paste0("b_1_", i, "*M1diff"), fixed = TRUE)
+    expect_match(model, paste0("d_1_", i, "*M1avg"), fixed = TRUE)
+    expect_match(model, paste0("indirect_1_", i, " := a1 * b_1_", i, " * b", i), fixed = TRUE)
+    expect_match(model, paste0("X1_b_1_", i, " := (2*b_1_", i, " + d_1_", i, ")/2"), fixed = TRUE)
+    expect_match(model, paste0("X0_b_1_", i, " := X1_b_1_", i, " - d_1_", i), fixed = TRUE)
+  }
 
-  # 确保间接效应计算正确
-  expect_match(model_syntax, "indirect1 := a1 \\* b1")
-  expect_match(model_syntax, "indirect2 := a2 \\* b2")
-  expect_match(model_syntax, "indirect3 := a3 \\* b3")
-  expect_match(model_syntax, "indirect4 := a4 \\* b4")
+  expect_match(model, "total_indirect := indirect_1 + indirect_2 + indirect_1_2 + indirect_3 + indirect_1_3 + indirect_4 + indirect_1_4", fixed = TRUE)
+  expect_match(model, "total_effect := cp + total_indirect", fixed = TRUE)
 
-  # 确保 M1 → M2 → Y, M1 → M3 → Y, M1 → M4 → Y 方向的间接效应正确
-  expect_match(model_syntax, "indirect12 := a1 \\* b12 \\* b2")
-  expect_match(model_syntax, "indirect13 := a1 \\* b13 \\* b3")
-  expect_match(model_syntax, "indirect14 := a1 \\* b14 \\* b4")
-
-  # 确保总间接效应计算正确
-  expect_match(model_syntax, "total_indirect := indirect1 \\+ indirect2 \\+ indirect3 \\+ indirect4 \\+ indirect12 \\+ indirect13 \\+ indirect14")
-
-  # 确保总效应计算正确
-  expect_match(model_syntax, "total_effect := cp \\+ total_indirect")
-
-  # **确保间接效应对比计算完整**
-  expect_match(model_syntax, "CI1vs2 := indirect1 - indirect2")
-  expect_match(model_syntax, "CI1vs3 := indirect1 - indirect3")
-  expect_match(model_syntax, "CI1vs4 := indirect1 - indirect4")
-  expect_match(model_syntax, "CI1vs12 := indirect1 - indirect12")
-  expect_match(model_syntax, "CI1vs13 := indirect1 - indirect13")
-  expect_match(model_syntax, "CI1vs14 := indirect1 - indirect14")
-
-  expect_match(model_syntax, "CI2vs3 := indirect2 - indirect3")
-  expect_match(model_syntax, "CI2vs4 := indirect2 - indirect4")
-  expect_match(model_syntax, "CI2vs12 := indirect2 - indirect12")
-  expect_match(model_syntax, "CI2vs13 := indirect2 - indirect13")
-  expect_match(model_syntax, "CI2vs14 := indirect2 - indirect14")
-
-  expect_match(model_syntax, "CI3vs4 := indirect3 - indirect4")
-  expect_match(model_syntax, "CI3vs12 := indirect3 - indirect12")
-  expect_match(model_syntax, "CI3vs13 := indirect3 - indirect13")
-  expect_match(model_syntax, "CI3vs14 := indirect3 - indirect14")
-
-  expect_match(model_syntax, "CI4vs12 := indirect4 - indirect12")
-  expect_match(model_syntax, "CI4vs13 := indirect4 - indirect13")
-  expect_match(model_syntax, "CI4vs14 := indirect4 - indirect14")
-
-  expect_match(model_syntax, "CI12vs13 := indirect12 - indirect13")
-  expect_match(model_syntax, "CI12vs14 := indirect12 - indirect14")
-  expect_match(model_syntax, "CI13vs14 := indirect13 - indirect14")
-
-  expect_match(model_syntax, "X1_b12 := \\(2\\*b12 \\+ d12\\) ?/ ?2")
-  expect_match(model_syntax, "X0_b12 := X1_b12 - d12")
-  expect_match(model_syntax, "X1_b13 := \\(2\\*b13 \\+ d13\\) ?/ ?2")
-  expect_match(model_syntax, "X0_b13 := X1_b13 - d13")
-  expect_match(model_syntax, "X1_b14 := \\(2\\*b14 \\+ d14\\) ?/ ?2")
-  expect_match(model_syntax, "X0_b14 := X1_b14 - d14")
+  expect_match(model, "Cb1", fixed = TRUE)
+  expect_match(model, "Cb2", fixed = TRUE)
+  expect_match(model, "Cw1diff", fixed = TRUE)
+  expect_match(model, "Cw1avg", fixed = TRUE)
 })
 
 
