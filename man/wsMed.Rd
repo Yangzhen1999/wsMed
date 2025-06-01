@@ -88,6 +88,12 @@ wsMed(
 \item{seed}{Integer. Random seed used in Monte Carlo simulation. Defaults to \code{123}.}
 
 \item{MCmethod}{Character. If \code{Na = "FIML"} and \code{ci_method = "mc"}, choose \code{"mc"} (default) or \code{"bootSD"}.}
+
+\item{store_boot_args}{A list of additional arguments passed to the internal bootstrap function
+\code{semboottools::store_boot()}. Typically used for advanced customization of bootstrap behavior.
+Not intended for general users.}
+
+\item{...}{Additional arguments passed to internal functions. Reserved for future extensions or developer use.}
 }
 \value{
 A list with class \code{"wsMed"} containing:

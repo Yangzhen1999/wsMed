@@ -44,40 +44,6 @@
 #' - Other components specific to the `semmcci` class.
 #'
 #' @seealso [PrepareMissingData()], [MCMI2()], [wsMed()]
-#'
-#' @examples
-#' # Example dataset with missing values
-#' data(example_data)
-#' set.seed(123)
-#' example_dataN <- mice::ampute(
-#'    data = example_data,
-#'    prop = 0.1,
-#'    )$amp
-#'
-#'
-#' # Example SEM model
-#' sem_model <- "
-#'   Ydiff ~ cp * 1 + b1 * M1diff
-#'   M1diff ~ a1 * 1
-#'   indirect := a1 * b1
-#'   total := cp + indirect
-#' "
-#'
-#' # Perform Monte Carlo analysis with multiple imputation
-#' result <- RunMCMIAnalysis(
-#'   data_missing =  example_dataN,
-#'   m = 5,
-#'   method = "pmm",
-#'   seed = 123,
-#'   M_C1 = c("A2", "B2"),
-#'   M_C2 = c("A1", "B1"),
-#'   Y_C1 = "C2",
-#'   Y_C2 = "C1",
-#'   sem_model = sem_model,
-#'   R = 1000,
-#'   alpha = c(0.05, 0.01)
-#' )
-#'
 #' @keywords internal
 
 RunMCMIAnalysis <- function(data_missing,

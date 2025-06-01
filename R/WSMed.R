@@ -69,6 +69,10 @@
 #' @param C_C1 Character vector of within-subject control variable names (condition 1).
 #' @param C_C2 Character vector of within-subject control variable names (condition 2).
 #' @param C Character vector of between-subject control variable names.
+#' @param store_boot_args A list of additional arguments passed to the internal bootstrap function
+#'   \code{semboottools::store_boot()}. Typically used for advanced customization of bootstrap behavior.
+#'   Not intended for general users.
+#' @param ... Additional arguments passed to internal functions. Reserved for future extensions or developer use.
 
 #' @return A list with class `"wsMed"` containing:
 #' \describe{
@@ -284,7 +288,7 @@ wsMed <- function(data,
   fiml_result <- NULL
   mi_result <- NULL
   mc_de_result  <-  NULL
-
+  ncpus <- get_safe_ncpus()
 
   # Step 4: 拟合模型
   if (Na == "DE") {
@@ -301,9 +305,13 @@ wsMed <- function(data,
     if (ci_method %in% c("bootstrap", "both")) {
 
       if (length(store_boot_args) == 0) {
-        store_boot_args <- list(
-          parallel = "snow"
-        )
+        store_boot_args <- list()
+      }
+      if (!"ncpus" %in% names(store_boot_args)) {
+        store_boot_args$ncpus <- get_safe_ncpus()
+      }
+      if (!"parallel" %in% names(store_boot_args)) {
+        store_boot_args$parallel <- "snow"
       }
 
       store_boot_args1 <- utils::modifyList(store_boot_args,
@@ -311,6 +319,7 @@ wsMed <- function(data,
                                                  iseed = iseed,
                                                  object = fit,
                                                  do_bootstrapping = TRUE))
+
 
       fit_u <- do.call(semboottools::store_boot,
                        store_boot_args1)
@@ -343,12 +352,18 @@ wsMed <- function(data,
 
     # Bootstrap CI
     if (ci_method %in% c("bootstrap", "both")) {
-      fit_u <- semboottools::store_boot(
-        fit,
-        do_bootstrapping = TRUE,
-        R = bootstrap,
-        iseed = iseed
-      )
+      if (!"ncpus" %in% names(store_boot_args)) {
+        store_boot_args$ncpus <- get_safe_ncpus()
+      }
+      if (!"parallel" %in% names(store_boot_args)) {
+        store_boot_args$parallel <- "snow"
+      }
+
+      store_boot_args1 <- utils::modifyList(store_boot_args,
+                                            list(R = bootstrap,
+                                                 iseed = iseed,
+                                                 object = fit,
+                                                 do_bootstrapping = TRUE))
 
       ustd_result <- semboottools::parameterEstimates_boot(
         object = fit_u,

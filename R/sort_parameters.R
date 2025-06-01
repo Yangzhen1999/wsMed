@@ -21,12 +21,9 @@
 #' @details This is an internal helper function used by \code{print.WsMed()} to ensure that printed
 #' tables of standardized or unstandardized estimates appear in a logical and human-readable order.
 #'
-#' @examples
-#' df <- data.frame(Parameter = c("b2", "a1", "direct effect", "ind2", "total effect"))
-#' sort_parameters(df)
 #'
 #' @keywords internal
-#' @keywords internal
+
 
 
 
