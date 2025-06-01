@@ -137,7 +137,7 @@ test_that("print.wsMed correctly handles FIML missing data method", {
 
   # 可选部分
   if (any(grepl("CONTRAST INDIRECT EFFECTS", printed_output))) {
-    expect_true(any(grepl("ind_\\d+ - ind_\\d+", printed_output)))
+    expect_true(any(grepl("ind_\\d+\\s+-\\s+ind_\\d+", printed_output)))
   }
 
   if (any(grepl("MODERATION EFFECTS of X", printed_output))) {
