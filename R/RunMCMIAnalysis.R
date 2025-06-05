@@ -37,6 +37,8 @@
 #' @param C_C1 Character vector of within-subject control variable names (condition 1).
 #' @param C_C2 Character vector of within-subject control variable names (condition 2).
 #' @param C Character vector of between-subject control variable names.
+#' @param W A character vector specifying the names of moderator variable(s)
+#'   that are used to generate interaction terms with mediators.
 #'
 #' @return A `semmcci` object containing the Monte Carlo analysis results, including:
 #' - `thetahat`: The pooled parameter estimates.
@@ -57,6 +59,7 @@ RunMCMIAnalysis <- function(data_missing,
                             C_C1 = NULL,
                             C_C2 = NULL,
                             C = NULL,
+                            W = NULL,  # <-- 添加对 W 的支持
                             sem_model,
                             Na = "MI",
                             R = 20000L,
@@ -80,7 +83,8 @@ RunMCMIAnalysis <- function(data_missing,
       Y_C2 = Y_C2,
       C_C1 = C_C1,
       C_C2 = C_C2,
-      C = C
+      C = C,
+      W = W  # <-- 传递调节变量
     )
 
     processed_data_list <- prepared_data$processed_data_list
@@ -105,4 +109,3 @@ RunMCMIAnalysis <- function(data_missing,
     first_imputed_data = first_imputed_data
   ))
 }
-

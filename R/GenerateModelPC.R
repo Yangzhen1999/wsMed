@@ -37,7 +37,18 @@
 #' within-subject mediator and outcome variables. The data frame must include columns for
 #' difference scores (`Mdiff`) and average scores (`Mavg`) of mediators, as well as the
 #' outcome difference score (`Ydiff`).
+#' @param MP A character vector specifying which paths are moderated by variable(s) W.
+#'           Acceptable values include:
+#'           - \code{"a2"}, \code{"a3"}, ...: moderation on the a paths (W → Mdiff).
+#'           - \code{"b2"}, \code{"b3"}, ...: moderation on the b paths (Mdiff × W → Ydiff).
+#'           - \code{"b_2_1"}, \code{"b_3_1"}, ...: moderation on the cross-paths from parallel mediators to the chain mediator (e.g., M2 → M1).
+#'           - \code{"d_2_1"}, \code{"d_3_1"}, ...: moderation on the paths from parallel mediators’ centered means to M1.
+#'           - \code{"cp"}: moderation on the direct effect of X on Y (i.e., W → Ydiff).
 #'
+#'           This argument controls which interaction terms (e.g., \code{int_Mdiff_W}, \code{int_Mavg_W}) are included
+#'           in the regression equations. Variable names are automatically matched using the naming convention
+#'           \code{"int_<predictor>_W<index>"}.
+
 #' @return A character string representing the SEM model syntax for the specified parallel and chained mediation analysis.
 #'
 #' @seealso [PrepareData()], [wsMed()], [GenerateModelP()], [GenerateModelCN()]
@@ -174,6 +185,139 @@ GenerateModelPC <- function(prepared_data) {
 
   return(sem_model)
 }
+GenerateModelPC <- function(prepared_data, MP) {
+  chain_var <- grep("^M1diff$", colnames(prepared_data), value = TRUE)
+  chain_avg <- grep("^M1avg$", colnames(prepared_data), value = TRUE)
+  all_mdiff <- sort(grep("^M\\d+diff$", colnames(prepared_data), value = TRUE))
+  all_mavg  <- sort(grep("^M\\d+avg$",  colnames(prepared_data), value = TRUE))
 
+  parallel_vars <- setdiff(all_mdiff, chain_var)
+  parallel_avgs <- setdiff(all_mavg, chain_avg)
+  n <- length(parallel_vars)
+
+  between_covs <- grep("^Cb\\d+$", colnames(prepared_data), value = TRUE)
+  within_covs  <- grep("^Cw\\d+(diff|avg)$", colnames(prepared_data), value = TRUE)
+  control_vars <- c(between_covs, within_covs)
+  control_rhs  <- if (length(control_vars) > 0) paste(control_vars, collapse = " + ") else NULL
+
+  W_vars <- grep("^W\\d+$", colnames(prepared_data), value = TRUE)
+  interaction_vars <- grep("^int_", colnames(prepared_data), value = TRUE)
+
+  # 构造 Ydiff
+  y_rhs <- c("cp*1")
+  y_rhs <- c(y_rhs, paste0("b1*", chain_var), paste0("d1*", chain_avg))
+  if (n > 0) {
+    y_rhs <- c(y_rhs,
+               paste0("b", 2:(n + 1), "*", parallel_vars),
+               paste0("d", 2:(n + 1), "*", parallel_avgs))
+  }
+
+  # 调节 cp 路径
+  if ("cp" %in% MP && length(W_vars) > 0) {
+    y_rhs <- c(y_rhs, paste0("cpw1_", seq_along(W_vars), "*", W_vars))
+  }
+
+  # b 路径调节
+  for (i in 2:(n + 1)) {
+    if (paste0("b", i) %in% MP) {
+      matched <- grep(paste0("^int_M", i, "diff_W\\d+$"), interaction_vars, value = TRUE)
+      y_rhs <- c(y_rhs, paste0("bw", i, "_", seq_along(matched), "*", matched))
+    }
+    if (paste0("d", i) %in% MP) {
+      matched <- grep(paste0("^int_M", i, "avg_W\\d+$"), interaction_vars, value = TRUE)
+      y_rhs <- c(y_rhs, paste0("dw", i, "_", seq_along(matched), "*", matched))
+    }
+  }
+
+  regression_y <- paste("Ydiff ~", paste(c(y_rhs, control_rhs), collapse = " + "))
+
+  # 构造 M1diff 回归式
+  rhs_chain <- c("a1*1")
+  if (n > 0) {
+    for (i in 2:(n + 1)) {
+      rhs_chain <- c(rhs_chain,
+                     paste0("b_", i, "_1*", parallel_vars[i - 1]),
+                     paste0("d_", i, "_1*", parallel_avgs[i - 1]))
+      if (paste0("b_", i, "_1") %in% MP) {
+        matched <- grep(paste0("^int_", parallel_vars[i - 1], "_W\\d+$"), interaction_vars, value = TRUE)
+        rhs_chain <- c(rhs_chain, paste0("bw_", i, "_1_", seq_along(matched), "*", matched))
+      }
+      if (paste0("d_", i, "_1") %in% MP) {
+        matched <- grep(paste0("^int_", parallel_avgs[i - 1], "_W\\d+$"), interaction_vars, value = TRUE)
+        rhs_chain <- c(rhs_chain, paste0("dw_", i, "_1_", seq_along(matched), "*", matched))
+      }
+    }
+  }
+  regression_m1 <- paste(chain_var, "~", paste(c(rhs_chain, control_rhs), collapse = " + "))
+
+  # 构造并行 Mdiff 回归
+  regression_m_par <- sapply(seq_along(parallel_vars), function(i) {
+    idx <- i + 1
+    rhs <- c(paste0("a", idx, "*1"))
+    if (paste0("a", idx) %in% MP) {
+      rhs <- c(rhs, paste0("aw", idx, "_", seq_along(W_vars), "*", W_vars))
+    }
+    paste(parallel_vars[i], "~", paste(c(rhs, control_rhs), collapse = " + "))
+  })
+
+  regression_m <- c(regression_m1, regression_m_par)
+
+  # 间接效应
+  indirect_effects <- c()
+  indirect_effect_labels <- c()
+  for (i in seq_along(parallel_vars)) {
+    idx <- i + 1
+    indirect_effects <- c(
+      indirect_effects,
+      paste0("indirect_", idx, " := a", idx, " * b", idx),
+      paste0("indirect_", idx, "_1 := a", idx, " * b_", idx, "_1 * b1")
+    )
+    indirect_effect_labels <- c(indirect_effect_labels,
+                                paste0("indirect_", idx),
+                                paste0("indirect_", idx, "_1"))
+  }
+  indirect_effects <- c(indirect_effects, "indirect_1 := a1 * b1")
+  indirect_effect_labels <- c(indirect_effect_labels, "indirect_1")
+
+  total_indirect <- paste0("total_indirect := ", paste(indirect_effect_labels, collapse = " + "))
+  total_effect <- "total_effect := cp + total_indirect"
+
+  # 比较项
+  compare_indirect_effect <- ""
+  if (length(indirect_effect_labels) > 1) {
+    combs <- combn(indirect_effect_labels, 2)
+    compare_indirect_effect <- paste(apply(combs, 2, function(pair) {
+      paste0("CI_", gsub("indirect_", "", pair[1]), "_vs_",
+             gsub("indirect_", "", pair[2]), " := ",
+             pair[1], " - ", pair[2])
+    }), collapse = "\n")
+  }
+
+  # 前后测转换
+  pre_post_lines <- c(
+    paste0("X1_b1 := (2*b1 + d1)/2\nX0_b1 := X1_b1 - d1"),
+    sapply(2:(n + 1), function(i) {
+      paste0("X1_b", i, " := (2*b", i, " + d", i, ")/2\nX0_b", i, " := X1_b", i, " - d", i)
+    }),
+    sapply(2:(n + 1), function(i) {
+      paste0("X1_b_", i, "_1 := (2*b_", i, "_1 + d_", i, "_1)/2\nX0_b_", i, "_1 := X1_b_", i, "_1 - d_", i, "_1")
+    })
+  )
+  pre_post_coefficients <- paste(pre_post_lines, collapse = "\n")
+
+  # 拼接模型
+  sem_model <- paste(
+    regression_y,
+    paste(regression_m, collapse = "\n"),
+    paste(indirect_effects, collapse = "\n"),
+    total_indirect,
+    total_effect,
+    compare_indirect_effect,
+    pre_post_coefficients,
+    sep = "\n"
+  )
+
+  return(sem_model)
+}
 
 

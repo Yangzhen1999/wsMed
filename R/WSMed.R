@@ -58,17 +58,51 @@
 #' @param boot_ci_type Character. Type of bootstrap CI: `"perc"`, `"bc"`, or `"bca.simple"`.
 #' @param R Integer. Number of Monte Carlo repetitions. Defaults to `20000L`.
 #' @param alpha Numeric vector. Significance levels for CI. Defaults to `c(0.01, 0.05)`.
-#' @param m Integer. Number of imputations for MI. Defaults to `5`.
-#' @param method Character. Imputation method for `mice`. Defaults to `"pmm"`.
-#' @param decomposition Character. Decomposition method for covariance matrices. Defaults to `"eigen"`.
-#' @param pd Logical. Whether to check for positive definiteness. Defaults to `TRUE`.
-#' @param tol Numeric. Tolerance for positive definiteness. Defaults to `1e-06`.
+#' @param mi_args A list of arguments used for multiple imputation (MI) and Monte Carlo inference with imputed data. The following fields can be specified:
+#'   \describe{
+#'     \item{\code{m}}{(integer) Number of imputations. Default is 5.}
+#'     \item{\code{method}}{(character) Imputation method passed to \code{mice()}. Default is \code{"pmm"}.}
+#'     \item{\code{decomposition}}{(character) Decomposition method used in Monte Carlo CI (\code{"eigen"}, \code{"chol"}, or \code{"svd"}). Default is \code{"eigen"}.}
+#'     \item{\code{pd}}{(logical) Whether to check positive definiteness of covariance matrix. Default is \code{TRUE}.}
+#'     \item{\code{tol}}{(numeric) Tolerance for positive-definiteness check. Default is \code{1e-6}.}
+#'   }
+#' @param moderation_args A list of arguments passed to compute conditional moderated effects. Includes:
+#'   \describe{
+#'     \item{\code{W_method}}{Method for defining moderator levels. Options: \code{"discrete"} or \code{"quantile"}.}
+#'     \item{\code{W_values}}{Values or levels of the moderator variable for estimation. Default is \code{c(-1, 0, 1)}.}
+#'     \item{\code{W_varname}}{Name of the moderator variable. Default is \code{"W1"}.}
+#'     \item{\code{ci_level}}{Confidence level for intervals. Default is \code{0.95}.}
+#'     \item{\code{digits}}{Number of digits to round results. Default is 3.}
+#'   }
+#'
+#' @param jn_args A list of arguments passed to compute Johnson-Neyman regions (if \code{JN = TRUE}). Includes:
+#'   \describe{
+#'     \item{\code{JN}}{Logical. If \code{TRUE}, perform Johnson-Neyman analysis.}
+#'     \item{\code{W_range}}{Range of moderator values to evaluate (e.g., \code{c(-3, 3)}).}
+#'     \item{\code{resolution}}{Number of evaluation points in the range.}
+#'     \item{\code{alpha}}{Significance level for confidence intervals. Default is \code{0.05}.}
+#'     \item{\code{verbose}}{Whether to print diagnostic messages.}
+#'   }
 #' @param seed Integer. Random seed used in Monte Carlo simulation. Defaults to `123`.
 #' @param alphastd Numeric. Significance level for standardized results. Defaults to `0.05`.
 #' @param fixed.x Logical. Whether to treat predictors as fixed. Defaults to `FALSE`.
 #' @param C_C1 Character vector of within-subject control variable names (condition 1).
 #' @param C_C2 Character vector of within-subject control variable names (condition 2).
 #' @param C Character vector of between-subject control variable names.
+#' @param W A character vector specifying one or more moderator variable names.
+#'   These variables will be centered (if needed) and used to create interaction
+#'   terms with mediator-related predictors (e.g., \code{Mdiff} or \code{Mavg})
+#'   in the SEM model. Default is \code{NULL}.
+#' @param MP A character vector specifying which regression paths are moderated by
+#'   the variables in \code{W}. Each element should indicate a target path, such as
+#'   \code{"a1"}, \code{"b2"}, \code{"d_2_1"}, or \code{"cp"}:
+#'   \itemize{
+#'     \item \code{"a1"}, \code{"a2"}, etc.: Add \code{W} as predictors of \code{M1diff}, \code{M2diff}, etc.
+#'     \item \code{"b1"}, \code{"b_1_2"}: Add interaction terms between \code{W} and \code{Mdiff} predictors in \code{Ydiff ~ ...}
+#'     \item \code{"d1"}, \code{"d_1_2"}: Add interaction terms between \code{W} and \code{Mavg} predictors in \code{Ydiff ~ ...}
+#'     \item \code{"cp"}: Include \code{W} directly in the regression for \code{Ydiff}, modeling moderation of the direct effect.
+#'   }
+#'   Default is \code{NULL}. Only effective when \code{W} is also specified.
 #' @param store_boot_args A list of additional arguments passed to the internal bootstrap function
 #'   \code{semboottools::store_boot()}. Typically used for advanced customization of bootstrap behavior.
 #'   Not intended for general users.
@@ -127,6 +161,8 @@ wsMed <- function(data,
                   C_C1 = NULL,
                   C_C2 = NULL,
                   C     = NULL,
+                  W     = NULL,
+                  MP    = NULL,
                   form = "P",
                   standardized = FALSE,
                   Na = "DE",
@@ -138,16 +174,27 @@ wsMed <- function(data,
                   fixed.x = FALSE,
                   alpha = 0.05,  # 显著性水平
                   alphastd = 0.05,
-                  m = 5,  # 插补次数
-                  method = "pmm",  # 插补方法
-                  decomposition = "eigen",
-                  pd = TRUE,
-                  tol = 1e-06,
                   seed = 123,
                   MCmethod = NULL,
+                  mi_args = list(
+                    m = 5,
+                    method = "pmm",
+                    decomposition = "eigen",
+                    pd = TRUE,
+                    tol = 1e-06
+                  ),
+                  mod_effect_args = list(),    # 调节路径主效应参数
                   store_boot_args = list(),
                   ...) {
 
+
+  {# 展开 mi_args 到局部变量
+    m             <- mi_args$m             %||% 5
+    method        <- mi_args$method        %||% "pmm"
+    decomposition <- mi_args$decomposition %||% "eigen"
+    pd            <- mi_args$pd            %||% TRUE
+    tol           <- mi_args$tol           %||% 1e-06
+  }
   # 输入验证
   {
     # 检查 data
@@ -264,23 +311,26 @@ wsMed <- function(data,
                                Y_C2 = Y_C2,
                                C_C1 = C_C1,
                                C_C2 = C_C2,
-                               C     = C)
+                               C     = C,
+                               W     = W)
 
   # Step 2: 构建模型
   # P is parallel mediation, CN is chained mediation, CP/PC is parallel + chain mediation
   {
     if (form == "P") {
-      sem_model <- GenerateModelP(prepared_data)
+      sem_model <- GenerateModelP(prepared_data, MP = MP)
     } else if (form == "CP") {
-      sem_model <- GenerateModelCP(prepared_data)
+      sem_model <- GenerateModelCP(prepared_data, MP = MP)
     } else if (form == "PC") {
-      sem_model <- GenerateModelPC(prepared_data)
+      sem_model <- GenerateModelPC(prepared_data, MP = MP)
     } else if (form == "CN") {
-      sem_model <- GenerateModelCN(prepared_data)
+      sem_model <- GenerateModelCN(prepared_data, MP = MP)
     } else {
       stop("Invalid 'form' parameter. Use 'CP', 'PC' or 'CN'.")
     }
   }
+
+
 
   # Step 3: 选择方法
   ustd_result <- NULL
@@ -408,6 +458,7 @@ wsMed <- function(data,
       C_C1 = C_C1,
       C_C2 = C_C2,
       C = C,
+      W = W,
       sem_model = sem_model,
       Na = Na,
       R = R,
@@ -425,6 +476,77 @@ wsMed <- function(data,
       fixed.x = fixed.x,
       warn = FALSE
     )}
+
+  # Step 6 前添加，防止 NA 进入布尔逻辑判断
+  mod_effect_args <- utils::modifyList(
+    list(
+      JN = TRUE,
+      W_method = "discrete",
+      W_values = c(-2, -1, 0, 1, 2),
+      ci_level = 0.95,
+      digits = 3
+    ),
+    mod_effect_args
+  )
+
+  # Step 6: 调节效应与 JN 分析
+  moderated_effects_main <- NULL
+  moderated_effects_jn <- NULL
+  moderated_effects_conditional <- NULL
+  if (!is.null(mc_de_result) || !is.null(fiml_result) || !is.null(mi_result)) {
+    mc_obj <- mi_result %||% fiml_result %||% mc_de_result
+    if (!is.null(mc_obj) && inherits(mc_obj, "semmcci")) {
+      # 自动推断调节变量名称
+      if (!is.null(W) && is.character(W) && length(W) >= 1 && W[1] %in% names(prepared_data)) {
+        W_varname <- W[1]
+      } else if (!is.null(W) && is.list(W) && length(W) >= 1 && all(sapply(W, is.character))) {
+        W_varname <- names(W)[1]
+      } else {
+        W_varname <- "W1"
+      }
+
+      # ---------- 主效应表 + JN ----------
+      mod_out <- tryCatch({
+        args_all <- c(
+          list(mc_result = mc_obj, data = prepared_data, W_varname = W_varname),
+          mod_effect_args
+        )
+        do.call(get_all_moderated_effects, args_all)
+      }, error = function(e) {
+        warning("get_all_moderated_effects failed: ", e$message)
+        NULL
+      })
+
+      # 拆分主效应表与 JN 表
+      if (is.list(mod_out) && all(c("main", "JN") %in% names(mod_out))) {
+        moderated_effects_main <- mod_out$main
+        moderated_effects_jn   <- mod_out$JN
+      } else {
+        moderated_effects_main <- mod_out
+        moderated_effects_jn   <- NULL
+      }
+
+
+      # ---------- 条件间接效应（基于 W 水平） ----------
+      moderated_effects_conditional <- tryCatch({
+        # 提取 mod_effect_args 中仅适用于 get_conditional_indirect_effects 的参数
+        args_cond <- c(
+          list(
+            mc_result = mc_obj,
+            data = prepared_data,
+            W_varname = W_varname
+          ),
+          mod_effect_args[intersect(names(mod_effect_args), c("W_method", "W_values", "ci_level", "digits"))]
+        )
+
+        do.call(get_conditional_indirect_effects, args_cond)
+      }, error = function(e) {
+        warning("get_conditional_indirect_effects failed: ", e$message)
+        NULL
+      })
+    }
+  }
+
 
   # Step 5: 标准化结果
   # 初始化结果变量
@@ -525,6 +647,9 @@ wsMed <- function(data,
     boot_ci_type = boot_ci_type,
     bootstrap = bootstrap,
     ustd_result = ustd_result,
+    moderated_effects_main = moderated_effects_main,
+    moderated_effects_jn = moderated_effects_jn,
+    moderated_effects_conditional = moderated_effects_conditional,
     std_mi_result = std_mi_result,
     std_fiml_result = std_fiml_result,
     input_vars = input_vars,

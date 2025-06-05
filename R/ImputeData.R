@@ -31,31 +31,48 @@
 #' @importFrom mice mice complete
 #' @export
 
-
-ImputeData <- function(data_missing, m = 5, method = "pmm", seed = 123, predictorMatrix = NULL) {
+ImputeData <- function(data_missing,
+                       m = 5,
+                       method = "pmm",
+                       seed = 123,
+                       predictorMatrix = NULL) {
   data_missing[data_missing == -999] <- NA
 
   if (!is.data.frame(data_missing)) stop("Input data must be a data frame.")
-  if (!all(sapply(data_missing, function(x) is.numeric(x) || is.factor(x)))) stop("All columns must be numeric or factor.")
+  if (!all(sapply(data_missing, function(x) is.numeric(x) || is.factor(x)))) {
+    stop("All columns must be numeric or factor.")
+  }
 
+  # 自动构建 predictorMatrix
   if (is.null(predictorMatrix)) {
     predictorMatrix <- mice::quickpred(data_missing, mincor = 0.1)
   }
 
+  # 扩展 method 为每列一项
   if (is.null(method)) {
-    method <- ifelse(sapply(data_missing, is.numeric), "pmm", "logreg")
+    method <- sapply(data_missing, function(x) if (is.numeric(x)) "pmm" else "logreg")
+  } else if (length(method) == 1 && is.character(method)) {
+    method <- rep(method, ncol(data_missing))
+    names(method) <- names(data_missing)
+  } else if (length(method) != ncol(data_missing)) {
+    stop("Length of 'method' must be 1 or equal to number of variables.")
   }
 
-  imp <- mice::mice(data_missing, m = m, method = method, seed = seed, predictorMatrix = predictorMatrix)
+  # 执行插补
+  imp <- mice::mice(
+    data_missing,
+    m = m,
+    method = method,
+    seed = seed,
+    predictorMatrix = predictorMatrix
+  )
 
   imputed_data_list <- mice::complete(imp, "all")
   imputed_data_list <- lapply(imputed_data_list, as.data.frame)
 
-  summary_imp <- summary(imp)
-
   return(list(
     mids = imp,
     imputed_data_list = imputed_data_list,
-    summary = summary_imp
+    summary = summary(imp)
   ))
 }

@@ -97,7 +97,8 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 
       # 识别数值列（数值列右对齐，字符列左对齐）
       numeric_cols <- vapply(sub_data, is.numeric, logical(1))
-      align_vec <- ifelse(numeric_cols, "r", "l")
+      # 修改后：让 "level" 列即使是字符型也右对齐
+      align_vec <- ifelse(numeric_cols | names(sub_data) %in% c("level", "Level"), "r", "l")
 
       # 格式化数值列
       sub_data[numeric_cols] <- lapply(sub_data[numeric_cols], function(col) {
@@ -863,7 +864,74 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
     }
   }
 
+  print_mc_moderation_terms <- function(mc_result, title_prefix = "MC", digits = 3) {
+    if (!inherits(mc_result, "semmcci")) return()
 
+    est <- mc_result$thetahat$est
+    se <- apply(mc_result$thetahatstar, 2, sd)
+
+    alpha <- mc_result$args$alpha
+    probs <- sort(c(alpha / 2, 1 - alpha / 2))
+    ci_vals <- apply(mc_result$thetahatstar, 2, quantile, probs = probs)
+    ci_vals <- t(ci_vals)
+    ci_names <- paste0(sprintf("%.1f", probs * 100), ifelse(probs < 0.5, "%CI.Lo", "%CI.Up"))
+    colnames(ci_vals) <- ci_names
+
+    # 筛选调节项系数名（aw, bw, dw, cpw 开头）
+    mod_coef_names <- grep("^(aw|bw|dw|cpw)\\d+(_\\d+)*$", names(est), value = TRUE)
+    if (length(mod_coef_names) == 0) return(invisible(NULL))
+
+    df <- data.frame(
+      Term     = mod_coef_names,
+      Estimate = est[mod_coef_names],
+      SE       = se[mod_coef_names],
+      stringsAsFactors = FALSE
+    )
+    for (ci_name in ci_names) {
+      df[[ci_name]] <- ci_vals[mod_coef_names, ci_name]
+    }
+
+    cat("\n")
+    cat(paste0("\n*************** MODERATION TERMS (", title_prefix, ") ***************\n"))
+    print_table_dynamic(df, digits_local = digits)
+  }
+  if (!is.null(x$mi_result))    print_mc_moderation_terms(x$mi_result, title_prefix = "MC (MI)", digits = digits)
+  if (!is.null(x$fiml_result))  print_mc_moderation_terms(x$fiml_result, title_prefix = "MC (FIML)", digits = digits)
+  if (!is.null(x$mc_de_result)) print_mc_moderation_terms(x$mc_de_result, title_prefix = "MC (DE)", digits = digits)
+
+  print_moderated_effects_main <- function(effects, digits = 3) {
+    if (!is.data.frame(effects) || nrow(effects) == 0) return()
+    cat("\n")
+    cat("\n*************** CONDITIONAL PATH COEFFICIENTS ***************\n")
+    print_table_dynamic(effects, digits_local = digits)
+  }
+  print_conditional_indirect_effects <- function(effects, digits = 3) {
+    if (!is.data.frame(effects) || nrow(effects) == 0) return()
+    cat("\n")
+    cat("\n*************** CONDITIONAL INDIRECT EFFECTS ***************\n")
+    print_table_dynamic(effects, digits_local = digits)
+  }
+  print_jn_results <- function(jn_results, digits = 3) {
+    if (!is.data.frame(jn_results) || nrow(jn_results) == 0) return()
+    cat("\n")
+    cat("\n*************** JOHNSON-NEYMAN INTERVALS ***************\n")
+    # 保持格式一致，转换 NA 为字符
+    df <- jn_results
+    df[] <- lapply(df, function(col) {
+      if (is.numeric(col)) formatC(col, format = "f", digits = digits) else as.character(col)
+    })
+    print_table_dynamic(df, digits_local = digits)
+  }
+  # Print moderation-related sections if available
+  if (!is.null(x$moderated_effects_main)) {
+    print_moderated_effects_main(x$moderated_effects_main, digits = digits)
+  }
+  if (!is.null(x$moderated_effects_conditional)) {
+    print_conditional_indirect_effects(x$moderated_effects_conditional, digits = digits)
+  }
+  if (!is.null(x$moderated_effects_jn)) {
+    print_jn_results(x$moderated_effects_jn, digits = digits)
+  }
 
   print_mc_std_result <- function(std_result, title_prefix = "MC") {
     if (!is.data.frame(std_result)) return()
@@ -1433,7 +1501,6 @@ print.wsMed <- function(x, digits=3, delta = FALSE, ...) {
 
   invisible(x)
 }
-
 
 
 

@@ -30,7 +30,10 @@
 #' @param C_C1 Character vector of within-subject control variable names (condition 1).
 #' @param C_C2 Character vector of within-subject control variable names (condition 2).
 #' @param C Character vector of between-subject control variable names.
-#'
+#' @param W A character vector specifying one or more moderator variable names.
+#'   These variables will be centered (if needed) and used to create interaction
+#'   terms with mediator-related predictors (e.g., \code{Mdiff} or \code{Mavg})
+#'   in the SEM model. Default is \code{NULL}.
 #' @return A data frame containing the following columns:
 #' - `Ydiff`: Difference score for the outcome variable.
 #' - `M1diff`, `M2diff`, ...: Difference scores for each mediator.
@@ -144,3 +147,83 @@ PrepareData <- function(data, M_C1, M_C2, Y_C1, Y_C2,
                       names(between_centered), names(within_diffs), names(within_avgs))
   return(data[, cols_to_return, drop = FALSE])
 }
+
+
+PrepareData <- function(data, M_C1, M_C2, Y_C1, Y_C2,
+                        C_C1 = NULL, C_C2 = NULL, C = NULL,
+                        W = NULL) {
+  if (length(M_C1) != length(M_C2)) {
+    stop("The number of M_C1 and M_C2 variables must match.")
+  }
+  if (!(Y_C1 %in% colnames(data)) || !(Y_C2 %in% colnames(data))) {
+    stop("Y variables not found in the dataset.")
+  }
+
+  data$Ydiff <- data[[Y_C2]] - data[[Y_C1]]
+
+  diffs <- list()
+  avgs <- list()
+  for (i in seq_along(M_C1)) {
+    M1 <- M_C1[i]
+    M2 <- M_C2[i]
+    diff_name <- paste0("M", i, "diff")
+    avg_name <- paste0("M", i, "avg")
+    diffs[[diff_name]] <- data[[M2]] - data[[M1]]
+    M1_centered <- data[[M1]] - mean(data[[M1]], na.rm = TRUE)
+    M2_centered <- data[[M2]] - mean(data[[M2]], na.rm = TRUE)
+    avgs[[avg_name]] <- (M1_centered + M2_centered) / 2
+  }
+
+  between_centered <- list()
+  if (!is.null(C)) {
+    for (i in seq_along(C)) {
+      new_name <- paste0("Cb", i)
+      between_centered[[new_name]] <- data[[C[i]]] - mean(data[[C[i]]], na.rm = TRUE)
+    }
+  }
+
+  within_diffs <- list()
+  within_avgs <- list()
+  if (!is.null(C_C1) && !is.null(C_C2)) {
+    for (i in seq_along(C_C1)) {
+      diff_name <- paste0("Cw", i, "diff")
+      avg_name <- paste0("Cw", i, "avg")
+      wdiff <- data[[C_C2[i]]] - data[[C_C1[i]]]
+      wavg <- (data[[C_C1[i]]] + data[[C_C2[i]]]) / 2
+      within_diffs[[diff_name]] <- wdiff - mean(wdiff, na.rm = TRUE)
+      within_avgs[[avg_name]] <- wavg - mean(wavg, na.rm = TRUE)
+    }
+  }
+
+  W_centered <- list()
+  interaction_terms <- list()
+  if (!is.null(W)) {
+    for (w_i in seq_along(W)) {
+      w_name <- paste0("W", w_i)
+      W_centered[[w_name]] <- data[[W[w_i]]] - mean(data[[W[w_i]]], na.rm = TRUE)
+    }
+    for (m_name in names(diffs)) {
+      for (w_name in names(W_centered)) {
+        int_name <- paste0("int_", m_name, "_", w_name)
+        interaction_terms[[int_name]] <- diffs[[m_name]] * W_centered[[w_name]]
+      }
+    }
+    for (m_name in names(avgs)) {
+      for (w_name in names(W_centered)) {
+        int_name <- paste0("int_", m_name, "_", w_name)
+        interaction_terms[[int_name]] <- avgs[[m_name]] * W_centered[[w_name]]
+      }
+    }
+  }
+
+  all_vars <- c(diffs, avgs, between_centered, within_diffs,
+                within_avgs, W_centered, interaction_terms)
+  data <- cbind(data, as.data.frame(all_vars))
+
+  cols_to_return <- c("Ydiff", names(diffs), names(avgs),
+                      names(between_centered), names(within_diffs),
+                      names(within_avgs), names(W_centered), names(interaction_terms))
+
+  return(data[, cols_to_return, drop = FALSE])
+}
+

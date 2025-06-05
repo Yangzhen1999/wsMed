@@ -32,7 +32,10 @@
 #' @param C_C1 Character vector of within-subject control variable names (condition 1).
 #' @param C_C2 Character vector of within-subject control variable names (condition 2).
 #' @param C Character vector of between-subject control variable names.
-
+#' @param W A character vector specifying the names of moderator variable(s)
+#'   that are used to generate interaction terms with mediators. These variables
+#'   will be included in the imputation model and passed to \code{PrepareData()}
+#'   for moderation effect processing. Default is \code{NULL}.
 #' @return A list containing:
 #' - `processed_data_list`: A list of `m` data frames, each representing an imputed and processed dataset,
 #' ready for within-subject mediation analysis.
@@ -76,26 +79,37 @@ PrepareMissingData <- function(data_missing,
                                Y_C2,
                                C_C1 = NULL,
                                C_C2 = NULL,
-                               C = NULL) {
-  # 检查输入
+                               C = NULL,
+                               W = NULL) {
+  # -------- Step 0: 输入检查 --------
   if (length(M_C1) != length(M_C2)) {
     stop("Error in PrepareMissingData: M_C1 and M_C2 must have the same length.")
   }
-
   if (!(Y_C1 %in% colnames(data_missing)) || !(Y_C2 %in% colnames(data_missing))) {
     stop("Error in PrepareMissingData: Y_C1 or Y_C2 is missing in the dataset.")
   }
 
-  # -------- Step 1: 选出需要插补的变量列 --------
+  # -------- Step 1: 提取变量列 --------
   relevant_vars <- c(Y_C1, Y_C2, M_C1, M_C2)
-
   if (!is.null(C)) relevant_vars <- c(relevant_vars, C)
   if (!is.null(C_C1) && !is.null(C_C2)) relevant_vars <- c(relevant_vars, C_C1, C_C2)
-
+  if (!is.null(W)) relevant_vars <- c(relevant_vars, W)
   relevant_vars <- unique(relevant_vars)
+
+  # 提取相关数据
   data_reduced <- data_missing[, relevant_vars, drop = FALSE]
 
-  # -------- Step 2: 执行多重插补 --------
+  # -------- Step 2: 若 W 为 factor/character，转为 numeric --------
+  if (!is.null(W)) {
+    for (w in W) {
+      if (is.factor(data_reduced[[w]]) || is.character(data_reduced[[w]])) {
+        warning(paste0("Converting '", w, "' to numeric for imputation."))
+        data_reduced[[w]] <- as.numeric(as.character(data_reduced[[w]]))
+      }
+    }
+  }
+
+  # -------- Step 3: 多重插补 --------
   imputed_result <- ImputeData(
     data_missing = data_reduced,
     m = m,
@@ -104,7 +118,7 @@ PrepareMissingData <- function(data_missing,
   )
   imputed_data_list <- imputed_result$imputed_data_list
 
-  # -------- Step 3: 处理每一个插补后的数据集 --------
+  # -------- Step 4: 每一个插补后的数据集处理 --------
   processed_data_list <- lapply(imputed_data_list, function(imputed_data) {
     PrepareData(
       data = imputed_data,
@@ -114,7 +128,8 @@ PrepareMissingData <- function(data_missing,
       Y_C2 = Y_C2,
       C_C1 = C_C1,
       C_C2 = C_C2,
-      C = C
+      C = C,
+      W = W
     )
   })
 
