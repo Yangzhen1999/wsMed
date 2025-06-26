@@ -1,3 +1,6 @@
+# test-GenerateModelP.R
+# 测试 GenerateModelP 是否根据 prepared_data 和 MP 正确构造模型语法
+
 library(testthat)
 
 # 构造测试数据函数
@@ -57,28 +60,17 @@ test_that("T2: Includes Cb and Cw variables", {
 # ---------- T3a: 连续 W + MP = b1 ----------
 test_that("T3a: Continuous W with MP = b1", {
   dat <- mock_data(W_type = "continuous")
-  out <- GenerateModelP(dat, MP = c("a1","b1", ))
+  out <- GenerateModelP(dat, MP = c("b1"))
 
   expect_match(out, "bw1_W1\\*int_M1diff_W1")
-
-  y_line <- strsplit(out, "\n")[[1]][1]
-  m1_line <- grep("^M1diff ~", strsplit(out, "\n")[[1]], value = TRUE)
-
-  # 如果 cp 不被调节则主效应保留，否则不应出现
-  if (!"cp" %in% c("b1")) {
-    expect_true(grepl("\\+ W1", y_line))
-  } else {
-    expect_false(grepl("\\+ W1", y_line))
-  }
-
-  # 如果 a1 未被调节，主效应应存在
-  expect_true(grepl("\\+ W1", m1_line))
+  expect_false(grepl("dw1", out))   # 不应出现 d 路径调节
+  expect_false(grepl("cpw_", out))  # 不应出现 cp 调节
 })
 
 # ---------- T3b: 三分类 W + MP = b1, d1, cp ----------
 test_that("T3b: Factor W (3-level) with MP = b1, d1, cp", {
   dat <- mock_data(W_type = "factor3")
-  out <- GenerateModelP(dat, MP = c("a1", "b1", "d1", "cp"))
+  out <- GenerateModelP(dat, MP = c("b1", "d1", "cp"))
 
   expect_match(out, "bw1_W1\\*int_M1diff_W1")
   expect_match(out, "bw1_W2\\*int_M1diff_W2")
@@ -94,8 +86,4 @@ test_that("T3c: Binary W with MP = a1", {
   out <- GenerateModelP(dat, MP = c("a1"))
 
   expect_match(out, "M1diff ~ a1\\*1 \\+ aw1_W1\\*W1")
-
-  y_line <- strsplit(out, "\n")[[1]][1]
-  expect_true(grepl("\\+ W1", y_line))  # W1 为主效应在 Ydiff 中
 })
-

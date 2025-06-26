@@ -7,7 +7,7 @@
 PrepareMissingData(
   data_missing,
   m = 5,
-  method = "pmm",
+  method_num = "pmm",
   seed = 123,
   M_C1,
   M_C2,
@@ -15,16 +15,18 @@ PrepareMissingData(
   Y_C2,
   C_C1 = NULL,
   C_C2 = NULL,
-  C = NULL
+  C = NULL,
+  C_type = NULL,
+  W = NULL,
+  W_type = NULL,
+  keep_W_raw = TRUE,
+  keep_C_raw = TRUE
 )
 }
 \arguments{
 \item{data_missing}{A data frame containing the raw dataset with missing values.}
 
 \item{m}{An integer specifying the number of imputations to perform. Default is \code{5}.}
-
-\item{method}{A character string specifying the imputation method. Default is \code{"pmm"}
-(predictive mean matching).}
 
 \item{seed}{An integer specifying the random seed for reproducibility. Default is \code{123}.}
 
@@ -42,6 +44,14 @@ Must match the length of \code{M_C1}.}
 \item{C_C2}{Character vector of within-subject control variable names (condition 2).}
 
 \item{C}{Character vector of between-subject control variable names.}
+
+\item{W}{A character vector specifying the names of moderator variable(s)
+that are used to generate interaction terms with mediators. These variables
+will be included in the imputation model and passed to \code{PrepareData()}
+for moderation effect processing. Default is \code{NULL}.}
+
+\item{method}{A character string specifying the imputation method. Default is \code{"pmm"}
+(predictive mean matching).}
 }
 \value{
 A list containing:

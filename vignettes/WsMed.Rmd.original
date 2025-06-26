@@ -149,8 +149,7 @@ print(result1)
 You can further control the behavior of `wsMed()` through additional arguments:
 
 - Set `standardized = TRUE` to compute **standardized effects** and their confidence intervals.
-- Use `bootstrap` and `iseed` to control the **number of bootstrap samples** and **random seed**.
-- Adjust `alpha` for the **significance level of unstandardized CIs**, and `alphastd` for **standardized CIs**.
+- Adjust `alpha` for the **significance level of CIs**.
 
 ```{r}
 library(wsMed)
@@ -163,9 +162,6 @@ result2 <- wsMed(
   form = "P", # Parallel mediation
   standardized = TRUE, # Compute standardized effects
   alpha =  0.05,  # Significance level
-  alphastd = 0.05, # Significance level for standardized
-  bootstrap = 2000, # Bootstrap for confidence intervals
-  iseed = 123 # Random seed for bootstrap
 )
 print(result2)
 ```
@@ -246,14 +242,13 @@ result4 <- wsMed(
   standardized = TRUE, # Compute standardized effects based on Monte Carlo method
   R = 20000L,  # the number of Monte Carlo repetitions
   alpha =  0.05,  # Significance level
-  alphastd = 0.05 # Significance level for standardized
 )
 print(result4)
 ```
 
 ### example 5
 
-Use 'FIML' method for missing data for chained + parallel mediation
+moderator W +  serial-parallel mediation + missing data
 
 ```{r}
 result5 <- wsMed(
@@ -263,13 +258,14 @@ result5 <- wsMed(
   Y_C1 = "D1",# D1 is outcome variable in condition 1
   Y_C2 = "D2",# D2 is outcome variable in condition 2
   form = "CP",# chained + parallel mediation, M1 is chained mediator by default
-  Na = "FIML",# Use Full Information Maximum Likelihood ("FIML")  for handling missing data
-  standardized = TRUE, # Compute standardized effects based on Monte Carlo method
-  R = 10000L,   # the number of Monte Carlo repetitions
-  alpha =  0.05,  # Significance level
-  alphastd = 0.05 # Significance level for standardized
+  W      = "D3",       W_type = "continuous",
+  MP     = c("a1","b2","d1","cp","b_1_2","d_1_2"),
 )
 print(result5)
+
+plot_moderation_curve(result5, "indirect_effect_1_2")
+plot_moderation_curve(result5, "b_1_2")
+plot_moderation_curve(result5, "total_effect")
 ```
 
 ### example 6
@@ -281,10 +277,29 @@ In this example,three covariates are included:
   - `Cw1diff = D2 - D1` (difference score)
   - `Cw1avg = mean-centered average of D1 and D2`
 
+
 These covariates are included as predictors of both the mediators and the outcome in the SEM model.
 
 ```{r}
 result6 <- wsMed(
+  data = example_data, #dataset
+  M_C1 = c("A1","B1","C1"), # A1/B1 is A/B mediator variable in condition 1
+  M_C2 = c("A2","B2","C2"), # A2/B2 is A/B mediator variable in condition 2
+  Y_C1 = "D1", # D1 is outcome variable in condition 1
+  Y_C2 = "D2", # D2 is outcome variable in condition 2
+  W      = "Group",
+  W_type = "categorical",
+  MP     =  c("a1","b1","d1","cp","b_1_2","b_2_3"),
+  form   = "CN"
+)
+
+print(result6, digits=6)
+```
+
+These covariates are included as predictors of both the mediators and the outcome in the SEM model.
+
+```{r}
+result7 <- wsMed(
   data = example_data, #dataset
   M_C1 = c("A1","B1"), # A1/B1 is A/B mediator variable in condition 1
   M_C2 = c("A2","B2"), # A2/B2 is A/B mediator variable in condition 2
@@ -293,10 +308,8 @@ result6 <- wsMed(
   form = "P", # Parallel mediation
   C_C1 = "D1", # within-subject covariate (e.g., measured under D1)
   C_C2 = "D2", # within-subject covariate (e.g., measured under C2)
-  C = "D3", # between-subject covariates
-  ci_method = "mc"
+  C = "D3" # between-subject covariates
 )
 
-print(result6)
+print(result7)
 ```
-

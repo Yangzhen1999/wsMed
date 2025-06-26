@@ -71,45 +71,74 @@ get_all_moderated_effects <- function(mc_result,
                                       ci_level = 0.95,
                                       digits = 3,
                                       JN = FALSE,
-                                      W_range = c(-3, 3),
+                                      W_range = NULL,
                                       resolution = 1000,
                                       alpha = 0.05,
-                                      verbose = TRUE) {
+                                      verbose = TRUE,
+                                      return_empty_table = TRUE) {
   W_method <- match.arg(W_method)
+
   if (!inherits(mc_result, "semmcci")) {
     stop("Input must be a 'semmcci' object.")
   }
 
   all_names <- names(mc_result$thetahat$est)
-  pattern <- "^(cpw|aw|bw|dw)[0-9_]*$|^bw_\\d+_\\d+_\\d+$|^dw_\\d+_\\d+_\\d+$"
+  pattern <- "^(cpw|aw\\d+|bw\\d+|dw\\d+|bw_\\d+(?:_\\d+)*|dw_\\d+(?:_\\d+)*)$"
   mod_names <- grep(pattern, all_names, value = TRUE)
-  if (length(mod_names) == 0) return(NULL)
 
+  if (length(mod_names) == 0) {
+    if (verbose) message("⚠️ No moderated effects matched.")
+    if (return_empty_table) {
+      return(data.frame(
+        Moderator = character(),
+        Coefficient = character(),
+        Path = character(),
+        Level = character(),
+        W = numeric(),
+        Estimate = numeric(),
+        SE = numeric(),
+        CI.Lower = numeric(),
+        CI.Upper = numeric(),
+        stringsAsFactors = FALSE
+      ))
+    } else {
+      return(NULL)
+    }
+  }
+
+  # 自动推断 W_range
+  if (is.null(W_range)) {
+    if (!is.null(data) && W_varname %in% names(data)) {
+      W_range <- quantile(data[[W_varname]], probs = c(0.025, 0.975), na.rm = TRUE)
+      message("✔ Auto W_range = [", round(W_range[1], 2), ", ", round(W_range[2], 2),
+              "] based on 95% quantile of ", W_varname, ".")
+    } else {
+      W_range <- c(-2, 2)
+      warning("⚠ Could not detect W_range from data. Defaulting to [-2, 2].")
+    }
+  }
+
+  # W values for conditional effect
   if (W_method == "quantile") {
     if (is.null(data)) stop("Raw data is required when W_method = 'quantile'.")
     if (!(W_varname %in% names(data))) stop(paste0("'", W_varname, "' not found in data."))
     W_values <- quantile(data[[W_varname]], probs = c(0.05, 0.25, 0.5, 0.75, 0.95), na.rm = TRUE)
     W_levels <- names(W_values)
   } else {
-    W_levels <- as.character(W_values)
+    W_levels <- paste0(W_values, " SD")
   }
 
   extract_main_path <- function(mod) {
-    if (grepl("^cpw\\d+_\\d+$", mod)) return("cp")
-    if (grepl("^aw\\d+_\\d+$", mod)) return(paste0("a", sub("^aw(\\d+)_\\d+$", "\\1", mod)))
-    if (grepl("^bw\\d+_\\d+$", mod)) return(paste0("b", sub("^bw(\\d+)_\\d+$", "\\1", mod)))
-    if (grepl("^dw\\d+_\\d+$", mod)) return(paste0("d", sub("^dw(\\d+)_\\d+$", "\\1", mod)))
-    if (grepl("^bw_\\d+_\\d+_\\d+$", mod)) return(sub("^bw_(\\d+_\\d+)_\\d+$", "b_\\1", mod))
-    if (grepl("^dw_\\d+_\\d+_\\d+$", mod)) return(sub("^dw_(\\d+_\\d+)_\\d+$", "d_\\1", mod))
+    if (grepl("^cpw", mod)) return("cp")
+    if (grepl("^aw\\d+$", mod)) return(paste0("a", sub("^aw(\\d+)$", "\\1", mod)))
+    if (grepl("^bw\\d+$", mod)) return(paste0("b", sub("^bw(\\d+)$", "\\1", mod)))
+    if (grepl("^dw\\d+$", mod)) return(paste0("d", sub("^dw(\\d+)$", "\\1", mod)))
+    if (grepl("^bw_\\d+(?:_\\d+)*$", mod)) return(sub("^bw_", "b_", mod))
+    if (grepl("^dw_\\d+(?:_\\d+)*$", mod)) return(sub("^dw_", "d_", mod))
     return(NA)
   }
 
   extract_moderator <- function(mod) {
-    if (grepl("_(W\\d+|\\d+)$", mod)) {
-      out <- sub(".*_(W\\d+|\\d+)$", "\\1", mod)
-      if (grepl("^\\d+$", out)) return(paste0("W", out))
-      return(out)
-    }
     return(W_varname)
   }
 
@@ -146,7 +175,6 @@ get_all_moderated_effects <- function(mc_result,
         CI.Upper = round(ci_vals[2], digits),
         stringsAsFactors = FALSE
       )
-
     })
     do.call(rbind, rows)
   })
@@ -155,7 +183,7 @@ get_all_moderated_effects <- function(mc_result,
   rownames(main_tbl) <- NULL
 
   if (JN) {
-    stars <- mc_result$thetahatstar
+    stars <- theta_star
     w_seq <- seq(W_range[1], W_range[2], length.out = resolution)
     probs <- c(alpha / 2, 1 - alpha / 2)
 
@@ -174,12 +202,22 @@ get_all_moderated_effects <- function(mc_result,
         !(ci[1] < 0 & ci[2] > 0)
       })
 
-      if (all(!sig_vec)) {
+      rle_obj <- rle(sig_vec)
+      min_run_length <- ceiling(length(w_seq) * 0.05)
+
+      if (!any(rle_obj$values)) {
         lower <- upper <- NA
       } else {
-        idx <- which(sig_vec)
-        lower <- w_seq[min(idx)]
-        upper <- w_seq[max(idx)]
+        longest_sig <- which.max(ifelse(rle_obj$values, rle_obj$lengths, 0))
+        if (rle_obj$lengths[longest_sig] < min_run_length) {
+          lower <- upper <- NA
+        } else {
+          starts <- cumsum(c(1, head(rle_obj$lengths, -1)))
+          idx_start <- starts[longest_sig]
+          idx_end <- idx_start + rle_obj$lengths[longest_sig] - 1
+          lower <- w_seq[idx_start]
+          upper <- w_seq[idx_end]
+        }
       }
 
       if (!is.null(data) && W_varname %in% names(data)) {
@@ -201,6 +239,7 @@ get_all_moderated_effects <- function(mc_result,
         stringsAsFactors = FALSE
       )
     })
+
     jn_tbl <- do.call(rbind, jn_list)
     rownames(jn_tbl) <- NULL
     return(invisible(list(main = main_tbl, JN = jn_tbl)))
@@ -208,3 +247,4 @@ get_all_moderated_effects <- function(mc_result,
 
   return(main_tbl)
 }
+

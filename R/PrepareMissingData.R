@@ -69,75 +69,74 @@
 #'
 #' @export
 
+
 PrepareMissingData <- function(data_missing,
-                               m = 5,
-                               method = "pmm",
-                               seed = 123,
-                               M_C1,
-                               M_C2,
-                               Y_C1,
-                               Y_C2,
-                               C_C1 = NULL,
-                               C_C2 = NULL,
-                               C = NULL,
-                               W = NULL) {
-  # -------- Step 0: 输入检查 --------
-  if (length(M_C1) != length(M_C2)) {
-    stop("Error in PrepareMissingData: M_C1 and M_C2 must have the same length.")
-  }
-  if (!(Y_C1 %in% colnames(data_missing)) || !(Y_C2 %in% colnames(data_missing))) {
-    stop("Error in PrepareMissingData: Y_C1 or Y_C2 is missing in the dataset.")
-  }
+                               m          = 5,
+                               method_num = "pmm",
+                               seed       = 123,
+                               M_C1,  M_C2,
+                               Y_C1,  Y_C2,
+                               C_C1 = NULL,  C_C2 = NULL,
+                               C     = NULL, C_type = NULL,
+                               W     = NULL, W_type = NULL,
+                               center_W   = TRUE,     # <‑‑ NEW
+                               keep_W_raw = TRUE,
+                               keep_C_raw = TRUE) {
 
-  # -------- Step 1: 提取变量列 --------
-  relevant_vars <- c(Y_C1, Y_C2, M_C1, M_C2)
-  if (!is.null(C)) relevant_vars <- c(relevant_vars, C)
-  if (!is.null(C_C1) && !is.null(C_C2)) relevant_vars <- c(relevant_vars, C_C1, C_C2)
-  if (!is.null(W)) relevant_vars <- c(relevant_vars, W)
-  relevant_vars <- unique(relevant_vars)
+  ## ---------- 0. basic checks ----------
+  stopifnot(length(M_C1) == length(M_C2))
+  stopifnot(all(c(Y_C1, Y_C2) %in% names(data_missing)))
 
-  # 提取相关数据
-  data_reduced <- data_missing[, relevant_vars, drop = FALSE]
+  ## ---------- 1. subset ----------
+  relevant <- unique(na.omit(c(Y_C1, Y_C2, M_C1, M_C2,
+                               C_C1, C_C2, C, W)))
+  dat <- data_missing[, relevant, drop = FALSE]
 
-  # -------- Step 2: 若 W 为 factor/character，转为 numeric --------
-  if (!is.null(W)) {
-    for (w in W) {
-      if (is.factor(data_reduced[[w]]) || is.character(data_reduced[[w]])) {
-        warning(paste0("Converting '", w, "' to numeric for imputation."))
-        data_reduced[[w]] <- as.numeric(as.character(data_reduced[[w]]))
-      }
+  ## ---------- 2. char → factor ----------
+  dat[vapply(dat, is.character, logical(1))] <-
+    lapply(dat[vapply(dat, is.character, logical(1))], factor)
+
+  ## ---------- 3. build mice method/predictor matrix ----------
+  init  <- mice::mice(dat, maxit = 0, print = FALSE)
+  meth  <- init$method
+  pred  <- init$predictorMatrix
+  is_fac <- vapply(dat, is.factor, logical(1))
+
+  for (v in names(dat)) {
+    if (is_fac[v]) {
+      k <- nlevels(dat[[v]])
+      meth[v] <- if (k == 2) "logreg" else "polyreg"
+    } else {
+      meth[v] <- method_num
     }
   }
 
-  # -------- Step 3: 多重插补 --------
-  imputed_result <- ImputeData(
-    data_missing = data_reduced,
-    m = m,
-    method = method,
-    seed = seed
-  )
-  imputed_data_list <- imputed_result$imputed_data_list
+  ## ---------- 4. run mice ----------
+  mids <- mice::mice(dat, m = m, method = meth,
+                     predictorMatrix = pred, seed = seed, print = FALSE)
+  imputed_list <- mice::complete(mids, action = "all")
 
-  # -------- Step 4: 每一个插补后的数据集处理 --------
-  processed_data_list <- lapply(imputed_data_list, function(imputed_data) {
-    PrepareData(
-      data = imputed_data,
-      M_C1 = M_C1,
-      M_C2 = M_C2,
-      Y_C1 = Y_C1,
-      Y_C2 = Y_C2,
-      C_C1 = C_C1,
-      C_C2 = C_C2,
-      C = C,
-      W = W
+  ## ---------- 5. call PrepareData on each completed set ----------
+  processed <- lapply(
+    imputed_list,
+    function(d) PrepareData(
+      data = d,
+      M_C1 = M_C1,  M_C2 = M_C2,
+      Y_C1 = Y_C1,  Y_C2 = Y_C2,
+      C_C1 = C_C1,  C_C2 = C_C2,
+      C     = C,    C_type = C_type,
+      W     = W,    W_type = W_type,
+      center_W = center_W,        # <‑‑ passes through
+      keep_W_raw = keep_W_raw,
+      keep_C_raw = keep_C_raw
     )
-  })
+  )
 
-  return(list(
-    mids = imputed_result$mids,
-    processed_data_list = processed_data_list,
-    imputation_summary = imputed_result$summary
-  ))
+  ## ---------- 6. return ----------
+  list(
+    mids               = mids,
+    processed_data_list= processed,
+    imputation_summary = summary(mids)
+  )
 }
-
 

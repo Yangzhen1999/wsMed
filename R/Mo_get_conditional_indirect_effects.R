@@ -52,8 +52,7 @@ get_conditional_indirect_effects <- function(mc_result,
                                              W_varname = "W1",
                                              W_method = c("quantile", "discrete"),
                                              W_values = NULL,
-                                             ci_level = 0.95,
-                                             digits = 3) {
+                                             ci_level = 0.95) {
   if (!inherits(mc_result, "semmcci")) {
     stop("Input must be a 'semmcci' object.")
   }
@@ -68,7 +67,7 @@ get_conditional_indirect_effects <- function(mc_result,
     probs <- if (is.null(W_values)) c(0.05, 0.25, 0.5, 0.75, 0.95) else W_values
     W_values <- quantile(W_raw, probs = probs, na.rm = TRUE)
     level_labels <- paste0(round(probs * 100), "%")
-  } else if (W_method == "discrete") {
+  } else {
     SD_unit <- if (is.null(W_values)) c(-2, -1, 0, 1, 2) else W_values
     mean_W <- mean(W_raw, na.rm = TRUE)
     sd_W <- sd(W_raw, na.rm = TRUE)
@@ -80,7 +79,7 @@ get_conditional_indirect_effects <- function(mc_result,
   names(W_values) <- level_labels
 
   param_names <- colnames(mc_result$thetahatstar)
-  indirect_names <- grep("^indirect(_\\d+)+$", param_names, value = TRUE)
+  indirect_names <- grep("^indirect(_\\d+)*$", param_names, value = TRUE)
   if (length(indirect_names) == 0) return(NULL)
 
   W_groups <- sapply(W_raw, function(wi) {
@@ -89,6 +88,9 @@ get_conditional_indirect_effects <- function(mc_result,
   })
   group_indices <- lapply(W_values, function(w) which(W_groups == w))
 
+  ci_lower_name <- sprintf("%.1f%%CI.Lo", (1 - ci_level) / 2 * 100)
+  ci_upper_name <- sprintf("%.1f%%CI.Up", (1 + ci_level) / 2 * 100)
+
   result_list <- lapply(indirect_names, function(ind_name) {
     samples <- mc_result$thetahatstar[, ind_name]
     rows <- mapply(function(i, label) {
@@ -96,21 +98,41 @@ get_conditional_indirect_effects <- function(mc_result,
       est <- mean(sub_samples, na.rm = TRUE)
       se <- sd(sub_samples, na.rm = TRUE)
       ci <- quantile(sub_samples, probs = c((1 - ci_level) / 2, 1 - (1 - ci_level) / 2), na.rm = TRUE)
-      data.frame(
+      row <- data.frame(
         Path = ind_name,
-        W = round(W_values[i], digits),
+        W = W_values[i],
         level = label,
-        Estimate = round(est, digits),
-        SE = round(se, digits),
-        CI.Lower = round(ci[1], digits),
-        CI.Upper = round(ci[2], digits),
+        Estimate = est,
+        SE = se,
         stringsAsFactors = FALSE
       )
+      row[[ci_lower_name]] <- ci[1]
+      row[[ci_upper_name]] <- ci[2]
+      row
     }, i = seq_along(W_values), label = names(W_values), SIMPLIFY = FALSE)
     do.call(rbind, rows)
   })
 
   result <- do.call(rbind, result_list)
+
+  extract_sort_key <- function(path) {
+    parts <- strsplit(sub("^indirect_", "", path), "_")[[1]]
+    nums <- suppressWarnings(as.numeric(parts))
+    nums[is.na(nums)] <- Inf
+    return(nums)
+  }
+
+  sort_key_list <- lapply(result$Path, extract_sort_key)
+  max_len <- max(lengths(sort_key_list))
+  sort_matrix <- t(sapply(sort_key_list, function(x) {
+    c(length(x), x, rep(Inf, max_len - length(x)))
+  }))
+  sort_df <- as.data.frame(sort_matrix)
+  sort_df$W <- result$W
+
+  ord <- do.call(order, sort_df)
+  result <- result[ord, ]
   rownames(result) <- NULL
   return(result)
 }
+

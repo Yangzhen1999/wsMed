@@ -13,26 +13,23 @@ wsMed(
   C_C1 = NULL,
   C_C2 = NULL,
   C = NULL,
-  form = "P",
-  standardized = FALSE,
-  Na = "DE",
-  ci_method = NULL,
-  bootstrap = 1000,
-  iseed = 123,
-  boot_ci_type = "perc",
-  R = 20000L,
-  fixed.x = FALSE,
+  C_type = NULL,
+  W = NULL,
+  W_type = NULL,
+  MP = NULL,
+  form = c("P", "CN", "CP", "PC"),
+  Na = c("DE", "FIML", "MI"),
   alpha = 0.05,
-  alphastd = 0.05,
-  m = 5,
-  method = "pmm",
-  decomposition = "eigen",
-  pd = TRUE,
-  tol = 1e-06,
+  mi_args = list(),
+  R = 20000L,
+  bootstrap = 1000,
+  boot_ci_type = "perc",
+  iseed = 123,
+  fixed.x = FALSE,
+  ci_method = NULL,
   seed = 123,
-  MCmethod = NULL,
-  store_boot_args = list(),
-  ...
+  standardized = FALSE,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -52,42 +49,75 @@ wsMed(
 
 \item{C}{Character vector of between-subject control variable names.}
 
+\item{W}{A character vector specifying one or more moderator variable names.
+These variables will be centered (if needed) and used to create interaction
+terms with mediator-related predictors (e.g., \code{Mdiff} or \code{Mavg})
+in the SEM model. Default is \code{NULL}.}
+
+\item{MP}{A character vector specifying which regression paths are moderated by
+the variables in \code{W}. Each element should indicate a target path, such as
+\code{"a1"}, \code{"b2"}, \code{"d_2_1"}, or \code{"cp"}:
+\itemize{
+\item \code{"a1"}, \code{"a2"}, etc.: Add \code{W} as predictors of \code{M1diff}, \code{M2diff}, etc.
+\item \code{"b1"}, \code{"b_1_2"}: Add interaction terms between \code{W} and \code{Mdiff} predictors in \code{Ydiff ~ ...}
+\item \code{"d1"}, \code{"d_1_2"}: Add interaction terms between \code{W} and \code{Mavg} predictors in \code{Ydiff ~ ...}
+\item \code{"cp"}: Include \code{W} directly in the regression for \code{Ydiff}, modeling moderation of the direct effect.
+}
+Default is \code{NULL}. Only effective when \code{W} is also specified.}
+
 \item{form}{Character. Mediation model type: \code{"P"}, \code{"CN"}, \code{"CP"}, or \code{"PC"}. Defaults to \code{"P"}.}
 
-\item{standardized}{Logical. Whether to compute standardized estimates. Defaults to \code{FALSE}.}
-
 \item{Na}{Character. Missing data method: \code{"DE"}, \code{"FIML"}, or \code{"MI"}. Defaults to \code{"DE"}.}
+
+\item{alpha}{Numeric vector. Significance levels for CI. Defaults to \code{c(0.01, 0.05)}.}
+
+\item{mi_args}{A list of arguments used for multiple imputation (MI) and Monte Carlo inference with imputed data. The following fields can be specified:
+\describe{
+\item{\code{m}}{(integer) Number of imputations. Default is 5.}
+\item{\code{method}}{(character) Imputation method passed to \code{mice()}. Default is \code{"pmm"}.}
+\item{\code{decomposition}}{(character) Decomposition method used in Monte Carlo CI (\code{"eigen"}, \code{"chol"}, or \code{"svd"}). Default is \code{"eigen"}.}
+\item{\code{pd}}{(logical) Whether to check positive definiteness of covariance matrix. Default is \code{TRUE}.}
+\item{\code{tol}}{(numeric) Tolerance for positive-definiteness check. Default is \code{1e-6}.}
+}}
+
+\item{R}{Integer. Number of Monte Carlo repetitions. Defaults to \code{20000L}.}
+
+\item{bootstrap}{Integer. Number of bootstrap samples (used for \code{"bootstrap"} CI). Defaults to \code{1000}.}
+
+\item{boot_ci_type}{Character. Type of bootstrap CI: \code{"perc"}, \code{"bc"}, or \code{"bca.simple"}.}
+
+\item{iseed}{Integer. Random seed used in bootstrapping. Defaults to \code{123}.}
+
+\item{fixed.x}{Logical. Whether to treat predictors as fixed. Defaults to \code{FALSE}.}
 
 \item{ci_method}{Character. Confidence interval method: \code{"bootstrap"} or \code{"mc"}. If \code{NULL}, defaults to:
 \code{"mc"} for \code{"MI"} amd \code{"FIML"}, \code{"bootstrap"} for \code{"DE"}.}
 
-\item{bootstrap}{Integer. Number of bootstrap samples (used for \code{"bootstrap"} CI). Defaults to \code{1000}.}
-
-\item{iseed}{Integer. Random seed used in bootstrapping. Defaults to \code{123}.}
-
-\item{boot_ci_type}{Character. Type of bootstrap CI: \code{"perc"}, \code{"bc"}, or \code{"bca.simple"}.}
-
-\item{R}{Integer. Number of Monte Carlo repetitions. Defaults to \code{20000L}.}
-
-\item{fixed.x}{Logical. Whether to treat predictors as fixed. Defaults to \code{FALSE}.}
-
-\item{alpha}{Numeric vector. Significance levels for CI. Defaults to \code{c(0.01, 0.05)}.}
-
-\item{alphastd}{Numeric. Significance level for standardized results. Defaults to \code{0.05}.}
-
-\item{m}{Integer. Number of imputations for MI. Defaults to \code{5}.}
-
-\item{method}{Character. Imputation method for \code{mice}. Defaults to \code{"pmm"}.}
-
-\item{decomposition}{Character. Decomposition method for covariance matrices. Defaults to \code{"eigen"}.}
-
-\item{pd}{Logical. Whether to check for positive definiteness. Defaults to \code{TRUE}.}
-
-\item{tol}{Numeric. Tolerance for positive definiteness. Defaults to \code{1e-06}.}
-
 \item{seed}{Integer. Random seed used in Monte Carlo simulation. Defaults to \code{123}.}
 
+\item{standardized}{Logical. Whether to compute standardized estimates. Defaults to \code{FALSE}.}
+
 \item{MCmethod}{Character. If \code{Na = "FIML"} and \code{ci_method = "mc"}, choose \code{"mc"} (default) or \code{"bootSD"}.}
+
+\item{moderation_args}{A list of arguments passed to compute conditional moderated effects. Includes:
+\describe{
+\item{\code{W_method}}{Method for defining moderator levels. Options: \code{"discrete"} or \code{"quantile"}.}
+\item{\code{W_values}}{Values or levels of the moderator variable for estimation. Default is \code{c(-1, 0, 1)}.}
+\item{\code{W_varname}}{Name of the moderator variable. Default is \code{"W1"}.}
+\item{\code{ci_level}}{Confidence level for intervals. Default is \code{0.95}.}
+\item{\code{digits}}{Number of digits to round results. Default is 3.}
+}}
+
+\item{jn_args}{A list of arguments passed to compute Johnson-Neyman regions (if \code{JN = TRUE}). Includes:
+\describe{
+\item{\code{JN}}{Logical. If \code{TRUE}, perform Johnson-Neyman analysis.}
+\item{\code{W_range}}{Range of moderator values to evaluate (e.g., \code{c(-3, 3)}).}
+\item{\code{resolution}}{Number of evaluation points in the range.}
+\item{\code{alpha}}{Significance level for confidence intervals. Default is \code{0.05}.}
+\item{\code{verbose}}{Whether to print diagnostic messages.}
+}}
+
+\item{alphastd}{Numeric. Significance level for standardized results. Defaults to \code{0.05}.}
 
 \item{store_boot_args}{A list of additional arguments passed to the internal bootstrap function
 \code{semboottools::store_boot()}. Typically used for advanced customization of bootstrap behavior.

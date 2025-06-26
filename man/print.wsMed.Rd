@@ -4,16 +4,16 @@
 \alias{print.wsMed}
 \title{Print Method for wsMed Objects}
 \usage{
-\method{print}{wsMed}(x, digits = 3, delta = FALSE, ...)
+\method{print}{wsMed}(x, digits = 3, ...)
 }
 \arguments{
 \item{x}{A \code{wsMed} object containing the results of within-subject mediation analysis.}
 
 \item{digits}{Numeric. Number of digits to display in the results.}
 
-\item{delta}{Logical. Whether to include original delta-method-based SE, CI, and p-values alongside bootstrap results. Default is FALSE.}
-
 \item{...}{Additional arguments (not used currently).}
+
+\item{delta}{Logical. Whether to include original delta-method-based SE, CI, and p-values alongside bootstrap results. Default is FALSE.}
 }
 \value{
 Invisibly returns the input \code{wsMed} object for further use.

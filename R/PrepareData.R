@@ -1,229 +1,455 @@
-#' @title Prepare Data for Within-Subject Mediation Analysis
+#' @title Prepare Data for Two-Condition Within-Subject Mediation (WsMed)
 #'
-#' @description Prepares a dataset for within-subject mediation analysis by calculating
-#' difference scores and centered average scores for specified mediators and the outcome variable.
-#' The function ensures that the input data meets the necessary requirements and generates
-#' new variables required for subsequent mediation analysis.
+#' @description
+#' `PrepareData()` transforms raw pre/post data into the set of variables
+#' required by the **WsMed** workflow.
+#' It handles *mediators*, *outcome*, *within-subject controls*, *between-subject
+#' controls*, *moderators*, and all necessary **interaction terms**, while
+#' automatically centring / dummy-coding variables as needed.
 #'
-#' @details This function processes raw data to create variables essential for within-subject
-#' mediation analysis. It performs the following operations:
+#' @details
+#' The function performs the following steps:
 #'
-#' - **Difference scores**: Calculates the difference between "before" and "after" values for
-#' the outcome variable (`Ydiff`) and each mediator (`Mdiff`).
+#' 1. **Outcome difference** (`Ydiff`) – `Y_C2 − Y_C1`.
+#' 2. **Mediator variables** for each pair `(M_C1[i], M_C2[i])`
+#'    * `Mi_diff` = `M_C2 − M_C1`
+#'    * `Mi_avg`  = mean-centred average of the two occasions.
+#' 3. **Between-subject controls C**
+#'    * Continuous → grand-mean centred (`Cb1`, `Cb2`, …).
+#'    * Categorical (binary or multi-level) → *k – 1* dummy variables
+#'      (`Cb1_1`, `Cb2_1`, `Cb2_2`, …), with the first level as reference.
+#' 4. **Within-subject controls Cw** – difference & centred-average versions
+#'    (`Cw1diff`, `Cw1avg`, …).
+#' 5. **Moderators W** (supports ≥ 1):
+#'    * Continuous → grand-mean centred (`W1`, `W2`, …).
+#'    * Categorical → dummy-coded like C.
+#' 6. **Interaction terms** between every moderator dummy/centred column and
+#'    each `Mi_diff` / `Mi_avg`:
+#'    `int_<Mi_diff>_<Wj>`, `int_<Mi_avg>_<Wj>`.
+#' 7. Adds two attributes:
+#'    * `"W_info"` – raw names, dummy names, level mapping
+#'    * `"C_info"` – same for between-subject C.
 #'
-#' - **Centered average scores**: Computes the centered average of "before" and "after"
-#' values for each mediator (`Mavg`), providing a measure of their mean level relative to
-#' their centered baseline.
+#' Row counts are preserved even if input factors contain *NA*
+#' (`model.matrix()` is called with `na.action = na.pass`).
 #'
-#' - **Input validation**: Checks that the number of "before" and "after" mediators match,
-#' and ensures all specified variables exist in the dataset.
+#' @param data A data frame with the raw pre/post measures.
+#' @param M_C1,M_C2 Character vectors: mediator names at occasion 1 / 2
+#'   (equal length).
+#' @param Y_C1,Y_C2 Character scalars: outcome names at occasion 1 / 2.
+#' @param C_C1,C_C2 Optional character vectors: within-subject control names.
+#' @param C Optional character vector: between-subject control names.
+#' @param C_type Optional vector of the same length as \code{C}.
+#'   Each element \code{"continuous"}, \code{"categorical"}, or \code{"auto"}
+#'   (default). Ignored when \code{C = NULL}.
+#' @param W Optional character vector: moderator names (≤ *J*).
+#' @param W_type Optional vector of the same length as \code{W}.
+#'   Same coding as \code{C_type}. Ignored when \code{W = NULL}.
+#' @param keep_W_raw,keep_C_raw Logical; keep original W / C columns in the
+#'   returned data?
 #'
-#' This function is a prerequisite for generating structural equation modeling (SEM)
-#' syntax and conducting mediation analysis.
+#' @return
+#' A data frame containing at minimum:
+#' \itemize{
+#'   \item \bold{Ydiff}
+#'   \item \bold{Mi_diff}, \bold{Mi_avg} for each mediator \(i\)
+#'   \item centred / dummy-coded \bold{Cb*}, \bold{Cw*diff}, \bold{Cw*avg}
+#'   \item centred / dummy-coded \bold{W*} and all \bold{int_*} interaction terms
+#' }
+#' plus the attributes \code{"W_info"} and \code{"C_info"} described above.
 #'
-#' @param data A data frame containing the raw dataset with mediator and outcome variables.
-#' @param M_C1 A character vector of column names representing mediators "before" the intervention.
-#' @param M_C2 A character vector of column names representing mediators "after" the intervention.
-#' Must match the length of `M_C1`.
-#' @param Y_C1 A character string representing the column name of the outcome variable "before" the intervention.
-#' @param Y_C2 A character string representing the column name of the outcome variable "after" the intervention.
-#' @param C_C1 Character vector of within-subject control variable names (condition 1).
-#' @param C_C2 Character vector of within-subject control variable names (condition 2).
-#' @param C Character vector of between-subject control variable names.
-#' @param W A character vector specifying one or more moderator variable names.
-#'   These variables will be centered (if needed) and used to create interaction
-#'   terms with mediator-related predictors (e.g., \code{Mdiff} or \code{Mavg})
-#'   in the SEM model. Default is \code{NULL}.
-#' @return A data frame containing the following columns:
-#' - `Ydiff`: Difference score for the outcome variable.
-#' - `M1diff`, `M2diff`, ...: Difference scores for each mediator.
-#' - `M1avg`, `M2avg`, ...: Centered average scores for each mediator.
-#'
-#' @seealso [GenerateModelP()], [GenerateModelCN()], [GenerateModelPC()], [wsMed()]
+#' @seealso
+#' \code{\link{PrepareMissingData}}, \code{\link{GenerateModelP}},
+#' \code{\link{wsMed}}
 #'
 #' @examples
-#' # Example raw data
-#' data <- data.frame(
-#'   M1_before = rnorm(100), M1_after = rnorm(100),
-#'   M2_before = rnorm(100), M2_after = rnorm(100),
-#'   Y_C1 = rnorm(100), Y_C2 = rnorm(100)
+#' set.seed(1)
+#' raw <- data.frame(
+#'   A1 = rnorm(50), A2 = rnorm(50),   # mediator 1
+#'   B1 = rnorm(50), B2 = rnorm(50),   # mediator 2
+#'   C1 = rnorm(50), C2 = rnorm(50),   # outcome
+#'   D1 = rnorm(50), D2 = rnorm(50),   # within-subject control
+#'   W_bin  = sample(0:1, 50, TRUE),   # between-subject binary C
+#'   W_fac3 = factor(sample(c("Low","Med","High"), 50, TRUE)) # moderator W
 #' )
 #'
-#' # Prepare the dataset
-#' prepared_data <- PrepareData(
-#'   data = data,
-#'   M_C1 = c("M1_before", "M2_before"),
-#'   M_C2 = c("M1_after", "M2_after"),
-#'   Y_C1 = "Y_C1",
-#'   Y_C2 = "Y_C2"
+#' prep <- PrepareData(
+#'   data  = raw,
+#'   M_C1  = c("A1","B1"), M_C2 = c("A2","B2"),
+#'   Y_C1  = "C1",         Y_C2 = "C2",
+#'   C_C1  = "D1",         C_C2 = "D2",
+#'   C     = "W_bin",      C_type = "categorical",
+#'   W     = "W_fac3",     W_type = "categorical"
 #' )
-#'
-#' head(prepared_data)
+#' head(prep)
 #'
 #' @export
 
+PrepareData <- function(data,
+                        M_C1, M_C2,
+                        Y_C1, Y_C2,
+                        C_C1 = NULL, C_C2 = NULL,
+                        C = NULL,       C_type = NULL,
+                        W = NULL,       W_type = NULL,
+                        keep_W_raw = TRUE,
+                        keep_C_raw = TRUE) {
 
-PrepareData <- function(data, M_C1, M_C2, Y_C1, Y_C2,
-                        C_C1 = NULL, C_C2 = NULL, C = NULL) {
-  # 检查中介变量匹配
-  if (length(M_C1) != length(M_C2)) {
-    stop("The number of M_C1 and M_C2 variables must match.")
+
+  core_cols <- c(Y_C1, Y_C2, M_C1, M_C2, C_C1, C_C2, C, W)
+  idx_complete <- stats::complete.cases(data[ , unique(core_cols), drop = FALSE])
+  if (any(!idx_complete)) {
+    data <- data[idx_complete, , drop = FALSE]
   }
+  ## ---------- 基本检查 ----------
+  stopifnot(length(M_C1) == length(M_C2))
+  stopifnot(all(c(Y_C1, Y_C2) %in% names(data)))
 
-  if (!(Y_C1 %in% colnames(data)) || !(Y_C2 %in% colnames(data))) {
-    stop("Y variables not found in the dataset.")
-  }
-
-  # 构造 Ydiff
+  ## ---------- Outcome diff ----------
   data$Ydiff <- data[[Y_C2]] - data[[Y_C1]]
 
-  # 中介变量差值与中心均值
-  diffs <- list()
-  avgs <- list()
+  ## ---------- 中介 diff / avg ----------
+  diffs <- avgs <- list()
   for (i in seq_along(M_C1)) {
-    M1 <- M_C1[i]
-    M2 <- M_C2[i]
-
-    if (!(M1 %in% colnames(data)) || !(M2 %in% colnames(data))) {
-      stop(paste0("M variables for ", M1, " and ", M2, " not found in the dataset."))
-    }
-
-    diff_name <- paste0("M", i, "diff")
-    avg_name <- paste0("M", i, "avg")
-
-    diffs[[diff_name]] <- data[[M2]] - data[[M1]]
-
-    M1_centered <- data[[M1]] - mean(data[[M1]], na.rm = TRUE)
-    M2_centered <- data[[M2]] - mean(data[[M2]], na.rm = TRUE)
-    avgs[[avg_name]] <- (M1_centered + M2_centered) / 2
+    diffs[[paste0("M", i, "diff")]] <- data[[M_C2[i]]] - data[[M_C1[i]]]
+    m1c <- data[[M_C1[i]]] - mean(data[[M_C1[i]]], na.rm = TRUE)
+    m2c <- data[[M_C2[i]]] - mean(data[[M_C2[i]]], na.rm = TRUE)
+    avgs[[paste0("M", i, "avg")]]  <- (m1c + m2c) / 2
   }
 
-  # 被试间控制变量中心化并命名为 Cb1, Cb2, ...
-  between_centered <- list()
+  ## ---------- 辅助 ----------
+  detect_type <- function(x) {
+    if (is.factor(x) || is.character(x)) return("categorical")
+    if (is.numeric(x) && setequal(unique(x[!is.na(x)]), c(0,1))) return("categorical")
+    if (is.numeric(x)) return("continuous")
+    stop("Unrecognized variable type.")
+  }
+
+
+  ## 取 k‑1 dummy 时直接用 levels 提取标签
+  build_dummy_map <- function(base, lv_vec) {
+    paste(base, "vs", lv_vec)
+  }
+
+
+  ## ---------- Between‑subject C ----------
+  between_centered <- list(); c_dummy_map <- list()
   if (!is.null(C)) {
+    if (is.null(C_type)) C_type <- rep("auto", length(C))
+    stopifnot(length(C_type) == length(C))
+
+    cb_counter <- 1L
     for (i in seq_along(C)) {
-      var <- C[i]
-      if (!var %in% colnames(data)) {
-        stop(paste0("Between-subject covariate ", var, " not found in the dataset."))
+      var   <- C[i]
+      raw   <- data[[var]]
+      ctype <- if (C_type[i] == "auto") detect_type(raw) else tolower(C_type[i])
+
+      if (ctype == "continuous") {
+        nm <- paste0("Cb", cb_counter)
+        between_centered[[nm]] <- raw - mean(raw, na.rm = TRUE)
+        c_dummy_map[[nm]]      <- "continuous"
+        cb_counter <- cb_counter + 1L
+
+      } else {
+        fac  <- factor(raw)
+        base <- levels(fac)[1]
+        k    <- nlevels(fac)
+        if (k == 2) {
+          nm   <- paste0("Cb", cb_counter, "_1")
+          dummy<- if (is.numeric(raw) && setequal(unique(raw), c(0,1))) raw
+          else as.numeric(fac == levels(fac)[2])
+          between_centered[[nm]] <- dummy
+          c_dummy_map[[nm]]      <- build_dummy_map(base, levels(fac)[2])
+          cb_counter <- cb_counter + 1L
+        } else {
+          mm <- model.matrix(~ fac, na.action = stats::na.pass)[ , -1, drop = FALSE]  # 保留 NA 行
+          for (j in seq_len(ncol(mm))) {
+            nm <- paste0("Cb", cb_counter, "_", j)
+            between_centered[[nm]] <- mm[, j]
+            lv_tag <- levels(fac)[j + 1]                  # 取真实水平
+            c_dummy_map[[nm]] <- build_dummy_map(base, lv_tag)
+          }
+          cb_counter <- cb_counter + 1L
+        }
       }
-      new_name <- paste0("Cb", i)
-      between_centered[[new_name]] <- data[[var]] - mean(data[[var]], na.rm = TRUE)
     }
   }
 
-  # 被试内控制变量处理（diff + avg），命名为 Cw1diff, Cw1avg, ...
-  within_diffs <- list()
-  within_avgs <- list()
-  if (!is.null(C_C1) && !is.null(C_C2)) {
-    if (length(C_C1) != length(C_C2)) {
-      stop("The number of C_C1 and C_C2 variables must match.")
-    }
-
+  ## ---------- Within‑subject C ----------
+  within_diffs <- within_avgs <- list()
+  if (!is.null(C_C1) && !is.null(C_C2))
     for (i in seq_along(C_C1)) {
-      W1 <- C_C1[i]
-      W2 <- C_C2[i]
-
-      if (!(W1 %in% colnames(data)) || !(W2 %in% colnames(data))) {
-        stop(paste0("Within-subject covariate pair ", W1, "/", W2, " not found."))
-      }
-
-      diff_name <- paste0("Cw", i, "diff")
-      avg_name <- paste0("Cw", i, "avg")
-
-      wdiff <- data[[W2]] - data[[W1]]
-      wavg <- (data[[W1]] + data[[W2]]) / 2
-
-      within_diffs[[diff_name]] <- wdiff - mean(wdiff, na.rm = TRUE)
-      within_avgs[[avg_name]] <- wavg - mean(wavg, na.rm = TRUE)
+      wd <- data[[C_C2[i]]] - data[[C_C1[i]]]
+      wa <- (data[[C_C1[i]]] + data[[C_C2[i]]]) / 2
+      within_diffs[[paste0("Cw", i, "diff")]] <- wd - mean(wd, na.rm = TRUE)
+      within_avgs [[paste0("Cw", i, "avg") ]] <- wa - mean(wa, na.rm = TRUE)
     }
-  }
 
-  # 合并所有结果
-  all_vars <- c(diffs, avgs, between_centered, within_diffs, within_avgs)
-  data <- cbind(data, as.data.frame(all_vars))
-
-  # 返回结果列
-  cols_to_return <- c("Ydiff", names(diffs), names(avgs),
-                      names(between_centered), names(within_diffs), names(within_avgs))
-  return(data[, cols_to_return, drop = FALSE])
-}
-
-
-PrepareData <- function(data, M_C1, M_C2, Y_C1, Y_C2,
-                        C_C1 = NULL, C_C2 = NULL, C = NULL,
-                        W = NULL) {
-  if (length(M_C1) != length(M_C2)) {
-    stop("The number of M_C1 and M_C2 variables must match.")
-  }
-  if (!(Y_C1 %in% colnames(data)) || !(Y_C2 %in% colnames(data))) {
-    stop("Y variables not found in the dataset.")
-  }
-
-  data$Ydiff <- data[[Y_C2]] - data[[Y_C1]]
-
-  diffs <- list()
-  avgs <- list()
-  for (i in seq_along(M_C1)) {
-    M1 <- M_C1[i]
-    M2 <- M_C2[i]
-    diff_name <- paste0("M", i, "diff")
-    avg_name <- paste0("M", i, "avg")
-    diffs[[diff_name]] <- data[[M2]] - data[[M1]]
-    M1_centered <- data[[M1]] - mean(data[[M1]], na.rm = TRUE)
-    M2_centered <- data[[M2]] - mean(data[[M2]], na.rm = TRUE)
-    avgs[[avg_name]] <- (M1_centered + M2_centered) / 2
-  }
-
-  between_centered <- list()
-  if (!is.null(C)) {
-    for (i in seq_along(C)) {
-      new_name <- paste0("Cb", i)
-      between_centered[[new_name]] <- data[[C[i]]] - mean(data[[C[i]]], na.rm = TRUE)
-    }
-  }
-
-  within_diffs <- list()
-  within_avgs <- list()
-  if (!is.null(C_C1) && !is.null(C_C2)) {
-    for (i in seq_along(C_C1)) {
-      diff_name <- paste0("Cw", i, "diff")
-      avg_name <- paste0("Cw", i, "avg")
-      wdiff <- data[[C_C2[i]]] - data[[C_C1[i]]]
-      wavg <- (data[[C_C1[i]]] + data[[C_C2[i]]]) / 2
-      within_diffs[[diff_name]] <- wdiff - mean(wdiff, na.rm = TRUE)
-      within_avgs[[avg_name]] <- wavg - mean(wavg, na.rm = TRUE)
-    }
-  }
-
-  W_centered <- list()
-  interaction_terms <- list()
+  ## ---------- Moderator W ----------
+  W_centered <- interaction_terms <- list()
+  w_dummy_map <- list()
   if (!is.null(W)) {
-    for (w_i in seq_along(W)) {
-      w_name <- paste0("W", w_i)
-      W_centered[[w_name]] <- data[[W[w_i]]] - mean(data[[W[w_i]]], na.rm = TRUE)
-    }
-    for (m_name in names(diffs)) {
-      for (w_name in names(W_centered)) {
-        int_name <- paste0("int_", m_name, "_", w_name)
-        interaction_terms[[int_name]] <- diffs[[m_name]] * W_centered[[w_name]]
+    if (is.null(W_type)) W_type <- rep("auto", length(W))
+    stopifnot(length(W_type) == length(W))
+
+    w_counter <- 1L
+    for (i in seq_along(W)) {
+      var  <- W[i]
+      raw  <- data[[var]]
+      wtype<- if (W_type[i] == "auto") detect_type(raw) else tolower(W_type[i])
+
+      if (wtype == "continuous") {
+        nm <- paste0("W", w_counter)
+        W_centered[[nm]] <- raw - mean(raw, na.rm = TRUE)
+        w_dummy_map[[nm]] <- "continuous"
+        w_counter <- w_counter + 1L
+
+      } else {
+        fac  <- factor(raw)
+        base <- levels(fac)[1]
+        k    <- nlevels(fac)
+        if (k == 2) {
+          nm    <- paste0("W", w_counter)
+          dummy <- if (is.numeric(raw) && setequal(unique(raw), c(0,1))) raw
+          else as.numeric(fac == levels(fac)[2])
+          W_centered[[nm]] <- dummy
+          w_dummy_map[[nm]] <- build_dummy_map(base, levels(fac)[2])
+          w_counter <- w_counter + 1L
+        } else {
+          mm <- model.matrix(~ fac, na.action = stats::na.pass)[ , -1, drop = FALSE]
+          for (j in seq_len(ncol(mm))) {
+            nm <- paste0("W", w_counter)
+            W_centered[[nm]] <- mm[, j]
+            lv_tag <- levels(fac)[j + 1]
+            w_dummy_map[[nm]] <- build_dummy_map(base, lv_tag)
+            w_counter <- w_counter + 1L
+          }
+        }
       }
     }
-    for (m_name in names(avgs)) {
-      for (w_name in names(W_centered)) {
-        int_name <- paste0("int_", m_name, "_", w_name)
-        interaction_terms[[int_name]] <- avgs[[m_name]] * W_centered[[w_name]]
+
+    ## ----- 交互项 -----
+    for (m in names(diffs))
+      for (w in names(W_centered))
+        interaction_terms[[paste0("int_", m, "_", w)]] <- diffs[[m]] * W_centered[[w]]
+
+    for (m in names(avgs))
+      for (w in names(W_centered))
+        interaction_terms[[paste0("int_", m, "_", w)]] <- avgs[[m]] * W_centered[[w]]
+  }
+
+  ## ---------- 汇总 ----------
+  all_vars <- c(diffs, avgs,
+                between_centered, within_diffs, within_avgs,
+                W_centered, interaction_terms)
+  data_out <- cbind(data, as.data.frame(all_vars))
+
+  sel <- c("Ydiff", names(diffs), names(avgs),
+           names(between_centered), names(within_diffs), names(within_avgs),
+           names(W_centered), names(interaction_terms))
+  if (keep_W_raw && !is.null(W)) sel <- c(W, sel)
+  if (keep_C_raw && !is.null(C)) sel <- c(C, sel)
+
+  data_out <- data_out[ , unique(sel), drop = FALSE]
+
+  ## ---------- 元信息 ----------
+  attr(data_out, "W_info") <- list(
+    raw         = W,
+    dummy_names = names(W_centered),
+    dummy_map   = w_dummy_map
+  )
+  attr(data_out, "C_info") <- list(
+    raw         = C,
+    dummy_names = names(between_centered),
+    dummy_map   = c_dummy_map
+  )
+
+  data_out
+}
+
+
+
+PrepareData <- function(data,
+                        M_C1, M_C2,
+                        Y_C1, Y_C2,
+                        C_C1 = NULL, C_C2 = NULL,
+                        C = NULL,       C_type = NULL,
+                        W = NULL,       W_type = NULL,
+                        center_W = TRUE,          # <‑‑ NEW ARGUMENT
+                        keep_W_raw = TRUE,
+                        keep_C_raw = TRUE) {
+
+  ## ---------- basic checks ----------
+  stopifnot(is.data.frame(data))
+  stopifnot(length(M_C1) == length(M_C2))
+  stopifnot(all(c(Y_C1, Y_C2) %in% names(data)))
+  if (!is.logical(center_W) || length(center_W) != 1)
+    stop("`center_W` must be TRUE or FALSE.", call. = FALSE)
+
+
+  ### 在 PrepareData() 函数顶端基本检查之后立即加入 -----------------
+  # >>>> enforce single‑moderator rule
+  if (!is.null(W) && length(W) != 1)
+    stop("Exactly one moderator variable can be supplied in `W`.", call. = FALSE)
+
+
+  ## ---------- Outcome diff ----------
+  data$Ydiff <- data[[Y_C2]] - data[[Y_C1]]
+
+  ## ---------- Mediator diff / avg ----------
+  diffs <- avgs <- list()
+  for (i in seq_along(M_C1)) {
+    diffs[[paste0("M", i, "diff")]] <- data[[M_C2[i]]] - data[[M_C1[i]]]
+    m1c <- data[[M_C1[i]]] - mean(data[[M_C1[i]]], na.rm = TRUE)
+    m2c <- data[[M_C2[i]]] - mean(data[[M_C2[i]]], na.rm = TRUE)
+    avgs[[paste0("M", i, "avg")]] <- (m1c + m2c) / 2
+  }
+
+  ## ---------- helpers ----------
+  detect_type <- function(x) {
+    if (is.factor(x) || is.character(x)) return("categorical")
+    if (is.numeric(x) && setequal(unique(x[!is.na(x)]), c(0, 1)))
+      return("categorical")
+    if (is.numeric(x)) return("continuous")
+    stop("Unsupported variable type.")
+  }
+  build_dummy_map <- function(base, lv_vec) paste(base, "vs", lv_vec)
+
+  ## ---------- Between‑subject C ----------
+  between_centered <- c_dummy_map <- list()
+  if (!is.null(C)) {
+    if (is.null(C_type)) C_type <- rep("auto", length(C))
+    stopifnot(length(C_type) == length(C))
+
+    cb_counter <- 1L
+    for (i in seq_along(C)) {
+      var   <- C[i]
+      raw   <- data[[var]]
+      ctype <- if (C_type[i] == "auto") detect_type(raw) else tolower(C_type[i])
+
+      if (ctype == "continuous") {
+        nm <- paste0("Cb", cb_counter)
+        between_centered[[nm]] <- raw - mean(raw, na.rm = TRUE)
+        c_dummy_map[[nm]]      <- "continuous"
+        cb_counter <- cb_counter + 1L
+
+      } else {                           # ----- categorical C -----------
+        fac  <- factor(raw)
+        base <- levels(fac)[1]
+        k    <- nlevels(fac)
+        if (k == 2) {
+          nm   <- paste0("Cb", cb_counter, "_1")
+          dummy<- if (is.numeric(raw) && setequal(unique(raw), c(0, 1))) raw
+          else as.numeric(fac == levels(fac)[2])
+          between_centered[[nm]] <- dummy
+          c_dummy_map[[nm]]      <- build_dummy_map(base, levels(fac)[2])
+          cb_counter <- cb_counter + 1L
+        } else {
+          mm <- model.matrix(~ fac, na.action = stats::na.pass)[, -1, drop = FALSE]
+          for (j in seq_len(ncol(mm))) {
+            nm <- paste0("Cb", cb_counter, "_", j)
+            between_centered[[nm]] <- mm[, j]
+            lv_tag <- levels(fac)[j + 1]
+            c_dummy_map[[nm]] <- build_dummy_map(base, lv_tag)
+          }
+          cb_counter <- cb_counter + 1L
+        }
       }
     }
   }
 
-  all_vars <- c(diffs, avgs, between_centered, within_diffs,
-                within_avgs, W_centered, interaction_terms)
-  data <- cbind(data, as.data.frame(all_vars))
+  ## ---------- Within‑subject C ----------
+  within_diffs <- within_avgs <- list()
+  if (!is.null(C_C1) && !is.null(C_C2))
+    for (i in seq_along(C_C1)) {
+      wd <- data[[C_C2[i]]] - data[[C_C1[i]]]
+      wa <- (data[[C_C1[i]]] + data[[C_C2[i]]]) / 2
+      within_diffs[[paste0("Cw", i, "diff")]] <- wd - mean(wd, na.rm = TRUE)
+      within_avgs [[paste0("Cw", i, "avg") ]] <- wa - mean(wa, na.rm = TRUE)
+    }
 
-  cols_to_return <- c("Ydiff", names(diffs), names(avgs),
-                      names(between_centered), names(within_diffs),
-                      names(within_avgs), names(W_centered), names(interaction_terms))
+  ## ---------- Moderator W ----------
+  W_centered <- interaction_terms <- w_dummy_map <- list()
+  if (!is.null(W)) {
+    if (is.null(W_type)) W_type <- rep("auto", length(W))
+    stopifnot(length(W_type) == length(W))
 
-  return(data[, cols_to_return, drop = FALSE])
+    w_counter <- 1L
+    for (i in seq_along(W)) {
+      var  <- W[i]
+      raw  <- data[[var]]
+      wtype<- if (W_type[i] == "auto") detect_type(raw) else tolower(W_type[i])
+
+      if (wtype == "continuous") {                # ----- numeric W -----
+        nm <- paste0("W", w_counter)
+        W_centered[[nm]] <-
+          if (center_W) raw - mean(raw, na.rm = TRUE) else raw
+        w_dummy_map[[nm]] <- "continuous"
+        w_counter <- w_counter + 1L
+
+      } else {                                    # ----- categorical W -----
+        fac  <- factor(raw)
+        base <- levels(fac)[1]
+        k    <- nlevels(fac)
+        if (k == 2) {
+          nm    <- paste0("W", w_counter)
+          dummy <- if (is.numeric(raw) && setequal(unique(raw), c(0, 1))) raw
+          else as.numeric(fac == levels(fac)[2])
+          W_centered[[nm]] <- dummy
+          w_dummy_map[[nm]] <- build_dummy_map(base, levels(fac)[2])
+          w_counter <- w_counter + 1L
+        } else {
+          mm <- model.matrix(~ fac, na.action = stats::na.pass)[, -1, drop = FALSE]
+          for (j in seq_len(ncol(mm))) {
+            nm <- paste0("W", w_counter)
+            W_centered[[nm]] <- mm[, j]
+            lv_tag <- levels(fac)[j + 1]
+            w_dummy_map[[nm]] <- build_dummy_map(base, lv_tag)
+            w_counter <- w_counter + 1L
+          }
+        }
+      }
+    }
+
+    ## ----- interaction terms (unchanged logic) -----
+    for (m in names(diffs))
+      for (w in names(W_centered))
+        interaction_terms[[paste0("int_", m, "_", w)]] <- diffs[[m]] * W_centered[[w]]
+
+    for (m in names(avgs))
+      for (w in names(W_centered))
+        interaction_terms[[paste0("int_", m, "_", w)]] <- avgs[[m]] * W_centered[[w]]
+  }
+
+  ## ---------- combine ----------
+  all_vars <- c(diffs, avgs,
+                between_centered, within_diffs, within_avgs,
+                W_centered, interaction_terms)
+  data_out <- cbind(data, as.data.frame(all_vars))
+
+  sel <- c("Ydiff", names(diffs), names(avgs),
+           names(between_centered), names(within_diffs), names(within_avgs),
+           names(W_centered), names(interaction_terms))
+  if (keep_W_raw && !is.null(W)) sel <- c(W, sel)
+  if (keep_C_raw && !is.null(C)) sel <- c(C, sel)
+
+  data_out <- data_out[, unique(sel), drop = FALSE]
+
+  ## ---------- attributes ----------
+  attr(data_out, "W_info") <- list(
+    raw         = W,
+    dummy_names = names(W_centered),
+    dummy_map   = w_dummy_map
+  )
+  attr(data_out, "C_info") <- list(
+    raw         = C,
+    dummy_names = names(between_centered),
+    dummy_map   = c_dummy_map
+  )
+  data_out
 }
+
+
+
+
+
 
