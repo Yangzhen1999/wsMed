@@ -1,5 +1,7 @@
+library(testthat)
 test_that("analyze_mm_categorical works on wsMed categorical output", {
 
+  data(example_data)
   set.seed(20250625)
 
   ## -------- 1. 运行一个最小 wsMed() -----------

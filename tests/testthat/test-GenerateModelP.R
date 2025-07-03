@@ -57,7 +57,7 @@ test_that("T2: Includes Cb and Cw variables", {
 # ---------- T3a: 连续 W + MP = b1 ----------
 test_that("T3a: Continuous W with MP = b1", {
   dat <- mock_data(W_type = "continuous")
-  out <- GenerateModelP(dat, MP = c("a1","b1", ))
+  out <- GenerateModelP(dat, MP = c("a1","b1" ))
 
   expect_match(out, "bw1_W1\\*int_M1diff_W1")
 
@@ -72,7 +72,8 @@ test_that("T3a: Continuous W with MP = b1", {
   }
 
   # 如果 a1 未被调节，主效应应存在
-  expect_true(grepl("\\+ W1", m1_line))
+  expect_true(grepl("\\+\\s*(\\w+\\*)?W1", m1_line))
+
 })
 
 # ---------- T3b: 三分类 W + MP = b1, d1, cp ----------

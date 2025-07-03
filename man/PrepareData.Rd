@@ -16,6 +16,7 @@ PrepareData(
   C_type = NULL,
   W = NULL,
   W_type = NULL,
+  center_W = TRUE,
   keep_W_raw = TRUE,
   keep_C_raw = TRUE
 )
@@ -40,6 +41,8 @@ Each element \code{"continuous"}, \code{"categorical"}, or \code{"auto"}
 
 \item{W_type}{Optional vector of the same length as \code{W}.
 Same coding as \code{C_type}. Ignored when \code{W = NULL}.}
+
+\item{center_W}{Logical. Whether to center the moderator variable W.}
 
 \item{keep_W_raw, keep_C_raw}{Logical; keep original W / C columns in the
 returned data?}

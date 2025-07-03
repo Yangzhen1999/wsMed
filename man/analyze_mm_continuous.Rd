@@ -12,7 +12,7 @@ analyze_mm_continuous(
   ci_level = 0.95,
   W_values = NULL,
   n_curve = 120,
-  digits = 3
+  digits = 8
 )
 }
 \arguments{
@@ -64,15 +64,5 @@ user-defined grid of centred \emph{W};
 \item \bold{path_curve}  – full curve for every moderated base path.
 }
 Significance stars (\code{"*"}) are added where the CI excludes 0.
-}
-\examples{
-## Not run: --------------------------------------------------------------
-# out <- analyze_mm_continuous(mc_out, processed[[1]], W_raw_name = "W")
-# head(out$beta_coef)
-## End(Not run)
-
-}
-\seealso{
-\code{\link{analyze_mm_categorical}}, \code{\link{get_indirect_paths}}
 }
 \keyword{internal}

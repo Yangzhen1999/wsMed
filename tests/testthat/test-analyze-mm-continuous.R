@@ -1,3 +1,4 @@
+library(testthat)
 
 test_that("analyze_mm_continuous works on wsMed output (continuous W)", {
 

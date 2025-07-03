@@ -2,10 +2,10 @@
 % Please edit documentation in R/plot_moderation_curve.R
 \name{plot_moderation_curve}
 \alias{plot_moderation_curve}
-\title{绘制 Johnson–Neyman 曲线并高亮显著区}
+\title{Plot moderation curves with Johnson-Neyman highlights}
 \usage{
 plot_moderation_curve(
-  df,
+  result,
   path_name,
   title = NULL,
   x_label = "Moderator (W)",
@@ -18,69 +18,58 @@ plot_moderation_curve(
 )
 }
 \arguments{
-\item{df}{数据框；必须包含列 \code{Path}, \code{W_raw}, \code{Estimate},
-\code{CI.LL}, \code{CI.UL} （来自 \emph{theta_curve} 或
-\emph{path_curve}）。}
+\item{result}{A \code{wsMed()} result that contains a \verb{$moderation} element.}
 
-\item{path_name}{需要绘制的路径 / 间接效应名称，与 \code{df$Path}
-完全匹配。}
+\item{path_name}{Exact name of the path to plot (e.g. \code{"indirect_1_2"} or
+\code{"b_1_2"}).  When the name exists in both curves, \code{theta_curve} is used.}
 
-\item{title}{图标题；默认生成 \code{"Effect Curve: (<path_name>)"}。}
+\item{title}{Optional plot title (default
+\code{sprintf("Effect Curve: (\%s)", path_name)}).}
 
-\item{x_label, y_label}{横纵坐标标签。}
+\item{x_label, y_label}{Axis labels.  Defaults are \code{"Moderator (W)"} and
+\code{"Estimate"}.}
 
-\item{ns_fill}{不显著区置信带填充色。}
+\item{ns_fill, sig_fill}{Fill colours for the confidence band and the
+significant regions.}
 
-\item{sig_fill}{显著区矩形填充色。}
+\item{alpha_ci, alpha_sig}{Alpha values for the two ribbons.}
 
-\item{alpha_ci}{置信带透明度。}
-
-\item{alpha_sig}{显著区透明度。}
-
-\item{base_size}{\code{ggplot2::theme_minimal()} 的基础字号。}
+\item{base_size}{Base font size passed to \code{ggplot2::theme_minimal()}.}
 }
 \value{
-一个 \code{ggplot} 对象，可继续叠加图层或用
-\code{ggplot2::ggsave()} 导出。
+A \code{ggplot} object (add layers or save with \code{ggsave()}).
 }
 \description{
-\code{plot_moderation_curve()} 根据
-\href{link-to-your-func}{\verb{analyze_mm_continuous_*()}} 产出的
-\strong{\code{theta_curve}}（间接效应）或 \strong{\code{path_curve}}（路径系数）
-数据框，绘制随连续调节变量 \emph{W} 变化的效应曲线，并：
+\code{plot_moderation_curve()} visualises how an indirect effect
+(\code{theta_curve}) or a path coefficient (\code{path_curve}) varies along a
+continuous moderator \emph{W}.
+
+The routine
 \itemize{
-\item 用红色置信带标示整体 95\% Monte-Carlo 置信区间；
-\item 自动检出所有 \code{CI.LL * CI.UL > 0} 的显著区段并以淡绿矩形高亮；
-\item 在显著区段上方标注 “sig \emph{p1}\%–\emph{p2}\%” 百分位范围；
-\item 支持自定义配色、透明度、字体大小等美观参数。
-}
-}
-\details{
-显著性判定准则：\code{Sig <- CI.LL * CI.UL > 0}。函数使用
-\code{rle()} 遍历 \code{Sig}，对每一段连续 \code{TRUE}：
-\enumerate{
-\item 记录其左右端点对应的 \code{W_raw} (\code{xmin}, \code{xmax})；
-\item 将端点行号换算为网格百分位：
-\code{pct = 100 * (index-1)/(nrow(df_path)-1)}；
-\item 在图中用 \code{geom_rect()} 高亮，并写注释。
+\item extracts the requested record (\code{path_name}) from \code{result$moderation},
+preferring \code{theta_curve} when it is available in both curves;
+\item draws the conditional effect (\code{Estimate}) against the raw moderator grid
+(\code{W_raw});
+\item overlays the Monte-Carlo confidence band (\code{CI.LL}, \code{CI.UL}) and finds every
+Johnson–Neyman segment whose 95 \% CI excludes zero
+(\code{CI.LL * CI.UL > 0});
+\item shades these significant regions and annotates each with its start /
+end percentiles (for example, \code{"sig 12.5\%-38.3\%"}).
 }
 
-若整条曲线均不显著，则仅绘制红色置信带及折线。
+Visual elements
+\itemize{
+\item \strong{Red ribbon}   – overall 95 \% confidence band (\code{ns_fill});
+\item \strong{Green ribbon} – significant Johnson–Neyman intervals (\code{sig_fill});
+\item \strong{Solid line}   – point estimate;
+\item \strong{Dashed h-line} – zero reference;
+\item \strong{Dashed v-lines} – J–N bounds.
+}
 }
 \examples{
 \dontrun{
-# 假设已运行 analyze_mm_continuous_v6_fix(...)
-ind_curve <- res4$moderation$extra$theta_curve
-plot_moderation_curve_pretty(ind_curve, "indirect_effect_1_2")
+plot_moderation_curve(result, "indirect_effect_1_2") # indirect
+plot_moderation_curve(result, "b_1_2")               # direct path
 }
 
-}
-\seealso{
-\itemize{
-\item \href{link}{\code{analyze_mm_continuous_v6_fix()}} – 生成 \emph{theta_curve} 数据
-\item \href{link}{\code{plot_jn_interval()}} – 仅返回显著区端点而不绘图
-}
-}
-\author{
-Your Name \href{mailto:your@email.com}{your@email.com}
 }

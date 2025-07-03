@@ -1,4 +1,4 @@
-
+library(wsMed)
 library(testthat)
 library(lavaan)
 library(knitr)
@@ -11,6 +11,17 @@ example_dataN <- mice::ampute(
   data = example_data,
   prop = 0.1,
 )$amp
+
+
+expect_wsMed_structure <- function(obj) {
+  expect_s3_class(obj, "wsMed")
+  expect_named(obj,
+               c("data","sem_model","input_vars","mc",
+                 "moderation","alpha","Na","form"),
+               ignore.order = TRUE)
+
+  expect_true(!is.null(obj$mc$result$thetahatstar))
+}
 
 
 # ── helper: 生成 wsMed 对象 (快速) ------------------------------------------

@@ -1,5 +1,3 @@
-
-
 #' @title Conditional Indirect Effects with a Continuous Moderator
 #'
 #' @description
@@ -44,67 +42,26 @@
 #'         curve.}
 #' }
 #'
-#' @seealso
-#' \code{\link{analyze_mm_categorical}}, \code{\link{get_indirect_paths}}
-#'
-#' @examples
-#' ## Not run: --------------------------------------------------------------
-#' # out <- analyze_mm_continuous(mc_out, processed[[1]], W_raw_name = "W")
-#' # head(out$beta_coef)
-#' ## End(Not run)
+#' @importFrom utils  tail modifyList
+#' @importFrom stats  model.matrix
 #'
 #' @keywords internal
 
-mc_summary_se <- function(x, ci = .95, digits = 3) {
-    qs <- quantile(x, c((1 - ci)/2, (1 + ci)/2), na.rm = TRUE)
-    names(qs) <- .make_ci_names(ci)
-    round(c(Estimate = mean(x), SE = sd(x), qs), digits)
-  }
-.make_ci_names <- function(ci) {
-  lo <- paste0(round((1 - ci) / 2 * 100, 1), "%CI.Lo")
-  up <- paste0(round((1 + ci) / 2 * 100, 1), "%CI.Up")
-  c(lo, up)
-}
-fix_ci_names <- function(df, ci = .95) {
-  old <- grep("CI\\[LL\\]|CI\\.LL|CI\\[UL\\]|CI\\.UL", names(df), value = TRUE)
-  if (length(old) >= 2) {
-    new <- .make_ci_names(ci)
-    names(df)[match(old[1], names(df))] <- new[1]
-    names(df)[match(old[2], names(df))] <- new[2]
-  }
-  df
-}
-add_sig <- function(df) {
-  ci_cols <- grep("%CI\\.Lo$|%CI\\.Up$", names(df), value = TRUE)
-  if (length(ci_cols) == 2)
-    df$Sig <- ifelse(df[[ci_cols[1]]] * df[[ci_cols[2]]] > 0, "*", "")
-  else df$Sig <- ""
-  df
-}
-fix_pct_names <- function(df) {
-  if (is.null(df) || !is.data.frame(df)) return(df)
-  names(df) <- sub("^X([0-9.]+)(\\.CI\\.(Lo|Up))", "\\1%CI.\\2", names(df))  # 修复 make.names 的
-  names(df) <- sub("([0-9]+)\\.CI\\.(Lo|Up)", "\\1%CI.\\2", names(df))      # 修复 2.5.CI.Lo → 2.5%CI.Lo
-  df
-}
-.clean_ci_names <- function(df, ci_level = 0.95) {
-  ## 把所有诸如 X2.5.CI.Lo / 2.5CI.Lo / 2.5%CI..Lo 等形态
-  ## 统一改成 2.5%CI.Lo（同理 97.5%CI.Up）
-  names(df) <- gsub(
-    pattern = "^X?([0-9.]+)(?:%?)?([._]CI)?[._]?(Lo|Up)$",
-    replacement = "\\1%CI.\\3",
-    x = names(df),
-    ignore.case = TRUE
-  )
-  df
-}
+# -----------------------------------------------------------------------------
+# analyze_mm_continuous.R ── Monte‑Carlo summary for continuous moderation -----
+# -----------------------------------------------------------------------------
+# Public (internal‑only) engine that aggregates MC draws when the moderator W
+# is *continuous*. Low‑level helpers live in cont_helpers.R (.cont_*).
+# The function signature and returned list are identical to the original
+# implementation so that existing tests keep working.
+
 
 analyze_mm_continuous <- function(mc_result, data, MP,
-                                     W_raw_name = "W",
-                                     ci_level   = 0.95,
-                                     W_values   = NULL,
-                                     n_curve    = 120,
-                                     digits     = 8) {
+                                  W_raw_name = "W",
+                                  ci_level   = 0.95,
+                                  W_values   = NULL,
+                                  n_curve    = 120,
+                                  digits     = 8) {
 
   if (!W_raw_name %in% names(data))
     stop("Moderator column `", W_raw_name, "` not found in `data`.")
@@ -321,37 +278,8 @@ analyze_mm_continuous <- function(mc_result, data, MP,
     )
   }
 
-  ## ---------- 通用工具 ----------
-  .make_ci_names <- function(ci) {
-    lo <- paste0(round((1 - ci) / 2 * 100, 1), "%CI.Lo")
-    up <- paste0(round((1 + ci) / 2 * 100, 1), "%CI.Up")
-    c(lo, up)
-  }
 
-  fix_ci_names <- function(df, ci = .95) {
-    old <- grep("CI\\[LL\\]|CI\\.LL|CI\\[UL\\]|CI\\.UL", names(df), value = TRUE)
-    if (length(old) >= 2) {
-      new <- .make_ci_names(ci)
-      names(df)[match(old[1], names(df))] <- new[1]
-      names(df)[match(old[2], names(df))] <- new[2]
-    }
-    df
-  }
-
-
-
-  add_sig <- function(df) {
-    ci_cols <- grep("%CI\\.Lo$|%CI\\.Up$", names(df), value = TRUE)
-    if (length(ci_cols) == 2)
-      df$Sig <- ifelse(df[[ci_cols[1]]] * df[[ci_cols[2]]] > 0, "*", "")
-    else df$Sig <- ""
-    df
-  }
-
-
-
-
-   ## ---------- 输出 ----------
+  ## ---------- 输出 ----------
   beta_out <- if (length(beta_tbl))
     add_sig(.clean_ci_names(do.call(rbind, beta_tbl)))
   else NULL
@@ -373,6 +301,8 @@ analyze_mm_continuous <- function(mc_result, data, MP,
   )
 
 }
+
+
 
 #' @title Parse All Possible Indirect Paths from Column Names
 #'
@@ -408,10 +338,6 @@ analyze_mm_continuous <- function(mc_result, data, MP,
 #' @return A list of path descriptors; each element is itself a list with
 #'   components \code{path_name}, \code{coefs}, and \code{mediators}.
 #'   If no valid path exists, an empty list is returned.
-#'
-#' @examples
-#' cn <- c("a1","a2","b1","b2","b_1_2","d_2_1")
-#' get_indirect_paths(cn)
 #'
 #' @keywords internal
 
@@ -483,5 +409,76 @@ get_indirect_paths <- function(col_names) {
 
   # 去重
   result[!duplicated(sapply(result, `[[`, "path_name"))]
+}
+
+
+# -----------------------------------------------------------------------------
+# mc_summary_helpers.R ── Internal utils formerly in‑lined in analyze_mm_*() ----
+# -----------------------------------------------------------------------------
+#' @title  mc_summary_se
+#' @param x   Numeric vector of length *R* (e.g., one column of `thetahatstar`).
+#' @param ci  Two‑sided confidence level (default 0.95).
+#' @param digits Integer; round results to this many decimal places.
+#'
+#' @return A named numeric vector: *Estimate, SE, <lower>%CI.Lo, <upper>%CI.Up*.
+#' @keywords internal
+mc_summary_se <- function(x, ci = .95, digits = 3) {
+  qs <- quantile(x, c((1 - ci) / 2, (1 + ci) / 2), na.rm = TRUE)
+  names(qs) <- .make_ci_names(ci)
+  round(c(Estimate = mean(x), SE = sd(x), qs), digits)
+}
+
+#' Make CI column names like "2.5%CI.Lo / 97.5%CI.Up"
+#' @keywords internal
+.make_ci_names <- function(ci) {
+  lo <- paste0(round((1 - ci) / 2 * 100, 1), "%CI.Lo")
+  up <- paste0(round((1 + ci) / 2 * 100, 1), "%CI.Up")
+  c(lo, up)
+}
+
+#' Fix legacy CI column names in a data.frame
+#'
+#' Converts columns like `CI[LL]` / `CI[UL]` or `CI.LL` / `CI.UL` to the
+#' standard produced by `.make_ci_names()`.
+#' @keywords internal
+fix_ci_names <- function(df, ci = .95) {
+  old <- grep("CI\\[LL\\]|CI\\.LL|CI\\[UL\\]|CI\\.UL", names(df), value = TRUE)
+  if (length(old) >= 2) {
+    new <- .make_ci_names(ci)
+    names(df)[match(old[1], names(df))] <- new[1]
+    names(df)[match(old[2], names(df))] <- new[2]
+  }
+  df
+}
+
+#' Append significance stars based on CI
+#' @keywords internal
+add_sig <- function(df) {
+  ci_cols <- grep("%CI\\.Lo$|%CI\\.Up$", names(df), value = TRUE)
+  if (length(ci_cols) == 2)
+    df$Sig <- ifelse(df[[ci_cols[1]]] * df[[ci_cols[2]]] > 0, "*", "")
+  else df$Sig <- ""
+  df
+}
+
+#' Fix % characters mangled by `make.names()`
+#' @keywords internal
+fix_pct_names <- function(df) {
+  if (is.null(df) || !is.data.frame(df)) return(df)
+  names(df) <- sub("^X([0-9.]+)(\\.CI\\.(Lo|Up))", "\\1%CI.\\2", names(df))  # e.g. X2.5.CI.Lo → 2.5%CI.Lo
+  names(df) <- sub("([0-9]+)\\.CI\\.(Lo|Up)", "\\1%CI.\\2", names(df))      # 2.5.CI.Lo → 2.5%CI.Lo
+  df
+}
+
+#' Clean all CI column names into the standard form
+#' @keywords internal
+.clean_ci_names <- function(df, ci_level = 0.95) {
+  names(df) <- gsub(
+    pattern = "^X?([0-9.]+)(?:%?)?([._]CI)?[._]?(Lo|Up)$",
+    replacement = "\\1%CI.\\3",
+    x = names(df),
+    ignore.case = TRUE
+  )
+  df
 }
 

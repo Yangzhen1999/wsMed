@@ -27,16 +27,16 @@ validate_wsMed_inputs <- function(data,
   }
   ## ---- 0. data ------------------------------------------------------------
   if (is.null(data))
-    stop("`data` cannot be NULL.", call. = FALSE)
+    stop("data cannot be NULL.", call. = FALSE)
 
   if (!is.data.frame(data))
-    stop("`data` must be a data frame.", call. = FALSE)
+    stop("data must be a data frame.", call. = FALSE)
 
   if (nrow(data) == 0)
-    stop("`data` cannot be empty.", call. = FALSE)
+    stop("data cannot be empty.", call. = FALSE)
 
   if (anyDuplicated(names(data)))
-    stop("Duplicated column names in `data`: ",
+    stop("Duplicated column names in data: ",
          paste(names(data)[duplicated(names(data))], collapse = ", "),
          call. = FALSE)
 
@@ -44,34 +44,34 @@ validate_wsMed_inputs <- function(data,
 
   ## ---- 1. mediator & outcome columns -------------------------------------
   if (is.null(M_C1) || is.null(M_C2))
-    stop("`M_C1` and `M_C2` cannot be NULL.", call. = FALSE)
+    stop("M_C1 and M_C2 cannot be NULL.", call. = FALSE)
   if (length(M_C1) != length(M_C2))
-    stop("The lengths of `M_C1` and `M_C2` must match.", call. = FALSE)
+    stop("The lengths of M_C1 and M_C2 must match.", call. = FALSE)
   if (is.null(Y_C1) || is.null(Y_C2))
-    stop("`Y_C1` and `Y_C2` cannot be NULL.", call. = FALSE)
+    stop("Y_C1 and Y_C2 cannot be NULL.", call. = FALSE)
 
   req <- c(M_C1, M_C2, Y_C1, Y_C2)
   miss <- setdiff(req, names(data))
   if (length(miss))
-    stop("Missing columns in `data`: ", paste(miss, collapse = ", "),
+    stop("Missing columns in data: ", paste(miss, collapse = ", "),
          call. = FALSE)
 
   ## ---- 2. moderator -------------------------------------------------------
   if (!is.null(W) && (!is.character(W) || length(W) != 1L))
-    stop("Exactly one moderator column name must be supplied in `W`.", call. = FALSE)
+    stop("Exactly one moderator column name must be supplied in W.", call. = FALSE)
   if (!is.null(W) && !W %in% names(data))
-    stop("Moderator `W` ('", W, "') is not a column in `data`.", call. = FALSE)
+    stop("Moderator W ('", W, "') is not a column in data.", call. = FALSE)
 
   if (!is.null(W) && (is.null(MP) || length(MP) == 0))
-    stop("When `W` is specified you must also supply `MP`.", call. = FALSE)
+    stop("When W is specified you must also supply MP.", call. = FALSE)
   if (is.null(W) && !is.null(MP) && length(MP) > 0)
-    stop("`MP` specified but `W` is NULL.", call. = FALSE)
+    stop("MP specified but W is NULL.", call. = FALSE)
 
   if (!is.null(MP)) {
     if (!is.character(MP) || anyNA(MP))
-      stop("`MP` must be a character vector with no NA.", call. = FALSE)
+      stop("MP must be a character vector with no NA.", call. = FALSE)
     if (any(dup <- duplicated(MP)))
-      stop("Duplicated names in `MP`: ", paste(MP[dup], collapse = ", "),
+      stop("Duplicated names in MP: ", paste(MP[dup], collapse = ", "),
            call. = FALSE)
   }
 
@@ -93,7 +93,7 @@ validate_wsMed_inputs <- function(data,
   ## ---- 5. ci_level --------------------------------------------------------
   if (!is.numeric(ci_level) || length(ci_level) != 1 ||
       ci_level <= 0 || ci_level >= 1)
-    stop("`ci_level` must be between 0 and 1 (e.g., 0.95).", call. = FALSE)
+    stop("ci_level must be between 0 and 1 (e.g., 0.95).", call. = FALSE)
 
   ## ---- 6. ci_method -------------------------------------------------------
   ci_method <- if (is.null(ci_method)) {
@@ -107,13 +107,13 @@ validate_wsMed_inputs <- function(data,
             call. = FALSE)
   }
   if (Na == "DE" && ci_method == "bootstrap" && bootstrap == 0)
-    stop("`bootstrap` = 0 but ci_method = 'bootstrap'.", call. = FALSE)
+    stop("bootstrap = 0 but ci_method = 'bootstrap'.", call. = FALSE)
 
   ## ---- 7. MCmethod --------------------------------------------------------
   if (is.null(MCmethod)) {
     MCmethod <- "mc"
   } else if (!MCmethod %in% c("mc","bootSD")) {
-    stop("`MCmethod` must be 'mc', 'bootSD', or NULL.", call. = FALSE)
+    stop("MCmethod must be 'mc', 'bootSD', or NULL.", call. = FALSE)
   }
 
   ## ---- 8. control-variable columns ---------------------------------------
@@ -144,30 +144,36 @@ assert_scalar_int <- function(x,
   # ---- 1. NULL 处理 -------------------------------------------------------
   if (is.null(x)) {
     if (allow_null) return(invisible(TRUE))
-    stop(sprintf("`%s` must not be NULL.", name), call. = FALSE)
+    stop(sprintf("%s must not be NULL.", name), call. = FALSE)
   }
 
   # ---- 2. 标量整数检查 ----------------------------------------------------
   ok <- is.numeric(x) && length(x) == 1L && !is.na(x) && (x == as.integer(x))
   if (!ok) {
-    stop(sprintf("`%s` must be a single whole number (e.g., 5 or 5L).", name),
+    stop(sprintf("%s must be a single whole number (e.g., 5 or 5L).", name),
          call. = FALSE)
   }
 
   # ---- 3. 上下界 ----------------------------------------------------------
   if (!is.null(lower) && x < lower)
-    stop(sprintf("`%s` must be ≥ %s.", name, lower), call. = FALSE)
+    stop(sprintf("%s must be >= %s.", name, lower), call. = FALSE)
   if (!is.null(upper) && x > upper)
-    stop(sprintf("`%s` must be ≤ %s.", name, upper), call. = FALSE)
+    stop(sprintf("%s must be <= %s.", name, upper), call. = FALSE)
 
   invisible(TRUE)
 }
 
 
-
-#' Null-coalescing operator (internal)
+#' Null-coalescing operator
+#'
+#' Returns \code{x} unless it is \code{NULL}, otherwise returns \code{y}.
+#'
+#' @name null_coalesce
+#' @aliases %||%
 #' @keywords internal
-`%||%` <- function(x, y) if (is.null(x)) y else x
+`%||%` <- function(x, y) if (is.null(x)) y else y
+
+
 
 #' Verbose message wrapper (internal)
 #' @keywords internal
@@ -177,7 +183,7 @@ assert_scalar_int <- function(x,
 #' @keywords internal
 dbg <- function(..., .lvl = 0, verbose = TRUE) {
   if (verbose) {
-    pref <- paste(rep("·", .lvl), collapse = "")
+    pref <- paste(rep(".", .lvl), collapse = "")
     message("[DBG] ", pref, sprintf(...))
   }
 }
@@ -221,7 +227,7 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
                              verbose = TRUE) {
 
   W_type <- match.arg(W_type)
-  dbg("🟦 .make_moderation(): W = %s ; W_type = %s",
+  dbg("[MAKE_MODERATION] W = %s ; W_type = %s",
       paste(W, collapse = ", "), W_type, verbose = verbose)
 
   ## ---- A. 抽样矩阵 -------------------------------------------------------
@@ -234,12 +240,13 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
   } else {
     stop(".make_moderation(): cannot locate Monte-Carlo draws.", call. = FALSE)
   }
-  dbg("· theta_draws dim = %d × %d", nrow(theta_draws), ncol(theta_draws),
+  dbg(". theta_draws dim = %d x %d",
+      nrow(theta_draws), ncol(theta_draws),
       verbose = verbose)
 
   ## ---- B. 无调节 ---------------------------------------------------------
   if (is.null(W)) {
-    dbg("· W = NULL → basic contrasts", verbose = verbose)
+    dbg(". W = NULL -> basic contrasts", verbose = verbose)
     basic <- calc_basic_contrasts(theta_draws, ci_level = 1 - alpha)
     return(list(
       type         = "none",
@@ -250,7 +257,7 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
 
   ## ---- C. 分类调节 -------------------------------------------------------
   if (W_type == "categorical") {
-    dbg("· categorical moderation branch", verbose = verbose)
+    dbg(". categorical moderation branch", verbose = verbose)
     cat_out <- analyze_mm_categorical(
       mc_result     = theta_draws,
       prepared_data = data,
@@ -268,7 +275,7 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
   }
 
   ## ---- D. 连续调节 -------------------------------------------------------
-  dbg("· continuous moderation branch", verbose = verbose)
+  dbg(". continuous moderation branch", verbose = verbose)
   cont_out <- analyze_mm_continuous(
     mc_result   = theta_draws,
     data        = data,
@@ -279,4 +286,8 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
   cont_out$type <- "continuous"
   cont_out
 }
+
+
+
+
 

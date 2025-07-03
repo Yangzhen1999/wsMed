@@ -32,7 +32,9 @@ Imports:
     mice,
     semboottools,
     MASS,
-    rlang
+    rlang,
+    dplyr,
+    ggplot2
 VignetteBuilder: knitr
 LazyData: true
 URL: https://github.com/Yangzhen1999/wsMed

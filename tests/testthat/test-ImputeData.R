@@ -1,3 +1,6 @@
+library(mice)
+
+
 # 测试 ImputeData() 函数的结构与方法自动识别逻辑
 
 # 构造含缺失的 toy 数据集

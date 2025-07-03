@@ -1,6 +1,7 @@
-
-
 library(testthat)
+library(lavaan)
+library(semboottools)
+library(wsMed)
 
 # 创建一个最简模型语法字符串
 mock_model <- paste(

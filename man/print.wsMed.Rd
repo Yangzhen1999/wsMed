@@ -12,8 +12,6 @@
 \item{digits}{Numeric. Number of digits to display in the results.}
 
 \item{...}{Additional arguments (not used currently).}
-
-\item{delta}{Logical. Whether to include original delta-method-based SE, CI, and p-values alongside bootstrap results. Default is FALSE.}
 }
 \value{
 Invisibly returns the input \code{wsMed} object for further use.
@@ -37,7 +35,7 @@ analysis conducted using the \code{wsMed} function. Key features include:
 \itemize{
 \item \strong{Variables}:
 \itemize{
-\item Shows input variables (\code{M_C1}, \code{M_C2}, \code{Y_C1}, \code{Y_C2}) and computed variables like \code{Ydiff}, \code{Mdiff}, and \code{Mavg}.
+\item Shows input variables (M_C1, M_C2, Y_C1, Y_C2) and computed variables like Ydiff, Mdiff, and Mavg.
 \item Reports the sample size used in the analysis.
 }
 \item \strong{Model Fit Indices}:
@@ -68,17 +66,11 @@ analysis conducted using the \code{wsMed} function. Key features include:
 }
 }
 \examples{
-# Example dataset with missing values
-data(example_data)
-set.seed(123)
-example_dataN <- mice::ampute(
-  data = example_data,
-  prop = 0.1
-)$amp
 
 # Perform within-subject mediation analysis
+library(wsMed)
 result1 <- wsMed(
-  data = example_dataN,
+  data = example_data,
   M_C1 = c("A1", "B1"),
   M_C2 = c("A2", "B2"),
   Y_C1 = "C1",
@@ -86,9 +78,7 @@ result1 <- wsMed(
   form = "P",
   Na = "FIML",
   standardized = FALSE,
-  ci_method = "mc",
-  alpha = 0.05,
-  alphastd = 0.05
+  alpha = 0.05
 )
 
 # Print the results

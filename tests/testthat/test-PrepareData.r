@@ -1,3 +1,7 @@
+library(testthat)
+library(lavaan)
+library(semboottools)
+library(wsMed)
 
 data(example_data)
 

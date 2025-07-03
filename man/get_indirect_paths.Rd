@@ -41,9 +41,4 @@ coefficient sequence.
 }
 Duplicate paths (identical mediator ordering) are removed.
 }
-\examples{
-cn <- c("a1","a2","b1","b2","b_1_2","d_2_1")
-get_indirect_paths(cn)
-
-}
 \keyword{internal}

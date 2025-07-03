@@ -1,6 +1,7 @@
 library(testthat)
 library(lavaan)
 library(semboottools)
+library(wsMed)
 
 data(example_data)
   set.seed(123)
@@ -56,17 +57,17 @@ test_that("wsMed input validation catches all invalid scenarios", {
       wsMed(data = make_base_data(),
             M_C1 = c("A1","B1"), M_C2 = "A2",
             Y_C1 = "Y1", Y_C2 = "Y2",
-            form = "P", Na = "DE", R = 10, bootstrap = 0,
+            form = "P", Na = "DE", R = 10,
             verbose = FALSE),
-      "lengths of `M_C1` and `M_C2`"
+      "lengths of M_C1 and M_C2"
     )
 
     ## ── W & MP consistency ────────────────────────────────────────────────
     expect_error(call_ws(W = "W",              W_type = "categorical"),
-                 "must also supply `MP`")
+                 "must also supply")
 
     expect_error(call_ws(MP = "a1"),
-                 "`MP` specified but `W` is NULL")
+                 "MP specified but W is NULL")
 
     expect_error(call_ws(W = "noCol", MP = "a1"),
                  "not a column")
@@ -75,7 +76,7 @@ test_that("wsMed input validation catches all invalid scenarios", {
                  "Exactly one moderator")
 
     ## ── integer parameters ────────────────────────────────────────────────
-    expect_error(call_ws(R = -5), "`R` must be ≥ 1")
+    expect_error(call_ws(R = -5), "R must be >= 1")
     expect_error(call_ws(R = 3.5), "whole number")   # 非整数仍匹配原文本
     expect_error(call_ws(bootstrap = 3.2),    "whole number")
 

@@ -45,8 +45,10 @@
 #' @param W Optional character vector: moderator names (≤ *J*).
 #' @param W_type Optional vector of the same length as \code{W}.
 #'   Same coding as \code{C_type}. Ignored when \code{W = NULL}.
+#' @param center_W Logical. Whether to center the moderator variable W.
 #' @param keep_W_raw,keep_C_raw Logical; keep original W / C columns in the
 #'   returned data?
+#'
 #'
 #' @return
 #' A data frame containing at minimum:

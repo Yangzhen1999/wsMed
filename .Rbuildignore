@@ -11,3 +11,5 @@
 ^wsMed\.Rproj$
 ^\.Rproj\.user$
 ^Meta$
+^cd$
+^git$

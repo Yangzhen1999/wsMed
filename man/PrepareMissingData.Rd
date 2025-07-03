@@ -19,6 +19,7 @@ PrepareMissingData(
   C_type = NULL,
   W = NULL,
   W_type = NULL,
+  center_W = TRUE,
   keep_W_raw = TRUE,
   keep_C_raw = TRUE
 )
@@ -27,6 +28,8 @@ PrepareMissingData(
 \item{data_missing}{A data frame containing the raw dataset with missing values.}
 
 \item{m}{An integer specifying the number of imputations to perform. Default is \code{5}.}
+
+\item{method_num}{integer. …  (# 如果的确改名)}
 
 \item{seed}{An integer specifying the random seed for reproducibility. Default is \code{123}.}
 
@@ -45,13 +48,19 @@ Must match the length of \code{M_C1}.}
 
 \item{C}{Character vector of between-subject control variable names.}
 
-\item{W}{A character vector specifying the names of moderator variable(s)
-that are used to generate interaction terms with mediators. These variables
-will be included in the imputation model and passed to \code{PrepareData()}
-for moderation effect processing. Default is \code{NULL}.}
+\item{C_type}{Optional vector of the same length as \code{C}.
+Each element \code{"continuous"}, \code{"categorical"}, or \code{"auto"}
+(default). Ignored when \code{C = NULL}.}
 
-\item{method}{A character string specifying the imputation method. Default is \code{"pmm"}
-(predictive mean matching).}
+\item{W}{Optional character vector: moderator names (≤ \emph{J}).}
+
+\item{W_type}{Optional vector of the same length as \code{W}.
+Same coding as \code{C_type}. Ignored when \code{W = NULL}.}
+
+\item{center_W}{Logical. Whether to center the moderator variable W.}
+
+\item{keep_W_raw, keep_C_raw}{Logical; keep original W / C columns in the
+returned data?}
 }
 \value{
 A list containing:
@@ -94,11 +103,10 @@ example_dataN <- mice::ampute(
 prepared_missing_data <- PrepareMissingData(
   data_missing = example_dataN,
   m = 5,
-  method = "pmm",
   M_C1 = c("A2", "B2"),
   M_C2 = c("A1", "B1"),
   Y_C1 = "C2",
-  Y_C2 = "C1",
+  Y_C2 = "C1"
 )
 
 # Access processed datasets

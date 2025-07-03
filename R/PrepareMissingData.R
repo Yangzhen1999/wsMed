@@ -21,8 +21,6 @@
 #'
 #' @param data_missing A data frame containing the raw dataset with missing values.
 #' @param m An integer specifying the number of imputations to perform. Default is `5`.
-#' @param method A character string specifying the imputation method. Default is `"pmm"`
-#' (predictive mean matching).
 #' @param seed An integer specifying the random seed for reproducibility. Default is `123`.
 #' @param M_C1 A character vector of column names representing mediators "before" the intervention.
 #' @param M_C2 A character vector of column names representing mediators "after" the intervention.
@@ -36,6 +34,17 @@
 #'   that are used to generate interaction terms with mediators. These variables
 #'   will be included in the imputation model and passed to \code{PrepareData()}
 #'   for moderation effect processing. Default is \code{NULL}.
+#' @param method_num integer. …  (# 如果的确改名)
+#' @param C_type Optional vector of the same length as \code{C}.
+#'   Each element \code{"continuous"}, \code{"categorical"}, or \code{"auto"}
+#'   (default). Ignored when \code{C = NULL}.
+#' @param W Optional character vector: moderator names (≤ *J*).
+#' @param W_type Optional vector of the same length as \code{W}.
+#'   Same coding as \code{C_type}. Ignored when \code{W = NULL}.
+#' @param center_W Logical. Whether to center the moderator variable W.
+#' @param keep_W_raw,keep_C_raw Logical; keep original W / C columns in the
+#'   returned data?
+#'
 #' @return A list containing:
 #' - `processed_data_list`: A list of `m` data frames, each representing an imputed and processed dataset,
 #' ready for within-subject mediation analysis.
@@ -56,11 +65,10 @@
 #' prepared_missing_data <- PrepareMissingData(
 #'   data_missing = example_dataN,
 #'   m = 5,
-#'   method = "pmm",
 #'   M_C1 = c("A2", "B2"),
 #'   M_C2 = c("A1", "B1"),
 #'   Y_C1 = "C2",
-#'   Y_C2 = "C1",
+#'   Y_C2 = "C1"
 #' )
 #'
 #' # Access processed datasets

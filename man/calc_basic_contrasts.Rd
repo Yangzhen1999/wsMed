@@ -8,60 +8,43 @@ calc_basic_contrasts(mc_result, ci_level = 0.95, digits = 3)
 }
 \arguments{
 \item{mc_result}{A Monte-Carlo result of class \code{"semmcci"}
-(returned by \code{\link{MCMI2}}).}
+(returned by \code{\link[=MCMI2]{MCMI2()}}).}
 
-\item{ci_level}{Confidence level for the CI columns (default \code{0.95}).}
+\item{ci_level}{Confidence level for the CI (default \code{0.95}).}
 
-\item{digits}{Number of decimal places in the summary (default \code{3}).}
+\item{digits}{Decimal places to keep (default \code{3}).}
 }
 \value{
-A named list with up to two data frames:
+A list with up to two data frames:
 \describe{
-\item{\code{IE_contrasts}}{All pairwise contrasts of indirect
-effects (or \code{NULL} if fewer than two IEs are present).}
-\item{\code{Xcoef}}{Rows \code{X1_b*} and \code{X0_b*} for every
-detected \code{b} path (or \code{NULL} if none).}
+\item{IE_contrasts}{Pairwise contrasts of indirect effects, or \code{NULL} if
+fewer than two are present.}
+\item{Xcoef}{Rows \verb{X1_b*} and \verb{X0_b*} for every detected \eqn{b} path,
+or \code{NULL} if no \eqn{b} path is found.}
 }
 }
 \description{
-\code{calc_basic_contrasts()} extracts two sets of convenient summary
-contrasts from a Monte-Carlo SEM result (\code{semmcci} object):
+\code{calc_basic_contrasts()} extracts two convenient sets of contrasts from a
+Monte-Carlo SEM result (\code{semmcci} object):
 \enumerate{
 \item All pairwise differences between indirect effects
-(\code{indirect_*} columns).
-\item Pre-test (\eqn{X0}) and post-test (\eqn{X1}) coefficients for
-every primary \code{b} path, computed via
-\eqn{X1 = (2b + d) / 2} and \eqn{X0 = X1 - d}.
+(\verb{indirect_*} columns);
+\item Pre-test (\eqn{X_0}) and post-test (\eqn{X_1}) coefficients for every
+primary \eqn{b} path, obtained with
+\eqn{X_1 = (2b + d)/2}, \eqn{X_0 = X_1 - d}.
 }
-Each contrast is summarised by its Monte-Carlo mean, SD, and a symmetric
-\eqn{100(1-\alpha)}\\% confidence interval.
 }
 \details{
-Given the matrix \code{thetahatstar} (\eqn{R \times P}) of Monte-Carlo
-draws:
 \itemize{
-\item Indirect-effect columns are detected by the pattern
+\item Indirect-effect columns are detected by the regular expression
 \verb{^indirect_}.
-\item \code{b} paths follow either \code{b1}, \code{b_1_2}, etc.
-Their matching \code{d} path (\code{d1}, \code{d_1_2}, …)
-is located and used to derive \eqn{X1} / \eqn{X0}.
+\item A primary \eqn{b} path is any coefficient named \code{b1}, \code{b_1_2}, …
+Its matching \eqn{d} path (\code{d1}, \code{d_1_2}, …) is paired automatically.
 }
 
-The helper \code{mc_summary_pct()} is applied to every contrast vector
-to obtain
-\code{Estimate}, \code{SE}, \code{\if{html}{\out{<p>}}\%CI.Lo}, \code{\if{html}{\out{<p>}}\%CI.Up}.
-Column names are then cleaned by \code{fix_pct_names()} so that
-\code{"2.5\%CI.Lo"/"97.5\%CI.Up"} (for a 95 \% CI) are produced.
-}
-\examples{
-## Not run: --------------------------------------------------------------
-# basic <- calc_basic_contrasts(mc_out)
-# basic$IE_contrasts
-# basic$Xcoef
-## End(Not run)
-
-}
-\seealso{
-\code{\link{analyze_mm_categorical}}, \code{\link{analyze_mm_continuous}}
+Each contrast is summarised with its Monte-Carlo mean, SD, and a symmetric
+\eqn{100(1-\alpha)} \% confidence interval.  Helper functions
+\code{mc_summary_pct()} and \code{fix_pct_names()} ensure that the final CI columns are
+named, for example, \verb{2.5\%CI.Lo} and \verb{97.5\%CI.Up}.
 }
 \keyword{internal}
