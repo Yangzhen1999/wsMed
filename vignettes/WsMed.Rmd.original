@@ -130,7 +130,7 @@ result1 <- wsMed(
 print(result1)
 ```
 
-By default, `wsMed()` uses **bootstrap** confidence intervals when `ci_method` is not specified. You can also specify ci_method = "mc" to compute Monte Carlo confidence intervals instead of bootstrap:
+By default, `wsMed()` uses **Monte Carlo** confidence intervals when `ci_method` is not specified. You can also specify ci_method = "bootstrap" to compute Bootstrap confidence intervals instead of Monte Carlo:
 
 ```{r,eval = FALSE}
 result1 <- wsMed(
@@ -140,7 +140,7 @@ result1 <- wsMed(
   Y_C1 = "C1", # C1 is outcome variable in condition 1
   Y_C2 = "C2", # C2 is outcome variable in condition 2
   form = "P", # Parallel mediation
-  ci_method = "bootstrap" # use Monte Carlo confidence intervals
+  ci_method = "bootstrap" # use Bootstrap confidence intervals
 )
 print(result1)
 ```
@@ -166,8 +166,8 @@ result2 <- wsMed(
 print(result2)
 ```
 
-- You can also specify `ci_method = "mc"` to use **Monte Carlo confidence intervals** instead of bootstrap.
-- Set `R` to control the **number of Monte Carlo repetitions** (default = 20000).
+- You can also specify `ci_method = "bootstrap"`.
+- Set `bootstrap` to control the **number of bootstrapping** (default = 2000).
 
 ```{r,eval = FALSE}
 library(wsMed)
@@ -179,9 +179,9 @@ result2 <- wsMed(
   Y_C2 = "D2", # D2 is outcome variable in condition 2
   form = "P", # Parallel mediation
   standardized = TRUE, # Compute standardized effects based on Monte Carlo method
-  R = 10000L,   # the number of Monte Carlo repetitions
+  ci_method = "bootstrap", # use Bootstrap confidence intervals
+  bootstrap = 1000,   # the number of bootstrap
   alpha =  0.05,  # Significance level
-  alphastd = 0.05 # Significance level for standardized
 )
 print(result2)
 ```
@@ -260,6 +260,7 @@ result5 <- wsMed(
   form = "CP",# chained + parallel mediation, M1 is chained mediator by default
   W      = "D3",       W_type = "continuous",
   MP     = c("a1","b2","d1","cp","b_1_2","d_1_2"),
+  standardized = "TRUE"
 )
 print(result5)
 
@@ -268,7 +269,7 @@ plot_moderation_curve(result5, "b_1_2")
 plot_moderation_curve(result5, "total_effect")
 ```
 
-```
+```{r,eval = FALSE}
 result5 <- wsMed(
   data = example_dataN,
   M_C1 = c("A1","B1","C1"),# A1/B1/C1 is A/B/C mediator variable in condition 1
@@ -278,9 +279,13 @@ result5 <- wsMed(
   form = "CP",# chained + parallel mediation, M1 is chained mediator by default
   W      = "D3",       W_type = "continuous",
   ci_method = "bootstrap",
+  bootstrap = 2000,
+  standardized = "TRUE",
   MP     = c("a1","b2","d1","cp","b_1_2","d_1_2"),
 )
-
+plot_moderation_curve(result5, "indirect_effect_1_2")
+plot_moderation_curve(result5, "b_1_2")
+plot_moderation_curve(result5, "total_effect")
 ```
 
 ### example 6
@@ -296,8 +301,16 @@ In this example,three covariates are included:
 These covariates are included as predictors of both the mediators and the outcome in the SEM model.
 
 ```{r}
+example_data2 <- example_data
+set.seed(123)  # 为可复现性设随机种子
+example_data2$Group <- factor(
+  sample(c("G1", "G2", "G3"),      # 三个组别标签
+         nrow(example_data2),       # 样本数与数据行数一致
+         replace = TRUE)
+)
+
 result6 <- wsMed(
-  data = example_data, #dataset
+  data = example_data2, #dataset
   M_C1 = c("A1","B1","C1"), # A1/B1 is A/B mediator variable in condition 1
   M_C2 = c("A2","B2","C2"), # A2/B2 is A/B mediator variable in condition 2
   Y_C1 = "D1", # D1 is outcome variable in condition 1
@@ -311,6 +324,24 @@ result6 <- wsMed(
 print(result6, digits=6)
 ```
 
+```{r,eval = FALSE}
+result6 <- wsMed(
+  data = example_data2, #dataset
+  M_C1 = c("A1","B1","C1"), # A1/B1 is A/B mediator variable in condition 1
+  M_C2 = c("A2","B2","C2"), # A2/B2 is A/B mediator variable in condition 2
+  Y_C1 = "D1", # D1 is outcome variable in condition 1
+  Y_C2 = "D2", # D2 is outcome variable in condition 2
+  W      = "Group",
+  W_type = "categorical",
+  ci_method = "bootstrap",
+  bootstrap = 2000,
+  MP     =  c("a1","b1","d1","cp","b_1_2","b_2_3"),
+  form   = "CN"
+)
+
+print(result6, digits=6)
+
+```
 These covariates are included as predictors of both the mediators and the outcome in the SEM model.
 
 ```{r}
@@ -328,3 +359,5 @@ result7 <- wsMed(
 
 print(result7)
 ```
+
+

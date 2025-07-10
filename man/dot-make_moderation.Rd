@@ -7,11 +7,11 @@
 .make_moderation(
   mc_res,
   data,
-  W,
+  W = NULL,
   MP = NULL,
-  W_type = c("categorical", "continuous"),
+  W_type = c("categorical", "continuous", "none"),
   alpha = 0.05,
-  verbose = TRUE
+  verbose = FALSE
 )
 }
 \description{

@@ -26,11 +26,11 @@ wsMed(
   boot_ci_type = "perc",
   iseed = 123,
   fixed.x = FALSE,
-  ci_method = NULL,
+  ci_method = c("mc", "bootstrap", "both"),
   MCmethod = NULL,
   seed = 123,
   standardized = FALSE,
-  verbose = TRUE
+  verbose = FALSE
 )
 }
 \arguments{

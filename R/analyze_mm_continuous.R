@@ -44,6 +44,8 @@
 #'
 #' @importFrom utils  tail modifyList
 #' @importFrom stats  model.matrix
+#' @importFrom methods slot
+#' @importFrom stats complete.cases
 #'
 #' @keywords internal
 

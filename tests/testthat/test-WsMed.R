@@ -13,10 +13,11 @@ data(example_data)
 ## 小工具：断言顶层字段齐全
 expect_wsMed_structure <- function(obj) {
     expect_s3_class(obj, "wsMed")
-    expect_named(obj,
-                 c("data","sem_model","input_vars","mc",
-                   "moderation","alpha","Na","form"),
-                 ignore.order = TRUE)
+  expect_setequal(
+    names(obj),
+    c("Na", "alpha", "ci_method", "data", "fit_u", "form",
+      "input_vars", "mc", "moderation", "param_boot", "sem_model")
+  )
 
     expect_true(!is.null(obj$mc$result$thetahatstar))
   }

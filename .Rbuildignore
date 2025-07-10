@@ -13,3 +13,5 @@
 ^Meta$
 ^cd$
 ^git$
+^vignettes/figure$
+

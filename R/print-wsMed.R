@@ -84,7 +84,13 @@ print.wsMed <- function(x, digits = 3, ...){
   .print_fit(x$mc$fit)
 
   ## ---------- 总 / 直 / 总间接 & 独立间接 ----------
-  .print_mc_totals(x$mc$result, x$alpha, digits)
+  if (!is.null(x$mc$result))
+    .print_mc_totals(x$mc$result, x$alpha, digits)
+
+
+  if (!is.null(x$param_boot)) {
+    .print_boot_totals(x$param_boot, x$alpha, digits)
+  }
 
   ## ---------- 间接 key ----------
   .print_indirect_key(x)
@@ -92,8 +98,18 @@ print.wsMed <- function(x, digits = 3, ...){
   ## 3 Monte‑Carlo 总/直/间接 --------------------
   ## ---------- 回归 / 方差 / 截距 ----------
   .print_mc_RIV(x$mc$result, x$mc$fit, x$alpha, digits)
+  if (!is.null(x$param_boot)) {
+    .print_boot_RIV   (x$param_boot, x$alpha, digits)
+  }
 
 
+  .print_mc_d_moderation(x$mc$result, x$alpha, digits)
+  if (!is.null(x$param_boot))
+    .print_boot_d_moderation(x$param_boot, x$alpha, digits)
+
+  .print_d_key(x$data, x$mc$result)
+  if (!is.null(x$param_boot))
+    .print_d_key(x$data, x$mc$result, x$param_boot)
 
   ## 4 调节--------------------------------
   ## ---------- (1) basic contrasts ----------
@@ -101,8 +117,13 @@ print.wsMed <- function(x, digits = 3, ...){
     if (!is.null(x$moderation$IE_contrasts)) {
       cat("\n")
       cat("\n*************** CONTRAST INDIRECT EFFECTS (No Moderator) ***************\n")
-      .print_tbl(x$moderation$IE_contrasts, digits)
+      tbl <- x$moderation$IE_contrasts        # ① 取出原表
+      names(tbl) <- clean_ci_names(names(tbl))
+      if ("Contrast" %in% names(tbl))         # ② 对齐，别动别的列
+        tbl$Contrast <- align_minus(tbl$Contrast)
+      .print_tbl(tbl, digits)
     }
+
     if (!is.null(x$moderation$Xcoef)) {
       cat("\n")
       cat("\n*************** C1-C2 COEFFICIENTS (No Moderator) ***************\n")
@@ -110,9 +131,6 @@ print.wsMed <- function(x, digits = 3, ...){
     }
 
   }
-
-  .print_mc_d_moderation(x$mc$result, x$alpha, digits)
-  .print_d_key(x$data, x$mc$result)
 
 
   if (!is.null(x$moderation)) {
@@ -124,16 +142,16 @@ print.wsMed <- function(x, digits = 3, ...){
   }
 
   ## 5 标准化（若有） ---------------------------
-  if (!is.null(x$mc$std)){
+  if (!is.null(x$mc$std_mc)){
     cat("\n")
     cat("\n*************** STANDARDIZED (MC) ***************\n")
-    .print_tbl(x$mc$std, digits = digits)
+    .print_tbl(x$mc$std_mc, digits = digits)
   }
 
-  ## 6 bootstrap （仅 listwise） ---------------
-  if (!is.null(x$mc$bootstrap)){
-    cat("\n*************** BOOTSTRAP (DE) *****************\n")
-    .print_tbl(x$mc$bootstrap, digits = digits)
+  ## ---- 新增：BOOT 版 ----------------------------------------------------------
+  if (!is.null(x$mc$std_boot)){
+     cat("\n")
+    .print_boot_std_all(x$mc$std_boot, x$alpha, digits)
   }
 
   invisible(x)

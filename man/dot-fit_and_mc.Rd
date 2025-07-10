@@ -11,7 +11,8 @@
   R = 20000,
   alpha = 0.05,
   fixed.x = FALSE,
-  verbose = TRUE
+  verbose = TRUE,
+  run_mc = TRUE
 )
 }
 \description{

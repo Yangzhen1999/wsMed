@@ -34,7 +34,9 @@ Imports:
     MASS,
     rlang,
     dplyr,
-    ggplot2
+    ggplot2,
+    methods,
+    stats
 VignetteBuilder: knitr
 LazyData: true
 URL: https://github.com/Yangzhen1999/wsMed
