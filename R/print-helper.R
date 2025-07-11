@@ -759,41 +759,50 @@
 #' @keywords internal
 #' @noRd
 .print_boot_d_moderation <- function(df, alpha, digits = 3,
-                                         title = "BOOT", dbg = FALSE) {
+                                     title = "BOOT", dbg = FALSE) {
+
+  # ── 0  early exit ──────────────────────────────────────────────────────
   if (is.null(df) || !nrow(df)) {
-    if (dbg) message("[DBG] param_boot 为空或没有行");
+    if (dbg) message("[DBG] 'df' is NULL or has zero rows.")
     return(invisible())
   }
 
+  # ── 1  locate d-path rows ──────────────────────────────────────────────
   sel <- grepl("^d(\\d+|_\\d+)+$", df$label)
   if (!any(sel)) {
-    if (dbg) message("[DBG] 没有匹配 d-path 的 label");
+    if (dbg) message("[DBG] No rows match d-path labels.")
     return(invisible())
   }
   sub <- df[sel, ]
 
   if (dbg) {
-    message("[DBG] d-paths 行数 = ", nrow(sub))
-    message("[DBG] d-paths 实际列名: ", paste(names(sub), collapse = ", "))
+    message("[DBG] Number of d-path rows: ", nrow(sub))
+    message("[DBG] Column names in d-path block: ",
+            paste(names(sub), collapse = ", "))
   }
 
+  # ── 2  tidy numeric columns ────────────────────────────────────────────
   vals <- .boot_param_table(sub, alpha)
 
   if (dbg) {
-    message("[DBG] .boot_param_table() 返回行数 = ", nrow(vals))
-    message("[DBG] 其列名: ", paste(names(vals), collapse = ", "))
+    message("[DBG] .boot_param_table() returned ", nrow(vals), " rows")
+    message("[DBG] Column names of returned table: ",
+            paste(names(vals), collapse = ", "))
   }
 
-  ## 若两侧行数不同，立刻抛出调试提示以免 data.frame() 出错
+  # safeguard: row counts must match
   if (nrow(vals) != nrow(sub)) {
-    stop("Row-mismatch: sub = ", nrow(sub),
-         " vs vals = ", nrow(vals),
-         "\n检查 .boot_param_table 是否按行回退 NA 失败")
+    stop("Row mismatch: sub = ", nrow(sub),
+         ", vals = ", nrow(vals),
+         ". Check .boot_param_table for alignment issues.")
   }
 
-  out <- data.frame(Coefficient = sub$label,
-                    vals,
-                    check.names = FALSE)
+  # ── 3  assemble & print ───────────────────────────────────────────────
+  out <- data.frame(
+    Coefficient = sub$label,
+    vals,
+    check.names = FALSE
+  )
 
   cat(sprintf(
     "\n\n*************** MODERATION EFFECTS (d-paths, %s) ***************\n",
@@ -803,8 +812,7 @@
 }
 
 
-
-#' Safe column extractor for standardized‐solution tables
+#' Safe column extractor for standardized-solution tables
 #'
 #' @param df   Data frame (standardized bootstrap output).
 #' @param r    Expected number of rows.
@@ -839,7 +847,7 @@
   loH <- sprintf("%.1f%%CI.Lo", 100 * alpha / 2)
   upH <- sprintf("%.1f%%CI.Up", 100 * (1 - alpha / 2))
 
-  ## 数值列 ------------------------------------------------------------------
+  ## 数值列
   vals <- data.frame(
     Estimate = .boot_pick(std_boot, r, c("est.std","std","std.all")),
     SE       = .boot_pick(std_boot, r, c("boot.se","bse","se")),
@@ -850,7 +858,7 @@
   )
   names(vals)[4:5] <- c(loH, upH)
 
-  ## 关键字列 ---------------------------------------------------------------
+  ## 关键字列
   key   <- character(r)
   reg_i <- std_boot$op == "~"
   int_i <- std_boot$op == "~1"
@@ -865,9 +873,9 @@
   key[def_i] <- std_boot$lhs[def_i]
 
   label <- std_boot$label
-  label[is.na(label) | label == ""] <- ""          # ← 空串替代 NA
+  label[is.na(label) | label == ""] <- ""          #  空串替代 NA
 
-  ## 合并大表（先加 Section 作排序后再删除） -------------------------------
+  ## 合并大表（先加 Section 作排序后再删除
   sec <- character(r)
   sec[reg_i] <- "1_Regressions"
   sec[cov_i] <- "2_Covariances"
@@ -883,9 +891,9 @@
     check.names = FALSE, stringsAsFactors = FALSE
   )
   big_tbl <- big_tbl[order(big_tbl$Section), ]
-  big_tbl$Section <- NULL               # ← 删除 Section 列
+  big_tbl$Section <- NULL               #  删除 Section 列
 
-  ## 打印 --------------------------------------------------------------------
+  ## 打印
   cat("\n*************** STANDARDIZED (", title, ") ***************\n", sep = "")
   .print_tbl(big_tbl, digits)
   invisible()
@@ -893,7 +901,7 @@
 
 
 
-# ---------- 小工具：让 “–” 左右对齐 ---------------------------------
+# ---------- 小工具：让 “-” 左右对齐 -------
 #' Align text around a minus sign for pretty printing
 #'
 #' @param x   Character vector of "lhs - rhs" strings.
@@ -913,13 +921,12 @@ align_minus <- function(x, sep = "-") {
   wL <- max(nchar(lhs))
   wR <- max(nchar(rhs))
 
-  # %-wLs  左对齐；%-wRs  右也左对齐（保持空格长度）
   fmt <- paste0("%-", wL, "s  -  %-", wR, "s")
   sprintf(fmt, lhs, rhs)
 }
 
 
-# ── 工具：修正 CI 列名 ───────────────────────────────────────────
+# ── 工具：修正 CI 列名
 #' Clean CI column names produced by `fix_pct_names()`
 #'
 #' @param nm Character vector of column names.

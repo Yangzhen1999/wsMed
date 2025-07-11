@@ -99,7 +99,6 @@ validate_wsMed_inputs <- function(data,
   allowed_methods <- c("mc", "bootstrap", "both")
 
   ci_method <- if (is.null(ci_method)) {
-    # 默认策略：DE → bootstrap；FIML / MI → mc
     switch(Na,
            DE   = "bootstrap",
            FIML = "mc",
@@ -108,7 +107,7 @@ validate_wsMed_inputs <- function(data,
     match.arg(ci_method, allowed_methods)
   }
 
-  # ── 合法性规则 ────────────────────────────────────────────────
+  # ── 合法性规则
   # 1) MI 只能用 mc
   if (Na == "MI" && ci_method != "mc") {
     stop("With Na = 'MI', only ci_method = 'mc' is supported.",
@@ -212,7 +211,7 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
                         alpha     = 0.05,
                         fixed.x   = FALSE,
                         verbose   = TRUE,
-                        run_mc    = TRUE) {   # ← 新增参数
+                        run_mc    = TRUE) {
   # 0) 解析缺失处理方式
   Na <- match.arg(Na)
   miss_opt <- if (Na == "DE") "listwise" else "fiml"
@@ -227,16 +226,16 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
   if (!lavaan::lavInspect(fit, "converged"))
     warning("lavaan did not converge.")
 
-  # 2) 可选 Monte-Carlo 抽样 --------------------------------------------------
+  # 2) 可选 Monte-Carlo 抽样
   mc_out <- NULL
   if (run_mc) {
-    if (verbose) message("  ├─ Monte-Carlo draws …")
+    if (verbose) message("  -- Monte-Carlo draws...")
     mc_out <- semmcci::MC(lav = fit, R = R, alpha = alpha)
   } else {
-    if (verbose) message("  ├─ Monte-Carlo skipped (ci_method = 'bootstrap')")
+    if (verbose) message("  -- Monte-Carlo skipped (ci_method = 'bootstrap')")
   }
 
-  # 3) 返回 -------------------------------------------------------------------
+  # 3) 返回
   list(
     fit    = fit,     # lavaan 对象
     result = mc_out   # 可能是 NULL
@@ -269,9 +268,9 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
   ## ---- A. 抽样矩阵 -------------------------------------------------------
   theta_draws <- if (is.matrix(mc_res) || is.data.frame(mc_res)) {
     as.matrix(mc_res)
-  } else if (!is.null(mc_res$thetahatstar)) {          # semmcci::MC 对象
+  } else if (!is.null(mc_res$thetahatstar)) {
     mc_res$thetahatstar
-  } else if (!is.null(mc_res$result$thetahatstar)) {   # 另一种嵌套
+  } else if (!is.null(mc_res$result$thetahatstar)) {
     mc_res$result$thetahatstar
   } else {
     stop(".make_moderation(): cannot locate Monte-Carlo draws.", call. = FALSE)
@@ -281,7 +280,7 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
 
   ## ---- B. 无调节（basic contrasts） --------------------------------------
   if (W_type == "none") {                                               ## ***
-    dbg(". W_type = 'none'  → basic contrasts", verbose = verbose)
+    dbg(". W_type = 'none' -> basic contrasts", verbose = verbose)
     basic <- calc_basic_contrasts(theta_draws, ci_level = 1 - alpha)
 
     return(list(
@@ -330,17 +329,17 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
 
 
 
-#' Augment bootstrap matrix with indirect effects
+#' Add missing indirect-effect columns to a bootstrap matrix
 #'
-#' @param theta_boot  matrix / data.frame
-#'   每行一条 bootstrap 样本，每列一个自由参数（例如 a1, b1, d1 …）。
-#' @param sem_model   character(1) or character vector
-#'   lavaan 语法文本，需包含 `:=` 定义的间接效应（如 `indirect_1 := a1*b1`）。
-#' @param prefix      character(1)  要提取的派生量名前缀；默认 "indirect_"
-#' @param warn        logical  如果公式里引用了缺失列，是否给出 warning
+#' @param theta_boot Numeric matrix/data.frame: bootstrap draws (rows * free-parameters).
+#' @param sem_model  Character: lavaan syntax containing \code{:=} definitions.
+#' @param prefix     Prefix of derived names to insert (default \code{"indirect_"}).
+#' @param warn       Emit a warning when RHS variables are absent (default \code{TRUE}).
 #'
-#' @return 与 `theta_boot` 同类型、列数可能增多的对象
+#' @return Same type as \code{theta_boot} with extra columns, if any.
 #' @keywords internal
+#' @noRd
+
 .add_indirect_boot <- function(theta_boot,
                               sem_model,
                               prefix = "indirect_",
@@ -368,7 +367,7 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
   def_names  <- def_names[ sel ]
   def_rhs    <- def_rhs  [ sel ]
 
-  ## 3. 逐个公式计算并追加 ---------------------------------------
+  ## 3. 逐个公式计算并追加
   df_boot <- as.data.frame(theta_boot)     # 方便 with() 评估
   for (i in seq_along(def_names)) {
     nm  <- def_names[i]
