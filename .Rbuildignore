@@ -15,3 +15,5 @@
 ^git$
 ^vignettes/figure$
 
+^CRAN-SUBMISSION$
+^cran-comments\.md$
