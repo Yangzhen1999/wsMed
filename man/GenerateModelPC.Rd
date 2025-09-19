@@ -4,13 +4,26 @@
 \alias{GenerateModelPC}
 \title{Generate Parallel and Chained Mediation Model}
 \usage{
-GenerateModelPC(prepared_data)
+GenerateModelPC(prepared_data, MP = character(0))
 }
 \arguments{
 \item{prepared_data}{A data frame returned by \code{\link[=PrepareData]{PrepareData()}}, containing the processed
 within-subject mediator and outcome variables. The data frame must include columns for
 difference scores (\code{Mdiff}) and average scores (\code{Mavg}) of mediators, as well as the
 outcome difference score (\code{Ydiff}).}
+
+\item{MP}{A character vector specifying which paths are moderated by variable(s) W.
+Acceptable values include:
+- \code{"a2"}, \code{"a3"}, ...: moderation on the a paths (W → Mdiff).
+- \code{"b2"}, \code{"b3"}, ...: moderation on the b paths (Mdiff × W → Ydiff).
+- \code{"b_2_1"}, \code{"b_3_1"}, ...: moderation on the cross-paths from parallel mediators to the chain mediator (e.g., M2 → M1).
+- \code{"d_2_1"}, \code{"d_3_1"}, ...: moderation on the paths from parallel mediators’ centered means to M1.
+- \code{"cp"}: moderation on the direct effect of X on Y (i.e., W → Ydiff).
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{      This argument controls which interaction terms (e.g., \code{int_Mdiff_W}, \code{int_Mavg_W}) are included
+      in the regression equations. Variable names are automatically matched using the naming convention
+      \code{"int_<predictor>_W<index>"}.
+}\if{html}{\out{</div>}}}
 }
 \value{
 A character string representing the SEM model syntax for the specified parallel and chained mediation analysis.

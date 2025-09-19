@@ -8,8 +8,8 @@ articles:
   GenerateModelPC: GenerateModelPC.html
   MEMORE_vs_wsMed: MEMORE_vs_wsMed.html
   printGM: printGM.html
-  wsMed: wsMed.html
-last_built: 2025-05-31T15:24Z
+  WsMed: WsMed.html
+last_built: 2025-09-19T00:32Z
 urls:
-  reference: https://github.com/Yangzhen1999/wsMed/reference
-  article: https://github.com/Yangzhen1999/wsMed/articles
+  reference: https://yangzhen1999.github.io/wsMed/reference
+  article: https://yangzhen1999.github.io/wsMed/articles

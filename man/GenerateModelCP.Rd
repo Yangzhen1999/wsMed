@@ -4,13 +4,24 @@
 \alias{GenerateModelCP}
 \title{Generate Combined Parallel and Chained Mediation Model}
 \usage{
-GenerateModelCP(prepared_data)
+GenerateModelCP(prepared_data, MP = character(0))
 }
 \arguments{
 \item{prepared_data}{A data frame returned by \code{\link[=PrepareData]{PrepareData()}}, containing the processed
 within-subject mediator and outcome variables. The data frame must include columns for
 difference scores (\code{Mdiff}) and average scores (\code{Mavg}) of mediators, as well as the
 outcome difference score (\code{Ydiff}).}
+
+\item{MP}{A character vector specifying which paths are moderated by variable(s) W.
+Acceptable values include:
+- \code{"a2"}, \code{"a3"}, ...: moderation on the a paths of parallel mediators (W → Mdiff).
+- \code{"b2"}, \code{"b3"}, ...: moderation on the b paths of parallel mediators (Mdiff × W → Ydiff).
+- \code{"b_1_2"}, \code{"b_1_3"}, ...: moderation on the paths from the chain mediator to parallel mediators.
+- \code{"d_1_2"}, \code{"d_1_3"}, ...: moderation on the paths from the chain mediator’s Mavg to parallel mediators.
+- \code{"cp"}: moderation on the direct effect from X to Y (i.e., W → Ydiff).
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{      Each entry triggers inclusion of W’s main effect or interaction terms (e.g., \code{int_Mdiff_W}).
+}\if{html}{\out{</div>}}}
 }
 \value{
 A character string representing the SEM model syntax for the specified combined parallel and chained mediation analysis.

@@ -1,10 +1,10 @@
-url: https://github.com/Yangzhen1999/wsMed
+url: https://yangzhen1999.github.io/wsMed
+
+
 
 template:
   bootstrap: 5
   bootswatch: flatly
-  params:
-    copy_vignettes: true
 
 navbar:
   structure:
@@ -63,3 +63,7 @@ reference:
       - PrepareMissingData
       - MCMI2
       - PrepareData
+  - title: "Plotting Conditional Indirect Effects"
+    desc: "Functions for visualizing conditional indirect effect curves"
+    contents:
+      - plot_moderation_curve

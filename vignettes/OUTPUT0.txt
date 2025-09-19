@@ -1,0 +1,118 @@
+﻿
+Run MATRIX procedure:
+
+*********************** MEMORE Procedure for SPSS Version 3.0 ***********************
+
+                           Written by Amanda Montoya
+
+                    Documentation available at github.com/akmontoya/MEMORE
+
+**************************** ANALYSIS NOTES AND WARNINGS ****************************
+
+Number of samples for Monte Carlo condifidence intervals:
+  5000
+
+The following variables were mean centered prior to analysis:
+ (        TSRQ_T2   +       TSRQ_T1  )        /2
+ (        WEMBS_T2  +       WEMBS_T1 )        /2
+
+Level of confidence for all confidence intervals in output:
+      95.00
+
+**************************************************************************************
+
+Model:
+  1
+
+Variables:
+Y =   DASSS_T2 DASSS_T1
+M1 =  TSRQ_T2  TSRQ_T1
+M2 =  WEMBS_T2 WEMBS_T1
+
+Computed Variables:
+Ydiff =           DASSS_T2  -       DASSS_T1
+M1diff =          TSRQ_T2   -       TSRQ_T1
+M2diff =          WEMBS_T2  -       WEMBS_T1
+M1avg  = (        TSRQ_T2   +       TSRQ_T1  )        /2                         Centered
+M2avg  = (        WEMBS_T2  +       WEMBS_T1 )        /2                         Centered
+
+Sample Size:
+  63
+
+**************************************************************************************
+Outcome: Ydiff =  DASSS_T2  -       DASSS_T1
+
+Model
+               Coef         SE          t          p       LLCI       ULCI
+constant    -3.0476      .5400    -5.6441      .0000    -4.1270    -1.9682
+
+Degrees of freedom for all regression coefficient estimates:
+  62
+
+**************************************************************************************
+Outcome: M1diff = TSRQ_T2   -       TSRQ_T1
+
+Model
+               Coef         SE          t          p       LLCI       ULCI
+constant     1.2381      .8625     1.4355      .1562     -.4860     2.9621
+
+Degrees of freedom for all regression coefficient estimates:
+  62
+
+**************************************************************************************
+Outcome: M2diff = WEMBS_T2  -       WEMBS_T1
+
+Model
+               Coef         SE          t          p       LLCI       ULCI
+constant     1.6349      .6252     2.6152      .0112      .3852     2.8846
+
+Degrees of freedom for all regression coefficient estimates:
+  62
+
+**************************************************************************************
+Outcome: Ydiff =  DASSS_T2  -       DASSS_T1
+
+Model Summary
+          R       R-sq        MSE          F        df1        df2          p
+      .5061      .2562    14.6053     4.9939     4.0000    58.0000      .0016
+
+Model
+               Coef         SE          t          p       LLCI       ULCI
+constant    -2.5543      .5193    -4.9182      .0000    -3.5939    -1.5147
+M1diff        .0615      .0712      .8646      .3908     -.0809      .2040
+M2diff       -.3484      .1019    -3.4184      .0012     -.5524     -.1444
+M1avg        -.0104      .0585     -.1784      .8590     -.1276      .1067
+M2avg        -.2557      .1246    -2.0512      .0448     -.5051     -.0062
+
+Degrees of freedom for all regression coefficient estimates:
+  58
+
+************************* TOTAL, DIRECT, AND INDIRECT EFFECTS *************************
+
+Total effect of X on Y
+     Effect         SE          t         df          p       LLCI       ULCI
+    -3.0476      .5400    -5.6441    62.0000      .0000    -4.1270    -1.9682
+
+Direct effect of X on Y
+     Effect         SE          t         df          p       LLCI       ULCI
+    -2.5543      .5193    -4.9182    58.0000      .0000    -3.5939    -1.5147
+
+Indirect Effect of X on Y through M
+          Effect       MCSE     MCLLCI     MCULCI
+Ind1       .0762      .1216     -.1163      .3652
+Ind2      -.5695      .2807    -1.2010     -.1007
+Total     -.4934      .3085    -1.1692      .0665
+
+Indirect Key
+Ind1  'X'      ->       M1diff   ->       Ydiff
+Ind2  'X'      ->       M2diff   ->       Ydiff
+
+Pairwise Contrasts Between Specific Indirect Effects
+          Effect       MCSE     MCLLCI     MCULCI
+(C1)       .6457      .3032      .1320     1.3132
+
+Contrast Key:
+(C1)  Ind1      -       Ind2
+
+------ END MATRIX -----
+

@@ -1,5 +1,9 @@
 library(semmcci)
 library(lavaan)
+library(testthat)
+library(lavaan)
+library(semboottools)
+library(wsMed)
 
 test_that("MCStd2 works correctly with valid semmcci object", {
   # 构建简单模型

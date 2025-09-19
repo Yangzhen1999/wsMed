@@ -1,123 +1,76 @@
-test_that("PrepareData correctly computes difference and average scores", {
-  # 生成示例数据
-  set.seed(123)
-  data <- data.frame(
-    M1_before = rnorm(100), M1_after = rnorm(100),
-    M2_before = rnorm(100), M2_after = rnorm(100),
-    Y_C1 = rnorm(100), Y_C2 = rnorm(100)
-  )
+library(testthat)
+library(lavaan)
+library(semboottools)
+library(wsMed)
 
-  # 运行 PrepareData 函数
-  prepared_data <- PrepareData(
-    data = data,
-    M_C1 = c("M1_before", "M2_before"),
-    M_C2 = c("M1_after", "M2_after"),
-    Y_C1 = "Y_C1",
-    Y_C2 = "Y_C2"
-  )
+data(example_data)
 
-  # 确保返回的数据是数据框
-  expect_s3_class(prepared_data, "data.frame")
+# 统一参数 ---------------------------------------------------------
+args_core <- list(
+  data = example_data,
+  M_C1 = c("A1", "A2"),
+  M_C2 = c("B1", "B2"),
+  Y_C1 = "C1",
+  Y_C2 = "C2",
+  C_C1 = "D1",
+  C_C2 = "D2",
+  C     = "C3",
+  C_type = "auto"
+)
 
-  # 确保包含正确的列名
-  expected_cols <- c("Ydiff", "M1diff", "M2diff", "M1avg", "M2avg")
-  expect_true(all(expected_cols %in% colnames(prepared_data)))
+# -----------------------------------------------------------------
+# 测试 1：numeric W 连续型，开启中心化
+# -----------------------------------------------------------------
+pd_num_cent <- do.call(PrepareData, c(args_core,
+                                      list(W = "A3", W_type = "continuous", center_W = TRUE)))
 
-  # 验证 Ydiff 计算是否正确
-  expect_equal(prepared_data$Ydiff, data$Y_C2 - data$Y_C1, tolerance = 1e-6)
-
-  # 验证 Mdiff 计算是否正确
-  expect_equal(prepared_data$M1diff, data$M1_after - data$M1_before, tolerance = 1e-6)
-  expect_equal(prepared_data$M2diff, data$M2_after - data$M2_before, tolerance = 1e-6)
-
-  # 验证 Mavg 计算是否正确（中心化）
-  expect_equal(prepared_data$M1avg, (data$M1_before - mean(data$M1_before) +
-                                     data$M1_after - mean(data$M1_after)) / 2, tolerance = 1e-6)
-  expect_equal(prepared_data$M2avg, (data$M2_before - mean(data$M2_before) +
-                                     data$M2_after - mean(data$M2_after)) / 2, tolerance = 1e-6)
+test_that("Numeric W is centred and named W1", {
+  expect_true("W1" %in% names(pd_num_cent))
+  expect_lt(abs(mean(pd_num_cent$W1)), 1e-10)
 })
 
-# 测试 M_C1 和 M_C2 长度不匹配时应报错
-test_that("PrepareData throws an error when M_C1 and M_C2 lengths do not match", {
-  data <- data.frame(
-    M1_before = rnorm(100), M1_after = rnorm(100),
-    Y_C1 = rnorm(100), Y_C2 = rnorm(100)
-  )
+# -----------------------------------------------------------------
+# 测试 2：numeric W 关闭中心化
+# -----------------------------------------------------------------
+pd_num_raw <- do.call(PrepareData, c(args_core,
+                                     list(W = "A3", W_type = "continuous", center_W = FALSE)))
 
+test_that("Numeric W remains un‑centred when centre_W = FALSE", {
+  expect_gt(abs(mean(pd_num_raw$W1)), 1e-3)
+})
+
+# -----------------------------------------------------------------
+# 测试 3：factor W → dummy 列
+# -----------------------------------------------------------------
+pd_fac <- do.call(PrepareData, c(args_core,
+                                 list(W = "Group", W_type = "categorical", center_W = TRUE)))
+
+test_that("Factor W converted to (k‑1) dummy columns", {
+  dummies <- attr(pd_fac, "W_info")$dummy_names
+  expect_equal(length(dummies), length(levels(example_data$Group)) - 1)
+  expect_true(all(dummies %in% names(pd_fac)))
+})
+
+# -----------------------------------------------------------------
+# 测试 4：Ydiff / Mdiff / Mavg 正确
+# -----------------------------------------------------------------
+test_that("Core diff/avg columns are correct", {
+  expect_equal(pd_num_cent$Ydiff, example_data$C2 - example_data$C1)
+  expect_equal(pd_num_cent$M1diff, example_data$B1 - example_data$A1)
+  m1_avg_truth <- (example_data$A1 - mean(example_data$A1) +
+                     example_data$B1 - mean(example_data$B1)) / 2
+  expect_equal(pd_num_cent$M1avg, m1_avg_truth)
+})
+
+# -----------------------------------------------------------------
+# 测试 5：一次传入两个 W 必须报错
+# -----------------------------------------------------------------
+test_that("Supplying more than one W triggers error", {
   expect_error(
-    PrepareData(
-      data = data,
-      M_C1 = c("M1_before"),
-      M_C2 = c("M1_after", "M2_after"),  # 长度不匹配
-      Y_C1 = "Y_C1",
-      Y_C2 = "Y_C2"
-    ),
-    "The number of M_C1 and M_C2 variables must match."
+    PrepareData(example_data,
+                M_C1 = c("A1"), M_C2 = c("B1"),
+                Y_C1 = "C1", Y_C2 = "C2",
+                W     = c("A3", "Group")),
+    "Exactly one moderator"
   )
-})
-
-# 测试数据缺少 Y_C1 / Y_C2 时应报错
-test_that("PrepareData throws an error when Y variables are missing", {
-  data <- data.frame(
-    M1_before = rnorm(100), M1_after = rnorm(100)
-  )
-
-  expect_error(
-    PrepareData(
-      data = data,
-      M_C1 = c("M1_before"),
-      M_C2 = c("M1_after"),
-      Y_C1 = "Y_C1",  # 这个变量不存在
-      Y_C2 = "Y_C2"
-    ),
-    "Y variables not found in the dataset."
-  )
-})
-
-# 测试数据缺少 M_C1 / M_C2 时应报错
-test_that("PrepareData throws an error when M variables are missing", {
-  data <- data.frame(
-    Y_C1 = rnorm(100), Y_C2 = rnorm(100)
-  )
-
-  expect_error(
-    PrepareData(
-      data = data,
-      M_C1 = c("M1_before"),
-      M_C2 = c("M1_after"),
-      Y_C1 = "Y_C1",
-      Y_C2 = "Y_C2"
-    ),
-    "M variables for M1_before and M1_after not found in the dataset."
-  )
-})
-
-# 测试处理包含缺失值的数据
-test_that("PrepareData correctly handles missing values", {
-  set.seed(123)
-  data <- data.frame(
-    M1_before = rnorm(100), M1_after = rnorm(100),
-    M2_before = rnorm(100), M2_after = rnorm(100),
-    Y_C1 = rnorm(100), Y_C2 = rnorm(100)
-  )
-
-  # 人为引入缺失值
-  data$M1_before[1:10] <- NA
-  data$M1_after[5:15] <- NA
-
-  # 运行 PrepareData
-  prepared_data <- PrepareData(
-    data = data,
-    M_C1 = c("M1_before", "M2_before"),
-    M_C2 = c("M1_after", "M2_after"),
-    Y_C1 = "Y_C1",
-    Y_C2 = "Y_C2"
-  )
-
-  # 确保包含正确的列名
-  expected_cols <- c("Ydiff", "M1diff", "M2diff", "M1avg", "M2avg")
-  expect_true(all(expected_cols %in% colnames(prepared_data)))
-
-  # 允许 NA 但不应影响数据框格式
-  expect_s3_class(prepared_data, "data.frame")
 })

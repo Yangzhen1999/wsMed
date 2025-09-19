@@ -15,7 +15,7 @@ the outcome variable, emphasizing a downstream role for the chained mediator."><
 
     <a class="navbar-brand me-2" href="../index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,7 +36,7 @@ the outcome variable, emphasizing a downstream role for the chained mediator."><
     <li><a class="dropdown-item" href="../articles/MEMORE_vs_wsMed.html">Comparison: MEMORE 3.0 vs wsMed</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
-      </ul><ul class="navbar-nav"><li class="nav-item"><a class="nav-link" href="https://github.com/Yangzhen1999/wsMed" aria-label="GitHub Repository"><span class="fa fab fa-github"></span></a></li>
+      </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/Yangzhen1999/wsMed" aria-label="GitHub Repository"><span class="fa fab fa-github"></span></a></li>
       </ul></div>
 
 
@@ -46,7 +46,7 @@ the outcome variable, emphasizing a downstream role for the chained mediator."><
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Generate Parallel and Chained Mediation Model</h1>
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/HEAD/R/GenerateModelPC.R"><code>R/GenerateModelPC.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/HEAD/R/GenerateModelPC.R" class="external-link"><code>R/GenerateModelPC.R</code></a></small>
       <div class="d-none name"><code>GenerateModelPC.Rd</code></div>
     </div>
 
@@ -60,7 +60,7 @@ the outcome variable, emphasizing a downstream role for the chained mediator.</p
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">GenerateModelPC</span><span class="op">(</span><span class="va">prepared_data</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">GenerateModelPC</span><span class="op">(</span><span class="va">prepared_data</span>, MP <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -72,6 +72,19 @@ the outcome variable, emphasizing a downstream role for the chained mediator.</p
 within-subject mediator and outcome variables. The data frame must include columns for
 difference scores (<code>Mdiff</code>) and average scores (<code>Mavg</code>) of mediators, as well as the
 outcome difference score (<code>Ydiff</code>).</p></dd>
+
+
+<dt id="arg-mp">MP<a class="anchor" aria-label="anchor" href="#arg-mp"></a></dt>
+<dd><p>A character vector specifying which paths are moderated by variable(s) W.
+Acceptable values include:
+- <code>"a2"</code>, <code>"a3"</code>, ...: moderation on the a paths (W → Mdiff).
+- <code>"b2"</code>, <code>"b3"</code>, ...: moderation on the b paths (Mdiff × W → Ydiff).
+- <code>"b_2_1"</code>, <code>"b_3_1"</code>, ...: moderation on the cross-paths from parallel mediators to the chain mediator (e.g., M2 → M1).
+- <code>"d_2_1"</code>, <code>"d_3_1"</code>, ...: moderation on the paths from parallel mediators’ centered means to M1.
+- <code>"cp"</code>: moderation on the direct effect of X on Y (i.e., W → Ydiff).</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>      This argument controls which interaction <span class="fu">terms</span> (e.g., \code{int_Mdiff_W}, \code{int_Mavg_W}) are included</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>      <span class="cf">in</span> the regression equations. Variable names are automatically matched using the naming convention</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>      \code{<span class="st">"int_&lt;predictor&gt;_W&lt;index&gt;"</span>}.</span></code></pre><p></p></div></dd>
 
 </dl></div>
     <div class="section level2">

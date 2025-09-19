@@ -33,7 +33,15 @@
 #' within-subject mediator and outcome variables. The data frame must include columns for
 #' difference scores (`Mdiff`) and average scores (`Mavg`) of mediators, as well as the
 #' outcome difference score (`Ydiff`).
+#' @param MP A character vector specifying which paths are moderated by variable(s) W.
+#'           Valid values include:
+#'           - \code{"a1"}, \code{"a2"}, ...: moderation on the a paths (W → Mdiff).
+#'           - \code{"b1"}, \code{"b2"}, ...: moderation on the b paths (Mdiff × W → Ydiff).
+#'           - \code{"d1"}, \code{"d2"}, ...: moderation on the d paths (Mavg × W → Ydiff).
+#'           - \code{"cp"}: moderation on the direct effect from X to Y (i.e., W → Ydiff).
 #'
+#'           This argument controls which interaction terms (e.g., \code{int_Mdiff_W}, \code{int_Mavg_W}) are
+#'           added to the corresponding regression equations.
 #' @return A character string representing the SEM model syntax for the specified parallel mediation analysis.
 #'
 #' @seealso [PrepareData()], [wsMed()], [GenerateModelCN()]
@@ -54,97 +62,85 @@
 #' @importFrom stats na.omit
 #' @export
 
-GenerateModelP <- function(prepared_data) {
-  # 提取变量
-  Mdiff_vars <- sort(grep("M\\d+diff", colnames(prepared_data), value = TRUE))
-  Mavg_vars  <- sort(grep("M\\d+avg",  colnames(prepared_data), value = TRUE))
 
-  # 提取控制变量
-  between_covs <- grep("^Cb\\d+$", colnames(prepared_data), value = TRUE)
+GenerateModelP <- function(prepared_data,
+                           MP = character(0)) {
+
+  ## ---------- 识别变量 ----------
+  Mdiff_vars <- sort(grep("^M\\d+diff$", colnames(prepared_data), value = TRUE))
+  Mavg_vars  <- sort(grep("^M\\d+avg$",  colnames(prepared_data), value = TRUE))
+
+  between_covs <- grep("^Cb\\d+(_\\d+)?$", colnames(prepared_data), value = TRUE)
   within_covs  <- grep("^Cw\\d+(diff|avg)$", colnames(prepared_data), value = TRUE)
   control_vars <- c(between_covs, within_covs)
 
-  # 控制变量公式
-  controls_formula <- if (length(control_vars) > 0) {
-    paste(control_vars, collapse = " + ")
-  } else {
-    NULL
+  W_vars          <- grep("^W\\d+$", colnames(prepared_data), value = TRUE)
+  interaction_vars <- grep("^int_", colnames(prepared_data), value = TRUE)
+
+  ## ---------- Ydiff 回归 ----------
+  y_terms <- c("cp*1")
+  for (i in seq_along(Mdiff_vars)) {
+    y_terms <- c(y_terms,
+                 paste0("b", i, "*", Mdiff_vars[i]),
+                 paste0("d", i, "*", Mavg_vars[i]))
   }
 
-  # 构造 Y 回归
-  y_terms <- c(
-    "cp*1",
-    paste0("b", seq_along(Mdiff_vars), "*", Mdiff_vars),
-    paste0("d", seq_along(Mavg_vars), "*", Mavg_vars)
-  )
-  if (!is.null(controls_formula)) {
-    y_terms <- c(y_terms, controls_formula)
+  for (mp in MP) {
+    if (grepl("^b\\d+$", mp)) {
+      idx <- sub("^b", "", mp)
+      for (w in W_vars)
+        if (length(match <- grep(paste0("^int_M", idx, "diff_", w, "$"),
+                                 interaction_vars, value = TRUE)))
+          y_terms <- c(y_terms, paste0("bw", idx, "_", w, "*", match))
+    }
+    if (grepl("^d\\d+$", mp)) {
+      idx <- sub("^d", "", mp)
+      for (w in W_vars)
+        if (length(match <- grep(paste0("^int_M", idx, "avg_", w, "$"),
+                                 interaction_vars, value = TRUE)))
+          y_terms <- c(y_terms, paste0("dw", idx, "_", w, "*", match))
+    }
   }
+  if ("cp" %in% MP && length(W_vars))
+    y_terms <- c(y_terms, paste0("cpw_", W_vars, "*", W_vars))
+  else if (length(W_vars))
+    y_terms <- c(y_terms, W_vars)
 
-  regression_y <- paste("Ydiff ~", paste(y_terms, collapse = " + "))
+  if (length(control_vars))
+    y_terms <- c(y_terms, control_vars)
 
-  # 构造每个 Mdiff 回归
-  regression_m <- paste(
-    sapply(seq_along(Mdiff_vars), function(i) {
-      rhs <- c(paste0("a", i, "*1"), controls_formula)
-      paste0(Mdiff_vars[i], " ~ ", paste(rhs, collapse = " + "))
-    }),
-    collapse = "\n"
-  )
+  regression_y <- paste("Ydiff ~", paste(unique(y_terms), collapse = " + "))
 
-  # 构造间接效应
+  ## ---------- 每个 Mdiff 回归 ----------
+  regression_m <- sapply(seq_along(Mdiff_vars), function(i) {
+    rhs <- c(paste0("a", i, "*1"))
+    if (paste0("a", i) %in% MP && length(W_vars)) {
+      rhs <- c(rhs, paste0("aw", i, "_", W_vars, "*", W_vars))
+    } else if (length(W_vars)) {
+      rhs <- c(rhs, W_vars)
+    }
+    if (length(control_vars))
+      rhs <- c(rhs, control_vars)
+    paste0(Mdiff_vars[i], " ~ ", paste(unique(rhs), collapse = " + "))
+  })
+  regression_m <- paste(regression_m, collapse = "\n")
+
+  ## ---------- 基础间接效应 ----------
   indirect_effects <- paste(
-    sapply(seq_along(Mdiff_vars), function(i) {
-      paste0("indirect_", i, " := a", i, " * b", i)
-    }),
+    sapply(seq_along(Mdiff_vars),
+           function(i) paste0("indirect_", i, " := a", i, " * b", i)),
     collapse = "\n"
   )
-
-  # 构造总间接效应
-  total_indirect <- paste0(
-    "total_indirect := ",
-    paste(paste0("indirect_", seq_along(Mdiff_vars)), collapse = " + ")
-  )
-
-  # 构造总效应
+  total_indirect <- paste0("total_indirect := ",
+                           paste0("indirect_", seq_along(Mdiff_vars), collapse = " + "))
   total_effect <- "total_effect := cp + total_indirect"
 
-  # 构造间接效应对比（两两组合）
-  indirect_contrasts <- ""
-  if (length(Mdiff_vars) > 1) {
-    indirect_combinations <- utils::combn(seq_along(Mdiff_vars), 2)
-    indirect_contrasts <- paste(
-      apply(indirect_combinations, 2, function(pair) {
-        paste0(
-          "CI_", pair[1], "_vs_", pair[2],
-          " := indirect_", pair[1], " - indirect_", pair[2]
-        )
-      }),
-      collapse = "\n"
-    )
-  }
-
-  # 构造前后测系数
-  pre_post_coefficients <- paste(
-    sapply(seq_along(Mdiff_vars), function(i) {
-      x1_bi <- paste0("X1_b", i, " := (2*b", i, " + d", i, ") / 2")
-      x0_bi <- paste0("X0_b", i, " := X1_b", i, " - d", i)
-      paste(x1_bi, x0_bi, sep = "\n")
-    }),
-    collapse = "\n"
-  )
-
-  # 合并模型语法
-  sem_model <- paste(
-    regression_y,
-    regression_m,
-    indirect_effects,
-    total_indirect,
-    total_effect,
-    indirect_contrasts,
-    pre_post_coefficients,
-    sep = "\n"
-  )
+  sem_model <- paste(regression_y,
+                     regression_m,
+                     indirect_effects,
+                     total_indirect,
+                     total_effect,
+                     sep = "\n")
 
   return(sem_model)
 }

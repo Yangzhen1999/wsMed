@@ -2,78 +2,128 @@
 % Please edit documentation in R/PrepareData.R
 \name{PrepareData}
 \alias{PrepareData}
-\title{Prepare Data for Within-Subject Mediation Analysis}
+\title{Prepare Data for Two-Condition Within-Subject Mediation (WsMed)}
 \usage{
-PrepareData(data, M_C1, M_C2, Y_C1, Y_C2, C_C1 = NULL, C_C2 = NULL, C = NULL)
+PrepareData(
+  data,
+  M_C1,
+  M_C2,
+  Y_C1,
+  Y_C2,
+  C_C1 = NULL,
+  C_C2 = NULL,
+  C = NULL,
+  C_type = NULL,
+  W = NULL,
+  W_type = NULL,
+  center_W = TRUE,
+  keep_W_raw = TRUE,
+  keep_C_raw = TRUE
+)
 }
 \arguments{
-\item{data}{A data frame containing the raw dataset with mediator and outcome variables.}
+\item{data}{A data frame with the raw pre/post measures.}
 
-\item{M_C1}{A character vector of column names representing mediators "before" the intervention.}
+\item{M_C1, M_C2}{Character vectors: mediator names at occasion 1 and 2
+(equal length).}
 
-\item{M_C2}{A character vector of column names representing mediators "after" the intervention.
-Must match the length of \code{M_C1}.}
+\item{Y_C1, Y_C2}{Character scalars: outcome names at occasion 1 and 2.}
 
-\item{Y_C1}{A character string representing the column name of the outcome variable "before" the intervention.}
+\item{C_C1, C_C2}{Optional character vectors: within-subject control names.}
 
-\item{Y_C2}{A character string representing the column name of the outcome variable "after" the intervention.}
+\item{C}{Optional character vector: between-subject control names.}
 
-\item{C_C1}{Character vector of within-subject control variable names (condition 1).}
+\item{C_type}{Optional vector of the same length as \code{C}.
+Each element is one of \code{"continuous"}, \code{"categorical"}, or \code{"auto"}
+(default). Ignored when \code{C = NULL}.}
 
-\item{C_C2}{Character vector of within-subject control variable names (condition 2).}
+\item{W}{Optional character vector: moderator names (one or more).}
 
-\item{C}{Character vector of between-subject control variable names.}
+\item{W_type}{Optional vector of the same length as \code{W}.
+Same coding as \code{C_type}. Ignored when \code{W = NULL}.}
+
+\item{center_W}{Logical. Whether to center the moderator variable \code{W}.}
+
+\item{keep_W_raw, keep_C_raw}{Logical. If \code{TRUE}, keep the original
+\code{W} / \code{C} columns in the returned data.}
 }
 \value{
-A data frame containing the following columns:
+A data frame containing at minimum:
 \itemize{
-\item \code{Ydiff}: Difference score for the outcome variable.
-\item \code{M1diff}, \code{M2diff}, ...: Difference scores for each mediator.
-\item \code{M1avg}, \code{M2avg}, ...: Centered average scores for each mediator.
+\item \code{Ydiff}
+\item \code{Mi_diff}, \code{Mi_avg} for each mediator
+\item centered or dummy-coded \code{Cb*}, \code{Cw*diff}, \code{Cw*avg}
+\item centered or dummy-coded \code{W*} and all \code{int_*} interaction terms
 }
+plus the attributes \code{"W_info"} and \code{"C_info"} described above.
 }
 \description{
-Prepares a dataset for within-subject mediation analysis by calculating
-difference scores and centered average scores for specified mediators and the outcome variable.
-The function ensures that the input data meets the necessary requirements and generates
-new variables required for subsequent mediation analysis.
+\code{PrepareData()} transforms raw pre/post data into the set of variables
+required by the \strong{WsMed} workflow.
+It handles \emph{mediators}, \emph{outcome}, \emph{within-subject controls}, \emph{between-subject
+controls}, \emph{moderators}, and all necessary \strong{interaction terms}, while
+automatically centering / dummy-coding variables as needed.
 }
 \details{
-This function processes raw data to create variables essential for within-subject
-mediation analysis. It performs the following operations:
+The function performs the following steps:
+\enumerate{
+\item Outcome difference: \code{Ydiff = Y_C2 - Y_C1}.
+\item Mediator variables for each pair \code{(M_C1[i], M_C2[i])}:
 \itemize{
-\item \strong{Difference scores}: Calculates the difference between "before" and "after" values for
-the outcome variable (\code{Ydiff}) and each mediator (\code{Mdiff}).
-\item \strong{Centered average scores}: Computes the centered average of "before" and "after"
-values for each mediator (\code{Mavg}), providing a measure of their mean level relative to
-their centered baseline.
-\item \strong{Input validation}: Checks that the number of "before" and "after" mediators match,
-and ensures all specified variables exist in the dataset.
+\item \code{Mi_diff = M_C2 - M_C1}
+\item \code{Mi_avg} is the mean-centered average of the two occasions.
+}
+\item Between-subject controls \code{C}:
+\itemize{
+\item Continuous variables are grand-mean centered (\code{Cb1}, \code{Cb2}, ...).
+\item Categorical variables (binary or multi-level) are expanded into \code{k - 1}
+dummy variables (\code{Cb1_1}, \code{Cb2_1}, \code{Cb2_2}, ...), using the
+first level as the reference.
+}
+\item Within-subject controls \code{Cw}: difference and centered-average versions
+(\code{Cw1diff}, \code{Cw1avg}, ...).
+\item Moderators \code{W} (one or more):
+\itemize{
+\item Continuous variables are grand-mean centered (\code{W1}, \code{W2}, ...).
+\item Categorical variables are dummy-coded in the same way as \code{C}.
+}
+\item Interaction terms between each moderator column and each mediator column:
+\itemize{
+\item \code{int_<Mi_diff>_<Wj>}, \code{int_<Mi_avg>_<Wj>}.
+}
+\item Two attributes are added to the returned data:
+\itemize{
+\item \code{"W_info"}: raw names, dummy names, level mapping
+\item \code{"C_info"}: same structure for between-subject controls.
+}
 }
 
-This function is a prerequisite for generating structural equation modeling (SEM)
-syntax and conducting mediation analysis.
+Row counts are preserved even if input factors contain NA values
+(model.matrix is called with \code{na.action = na.pass}).
 }
 \examples{
-# Example raw data
-data <- data.frame(
-  M1_before = rnorm(100), M1_after = rnorm(100),
-  M2_before = rnorm(100), M2_after = rnorm(100),
-  Y_C1 = rnorm(100), Y_C2 = rnorm(100)
+set.seed(1)
+raw <- data.frame(
+  A1 = rnorm(50), A2 = rnorm(50),   # mediator 1
+  B1 = rnorm(50), B2 = rnorm(50),   # mediator 2
+  C1 = rnorm(50), C2 = rnorm(50),   # outcome
+  D1 = rnorm(50), D2 = rnorm(50),   # within-subject control
+  W_bin  = sample(0:1, 50, TRUE),   # between-subject binary C
+  W_fac3 = factor(sample(c("Low","Med","High"), 50, TRUE)) # moderator W
 )
 
-# Prepare the dataset
-prepared_data <- PrepareData(
-  data = data,
-  M_C1 = c("M1_before", "M2_before"),
-  M_C2 = c("M1_after", "M2_after"),
-  Y_C1 = "Y_C1",
-  Y_C2 = "Y_C2"
+prep <- PrepareData(
+  data  = raw,
+  M_C1  = c("A1","B1"), M_C2 = c("A2","B2"),
+  Y_C1  = "C1",         Y_C2 = "C2",
+  C_C1  = "D1",         C_C2 = "D2",
+  C     = "W_bin",      C_type = "categorical",
+  W     = "W_fac3",     W_type = "categorical"
 )
-
-head(prepared_data)
+head(prep)
 
 }
 \seealso{
-\code{\link[=GenerateModelP]{GenerateModelP()}}, \code{\link[=GenerateModelCN]{GenerateModelCN()}}, \code{\link[=GenerateModelPC]{GenerateModelPC()}}, \code{\link[=wsMed]{wsMed()}}
+\code{\link{PrepareMissingData}}, \code{\link{GenerateModelP}},
+\code{\link{wsMed}}
 }

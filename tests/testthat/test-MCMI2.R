@@ -1,3 +1,9 @@
+library(semmcci)
+library(lavaan)
+library(testthat)
+library(lavaan)
+library(semboottools)
+library(wsMed)
 
 test_that("MCMI2 returns correct semmcci object structure", {
   # 构建示例模型
