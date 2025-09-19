@@ -14,7 +14,7 @@
 #'
 #' @family Random Gaussian Functions
 #' @keywords randomGaussian random svd internal
-#' @export
+#' @keywords internal
 RandomGaussianSVDwrapper <- function(Z,
                                svd) {
   return(

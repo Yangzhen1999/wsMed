@@ -11,10 +11,9 @@ vignette: >
 ## Introduction
 
 The `GenerateModelCN` function dynamically generates a Structural Equation Model (SEM) formula to analyze chained or nested mediation for 'lavaan' based on the prepared dataset. This document explains the mathematical principles and the structure of the generated model.
-```{r, echo=FALSE, out.width="100%"}
-knitr::include_graphics("CN.png")
-```
-
+<p align="center">
+  <img src="Wb.png" alt="serial within-subject mediation model" width="100%">
+</p>
 ---
 
 ## 1. Difference Model Description
@@ -204,64 +203,64 @@ The indirect effects are compared as follows:
    \]
 ---
 
-## 5. Pre- and Post-Measurement Coefficients
+## 5. C1 and C2 Coefficients
 
-For pre- and post-measurement conditions, the coefficients are calculated as follows:
+For C1- and C2-measurement conditions, the coefficients are calculated as follows:
 
-1. **Post-Measurement Coefficient (\( X1_{b,i} \)):**
+1. **C2-Measurement Coefficient (\( X1_{b,i} \)):**
    \[
    X1_{b,i} = b_i + d_i
    \]
 
-2. **Pre-Measurement Coefficient (\( X0_{b,i} \)):**
+2. **C1-Measurement Coefficient (\( X0_{b,i} \)):**
    \[
    X0_{b,i} = X1_{b,i} - d_i
    \]
 
 For chained pathways:
-1. **Post-Measurement Coefficient (\( X1_{b,ij} \)):**
+1. **C2-Measurement Coefficient (\( X1_{b,ij} \)):**
    \[
    X1_{b,ij} = b_{ij} + d_{ij}
    \]
 
-2. **Pre-Measurement Coefficient (\( X0_{b,ij} \)):**
+2. **C1-Measurement Coefficient (\( X0_{b,ij} \)):**
    \[
    X0_{b,ij} = X1_{b,ij} - d_{ij}
    \]
 ---
 For three mediators \( M_1, M_2, M_3 \), the coefficients are calculated as follows:
 
-   - Post-Measurement Coefficient:
+   - C2-Measurement Coefficient:
      \[
      X1_{b,1} = b_1 + d_1
      \]
-   - Pre-Measurement Coefficient:
+   - C1-Measurement Coefficient:
      \[
      X0_{b,1} = X1_{b,1} - d_1
      \]
 
-   - Post-Measurement Coefficient:
+   - C2-Measurement Coefficient:
      \[
      X1_{b,2} = b_2 + d_2
      \]
-   - Pre-Measurement Coefficient:
+   - C1-Measurement Coefficient:
      \[
      X0_{b,2} = X1_{b,2} - d_2
      \]
-   - Post-Measurement Coefficient:
+   - C2-Measurement Coefficient:
      \[
      X1_{b,3} = b_3 + d_3
      \]
-   - Pre-Measurement Coefficient:
+   - C1-Measurement Coefficient:
      \[
      X0_{b,3} = X1_{b,3} - d_3
      \]
 
-   - Post-Measurement Coefficient:
+   - C2-Measurement Coefficient:
      \[
      X1_{b,12} = b_{12} + d_{12}
      \]
-   - Pre-Measurement Coefficient:
+   - C1-Measurement Coefficient:
      \[
      X0_{b,12} = X1_{b,12} - d_{12}
      \]
@@ -289,7 +288,7 @@ This section summarizes all the regression equations:
     \[
     CI_{\text{path}_1\text{vs}\text{path}_2} = \text{indirect}_{\text{path}_1} - \text{indirect}_{\text{path}_2}
     \]
-5. **Pre- and Post-Measurement Coefficients:**
+5. **C1- and C2-Measurement Coefficients:**
    \[
    X1_{b,i} = b_i + d_i, \quad X0_{b,i} = X1_{b,i} - d_i
    \]

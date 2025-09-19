@@ -62,3 +62,69 @@ printGM <- function(x, ...) {
   # **返回原始模型字符串（不影响后续使用）**
   invisible(x)
 }
+
+
+printGM <- function(x, ...) {
+  # 如果是 list 且包含 sem_model 元素，则提取之
+  if (is.list(x) && "sem_model" %in% names(x)) {
+    x <- x$sem_model
+  }
+
+  # 检查输入是否为合法的字符串
+  if (!is.character(x) || length(x) != 1 || is.na(x) || x == "") {
+    stop("Error in printGM(): Input must be a non-empty character string representing an SEM model.")
+  }
+
+  # 拆分并清理换行行内容
+  lines <- trimws(unlist(strsplit(x, "\n")))
+
+  # 查找所有回归方程
+  reg_lines <- grep("~", lines, value = TRUE)
+  y_line    <- grep("^Ydiff ~", reg_lines, value = TRUE)
+  m_lines   <- grep("^[A-Za-z0-9_]+ ~", reg_lines, value = TRUE)
+  m_lines   <- setdiff(m_lines, y_line)
+
+  # 把链式中介（M1diff）放在第一组，其余放第二组
+  m1_line   <- grep("^M1diff ~", m_lines, value = TRUE)
+  other_m   <- setdiff(m_lines, m1_line)
+
+  # 查找间接效应、总效应等定义
+  ie_lines   <- grep("^indirect", lines, value = TRUE)
+  total_ind <- grep("^total_indirect", lines, value = TRUE)
+  total_eff <- grep("^total_effect", lines, value = TRUE)
+  contrasts <- grep("^CI\\d+vs", lines, value = TRUE)
+  x_lines   <- grep("^X[01]_b", lines, value = TRUE)
+
+  # 打印输出
+  if (length(y_line)) {
+    cat("\nOutcome Difference Model (Ydiff):\n", y_line, "\n")
+  }
+  if (length(m1_line)) {
+    cat("\nMediator Difference Model (Chained Mediator - M1diff):\n")
+    cat(paste(m1_line, collapse = "\n"), "\n")
+  }
+  if (length(other_m)) {
+    cat("\nMediator Difference Model (Other Mediators):\n")
+    cat(paste(other_m, collapse = "\n"), "\n")
+  }
+  if (length(ie_lines)) {
+    cat("\nIndirect Effects:\n")
+    cat(paste(ie_lines, collapse = "\n"), "\n")
+  }
+  if (length(total_ind)) {
+    cat("\nTotal Indirect Effect:\n", total_ind, "\n")
+  }
+  if (length(total_eff)) {
+    cat("\nTotal Effect:\n", total_eff, "\n")
+  }
+  if (length(contrasts)) {
+    cat("\nContrast of Indirect Effects:\n")
+    cat(paste(contrasts, collapse = "\n"), "\n")
+  }
+  if (length(x_lines)) {
+    cat("\nC1-C2 Coefficients:\n")
+    cat(paste(x_lines, collapse = "\n"), "\n")
+  }
+
+  invisible(x)
+}

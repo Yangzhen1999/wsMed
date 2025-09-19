@@ -3,7 +3,7 @@
 base_dir <- getwd()
 
 setwd("vignettes/")
-knitr::knit("wsMed.Rmd.originaL", output = "wsMed.Rmd")
+knitr::knit("wsMed.Rmd.original", output = "wsMed.Rmd")
 knitr::knit("GenerateModelP.Rmd.original", output = "GenerateModelP.Rmd")
 knitr::knit("GenerateModelCN.Rmd.original", output = "GenerateModelCN.Rmd")
 knitr::knit("GenerateModelCP.Rmd.original", output = "GenerateModelCP.Rmd")
@@ -19,3 +19,5 @@ base_dir <- getwd()
 setwd("vignettes/articles")
 
 setwd(base_dir)
+
+setwd(rprojroot::find_rstudio_root_file())

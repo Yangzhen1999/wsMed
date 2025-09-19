@@ -19,7 +19,8 @@
 #'   [Wikipedia: Definite matrix](https://en.wikipedia.org/wiki/Definite_matrix)
 #'
 #' @return Logical.
-#' @export
+#' @keywords internal
+
 TestPositiveDefinitewrapper <- function(eigen,
                                   tol = 1e-06) {
   return(

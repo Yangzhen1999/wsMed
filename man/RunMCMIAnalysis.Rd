@@ -2,17 +2,25 @@
 % Please edit documentation in R/RunMCMIAnalysis.R
 \name{RunMCMIAnalysis}
 \alias{RunMCMIAnalysis}
-\title{Perform Monte Carlo Analysis with Multiple Imputation for SEM Models}
+\title{Monte Carlo SEM with Multiple Imputation (WsMed Workflow)}
 \usage{
 RunMCMIAnalysis(
   data_missing,
   m = 5,
-  method = "pmm",
+  method_num = "pmm",
   seed = 123,
   M_C1,
   M_C2,
   Y_C1,
   Y_C2,
+  C_C1 = NULL,
+  C_C2 = NULL,
+  C = NULL,
+  C_type = NULL,
+  W = NULL,
+  W_type = NULL,
+  keep_W_raw = TRUE,
+  keep_C_raw = TRUE,
   sem_model,
   Na = "MI",
   R = 20000L,
@@ -23,99 +31,89 @@ RunMCMIAnalysis(
 )
 }
 \arguments{
-\item{data_missing}{A data frame containing the raw dataset with missing values.}
+\item{data_missing}{Data frame with missing values.}
 
-\item{m}{An integer specifying the number of imputations to perform. Default is \code{5}.}
+\item{m}{Integer, number of imputations. Default \code{5}.}
 
-\item{method}{A character string specifying the imputation method. Default is \code{"pmm"}
-(predictive mean matching). Other methods supported by \code{\link[=mice]{mice()}} can be used.}
+\item{method_num}{Character, imputation method for numeric variables
+(e.g., \code{"pmm"}, \code{"norm"}). Default \code{"pmm"}.}
 
-\item{seed}{An integer specifying the random seed for reproducibility. Default is \code{123}.}
+\item{seed}{Integer random seed (passed to \code{mice} and \code{MCMI2}).}
 
-\item{M_C1}{A character vector of column names representing mediators "before" the intervention.}
+\item{M_C1, M_C2}{Character vectors: mediator names at condition 1 & 2
+(same length).}
 
-\item{M_C2}{A character vector of column names representing mediators "after" the intervention.
-Must match the length of \code{M_C1}.}
+\item{Y_C1, Y_C2}{Character scalars: outcome names at condition 1 & 2.}
 
-\item{Y_C1}{A character string representing the column name of the outcome variable "before" the intervention.}
+\item{C_C1, C_C2}{Optional character vectors: within-subject controls.}
 
-\item{Y_C2}{A character string representing the column name of the outcome variable "after" the intervention.}
+\item{C}{Optional character vector: between-subject controls.}
 
-\item{sem_model}{A character string specifying the SEM model syntax.}
+\item{C_type}{Optional vector (length = \code{C});
+each element \code{"continuous"}, \code{"categorical"}, or
+\code{"auto"} (default).}
 
-\item{Na}{A character string specifying the missing data handling strategy. Currently, only \code{"MI"} (Multiple Imputation) is supported. Default is \code{"MI"}.}
+\item{W}{Optional character vector: moderator name(s).}
 
-\item{R}{An integer specifying the number of Monte Carlo samples. Default is \code{20000L}.}
+\item{W_type}{Optional vector (length = \code{W});
+same coding as \code{C_type}.}
 
-\item{alpha}{A numeric vector specifying significance levels for the confidence intervals. Default is \code{c(0.001, 0.01, 0.05)}.}
+\item{keep_W_raw, keep_C_raw}{Logical; keep raw W / C columns in the
+processed data? Defaults \code{TRUE}.}
 
-\item{decomposition}{A character string specifying the decomposition method for the covariance matrix.
-Default is \code{"eigen"}. Options include \code{"chol"}, \code{"eigen"}, or \code{"svd"}.}
+\item{sem_model}{Character string, lavaan syntax of the SEM to be fitted.}
 
-\item{pd}{A logical value indicating whether to ensure positive definiteness of the covariance matrix. Default is \code{TRUE}.}
+\item{Na}{Character, missing-data strategy. Currently only
+\code{"MI"} is implemented.}
 
-\item{tol}{A numeric value specifying the tolerance for positive definiteness checks. Default is \code{1e-06}.}
+\item{R}{Integer, number of Monte Carlo samples (default \code{20000L}).}
+
+\item{alpha}{Numeric vector, significance levels for two-sided CIs
+(default \code{c(0.001, 0.01, 0.05)}).}
+
+\item{decomposition}{Decomposition used by \code{MCMI2()}
+(\code{"eigen"} | \code{"chol"} | \code{"svd"}). Default \code{"eigen"}.}
+
+\item{pd}{Logical, enforce positive-definite covariance (default \code{TRUE}).}
+
+\item{tol}{Numeric tolerance for PD checks. Default \code{1e-6}.}
 }
 \value{
-A \code{semmcci} object containing the Monte Carlo analysis results, including:
-\itemize{
-\item \code{thetahat}: The pooled parameter estimates.
-\item \code{thetahatstar}: Monte Carlo samples for parameter estimates.
-\item Other components specific to the \code{semmcci} class.
+A list with three elements:
+\describe{
+\item{\code{mc_result}}{A \code{semmcci} object returned by
+\code{MCMI2()}.}
+\item{\code{first_imputed_data}}{The first processed data frame
+(useful for inspection or plotting).}
+\item{\code{imputation_summary}}{Diagnostics from
+\code{PrepareMissingData()}.}
 }
 }
 \description{
-Automates the process of handling missing data with multiple imputation
-and conducting Monte Carlo confidence interval (MCCI) analysis for structural equation modeling (SEM).
-The function prepares the imputed datasets, fits the specified SEM model, and generates Monte Carlo
-confidence intervals for the model parameters.
+\code{RunMCMIAnalysis()} is a helper that:
+\enumerate{
+\item imputes missing data via \code{\link{PrepareMissingData}};
+\item generates all WsMed variables in each completed data set;
+\item fits the user-supplied SEM model to each replicate; and
+\item pools the results via \code{MCMI2()}, producing Monte Carlo
+confidence intervals (MCCI) for all model parameters.
+}
 }
 \details{
-This function streamlines the workflow for SEM analysis with missing data by integrating:
+Internally the function calls:
 \itemize{
-\item \strong{Multiple Imputation}: Uses \code{\link[=PrepareMissingData]{PrepareMissingData()}} to impute missing values and calculate the necessary
-difference and centered average scores for mediators and the outcome variable.
-\item \strong{SEM Fitting and Monte Carlo Analysis}: Uses \code{\link[=MCMI2]{MCMI2()}} to fit the specified SEM model to the imputed datasets,
-pool the parameter estimates, and compute Monte Carlo confidence intervals.
+\item \code{PrepareMissingData()} – performs multiple imputation
+(\strong{logreg} / \strong{polyreg} for categorical variables,
+and \code{method_num} for numeric) and applies
+\code{\link{PrepareData}} to each imputed set;
+\item \code{MCMI2()} – pools parameter estimates across the
+\code{m} imputations and draws \code{R} Monte Carlo samples.
 }
 
-This function is suitable for mediation or other SEM analyses where missing data need to be addressed
-through multiple imputation and Monte Carlo methods for enhanced precision.
-}
-\examples{
-# Example dataset with missing values
-data(example_data)
-set.seed(123)  
-example_dataN <- mice::ampute(
-   data = example_data,       
-   prop = 0.1,       
-   )$amp
-
-
-# Example SEM model
-sem_model <- "
-  Ydiff ~ cp * 1 + b1 * M1diff
-  M1diff ~ a1 * 1
-  indirect := a1 * b1
-  total := cp + indirect
-"
-
-# Perform Monte Carlo analysis with multiple imputation
-result <- RunMCMIAnalysis(
-  data_missing =  example_dataN,
-  m = 5,
-  method = "pmm",
-  seed = 123,
-  M_C1 = c("A2", "B2"),
-  M_C2 = c("A1", "B1"),
-  Y_C1 = "C2",
-  Y_C2 = "C1",
-  sem_model = sem_model,
-  R = 1000,
-  alpha = c(0.05, 0.01)
-)
-
+Only the missing-data strategy \code{Na = "MI"} is supported.
 }
 \seealso{
-\code{\link[=PrepareMissingData]{PrepareMissingData()}}, \code{\link[=MCMI2]{MCMI2()}}, \code{\link[=wsMed]{wsMed()}}
+\code{\link{PrepareMissingData}}, \code{\link{PrepareData}}, \code{MCMI2},
+\code{wsMed}
 }
+\keyword{internal}

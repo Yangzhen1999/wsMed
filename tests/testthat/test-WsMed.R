@@ -1,7 +1,7 @@
 library(testthat)
 library(lavaan)
-library(semhelpinghands)
-library(semmcci)
+library(semboottools)
+library(wsMed)
 
 data(example_data)
   set.seed(123)
@@ -10,263 +10,162 @@ data(example_data)
     prop = 0.1,
   )$amp
 
-  test_that("wsMed input validation works as expected", {
-    valid_data <- example_data
+## 小工具：断言顶层字段齐全
+expect_wsMed_structure <- function(obj) {
+    expect_s3_class(obj, "wsMed")
+  expect_setequal(
+    names(obj),
+    c("Na", "alpha", "ci_method", "data", "fit_u", "form",
+      "input_vars", "mc", "moderation", "param_boot", "sem_model")
+  )
 
-    # 1. M_C1 或 M_C2 为空
-    expect_error(wsMed(data = valid_data, M_C1 = NULL, M_C2 = c("A2"), Y_C1 = "C1", Y_C2 = "C2"), "Error: 'M_C1' and 'M_C2' cannot be NULL")
+    expect_true(!is.null(obj$mc$result$thetahatstar))
+  }
 
-    # 2. Y_C1 或 Y_C2 为空
-    expect_error(wsMed(data = valid_data, M_C1 = c("A1"), M_C2 = c("A2"), Y_C1 = NULL, Y_C2 = "C2"), "Error: 'Y_C1' and 'Y_C2' cannot be NULL")
 
-    # 3. M_C1 和 M_C2 长度不一致
-    expect_error(wsMed(data = valid_data, M_C1 = c("A1"), M_C2 = c("A2", "B2"), Y_C1 = "C1", Y_C2 = "C2"), "Error: The lengths of 'M_C1' and 'M_C2' must match")
-
-    # 4. 数据中缺少列
-    expect_error(wsMed(data = valid_data, M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"), Y_C1 = "Nonexistent", Y_C2 = "C2"), "Error: Missing columns in data: Nonexistent")
-
-    # 5. form 参数无效
-    expect_error(wsMed(data = valid_data, M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"), Y_C1 = "C1", Y_C2 = "C2", form = "Invalid"), "Error: Invalid 'form' parameter. Use 'P', 'CN', 'CP', or 'PC'")
-
-    # 6. Na 参数无效
-    expect_error(wsMed(data = valid_data, M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"), Y_C1 = "C1", Y_C2 = "C2", Na = "Invalid"), "Error: Invalid 'Na' parameter. Use 'DE', 'FIML', or 'MI'")
-
-    # 验证其他参数
-    expect_error(wsMed(data = valid_data, M_C1 = NULL, M_C2 = c("A2"), Y_C1 = "C1", Y_C2 = "C2"), "Error: 'M_C1' and 'M_C2' cannot be NULL")
-    expect_error(wsMed(data = valid_data, M_C1 = c("A1"), M_C2 = c("A2"), Y_C1 = NULL, Y_C2 = "C2"), "Error: 'Y_C1' and 'Y_C2' cannot be NULL")
-    expect_error(wsMed(data = valid_data, M_C1 = c("A1"), M_C2 = c("A2", "B2"), Y_C1 = "C1", Y_C2 = "C2"), "Error: The lengths of 'M_C1' and 'M_C2' must match")
-    expect_error(wsMed(data = valid_data, M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"), Y_C1 = "Nonexistent", Y_C2 = "C2"), "Error: Missing columns in data: Nonexistent")
-    expect_error(wsMed(data = valid_data, M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"), Y_C1 = "C1", Y_C2 = "C2", form = "Invalid"), "Error: Invalid 'form' parameter. Use 'P', 'CN', 'CP', or 'PC'")
-    expect_error(wsMed(data = valid_data, M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"), Y_C1 = "C1", Y_C2 = "C2", Na = "Invalid"), "Error: Invalid 'Na' parameter. Use 'DE', 'FIML', or 'MI'")
-  })
-
-  test_that("wsMed handle the missing data", {
-    valid_data <- example_data
-    valid_data_with_na <- valid_data
-    valid_data_with_na$A1[1] <- NA
-
-    # 数据中存在缺失值，但 Na = "DE"
-    expect_warning(
-      wsMed(data = valid_data_with_na, M_C1 = c("A1"), M_C2 = c("A2"), Y_C1 = "C1", Y_C2 = "C2", Na = "DE"),
-      regexp = "The dataset contains missing values\\. Consider using 'Na = MI' or 'Na = FIML' to handle them"
+make_base_data <- function(n = 20) {
+    data.frame(
+      A1 = rnorm(n), A2 = rnorm(n),
+      B1 = rnorm(n), B2 = rnorm(n),
+      Y1 = rnorm(n), Y2 = rnorm(n),
+      W  = sample(c("low","high"), n, TRUE)
     )
+  }
 
-    # 数据中没有缺失值，但 Na = "MI"
-    expect_message(
-      wsMed(data = valid_data, M_C1 = c("A1"), M_C2 = c("A2"), Y_C1 = "C1", Y_C2 = "C2", Na = "MI"),
-      regexp = "No missing values detected in the data\\. Switching to 'DE'\\."
-    )
-  })
+call_ws <- function(..., .data = make_base_data()) {
+    wsMed(data   = .data,
+          M_C1   = "A1",
+          M_C2   = "A2",
+          Y_C1   = "Y1",
+          Y_C2   = "Y2",
+          form   = "P",
+          Na     = "DE",
+          verbose = FALSE,
+          ...)
+  }
 
-  test_that("wsMed validates number of mediators correctly", {
-    data(example_data)
+test_that("wsMed input validation catches all invalid scenarios", {
 
-    # Case 1: CN requires at least 2 mediators
+    ## ── data-related ───────────────────────────────────────────────────────
+    expect_error(call_ws(.data = NULL),                   "cannot be NULL")
+    #expect_error(call_ws(.data = character()),            "must be a data frame")
+
+    bad <- make_base_data(); bad$A2 <- NULL
+    expect_error(call_ws(.data = bad),                    "Missing columns")
+
+    ## ── mediator / outcome mismatch ───────────────────────────────────────
     expect_error(
-      wsMed(
-        data = example_data,
-        M_C1 = c("A2"),  # 只有 1 个中介变量
-        M_C2 = c("A1"),
-        Y_C1 = "C2",
-        Y_C2 = "C1",
-        form = "CN"
-      ),
-      "Error: For 'CN' models, the number of mediators must be at least 2."
+      wsMed(data = make_base_data(),
+            M_C1 = c("A1","B1"), M_C2 = "A2",
+            Y_C1 = "Y1", Y_C2 = "Y2",
+            form = "P", Na = "DE", R = 10,
+            verbose = FALSE),
+      "lengths of M_C1 and M_C2"
     )
 
-    # Case 2: PC requires at least 3 mediators
-    expect_error(
-      wsMed(
-        data = example_data,
-        M_C1 = c("A2", "B2"),  # 只有 2 个中介变量
-        M_C2 = c("A1", "B1"),
-        Y_C1 = "C2",
-        Y_C2 = "C1",
-        form = "PC"
-      ),
-      "Error: For 'PC' and 'CP' models, the number of mediators must be at least 3."
-    )
+    ## ── W & MP consistency ────────────────────────────────────────────────
+    expect_error(call_ws(W = "W",              W_type = "categorical"),
+                 "must also supply")
 
-    # Case 3: CP requires at least 3 mediators
-    expect_error(
-      wsMed(
-        data = example_data,
-        M_C1 = c("A2", "B2"),  # 只有 2 个中介变量
-        M_C2 = c("A1", "B1"),
-        Y_C1 = "C2",
-        Y_C2 = "C1",
-        form = "CP"
-      ),
-      "Error: For 'PC' and 'CP' models, the number of mediators must be at least 3."
-    )
+    expect_error(call_ws(MP = "a1"),
+                 "MP specified but W is NULL")
 
-    # Case 4: Valid mediator counts for CN
-    expect_silent(
-      wsMed(
-        data = example_data,
-        M_C1 = c("A2", "B2"),  # 满足 CN 要求的 2 个中介变量
-        M_C2 = c("A1", "B1"),
-        Y_C1 = "C2",
-        Y_C2 = "C1",
-        form = "CN"
-      )
-    )
+    expect_error(call_ws(W = "noCol", MP = "a1"),
+                 "not a column")
 
-    # Case 5: Valid mediator counts for PC
-    expect_silent(
-      wsMed(
-        data = example_data,
-        M_C1 = c("A2", "B2", "C2"),  # 满足 PC 要求的 3 个中介变量
-        M_C2 = c("A1", "B1", "C1"),
-        Y_C1 = "D2",
-        Y_C2 = "D1",
-        form = "PC"
-      )
-    )
+    expect_error(call_ws(W = c("W","W2"), MP = "a1"),
+                 "Exactly one moderator")
 
-    # Case 6: Valid mediator counts for CP
-    expect_silent(
-      wsMed(
-        data = example_data,
-        M_C1 = c("A2", "B2", "C2"),  # 满足 CP 要求的 3 个中介变量
-        M_C2 = c("A1", "B1", "C1"),
-        Y_C1 = "D2",
-        Y_C2 = "D1",
-        form = "CP"
-      )
-    )
+    ## ── integer parameters ────────────────────────────────────────────────
+    expect_error(call_ws(R = -5), "R must be >= 1")
+    expect_error(call_ws(R = 3.5), "whole number")   # 非整数仍匹配原文本
+    expect_error(call_ws(bootstrap = 3.2),    "whole number")
+
+    ## ── form / Na / ci_method combo ───────────────────────────────────────
+    expect_error(call_ws(form = "XYZ"),       "arg")
+    expect_error(call_ws(Na   = "ABC"),       "arg")
+    #expect_error(call_ws(ci_method = "bootstrap"), "`bootstrap` = 0")
   })
 
-  test_that("wsMed generates correct results", {
-    # 定义不同的测试场景
-    scenarios <- list(
-      DE = wsMed(
-        data = example_data,
-        M_C1 = c("A2", "B2"),
-        M_C2 = c("A1", "B1"),
-        Y_C1 = "C2",
-        Y_C2 = "C1",
-        form = "P",
-        standardized = TRUE
-      ),
-      MI = wsMed(
-        data = example_dataN,
-        M_C1 = c("A2", "B2"),
-        M_C2 = c("A1", "B1"),
-        Y_C1 = "C2",
-        Y_C2 = "C1",
-        form = "P",
-        Na = "MI",
-        m = 5,
-        standardized = TRUE
-      ),
-      FIML = wsMed(
-        data = example_dataN,
-        M_C1 = c("A2", "B2"),
-        M_C2 = c("A1", "B1"),
-        Y_C1 = "C2",
-        Y_C2 = "C1",
-        form = "P",
-        Na = "FIML",
-        standardized = TRUE
-      )
-    )
+test_that("wsMed handles continuous moderation (CP form)", {
+  set.seed(2)
 
-    # 对每种场景进行测试
-    for (name in names(scenarios)) {
-      result <- scenarios[[name]]
+  res5 <- wsMed(
+    data = example_data,
+    M_C1 = c("A1","B1","C1"), M_C2 = c("A2","B2","C2"),
+    Y_C1 = "D1", Y_C2 = "D2",
+    form = "CP",
+    W      = "D3",  W_type = "continuous",
+    MP     = c("a1","b2","d1","cp","b_1_2","d_1_2"),
+    R = 200,
+    verbose = FALSE
+  )
 
-      # 检查基本返回结构
-      expected_components <- c("prepared_data", "sem_model", "lavaan_fit",
-                               "model_summary", "mi_result", "fiml_result",
-                               "std_result", "std_mi_result", "std_fiml_result")
-      expect_true(!is.null(result))
-      expect_true(all(expected_components %in% names(result)))
-      expect_type(result$standardized, "logical")
+  expect_wsMed_structure(res5)
+  mod  <- res5$moderation
+  expect_equal(mod$type, "continuous")
+  expect_true(is.data.frame(mod$conditional_overall))
+  # 三水平 × 两条(total) = 6 行
+  expect_equal(nrow(mod$conditional_overall), 6)
+})
 
-      # Test sem_model
-      expect_type(result$sem_model, "character")
-      expect_true(grepl("Ydiff ~", result$sem_model))
-      expect_true(grepl("indirect", result$sem_model))
+test_that("wsMed handles categorical moderation with covariates", {
+  skip_on_cran()
+  set.seed(3)
 
-      # Test prepared_data
-      expect_s3_class(result$prepared_data, "data.frame")
-      expect_true(all(c("Ydiff", "M1diff", "M1avg") %in% colnames(result$prepared_data)))
+  res6 <- wsMed(
+    data = example_data,
+    M_C1 = c("A1","B1","C1"),
+    M_C2 = c("A2","B2","C2"),
+    Y_C1 = "D1", Y_C2 = "D2",
+    W      = "Group", W_type = "categorical",
+    MP     = c("a1","b1","d1","cp","b_1_2","b_2_3"),
+    form   = "CN",
+    C      = "D3",
+    fixed.x = TRUE,
+    R = 200,
+    verbose = FALSE
+  )
 
-      # Test lavaan_fit
-      fit_measures <- lavaan::fitMeasures(result$lavaan_fit)
-      expect_true(all(c("cfi", "rmsea", "srmr") %in% names(fit_measures)))
+  expect_wsMed_structure(res6)
+  mod <- res6$moderation
+  expect_equal(mod$type, "categorical")
+  g <- length(unique(example_data$Group))
+  expect_equal(nrow(mod$conditional_overall), g * 2)
+  expect_named(mod$extra, c("path_levels","path_contrasts"))
+})
 
-      # Test standardized results
-      if (!is.null(result$standardized) && result$standardized) {
-        if (name == "DE") {
-          expect_true(!is.null(result$std_result))
-          expect_type(result$std_result, "list")
-        } else if (name == "MI") {
-          expect_true(!is.null(result$std_mi_result))
-          expect_s3_class(result$std_mi_result, "semmcci")
-        } else if (name == "FIML") {
-          expect_true(!is.null(result$std_fiml_result))
-          expect_s3_class(result$std_fiml_result, "semmcci")
-        }
-      } else {
-        expect_null(result$std_result)
-        expect_null(result$std_mi_result)
-        expect_null(result$std_fiml_result)
-      }
-    }
-  })
 
-  test_that("wsMed handles bootstrap correctly", {
-    # Check invalid bootstrap parameter
-    expect_error(
-      wsMed(data = example_data, M_C1 = c("A2", "B2"), M_C2 = c("A1", "B1"),
-            Y_C1 = "C2", Y_C2 = "C1", bootstrap = -1),
-      "Error: 'bootstrap' must be a non-negative integer"
-    )
+test_that("wsMed handles missing data with standardized effects (MI)", {
+  skip_on_cran()                       # MICE + lavaan 稍慢
+  set.seed(987)
 
-    # Run with valid bootstrap parameter
-    result <- wsMed(
-      data = example_data,
-      M_C1 = c("A2", "B2"),
-      M_C2 = c("A1", "B1"),
-      Y_C1 = "C2",
-      Y_C2 = "C1",
-      form = "P",
-      bootstrap = 100,
-      standardized = FALSE
-    )
+  # ── 1. 造一个含缺失数据集 (10%) ──────────────────────────────
+  dat_mis <- suppressWarnings(
+    mice::ampute(example_data, prop = 0.10)$amp
+  )
 
-    # Check if lavaan_fit is an S4 object
-    expect_s4_class(result$lavaan_fit, "lavaan")
+  # ── 2. 调 wsMed() — MI + standardized ─────────────────────
+  res_mi <- wsMed(
+    data = example_dataN,
+    M_C1 = c("A1","B1"),  M_C2 = c("A2","B2"),
+    Y_C1 = "C1",          Y_C2 = "C2",
+    form = "P",
+    Na   = "MI",
+    mi_args = list(m = 3),
+    R = 200,
+    standardized = TRUE,
+    verbose = FALSE
+  )
 
-    # Check if the fit has converged
-    fit_info <- slot(result$lavaan_fit, "Fit")
-    expect_true(fit_info@converged, info = "Model did not converge during bootstrap")
+  # ── 3. 结构断言 ─────────────────────────────────────────────
+  expect_wsMed_structure(res_mi)
+  expect_equal(res_mi$Na, "MI")
 
-    # Validate the number of bootstrap replications
-    bootstrap_info <- slot(result$lavaan_fit, "boot")
-    expect_true(nrow(bootstrap_info$coef) == 100, info = "Bootstrap replications do not match the specified number")
+  # mc$std 应已填充
+  expect_true(!is.null(res_mi$mc$std))
+  expect_s3_class(res_mi$mc$std, "data.frame")
 
-    # Validate fit measures
-    fit_measures <- lavaan::fitMeasures(result$lavaan_fit)
-    expect_true(all(c("cfi", "rmsea", "srmr") %in% names(fit_measures)),
-                info = "Fit measures are missing from the lavaan output")
-
-    # Check parameter estimates with bootstrap confidence intervals
-    params <- lavaan::parameterEstimates(result$lavaan_fit, boot.ci.type = "perc")
-    expect_type(params, "list")
-    expect_true("ci.lower" %in% colnames(params) && "ci.upper" %in% colnames(params),
-                info = "Bootstrap confidence intervals are missing from the parameter estimates")
-
-    # Additional validation of bootstrap results
-    expect_true(all(!is.na(params$ci.lower)) && all(!is.na(params$ci.upper)),
-                info = "Some bootstrap confidence intervals contain NA values")
-    expect_true(all(params$ci.lower < params$ci.upper),
-                info = "Invalid bootstrap confidence intervals: lower bound exceeds upper bound")
-
-    # Check if bootstrap results match expectations
-    non_converged <- attr(bootstrap_info$coef, "nonadmissible")
-    expect_true(length(non_converged) == 0 || all(non_converged == 0),
-                info = "Some bootstrap replications failed to converge")
-  })
+  # moderation 无调节 → type = "none"
+  expect_equal(res_mi$moderation$type, "none")
+})

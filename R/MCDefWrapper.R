@@ -19,7 +19,7 @@
 #' @seealso [MCMI2()], [RunMCMIAnalysis()]
 #'
 #' @examples NULL
-#' @export
+#' @keywords internal
 
 MCDefWrapper <- function(object,
                    thetahat,

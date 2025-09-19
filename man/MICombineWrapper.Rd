@@ -45,3 +45,4 @@ NULL
 \seealso{
 \code{\link[=RunMCMIAnalysis]{RunMCMIAnalysis()}}
 }
+\keyword{internal}

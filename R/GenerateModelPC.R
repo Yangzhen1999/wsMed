@@ -37,7 +37,18 @@
 #' within-subject mediator and outcome variables. The data frame must include columns for
 #' difference scores (`Mdiff`) and average scores (`Mavg`) of mediators, as well as the
 #' outcome difference score (`Ydiff`).
+#' @param MP A character vector specifying which paths are moderated by variable(s) W.
+#'           Acceptable values include:
+#'           - \code{"a2"}, \code{"a3"}, ...: moderation on the a paths (W → Mdiff).
+#'           - \code{"b2"}, \code{"b3"}, ...: moderation on the b paths (Mdiff × W → Ydiff).
+#'           - \code{"b_2_1"}, \code{"b_3_1"}, ...: moderation on the cross-paths from parallel mediators to the chain mediator (e.g., M2 → M1).
+#'           - \code{"d_2_1"}, \code{"d_3_1"}, ...: moderation on the paths from parallel mediators’ centered means to M1.
+#'           - \code{"cp"}: moderation on the direct effect of X on Y (i.e., W → Ydiff).
 #'
+#'           This argument controls which interaction terms (e.g., \code{int_Mdiff_W}, \code{int_Mavg_W}) are included
+#'           in the regression equations. Variable names are automatically matched using the naming convention
+#'           \code{"int_<predictor>_W<index>"}.
+
 #' @return A character string representing the SEM model syntax for the specified parallel and chained mediation analysis.
 #'
 #' @seealso [PrepareData()], [wsMed()], [GenerateModelP()], [GenerateModelCN()]
@@ -60,134 +71,206 @@
 #'
 #' @export
 
-GenerateModelPC <- function(prepared_data) {
-  chain_var <- grep("M1diff", colnames(prepared_data), value = TRUE)
-  parallel_vars <- setdiff(grep("M\\ddiff", colnames(prepared_data), value = TRUE), chain_var)
-  chain_avg <- grep("M1avg", colnames(prepared_data), value = TRUE)
-  parallel_avgs <- setdiff(grep("M\\davg", colnames(prepared_data), value = TRUE), chain_avg)
 
-  if (length(chain_var) != 1) {
-    stop("The chain mediator should contain exactly one variable: M1diff.")
+GenerateModelPC <- function(prepared_data, MP = character(0)) {
+
+  ## ---------- 变量 ----------
+  chain_md <- grep("^M1diff$", colnames(prepared_data), value = TRUE)
+  chain_ma <- grep("^M1avg$",  colnames(prepared_data), value = TRUE)
+  all_md   <- sort(grep("^M\\d+diff$", colnames(prepared_data), value = TRUE))
+  all_ma   <- sort(grep("^M\\d+avg$",  colnames(prepared_data), value = TRUE))
+  par_md   <- setdiff(all_md, chain_md)
+  par_ma   <- setdiff(all_ma, chain_ma)
+  n_par    <- length(par_md)
+
+  between <- grep("^Cb\\d+(_\\d+)?$", colnames(prepared_data), value = TRUE)
+  within  <- grep("^Cw\\d+(diff|avg)$", colnames(prepared_data), value = TRUE)
+  controls<- c(between, within)
+  ctrl_rhs<- if (length(controls)) paste(controls, collapse = " + ") else NULL
+
+  Wvars <- grep("^W\\d+$", colnames(prepared_data), value = TRUE)
+  ints  <- grep("^int_", colnames(prepared_data), value = TRUE)
+
+  add_int <- function(pat_stub, coef_stub) {
+    hits <- grep(pat_stub, ints, value = TRUE)
+    if (!length(hits)) return(NULL)
+    wtag <- sub("^.*_(W\\d+)$", "\\1", hits)
+    paste0(coef_stub, "_", wtag, "*", hits)
   }
 
-  n <- length(parallel_vars)  
-
-  regression_y <- paste(
-    "Ydiff ~ cp*1",
-    paste0(" + b1*", chain_var),  
-    if (length(parallel_vars) > 0) paste0(" + b", seq(2, n + 1), "*", parallel_vars, collapse = " + ") else "",
-    paste0(" + d1*", chain_avg),
-    if (length(parallel_avgs) > 0) paste0(" + d", seq(2, n + 1), "*", parallel_avgs, collapse = " + ") else "",
-    sep = ""
-  )
-
-  regression_m <- c()
-
-  for (i in seq_along(parallel_vars)) {
-    regression_m <- c(
-      regression_m,
-      paste0(parallel_vars[i], " ~ a", i + 1, "*1")
-    )
+  ## ---------- Ydiff ----------
+  y_rhs <- c("cp*1", paste0("b1*", chain_md), paste0("d1*", chain_ma),
+             paste0("b", 2:(n_par+1), "*", par_md),
+             paste0("d", 2:(n_par+1), "*", par_ma))
+  if ("cp" %in% MP && length(Wvars))
+    y_rhs <- c(y_rhs, paste0("cpw_", Wvars, "*", Wvars))
+  if ("b1" %in% MP)
+    y_rhs <- c(y_rhs, add_int(paste0("^int_", chain_md, "_"), "bw1"))
+  if ("d1" %in% MP)
+    y_rhs <- c(y_rhs, add_int(paste0("^int_", chain_ma, "_"), "dw1"))
+  for (i in seq_len(n_par)) {
+    idx <- i + 1
+    if (paste0("b", idx) %in% MP)
+      y_rhs <- c(y_rhs, add_int(paste0("^int_", par_md[i], "_"), paste0("bw", idx)))
+    if (paste0("d", idx) %in% MP)
+      y_rhs <- c(y_rhs, add_int(paste0("^int_", par_ma[i], "_"), paste0("dw", idx)))
   }
+  if (!is.null(ctrl_rhs)) y_rhs <- c(y_rhs, ctrl_rhs)
+  regY <- paste("Ydiff ~", paste(y_rhs, collapse = " + "))
 
-  chain_predictors <- c()
-  if (length(parallel_vars) > 0) {
-    chain_predictors <- c(
-      paste0("b", seq(2, n + 1), "1*", parallel_vars),
-      paste0("d", seq(2, n + 1), "1*", parallel_avgs)
-    )
+  ## ---------- 链首 parallel mediators ----------
+  regM_par <- sapply(seq_along(par_md), function(i){
+    idx <- i + 1
+    rhs <- c(paste0("a", idx, "*1"))
+    if (paste0("a", idx) %in% MP && length(Wvars))
+      rhs <- c(rhs, paste0("aw", idx, "_", Wvars, "*", Wvars))
+    if (!is.null(ctrl_rhs)) rhs <- c(rhs, ctrl_rhs)
+    paste(par_md[i], "~", paste(rhs, collapse = " + "))
+  })
+
+  ## ---------- M1diff （链尾）----------
+  rhs_chain <- c("a1*1")
+  if ("a1" %in% MP && length(Wvars))
+    rhs_chain <- c(rhs_chain, paste0("aw1_", Wvars, "*", Wvars))
+  for (i in seq_along(par_md)) {
+    idx <- i + 1
+    rhs_chain <- c(rhs_chain,
+                   paste0("b_", idx, "_1*", par_md[i]),
+                   paste0("d_", idx, "_1*", par_ma[i]))
+    if (paste0("b_", idx, "_1") %in% MP)
+      rhs_chain <- c(rhs_chain, add_int(paste0("^int_", par_md[i], "_"),
+                                        paste0("bw_", idx, "_1")))
+    if (paste0("d_", idx, "_1") %in% MP)
+      rhs_chain <- c(rhs_chain, add_int(paste0("^int_", par_ma[i], "_"),
+                                        paste0("dw_", idx, "_1")))
   }
-  regression_m <- c(
-    paste0(chain_var, " ~ a1*1", if (length(chain_predictors) > 0) paste0(" + ", paste(chain_predictors, collapse = " + ")) else ""),
-    regression_m
-  )
+  if (!is.null(ctrl_rhs)) rhs_chain <- c(rhs_chain, ctrl_rhs)
+  regM_chain <- paste(chain_md, "~", paste(rhs_chain, collapse = " + "))
 
-
-  indirect_effects <- c()
-  indirect_effect_labels <- c()
-
-  for (i in seq_along(parallel_vars)) {
-    label <- paste0("indirect", i + 1)
-    formula <- paste0("a", i + 1, " * b", i + 1)
-    indirect_effects <- c(indirect_effects, paste0(label, " := ", formula))
-    indirect_effect_labels <- c(indirect_effect_labels, label)
+  ## ---------- 间接效应 ----------
+  ind_lines <- c("indirect_1 := a1 * b1")
+  ind_names <- "indirect_1"
+  for (i in seq_along(par_md)) {
+    idx <- i + 1
+    ind_lines <- c(ind_lines,
+                   paste0("indirect_", idx, " := a", idx, " * b", idx),
+                   paste0("indirect_", idx, "_1 := a", idx, " * b_", idx, "_1 * b1"))
+    ind_names <- c(ind_names,
+                   paste0("indirect_", idx),
+                   paste0("indirect_", idx, "_1"))
   }
+  tot_ind <- paste("total_indirect :=", paste(ind_names, collapse = " + "))
+  tot_eff <- "total_effect := cp + total_indirect"
 
-  indirect_effects <- c(indirect_effects, paste0("indirect1 := a1 * b1"))
-  indirect_effect_labels <- c(indirect_effect_labels, "indirect1")
-
-  for (i in seq_along(parallel_vars)) {
-    label <- paste0("indirect", i + 1, "1")
-    formula <- paste0("a", i + 1, " * b", i + 1, "1 * b1")
-    indirect_effects <- c(indirect_effects, paste0(label, " := ", formula))
-    indirect_effect_labels <- c(indirect_effect_labels, label)
-  }
-
-  first_label <- "indirect1"
-  other_labels <- setdiff(indirect_effect_labels, first_label)
-
-  total_indirect <- paste0(
-    "total_indirect := ", first_label, " + ", paste(other_labels, collapse = " + ")
-  )
-  total_effect <- "total_effect := cp + total_indirect"
-
-  compare_indirect_effect <- ""
-  if (length(indirect_effect_labels) > 1) {
-    comparisons <- c()
-
-    first_label <- "indirect1"
-    other_labels <- setdiff(indirect_effect_labels, first_label)
-
-    for (label in other_labels) {
-      short_label_i <- gsub("indirect", "", first_label)
-      short_label_j <- gsub("indirect", "", label)
-      comparisons <- c(
-        comparisons,
-        paste0("CI", short_label_i, "vs", short_label_j,
-               " := ", first_label, " - ", label)
-      )
-    }
-
-    for (i in seq_along(other_labels)) {
-      for (j in seq_along(other_labels)) {
-        if (i < j) {
-          short_label_i <- gsub("indirect", "", other_labels[i])
-          short_label_j <- gsub("indirect", "", other_labels[j])
-          comparisons <- c(
-            comparisons,
-            paste0("CI", short_label_i, "vs", short_label_j,
-                   " := ", other_labels[i], " - ", other_labels[j])
-          )
-        }
-      }
-    }
-
-    compare_indirect_effect <- paste(comparisons, collapse = "\n")
-   }
-
-  pre_post_coefficients <- paste(
-    c(
-      paste0("X1_b1 := (2*b1 + d1)/2\nX0_b1 := X1_b1 - d1"),
-      sapply(2:(n + 1), function(i) {
-        paste0("X1_b", i, " := (2*b", i, " + d", i, ")/2\nX0_b", i, " := X1_b", i, " - d", i)
-      }),
-      sapply(2:(n + 1), function(i) {
-        paste0("X1_b", i, "1 := (2*b", i, "1 + d", i, "1)/2\nX0_b", i, "1 := X1_b", i, "1 - d", i, "1")
-      })
-    ),
-    collapse = "\n"
-  )
-
-  sem_model <- paste(
-    regression_y,
-    paste(regression_m, collapse = "\n"),
-    paste(indirect_effects, collapse = "\n"),
-    total_indirect,
-    total_effect,
-    compare_indirect_effect,
-    pre_post_coefficients,
-    sep = "\n"
-  )
-
-  return(sem_model)
+  ## ---------- 汇总 ----------
+  paste(c(regY, regM_par, regM_chain, ind_lines, tot_ind, tot_eff),
+        collapse = "\n")
 }
+
+
+GenerateModelPC <- function(prepared_data, MP = character(0)) {
+
+  ## ---------- 变量 ----------
+  chain_md <- grep("^M1diff$", colnames(prepared_data), value = TRUE)
+  chain_ma <- grep("^M1avg$",  colnames(prepared_data), value = TRUE)
+  all_md   <- sort(grep("^M\\d+diff$", colnames(prepared_data), value = TRUE))
+  all_ma   <- sort(grep("^M\\d+avg$", colnames(prepared_data), value = TRUE))
+  par_md   <- setdiff(all_md, chain_md)
+  par_ma   <- setdiff(all_ma, chain_ma)
+  n_par    <- length(par_md)
+
+  between <- grep("^Cb\\d+(_\\d+)?$", colnames(prepared_data), value = TRUE)
+  within  <- grep("^Cw\\d+(diff|avg)$", colnames(prepared_data), value = TRUE)
+  controls<- c(between, within)
+  ctrl_rhs<- if (length(controls)) paste(controls, collapse = " + ") else NULL
+
+  Wvars <- grep("^W\\d+$", colnames(prepared_data), value = TRUE)
+  ints  <- grep("^int_", colnames(prepared_data), value = TRUE)
+
+  add_int <- function(pat_stub, coef_stub) {
+    hits <- grep(pat_stub, ints, value = TRUE)
+    if (!length(hits)) return(NULL)
+    wtag <- sub("^.*_(W\\d+)$", "\\1", hits)
+    paste0(coef_stub, "_", wtag, "*", hits)
+  }
+
+  ## ---------- Ydiff ----------
+  y_rhs <- c("cp*1", paste0("b1*", chain_md), paste0("d1*", chain_ma),
+             paste0("b", 2:(n_par+1), "*", par_md),
+             paste0("d", 2:(n_par+1), "*", par_ma))
+  if ("cp" %in% MP && length(Wvars)) {
+    y_rhs <- c(y_rhs, paste0("cpw_", Wvars, "*", Wvars))
+  } else if (!("cp" %in% MP) && length(Wvars)) {
+    y_rhs <- c(y_rhs, Wvars)
+  }
+  if ("b1" %in% MP)
+    y_rhs <- c(y_rhs, add_int(paste0("^int_", chain_md, "_"), "bw1"))
+  if ("d1" %in% MP)
+    y_rhs <- c(y_rhs, add_int(paste0("^int_", chain_ma, "_"), "dw1"))
+  for (i in seq_len(n_par)) {
+    idx <- i + 1
+    if (paste0("b", idx) %in% MP)
+      y_rhs <- c(y_rhs, add_int(paste0("^int_", par_md[i], "_"), paste0("bw", idx)))
+    if (paste0("d", idx) %in% MP)
+      y_rhs <- c(y_rhs, add_int(paste0("^int_", par_ma[i], "_"), paste0("dw", idx)))
+  }
+  if (!is.null(ctrl_rhs)) y_rhs <- c(y_rhs, ctrl_rhs)
+  regY <- paste("Ydiff ~", paste(y_rhs, collapse = " + "))
+
+  ## ---------- 链首 parallel mediators ----------
+  regM_par <- sapply(seq_along(par_md), function(i){
+    idx <- i + 1
+    rhs <- c(paste0("a", idx, "*1"))
+    if (paste0("a", idx) %in% MP && length(Wvars)) {
+      rhs <- c(rhs, paste0("aw", idx, "_", Wvars, "*", Wvars))
+    } else if (length(Wvars)) {
+      rhs <- c(rhs, Wvars)
+    }
+    if (!is.null(ctrl_rhs)) rhs <- c(rhs, ctrl_rhs)
+    paste(par_md[i], "~", paste(rhs, collapse = " + "))
+  })
+
+  ## ---------- M1diff （链尾）----------
+  rhs_chain <- c("a1*1")
+  if ("a1" %in% MP && length(Wvars)) {
+    rhs_chain <- c(rhs_chain, paste0("aw1_", Wvars, "*", Wvars))
+  } else if (length(Wvars)) {
+    rhs_chain <- c(rhs_chain, Wvars)
+  }
+  for (i in seq_along(par_md)) {
+    idx <- i + 1
+    rhs_chain <- c(rhs_chain,
+                   paste0("b_", idx, "_1*", par_md[i]),
+                   paste0("d_", idx, "_1*", par_ma[i]))
+    if (paste0("b_", idx, "_1") %in% MP)
+      rhs_chain <- c(rhs_chain, add_int(paste0("^int_", par_md[i], "_"), paste0("bw_", idx, "_1")))
+    if (paste0("d_", idx, "_1") %in% MP)
+      rhs_chain <- c(rhs_chain, add_int(paste0("^int_", par_ma[i], "_"), paste0("dw_", idx, "_1")))
+  }
+  if (!is.null(ctrl_rhs)) rhs_chain <- c(rhs_chain, ctrl_rhs)
+  regM_chain <- paste(chain_md, "~", paste(rhs_chain, collapse = " + "))
+
+  ## ---------- 间接效应 ----------
+  ind_lines <- c("indirect_1 := a1 * b1")
+  ind_names <- "indirect_1"
+  for (i in seq_along(par_md)) {
+    idx <- i + 1
+    ind_lines <- c(ind_lines,
+                   paste0("indirect_", idx, " := a", idx, " * b", idx),
+                   paste0("indirect_", idx, "_1 := a", idx, " * b_", idx, "_1 * b1"))
+    ind_names <- c(ind_names,
+                   paste0("indirect_", idx),
+                   paste0("indirect_", idx, "_1"))
+  }
+  tot_ind <- paste("total_indirect :=", paste(ind_names, collapse = " + "))
+  tot_eff <- "total_effect := cp + total_indirect"
+
+  ## ---------- 汇总 ----------
+  paste(c(regY, regM_par, regM_chain, ind_lines, tot_ind, tot_eff),
+        collapse = "\n")
+}
+
+
+
+
+

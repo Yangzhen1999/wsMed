@@ -11,7 +11,7 @@ imputes missing data, processes each imputed dataset, and provides diagnostics f
 
     <a class="navbar-brand me-2" href="../index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,15 +24,15 @@ imputes missing data, processes each imputed dataset, and provides diagnostics f
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials"><li><a class="dropdown-item" href="../articles/wsMed.html">Introduction to wsMed</a></li>
-    <li><a class="dropdown-item" href="../articles/printGM.html">Using printGM() to generate SEM models in detail</a></li>
+    <li><a class="dropdown-item" href="../articles/printGM.html">Using printGM() to Generate SEM Models</a></li>
     <li><a class="dropdown-item" href="../articles/GenerateModelP.html">Parallel Mediation (P)</a></li>
     <li><a class="dropdown-item" href="../articles/GenerateModelCN.html">Chained Mediation (CN)</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelCP.html">Combined Parallel and Chained Mediation (CP)</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelPC.html">Parallel + Chained Mediation (PC)</a></li>
-    <li><a class="dropdown-item" href="../articles/MEMORE_vs_wsMed.html">Comparison of MEMORE 3.0 and wsMed Outputs</a></li>
+    <li><a class="dropdown-item" href="../articles/GenerateModelCP.html">Combined Parallel and Chained (CP)</a></li>
+    <li><a class="dropdown-item" href="../articles/GenerateModelPC.html">Parallel + Chained (PC)</a></li>
+    <li><a class="dropdown-item" href="../articles/MEMORE_vs_wsMed.html">Comparison: MEMORE 3.0 vs wsMed</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
-      </ul><ul class="navbar-nav"><li class="nav-item"><a class="nav-link" href="https://github.com/Yangzhen1999/wsMed" aria-label="GitHub Repository"><span class="fa fab fa-github"></span></a></li>
+      </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/Yangzhen1999/wsMed" aria-label="GitHub Repository"><span class="fa fab fa-github"></span></a></li>
       </ul></div>
 
 
@@ -42,7 +42,7 @@ imputes missing data, processes each imputed dataset, and provides diagnostics f
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Prepare Data with Missing Values for Mediation Analysis</h1>
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/HEAD/R/PrepareMissingData.R"><code>R/PrepareMissingData.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/HEAD/R/PrepareMissingData.R" class="external-link"><code>R/PrepareMissingData.R</code></a></small>
       <div class="d-none name"><code>PrepareMissingData.Rd</code></div>
     </div>
 
@@ -57,12 +57,21 @@ imputes missing data, processes each imputed dataset, and provides diagnostics f
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">PrepareMissingData</span><span class="op">(</span></span>
 <span>  <span class="va">data_missing</span>,</span>
 <span>  m <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>  method <span class="op">=</span> <span class="st">"pmm"</span>,</span>
+<span>  method_num <span class="op">=</span> <span class="st">"pmm"</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">123</span>,</span>
 <span>  <span class="va">M_C1</span>,</span>
 <span>  <span class="va">M_C2</span>,</span>
 <span>  <span class="va">Y_C1</span>,</span>
-<span>  <span class="va">Y_C2</span></span>
+<span>  <span class="va">Y_C2</span>,</span>
+<span>  C_C1 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  C_C2 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  C <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  C_type <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  W <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  W_type <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  center_W <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  keep_W_raw <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  keep_C_raw <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -78,9 +87,8 @@ imputes missing data, processes each imputed dataset, and provides diagnostics f
 <dd><p>An integer specifying the number of imputations to perform. Default is <code>5</code>.</p></dd>
 
 
-<dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
-<dd><p>A character string specifying the imputation method. Default is <code>"pmm"</code>
-(predictive mean matching). Other methods supported by <code>mice()</code> can be used.</p></dd>
+<dt id="arg-method-num">method_num<a class="anchor" aria-label="anchor" href="#arg-method-num"></a></dt>
+<dd><p>integer. …  (# 如果的确改名)</p></dd>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
@@ -102,6 +110,42 @@ Must match the length of <code>M_C1</code>.</p></dd>
 
 <dt id="arg-y-c-">Y_C2<a class="anchor" aria-label="anchor" href="#arg-y-c-"></a></dt>
 <dd><p>A character string representing the column name of the outcome variable "after" the intervention.</p></dd>
+
+
+<dt id="arg-c-c-">C_C1<a class="anchor" aria-label="anchor" href="#arg-c-c-"></a></dt>
+<dd><p>Character vector of within-subject control variable names (condition 1).</p></dd>
+
+
+<dt id="arg-c-c-">C_C2<a class="anchor" aria-label="anchor" href="#arg-c-c-"></a></dt>
+<dd><p>Character vector of within-subject control variable names (condition 2).</p></dd>
+
+
+<dt id="arg-c">C<a class="anchor" aria-label="anchor" href="#arg-c"></a></dt>
+<dd><p>Character vector of between-subject control variable names.</p></dd>
+
+
+<dt id="arg-c-type">C_type<a class="anchor" aria-label="anchor" href="#arg-c-type"></a></dt>
+<dd><p>Optional vector of the same length as <code>C</code>.
+Each element <code>"continuous"</code>, <code>"categorical"</code>, or <code>"auto"</code>
+(default). Ignored when <code>C = NULL</code>.</p></dd>
+
+
+<dt id="arg-w">W<a class="anchor" aria-label="anchor" href="#arg-w"></a></dt>
+<dd><p>Optional character vector: moderator names (≤ <em>J</em>).</p></dd>
+
+
+<dt id="arg-w-type">W_type<a class="anchor" aria-label="anchor" href="#arg-w-type"></a></dt>
+<dd><p>Optional vector of the same length as <code>W</code>.
+Same coding as <code>C_type</code>. Ignored when <code>W = NULL</code>.</p></dd>
+
+
+<dt id="arg-center-w">center_W<a class="anchor" aria-label="anchor" href="#arg-center-w"></a></dt>
+<dd><p>Logical. Whether to center the moderator variable W.</p></dd>
+
+
+<dt id="arg-keep-w-raw-keep-c-raw">keep_W_raw, keep_C_raw<a class="anchor" aria-label="anchor" href="#arg-keep-w-raw-keep-c-raw"></a></dt>
+<dd><p>Logical; keep original W / C columns in the
+returned data?</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -131,23 +175,22 @@ are ready for subsequent mediation analysis.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Example dataset with missing values</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span> <span class="co"># 确保结果可重复</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">example_dataN</span> <span class="op">&lt;-</span> <span class="fu">mice</span><span class="fu">::</span><span class="fu"><a href="https://amices.org/mice/reference/ampute.html" class="external-link">ampute</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>   data <span class="op">=</span> <span class="va">example_data</span>,       <span class="co"># 输入完整数据</span></span></span>
-<span class="r-in"><span>   prop <span class="op">=</span> <span class="fl">0.1</span>,      <span class="co"># 缺失值比例 (20%)</span></span></span>
+<span class="r-in"><span>   data <span class="op">=</span> <span class="va">example_data</span>,</span></span>
+<span class="r-in"><span>   prop <span class="op">=</span> <span class="fl">0.1</span>,</span></span>
 <span class="r-in"><span>   <span class="op">)</span><span class="op">$</span><span class="va">amp</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Prepare the dataset with multiple imputations</span></span></span>
 <span class="r-in"><span><span class="va">prepared_missing_data</span> <span class="op">&lt;-</span> <span class="fu">PrepareMissingData</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  data_missing <span class="op">=</span> <span class="va">example_dataN</span>,</span></span>
 <span class="r-in"><span>  m <span class="op">=</span> <span class="fl">5</span>,</span></span>
-<span class="r-in"><span>  method <span class="op">=</span> <span class="st">"pmm"</span>,</span></span>
 <span class="r-in"><span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  Y_C1 <span class="op">=</span> <span class="st">"C2"</span>,</span></span>
-<span class="r-in"><span>  Y_C2 <span class="op">=</span> <span class="st">"C1"</span>,</span></span>
+<span class="r-in"><span>  Y_C2 <span class="op">=</span> <span class="st">"C1"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in PrepareMissingData(data_missing = example_dataN, m = 5, method = "pmm",     M_C1 = c("A2", "B2"), M_C2 = c("A1", "B1"), Y_C1 = "C2",     Y_C2 = "C1", ):</span> unused arguments (M_C1 = c("A2", "B2"), M_C2 = c("A1", "B1"), Y_C1 = "C2", Y_C2 = "C1")</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in PrepareMissingData(data_missing = example_dataN, m = 5, M_C1 = c("A2",     "B2"), M_C2 = c("A1", "B1"), Y_C1 = "C2", Y_C2 = "C1"):</span> unused arguments (M_C1 = c("A2", "B2"), M_C2 = c("A1", "B1"), Y_C1 = "C2", Y_C2 = "C1")</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Access processed datasets</span></span></span>
 <span class="r-in"><span><span class="va">processed_data_list</span> <span class="op">&lt;-</span> <span class="va">prepared_missing_data</span><span class="op">$</span><span class="va">processed_data_list</span></span></span>
@@ -162,7 +205,7 @@ are ready for subsequent mediation analysis.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by First Last.</p>
+  <p>Developed by Wendie Yang, Shu Fai Cheung.</p>
 </div>
 
 <div class="pkgdown-footer-right">

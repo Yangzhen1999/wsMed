@@ -16,7 +16,8 @@
 #' @param within Numeric matrix.
 #'   Covariance within imputations
 #'   \eqn{\mathbf{V}_{\mathrm{within}}}.
-#' @export
+#' @keywords internal
+
 TotalAdjwrapper <- function(ariv,
                       within) {
   return(

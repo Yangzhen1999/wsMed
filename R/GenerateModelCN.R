@@ -36,7 +36,16 @@
 #' within-subject mediator and outcome variables. The data frame must include columns for
 #' difference scores (`Mdiff`) and average scores (`Mavg`) of mediators, as well as the
 #' outcome difference score (`Ydiff`).
+#' @param MP A character vector specifying which paths are moderated by variable(s) W.
+#'           Valid entries include:
+#'           - \code{"a2"}, \code{"a3"}, ...: moderation on the a paths (W → Mdiff), for mediators beyond M1.
+#'           - \code{"b2"}, \code{"b3"}, ...: moderation on the b paths (Mdiff × W → Ydiff).
+#'           - \code{"b_1_2"}, \code{"b_2_3"}, ...: moderation on cross-paths from one mediator to the next (e.g., M1 → M2).
+#'           - \code{"d2"}, \code{"d3"}, ...: moderation on the d paths (Mavg × W → Ydiff).
+#'           - \code{"d_1_2"}, \code{"d_2_3"}, ...: moderation on cross-paths from one Mavg to the next Mdiff.
+#'           - \code{"cp"}: moderation on the direct effect from X to Y (i.e., W → Ydiff).
 #'
+#'           The function detects and inserts the correct interaction terms (e.g., \code{int_M2diff_W1}) based on these labels.
 #' @return A character string representing the SEM model syntax for the specified chained mediation analysis.
 #'
 #' @seealso [PrepareData()], [wsMed()], [GenerateModelP()]
@@ -59,148 +68,117 @@
 #'
 #' @export
 
-GenerateModelCN <- function(prepared_data) {
-   
-  Mdiff_vars <- grep("M\\ddiff", colnames(prepared_data), value = TRUE)
-  Mavg_vars <- grep("M\\davg", colnames(prepared_data), value = TRUE)
-  n <- length(Mdiff_vars)
+GenerateModelCN <- function(prepared_data, MP = character(0)) {
 
-  if (n < 1) {
-    stop("The function requires at least one mediator.")
+  ## -------- 变量 --------
+  Md <- sort(grep("^M\\d+diff$", colnames(prepared_data), value = TRUE))
+  Ma <- sort(grep("^M\\d+avg$",  colnames(prepared_data), value = TRUE))
+  nM <- length(Md);  if (nM < 1) stop("Need at least one mediator.")
+
+  between <- grep("^Cb\\d+(_\\d+)?$", colnames(prepared_data), value = TRUE)
+  within  <- grep("^Cw\\d+(diff|avg)$", colnames(prepared_data), value = TRUE)
+  controls<- c(between, within)
+  ctrl_rhs<- if (length(controls)) paste(controls, collapse = " + ") else NULL
+
+  ## ---- W 与交互列 ----
+  Wvars <- grep("^W\\d+$", colnames(prepared_data), value = TRUE)
+  Winfo <- attr(prepared_data, "W_info")
+  if (!is.null(Winfo) && isTRUE(Winfo$type == "continuous"))
+    Wvars <- Wvars[1]           # 连续 W 只保留第一个
+  if (length(Wvars) == 1)       # 安全起见
+    Wvars <- Wvars[1]
+
+  int_vars <- grep("^int_", colnames(prepared_data), value = TRUE)
+
+  ## ——— 帮助函数：仅保留 wtag ∈ Wvars ———
+  add_mod_terms <- function(pat_stub, param_stub) {
+    hits <- grep(pat_stub, int_vars, value = TRUE)
+    if (!length(hits)) return(NULL)
+    keep <- sub("^.*_(W\\d+)$", "\\1", hits) %in% Wvars
+    hits <- hits[keep]
+    if (!length(hits)) return(NULL)
+    wtags <- sub("^.*_(W\\d+)$", "\\1", hits)
+    paste0(param_stub, "_", wtags, "*", hits)
   }
 
-  
-  regression_y <- paste(
-    "Ydiff ~ cp*1",
-    paste0(" + ", paste0("b", 1:n, "*", Mdiff_vars, collapse = " + ")),
-    paste0(" + ", paste0("d", 1:n, "*", Mavg_vars, collapse = " + ")),
-    sep = ""
-  )
+  ## ---------- Ydiff ----------
+  y_rhs <- c("cp*1")
+  for (i in seq_len(nM)) {
+    y_rhs <- c(y_rhs,
+               paste0("b", i, "*", Md[i]),
+               paste0("d", i, "*", Ma[i]))
+    if (paste0("b", i) %in% MP && length(Wvars))
+      y_rhs <- c(y_rhs, add_mod_terms(paste0("^int_M", i, "diff_"), paste0("bw", i)))
+    if (paste0("d", i) %in% MP)
+      y_rhs <- c(y_rhs, add_mod_terms(paste0("^int_M", i, "avg_"), paste0("dw", i)))
+  }
+  if ("cp" %in% MP && length(Wvars))
+    y_rhs <- c(y_rhs, paste0("cpw_", Wvars, "*", Wvars))
+  if (length(Wvars))
+    y_rhs <- c(y_rhs, Wvars)  # 添加主效应 W
+  if (!is.null(ctrl_rhs)) y_rhs <- c(y_rhs, ctrl_rhs)
+  regY <- paste("Ydiff ~", paste(y_rhs, collapse = " + "))
 
-   
-  regression_m <- c()
-  for (i in 1:n) {
-    if (i == 1) {
-      
-      regression_m <- c(regression_m, paste(Mdiff_vars[i], "~ a1*1"))
-    } else {
-      predictors <- c(
-        paste0("a", i, "*1"),
-        paste0("b", (i-1):1, i, "*", Mdiff_vars[(i-1):1], collapse = " + "),
-        paste0("d", (i-1):1, i, "*", Mavg_vars[(i-1):1], collapse = " + ")
-      )
-      regression_m <- c(
-        regression_m,
-        paste(Mdiff_vars[i], "~", paste(predictors, collapse = " + "))
-      )
+  ## ---------- 每个 M 回归 ----------
+  regM <- character(nM)
+  for (i in seq_len(nM)) {
+    rhs <- c(paste0("a", i, "*1"))
+    if (paste0("a", i) %in% MP && length(Wvars))
+      rhs <- c(rhs, paste0("aw", i, "_", Wvars, "*", Wvars))
+
+    if (i > 1)
+      for (j in seq_len(i-1)) {
+        rhs <- c(rhs,
+                 paste0("b_", j, "_", i, "*", Md[j]),
+                 paste0("d_", j, "_", i, "*", Ma[j]))
+        if (paste0("b_", j, "_", i) %in% MP)
+          rhs <- c(rhs, add_mod_terms(paste0("^int_", Md[j], "_"), paste0("bw_", j, "_", i)))
+        if (paste0("d_", j, "_", i) %in% MP)
+          rhs <- c(rhs, add_mod_terms(paste0("^int_", Ma[j], "_"), paste0("dw_", j, "_", i)))
+      }
+
+    if (length(Wvars))
+      rhs <- c(rhs, Wvars)  # 添加主效应 W
+    if (!is.null(ctrl_rhs)) rhs <- c(rhs, ctrl_rhs)
+    regM[i] <- paste(Md[i], "~", paste(rhs, collapse = " + "))
+  }
+
+  ## ---------- 清理重复主效应项 ----------
+  for (i in seq_along(regM)) {
+    for (w in Wvars) {
+      if (grepl(paste0("aw", i, "_", w, "\\*", w), regM[i])) {
+        regM[i] <- gsub(paste0("\\s*\\+\\s*", w, "(?=\\s|$)"), "", regM[i], perl = TRUE)
+      }
     }
   }
-
-  
-  generate_path_effects <- function(paths) {
-    paste0(
-      "a", paths[1], " * ",  
-      paste(
-        c(
-          sapply(1:(length(paths) - 1), function(i) {
-            paste0("b", paths[i], paths[i + 1])  
-          }),
-          paste0("b", paths[length(paths)])  
-        ),
-        collapse = " * "
-      )
-    )
-  }
-
-  
-  indirect_effects <- c()
-  indirect_effect_labels <- c()  
-
-  for (length_path in 1:n) {
-
-    path_combinations <- utils::combn(1:n, length_path, simplify = FALSE)
-
-    for (path in path_combinations) {
-      if (length(path) > 1) {
-        
-        effect_formula <- generate_path_effects(path)
-        label <- paste0("indirect", paste(path, collapse = ""))  
-        indirect_effects <- c(
-          indirect_effects,
-          paste0(label, " := ", effect_formula)
-        )
-        indirect_effect_labels <- c(indirect_effect_labels, label)
-      } else {
-       
-        label <- paste0("indirect", path)
-        indirect_effects <- c(
-          indirect_effects,
-          paste0(label, " := a", path, " * b", path)
-        )
-        indirect_effect_labels <- c(indirect_effect_labels, label)
+  if (length(Wvars)) {
+    for (w in Wvars) {
+      if (grepl(paste0("cpw_", w, "\\*", w), regY)) {
+        regY <- gsub(paste0("\\s*\\+\\s*", w, "(?=\\s|$)"), "", regY, perl = TRUE)
       }
     }
   }
 
-
-  total_indirect <- paste0(
-    "total_indirect := ",
-    paste(indirect_effect_labels, collapse = " + ")
-  )
-
-  
-  total_effect <- "total_effect := cp + total_indirect"
-
-
-  compare_indirect_effect <- ""
-  if (length(indirect_effect_labels) > 1) {
-    comparisons <- c()
-    for (i in seq_along(indirect_effect_labels)) {
-      for (j in seq_along(indirect_effect_labels)) {
-        if (i < j) {
-          short_label_i <- gsub("indirect", "", indirect_effect_labels[i])
-          short_label_j <- gsub("indirect", "", indirect_effect_labels[j])
-          comparisons <- c(
-            comparisons,
-            paste0(
-              "CI", short_label_i, "vs", short_label_j,
-              " := ", indirect_effect_labels[i], " - ", indirect_effect_labels[j]
-            )
-          )
-        }
-      }
-    }
-    compare_indirect_effect <- paste(comparisons, collapse = "\n")
+  ## ---------- 间接效应 & 汇总 ----------
+  make_ie <- function(pth){
+    if (length(pth)==1) return(paste0("a", pth, " * b", pth))
+    last <- pth[length(pth)]
+    mid <- paste(sapply(seq_along(pth)[-1], function(k) paste0("b_", pth[k-1], "_", pth[k])), collapse=" * ")
+    paste0("a", pth[1], " * ", mid, " * b", last)
   }
 
-
-
-  pre_post_coefficients <- paste(
-    c(
-      sapply(seq_along(Mdiff_vars), function(i) {
-        x1 <- paste0("X1_b", i, " := (2*b", i, " + d", i, ")/2")
-        x0 <- paste0("X0_b", i, " := X1_b", i, " - d", i)
-        paste(x1, x0, sep = "\n")
-      }),
-      sapply(2:n, function(i) {
-        paste0("X1_b", (i-1), i, " := (2*b", (i-1), i, " + d", (i-1), i, ")/2\n",
-               "X0_b", (i-1), i, " := X1_b", (i-1), i, " - d", (i-1), i)
-      })
-    ),
-    collapse = "\n"
-  )
-
-
-  sem_model <- paste(
-    regression_y,
-    paste(regression_m, collapse = "\n"),
-    paste(indirect_effects, collapse = "\n"),
-    total_indirect,
-    total_effect,
-    compare_indirect_effect,
-    pre_post_coefficients,
-    sep = "\n"
-  )
-
-  return(sem_model)
+  ie_lines <- ie_names <- c()
+  for (len in 1:nM)
+    for (pth in utils::combn(nM,len, simplify=FALSE)){
+      nm <- paste0("indirect_",paste(pth,collapse="_"))
+      ie_lines <- c(ie_lines, paste(nm,":=",make_ie(pth)))
+      ie_names <- c(ie_names, nm)
+    }
+  paste(c(regY, regM,
+          ie_lines,
+          paste("total_indirect :=", paste(ie_names, collapse=" + ")),
+          "total_effect := cp + total_indirect"),
+        collapse = "\n")
 }
+
+

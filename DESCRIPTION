@@ -1,6 +1,6 @@
 Package: wsMed
 Title: Title: Within-Subject Mediation Analysis Using 'SEM'
-Version: 0.1.1
+Version: 0.5.2
 Authors@R:
     c(person(given = "Wendie",
              family ="Yang",
@@ -14,24 +14,33 @@ Authors@R:
              comment = c(ORCID = "0000-0002-9871-9448")))
 Description: Within-subject mediation analysis using structural equation modeling.
     Examine how changes in an outcome variable between two conditions are mediated 
-    through one or more variables.
+    through one or more variables. Supports within-subject mediation analysis using 
+    the 'lavaan' package by Rosseel (2012) <doi:10.18637/jss.v048.i02>, 
+    and extends Monte Carlo confidence interval estimation to missing data scenarios 
+    using the 'semmcci' package by Pesigan and Cheung (2023) <doi:10.3758/s13428-023-02114-4>.
 License: GPL (>= 3)
-Depends: R (>= 2.10)
+Depends: R (>= 4.1.0)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Suggests:
     rmarkdown,
     devtools,
-    testthat (>= 3.0.0)
+    testthat
 Config/testthat/edition: 3
 Imports:
     knitr,
     lavaan,
     semmcci,
     mice,
-    semhelpinghands
+    semboottools,
+    MASS,
+    rlang,
+    dplyr,
+    ggplot2,
+    methods,
+    stats
 VignetteBuilder: knitr
 LazyData: true
-URL: https://github.com/Yangzhen1999/wsMed
+URL:  https://yangzhen1999.github.io/wsMed/
 BugReports: https://github.com/Yangzhen1999/wsMed/issues

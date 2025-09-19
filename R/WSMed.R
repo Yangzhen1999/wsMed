@@ -1,373 +1,369 @@
-#' @title Within-Subject Mediation Analysis
+#' @title Within-Subject Mediation Analysis (Two-Condition)
 #'
-#' @description Performs two-condition within-subject mediation analysis using structural equation
-#' modeling (SEM). This function provides both standardized and unstandardized results for mediation effects.
-#' It also supports handling missing data using Full Information Maximum Likelihood (FIML) or
-#' Multiple Imputation (MI), and generates Monte Carlo confidence intervals for the estimated mediation effects.
+#' @description
+#' \code{wsMed()} fits a structural equation model (SEM) for two-condition
+#' within-subject mediation. It can handle missing data (DE, FIML, MI) and
+#' computes both unstandardized and standardized effects with bootstrap or
+#' Monte Carlo confidence intervals.
 #'
-#' @details The `wsMed` function is designed for analyzing within-subject mediation models, where the
-#' mediator and outcome variables are measured before and after an intervention or under multiple
-#' conditions. Key features include:
+#' @details
+#' Model structures:
+#' \itemize{
+#'   \item \code{"P"}: parallel mediation
+#'   \item \code{"CN"}: chained (serial) mediation
+#'   \item \code{"CP"}: chained then parallel
+#'   \item \code{"PC"}: parallel then chained
+#' }
 #'
-#' - **Data preprocessing**: Automatically computes difference scores and averages for mediator and
-#' outcome variables to facilitate within-subject analysis.
+#' Missing-data strategies:
+#' \itemize{
+#'   \item \code{"DE"}: list-wise deletion
+#'   \item \code{"FIML"}: full-information maximum likelihood
+#'   \item \code{"MI"}: multiple imputation via \pkg{mice}
+#' }
 #'
-#' - **Model construction**: Supports different mediation model types:
-#'   - `"P"`: Parallel mediation.
-#'   - `"CN"`: Chained mediation.
-#'   - `"CP"`/`"PC"`: Combined parallel and chained mediation.
+#' Confidence-interval engines:
+#' \itemize{
+#'   \item Bootstrap: percentile, BC, or BCa (DE and FIML only)
+#'   \item Monte Carlo: draws via \pkg{semmcci} (all \code{Na} options)
+#' }
+#' For \code{Na = "FIML"}, you may choose \code{MCmethod = "mc"} (default) or
+#' \code{"bootSD"} to add a finite-sample SD correction.
 #'
-#' - **Missing data handling**:
-#'   - `"DE"`: Deletes rows with missing data.
-#'   - `"FIML"`: Uses Full Information Maximum Likelihood for missing data.
-#'   - `"MI"`: Conducts multiple imputations (requires the `mice` package).
+#' Workflow: (1) preprocess -> (2) generate SEM syntax -> (3) fit
+#' -> (4) compute confidence intervals -> (5) optional: standardize estimates.
 #'
-#' - **Monte Carlo analysis**: Generates Monte Carlo confidence intervals for mediation effects.
+#' @param data A \link[base:data.frame]{data.frame} containing the raw scores.
+#' @param M_C1,M_C2 Character vectors of mediator names under condition 1 and 2.
+#' @param Y_C1,Y_C2 Character scalars for the outcome under each condition.
+#' @param form Model type: \code{"P"}, \code{"CN"}, \code{"CP"}, or \code{"PC"}.
+#' @param standardized Logical; if \code{TRUE}, return standardized effects. Default \code{FALSE}.
 #'
-#' - **Standardized results**: Optionally computes standardized effect sizes and confidence intervals.
+#' @param Na Missing-data method: \code{"DE"}, \code{"FIML"}, or \code{"MI"}.
+#' @param ci_method CI engine: \code{"bootstrap"} or \code{"mc"}.
+#'   If \code{NULL} (default) the choice is \code{"bootstrap"} for \code{Na = "DE"}
+#'   and \code{"mc"} otherwise.
+#' @param MCmethod If \code{Na = "FIML"} and \code{ci_method = "mc"},
+#'   choose \code{"mc"} (default) or \code{"bootSD"}.
 #'
-#' ## Workflow
-#' The function follows these main steps:
-#' 1. Data preprocessing.
-#' 2. Model construction.
-#' 3. Model fitting.
-#' 4. Monte Carlo analysis (optional).
-#' 5. Standardization of results (optional).
+#' @param bootstrap Integer; number of bootstrap replicates (DE and FIML only).
+#' @param boot_ci_type Character; bootstrap CI type: \code{"perc"}, \code{"bc"},
+#'   or \code{"bca.simple"}.
+#' @param R Integer; number of Monte Carlo draws. Default \code{20000L}.
+#' @param alpha Numeric vector in (0, 1); two-sided significance levels.
+#' @param iseed,seed Integer seeds for bootstrap and Monte Carlo, respectively.
 #'
-#' ## Supported Model Types
-#' The `form` parameter allows you to select the type of mediation model:
-#' - `"P"`: Parallel mediation.
-#' - `"CN"`: Chained mediation.
-#' - `"CP"`/`"PC"`: Combined parallel and chained mediation.
+#' @param fixed.x Logical; passed to \pkg{lavaan}.
 #'
-#' ## Missing Data Strategies
-#' The `Na` parameter determines how missing data are handled:
-#' - `"DE"`: Delete rows with missing data (default).
-#' - `"FIML"`: Use Full Information Maximum Likelihood (requires `lavaan`).
-#' - `"MI"`: Perform multiple imputations (requires the `mice` package).
+#' @param C_C1,C_C2 Character vectors of within-subject covariates (per condition).
+#' @param C Character vector of between-subject covariates.
+#' @param C_type Character; type of \code{C}: \code{"continuous"} or \code{"categorical"}.
 #'
-#' @param data A data frame containing the input data.
-#' @param M_C1 A character vector of column names representing the mediator variables measured "before."
-#' @param M_C2 A character vector of column names representing the mediator variables measured "after."
-#' @param Y_C1 A character string representing the outcome variable measured "before."
-#' @param Y_C2 A character string representing the outcome variable measured "after."
-#' @param form A string specifying the type of mediation model (`"P"`, `"CN"`, `"CP"`, or `"PC"`). Defaults to `"P"`.
-#' @param standardized Logical. If `TRUE`, standardized effects and confidence intervals are computed. Defaults to `FALSE`.
-#' @param Na A string specifying the missing data handling method (`"DE"`, `"FIML"`, or `"MI"`). Defaults to `"DE"`.
-#' @param bootstrap An integer specifying the number of bootstrap samples for the `"DE"` method. Defaults to `1000`.
-#' @param iseed An integer for setting the random seed. Defaults to `123`.
-#' @param se A string specifying the method for computing standard errors (`"standard"` or `"bootstrap"`). Defaults to `"standard"`.
-#' @param R An integer specifying the number of Monte Carlo repetitions. Defaults to `20000L`.
-#' @param alpha A numeric vector specifying the significance levels for confidence intervals. Defaults to `c(0.001, 0.01, 0.05)`.
-#' @param m An integer specifying the number of imputations for the `"MI"` method. Defaults to `5`.
-#' @param method A string specifying the imputation method for the `"MI"` method (e.g., `"pmm"`). Defaults to `"pmm"`.
-#' @param decomposition A string specifying the decomposition method for covariance matrices. Defaults to `"eigen"`.
-#' @param pd Logical. If `TRUE`, checks the positive definiteness of covariance matrices. Defaults to `TRUE`.
-#' @param tol A numeric value for the tolerance used in positive definiteness checks. Defaults to `1e-06`.
-#' @param seed An integer for setting the random seed during Monte Carlo simulations. Defaults to `123`.
-#' @param alphastd A numeric value specifying the significance level for standardized confidence intervals. Defaults to `0.05`.
-#' @param fixed.x Logical. If `TRUE`, the x variables are fixed. Default is `FALSE`.
-
-#' @return A list containing the following components:
-#' - `prepared_data`: The preprocessed dataset.
-#' - `model_summary`: Summary statistics of the fitted SEM model.
-#' - `lavaan_fit`: The fitted SEM model object.
-#' - `sem_model`: The constructed SEM model syntax.
-#' - `mi_result`: Monte Carlo results for the multiple imputation method (if applicable).
-#' - `fiml_result`: Monte Carlo results for the FIML method (if applicable).
-#' - `std_result`: Standardized results for the `"DE"` method (if applicable).
-#' - `std_mi_result`: Standardized results for the MI method (if applicable).
-#' - `std_fiml_result`: Standardized results for the FIML method (if applicable).
+#' @param W Character vector of moderators. Default \code{NULL}.
+#' @param W_type Character; \code{"continuous"} or \code{"categorical"}.
+#' @param MP Character vector identifying which regression paths are moderated
+#'   (for example, \code{"a1"}, \code{"b_1_2"}, \code{"cp"}).
+#'
+#' @param mi_args List of MI-specific controls:
+#' \describe{
+#'   \item{\code{m}}{Number of imputations. Default 5.}
+#'   \item{\code{method_num}}{Imputation method for \code{mice()}.}
+#'   \item{\code{decomposition}}{Covariance-decomposition method
+#'     (\code{"eigen"}, \code{"chol"}, \code{"svd"}).}
+#'   \item{\code{pd}}{Logical; positive-definiteness check.}
+#'   \item{\code{tol}}{Tolerance for the positive-definiteness check.}
+#' }
+#'
+#' @param verbose Logical; print progress messages.
+#'
+#' @return An object of class \code{"wsMed"} with elements:
+#' \describe{
+#'   \item{data}{Preprocessed data frame.}
+#'   \item{sem_model}{Generated \pkg{lavaan} syntax.}
+#'   \item{mc}{List with Monte Carlo draws, bootstrap tables (if any), and the fitted model.}
+#'   \item{moderation}{Conditional or moderated effect tables.}
+#'   \item{form,Na,alpha}{Analysis settings.}
+#'   \item{input_vars}{Names of all user-supplied variables.}
+#' }
 #'
 #' @examples
-#' # Simulated example dataset
 #' data(example_data)
-#' # example 1
-#' # parallel mediation model with unstandardized effects
-#' result1 <- wsMed(
+#' set.seed(123)
+#' result <- wsMed(
 #'   data = example_data,
 #'   M_C1 = c("A2", "B2"),
 #'   M_C2 = c("A1", "B1"),
-#'   Y_C1 = "C2",
-#'   Y_C2 = "C1",
-#'   form = "P",
-#'   standardized = FALSE,
-#'   bootstrap = 100,
+#'   Y_C1 = "C1", Y_C2 = "C2",
+#'   form = "P", Na = "DE"
 #' )
-#' print(result1)
+#' print(result)
 #'
-#' @importFrom semhelpinghands standardizedSolution_boot_ci
+#' @importFrom semboottools standardizedSolution_boot
 #' @export
 
 wsMed <- function(data,
-                  M_C1,
-                  M_C2,
-                  Y_C1,
-                  Y_C2,
-                  form = "P",
+                  M_C1, M_C2, Y_C1, Y_C2,
+                  C_C1 = NULL, C_C2 = NULL,
+                  C     = NULL, C_type = NULL,
+                  W     = NULL, W_type = NULL,
+                  MP    = NULL,
+                  form  = c("P", "CN", "CP", "PC"),
+                  Na    = c("DE", "FIML", "MI"),
+                  alpha = .05,
+                  mi_args = list(),
+                  R = 20000L,
+                  ## ── bootstrap (DE) ───────────────────────────────────────
+                  bootstrap    = 2000,
+                  boot_ci_type = "perc",
+                  iseed        = 123,
+                  fixed.x      = FALSE,
+                  ## ── misc. ───────────────────────────────────────────────
+                  ci_method    = c("mc", "bootstrap", "both"),
+                  MCmethod     = NULL,
+                  seed         = 123,
                   standardized = FALSE,
-                  Na = "DE",
-                  bootstrap = 1000,
-                  iseed = 123,
-                  se = "boot",
-                  R = 20000L,  # Monte Carlo 重复次数
-                  fixed.x = FALSE,
-                  alpha = c(0.01, 0.05),  # 显著性水平
-                  m = 5,  # 插补次数
-                  method = "pmm",  # 插补方法
-                  decomposition = "eigen",
-                  pd = TRUE,
-                  tol = 1e-06,
-                  seed = 123,
-                  alphastd = c(0.01, 0.05)) {
+                  verbose      = FALSE) {
 
-  # 输入验证
-  {
-    # 检查 data
-    if (is.null(data) || length(data) == 0) {
-      stop("Error: 'data' cannot be NULL or empty.")
-    }
-    if (!is.data.frame(data)) {
-      stop("Error: 'data' must be a data frame.")
-    }
+  ## ── 0  输入验证 ──────────────────────────────────────────────────────
+  ci_method <- match.arg(ci_method)
+  form      <- match.arg(form)
+  Na        <- match.arg(Na)
 
-    # 检查 M_C1 和 M_C2
-    if (is.null(M_C1) || is.null(M_C2)) {
-      stop("Error: 'M_C1' and 'M_C2' cannot be NULL. Please provide valid column names.")
-    }
-    if (length(M_C1) != length(M_C2)) {
-      stop("Error: The lengths of 'M_C1' and 'M_C2' must match.")
-    }
+  validate_wsMed_inputs(
+    data      = data,
+    M_C1      = M_C1,  M_C2 = M_C2,
+    Y_C1      = Y_C1,  Y_C2 = Y_C2,
+    C_C1      = C_C1,  C_C2 = C_C2,  C = C,
+    W         = W,     W_type = W_type,
+    MP        = MP,
+    form      = form,
+    Na        = Na,
+    R         = R,
+    bootstrap = bootstrap,
+    m         = mi_args$m %||% 5L,
+    ci_level  = 1 - alpha,
+    ci_method = ci_method,
+    MCmethod  = MCmethod
+  )
 
-    # 检查 Y_C1 和 Y_C2
-    if (is.null(Y_C1) || is.null(Y_C2)) {
-      stop("Error: 'Y_C1' and 'Y_C2' cannot be NULL. Please provide valid column names.")
-    }
+  # ── 参数标准化 ----------------------------------------------------------#
+  form <- match.arg(form)
+  Na   <- match.arg(Na)
 
-    # 检查必需列
-    required_columns <- c(M_C1, M_C2, Y_C1, Y_C2)
-    missing_columns <- required_columns[!required_columns %in% colnames(data)]
-    if (length(missing_columns) > 0) {
-      stop(paste("Error: Missing columns in data:", paste(missing_columns, collapse = ", ")))
-    }
+  # ── MI 参数合并（若适用） ----------------------------------------------#
+  mi_defaults <- list(
+    m             = 5L,
+    method_num    = "pmm",
+    decomposition = "eigen",
+    pd            = TRUE,
+    tol           = 1e-6,
+    seed          = seed
+  )
+  mi_args <- modifyList(mi_defaults, mi_args)
 
-    # 验证 form 参数
-    if (!form %in% c("P", "CN", "CP", "PC")) {
-      stop("Error: Invalid 'form' parameter. Use 'P', 'CN', 'CP', or 'PC'.")
-    }
+  ## ── 1  预处理数据 ────────────────────────────────────────────────────
+  .v("Preparing data ...", verbose = verbose)
+  prep <- PrepareData(
+    data, M_C1, M_C2, Y_C1, Y_C2,
+    C_C1, C_C2, C, C_type,
+    W,    W_type,
+    keep_W_raw = TRUE,
+    keep_C_raw = TRUE
+  )
 
-    # 验证 Na 参数
-    if (!Na %in% c("DE", "FIML", "MI")) {
-      stop("Error: Invalid 'Na' parameter. Use 'DE', 'FIML', or 'MI'.")
-    }
-
-    # 验证 bootstrap, R, 和 m
-    if (!is.numeric(bootstrap) || bootstrap < 0) {
-      stop("Error: 'bootstrap' must be a non-negative integer.")
-    }
-    if (!is.numeric(R) || R <= 0) {
-      stop("Error: 'R' must be a positive integer.")
-    }
-    if (!is.numeric(m) || m <= 0) {
-      stop("Error: 'm' must be a positive integer.")
-    }
-
-    # 处理缺失值
-    if (Na %in% c("MI", "FIML")) {
-      total_missing <- sum(is.na(data))
-      if (total_missing == 0) {
-        message("No missing values detected in the data. Switching to 'DE'.")
-        Na <- "DE"
-      }
-    }
-    if (Na == "DE") {
-      total_missing <- sum(is.na(data))
-      if (total_missing > 0) {
-        warning("The dataset contains missing values. Consider using 'Na = MI' or 'Na = FIML' to handle them")
-      }
-      data <- stats::na.omit(data)
-    }
-
-    # 验证调节变量数量
-    num_mediators <- length(M_C1)
-    if (form == "CN" && num_mediators < 2) {
-      stop("Error: For 'CN' models, the number of mediators must be at least 2.")
-    }
-    if (form %in% c("PC", "CP") && num_mediators < 3) {
-      stop("Error: For 'PC' and 'CP' models, the number of mediators must be at least 3.")
-    }
-  }
+  ## ── 2  构建 SEM 语法 ────────────────────────────────────────────────
+  .v(sprintf("Building SEM syntax (%s) ...", form), verbose = verbose)
+  sem_model <- switch(form,
+                      P  = GenerateModelP (prep, MP),
+                      CN = GenerateModelCN(prep, MP),
+                      CP = GenerateModelCP(prep, MP),
+                      PC = GenerateModelPC(prep, MP)
+  )
 
 
-  # Step 1: 数据预处理
-  prepared_data <- PrepareData(data = data,
-                               M_C1 = M_C1,
-                               M_C2 = M_C2,
-                               Y_C1 = Y_C1,
-                               Y_C2 = Y_C2)
+  ## ── 3  拟合 + 抽样（按 Na & ci_method 分流） ──────────────────────
+  .v(sprintf("Na = %s  |  ci_method = %s", Na, ci_method), verbose = verbose)
 
-  # Step 2: 构建模型
-  # P is parallel mediation, CN is chained mediation, CP/PC is parallel + chain mediation
-  if (form == "P") {
-    sem_model <- GenerateModelP(prepared_data)
-  } else if (form == "CP") {
-    sem_model <- GenerateModelCP(prepared_data)
-  } else if (form == "PC") {
-    sem_model <- GenerateModelPC(prepared_data)
-  } else if (form == "CN") {
-    sem_model <- GenerateModelCN(prepared_data)
-  } else {
-    stop("Invalid 'form' parameter. Use 'CP', 'PC' or 'CN'.")
-  }
+  need_mc   <- ci_method %in% c("mc", "both")      # 是否跑 Monte-Carlo
+  need_boot <- ci_method %in% c("bootstrap", "both")
 
-  # fit the model
-  if (Na == "DE") {
-    # 删除缺失值的模型拟合
-    fit <- lavaan::sem(
-      model = sem_model,
-      data = prepared_data,
-      se = se,
-      bootstrap = bootstrap,
-      iseed = iseed,
-      fixed.x = fixed.x,
-      warn = FALSE
-    )
-  } else if (Na == "FIML") {
-    # 使用 FIML 方法处理缺失值
-    fit <- lavaan::sem(
-      model = sem_model,
-      data = prepared_data,
-      missing = "fiml",
-      fixed.x = fixed.x,
-      warn = FALSE
-    )
-  } else if (Na == "MI") {
-    fit <- lavaan::sem(
-      model = sem_model,
-      data = prepared_data,
-      fixed.x = fixed.x,
-      warn = FALSE
-    )
-    if (!inherits(fit, "lavaan")) {
-      stop("Model fitting failed. Check your input model and data.")
-    }
-  }
-  # Monte Carlo
-  mi_result <- NULL
-  fiml_result <- NULL
+  mc          <- list()        # 统一容器
+  theta_mc    <- NULL
+  theta_boot  <- NULL
+  param_boot  <- NULL
+  fit_u <- NULL
+
+  ## ---- 3A: MI  --------------------------------------------------------------
   if (Na == "MI") {
-    # Step 4: MCMI 分析（可选）
-    mi_result <- RunMCMIAnalysis(
+
+    mi_out <- RunMCMIAnalysis(
       data_missing = data,
-      m = m,
-      method = method,
-      seed = seed,
-      M_C1 = M_C1,
-      M_C2 = M_C2,
-      Y_C1 = Y_C1,
-      Y_C2 = Y_C2,
-      sem_model = sem_model,
-      Na = Na,
-      R = R,
-      alpha = alpha,
-      decomposition = decomposition,
-      pd = pd,
-      tol = tol
+      m            = mi_args$m,
+      method_num   = mi_args$method_num,
+      seed         = mi_args$seed,
+      M_C1, M_C2, Y_C1, Y_C2,
+      C_C1, C_C2, C, C_type,
+      W,    W_type,
+      keep_W_raw   = TRUE,
+      keep_C_raw   = TRUE,
+      sem_model    = sem_model,
+      Na           = "MI",
+      R            = R,
+      alpha        = alpha,
+      decomposition = mi_args$decomposition,
+      pd            = mi_args$pd,
+      tol           = mi_args$tol
     )
-  }
-  if (Na == "FIML"){
-    fiml_result <- MC(fit,
-                      R = R,
-                      alpha = alpha)
+
+    mc$result <- mi_out$mc_result
+    theta_mc  <- mc$result$thetahatstar
+    mc$fit    <- lavaan::sem(sem_model, mi_out$first_imputed_data,
+                             fixed.x = fixed.x, warn = FALSE)
+    prep      <- mi_out$first_imputed_data           # 后续调节分析用
+
+  } else {
+
+    ## ---- 3B: DE / FIML ------------------------------------------------------
+
+    # 3B-1  拟合 lavaan +（可选）MC
+    mc <- .fit_and_mc(
+      sem_model, prep,
+      Na      = Na,
+      R       = R,
+      alpha   = alpha,
+      fixed.x = fixed.x,
+      verbose = verbose,
+      run_mc  = need_mc              # ← 关键开关
+    )
+
+    if (!is.null(mc$result)) {
+      theta_mc <- mc$result$thetahatstar
+    }
+
+    # 3B-2  Bootstrap（如需）
+    if (need_boot) {
+      .v(sprintf("Bootstrap draws (B = %d) ...", bootstrap), verbose = verbose)
+
+      fit_u <- semboottools::store_boot(
+        object           = mc$fit,
+        R                = bootstrap,
+        iseed            = iseed,
+        do_bootstrapping = TRUE,
+        ncpus            = parallel::detectCores(1L),
+        parallel         = "snow")
+
+      theta_boot <- slot(fit_u, "external")$sbt_boot_ustd
+      ok <- complete.cases(theta_boot)
+      if (!all(ok)) {
+        .v(sprintf("Filtered %d non-converged replicates.", sum(!ok)),
+           verbose = verbose)
+        theta_boot <- theta_boot[ok, , drop = FALSE]
+      }
+
+      theta_boot <- .add_indirect_boot(theta_boot, sem_model)
+
+      param_boot <- semboottools::parameterEstimates_boot(
+        object        = fit_u,
+        level         = 1 - alpha,
+        boot_ci_type  = boot_ci_type,
+        boot_pvalue   = TRUE)
+
+      mc$theta_boot <- theta_boot
+      mc$bootstrap  <- param_boot
+      assign("fit_u", fit_u, inherits = TRUE)   # 供后面标准化块使用
+    }
   }
 
-  # Step 5: 标准化结果
-  # 初始化结果变量
-  std_result <- NULL
-  std_mi_result <- NULL
-  std_fiml_result <- NULL
+  ## ---- 3C: 结果存在性检查 ---------------------------------------------------
+  if (is.null(theta_mc) && is.null(theta_boot))
+    stop("No sampling draws were produced; model may have failed.",
+         call. = FALSE)
 
-  # 生成标准化结果
+
+
+  ## ── 5  调节分析 (路由 CI 来源) ─────────────────────────────────
+  make_mod <- function(theta_mat) {
+    .make_moderation(
+      mc_res  = theta_mat,
+      data    = prep,
+      W       = W,
+      MP      = MP,
+      W_type  = W_type,
+      alpha   = alpha,
+      verbose = verbose)
+  }
+
+  moderation <- switch(ci_method,
+                       mc        = make_mod(theta_mc),
+                       bootstrap = make_mod(theta_boot),
+                       both      = list(mc   = make_mod(theta_mc),
+                                        boot = make_mod(theta_boot)))
+
+  ## ── 6  标准化结果 ───────────────────────────────────────────────
+  mc$std_mc   <- NULL   # Monte-Carlo 标准化结果
+  mc$std_boot <- NULL   # Bootstrap   标准化结果
+
   if (standardized) {
-    tryCatch({
-      if (Na == "DE") {
-        std_result <- semhelpinghands::standardizedSolution_boot_ci(fit)
-        if (is.null(std_result)) {
-          warning("Standardized solution for DE method returned NULL.")
+    ## 6-A  Monte-Carlo 标准化
+    if (need_mc && !is.null(theta_mc)) {
+      mc$std_mc <- tryCatch(
+        MCStd2(mc$result, alpha = alpha),
+        error = function(e) {
+          warning("MCStd2 failed: ", e$message)
+          NULL
         }
-      }
+      )
+    }
 
-      if (Na == "MI") {
-        if (is.null(mi_result)) {
-          warning("MI result is NULL, cannot compute standardized solution.")
-        } else {
-          std_mi_result <- tryCatch(
-            semmcci::MCStd(mi_result, alpha = alphastd),
-            error = function(e) {
-              warning("Standardized solution for MI failed: ", e$message)
-              NULL
-            }
-          )
-        }
-      }
+    ## 6-B  Bootstrap 标准化（仅 DE / FIML）
+    if (need_boot && exists("fit_u") && !is.null(fit_u)) {
+      boot_ci_type <- match.arg(boot_ci_type,
+                                choices = c("perc", "bc", "bca.simple"))
 
-      if (Na == "FIML") {
-        if (is.null(fiml_result)) {
-          warning("FIML result is NULL, cannot compute standardized solution.")
-        } else {
-          std_fiml_result <- tryCatch(
-            semmcci::MCStd(fiml_result, alpha = alphastd),
-            error = function(e) {
-              warning("Standardized solution for FIML failed: ", e$message)
-              NULL
-            }
-          )
+      mc$std_boot <- tryCatch(
+        semboottools::standardizedSolution_boot(
+          object             = fit_u,
+          level              = 1 - alpha,
+          type               = "std.all",
+          boot_ci_type       = boot_ci_type,
+          save_boot_est_std  = TRUE,
+          boot_pvalue        = TRUE),
+        error = function(e) {
+          warning("standardizedSolution_boot failed: ", e$message)
+          NULL
         }
-      }
-    }, error = function(e) {
-      warning("Error during standardized solution generation: ", e$message)
-    })
+      )
+    }
+
   }
 
 
   input_vars <- list(
-    M_C1 = M_C1,
-    M_C2 = M_C2,
-    Y_C1 = Y_C1,
-    Y_C2 = Y_C2
+    M_C1 = M_C1, M_C2 = M_C2,
+    Y_C1 = Y_C1, Y_C2 = Y_C2,
+    C_C1 = C_C1, C_C2 = C_C2,
+    C    = C,    C_type = C_type,
+    W    = W,    W_type = W_type
   )
 
-  paras <- list(
-    alpha = alpha,  # 显著性水平
-    m = m,  # 插补次数
-    method = method,  # 插补方法
-    decomposition = decomposition,
-    pd = pd,
-    tol = tol,
-    seed = seed,
-    alphastd = alphastd
-  )
 
+  ## ── 7  返回对象 ────────────────────────────────────────────────────
   out <- list(
-    prepared_data = prepared_data,
-    model_summary = summary(fit, fit.measures = TRUE, standardized = standardized),
-    lavaan_fit = fit,
-    sem_model = sem_model,
-    mi_result = mi_result,
-    fiml_result = fiml_result,
-    std_result = std_result,
-    std_mi_result = std_mi_result,
-    std_fiml_result = std_fiml_result,
+    data       = prep,
+    sem_model  = sem_model,
+    mc         = mc,                 # 所有 MC + bootstrap 抽样结果
+    param_boot = param_boot,         # bootstrap 参数表 (NULL if not used)
+    moderation = moderation,         # 已路由
+    alpha      = alpha,
+    Na         = Na,
+    form       = form,
+    ci_method  = ci_method,
     input_vars = input_vars,
-    alphastd = alphastd,
-    alpha = alpha,
-    Na = Na,
-    iseed = iseed,
-    paras = paras,
-    standardized = standardized
+    fit_u  = fit_u
   )
-
-  # Step 6: 返回结果
   class(out) <- "wsMed"
-  return(out)
+  out
 }
+
+
+

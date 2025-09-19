@@ -10,9 +10,9 @@ vignette: >
 ## Introduction
 
 The `GenerateModelCP` function dynamically generates a Structural Equation Model (SEM) formula to analyze models with a single chained mediator and multiple parallel mediators for 'lavaan' based on the prepared dataset. This document explains the mathematical principles and the structure of the generated model.
-```{r, echo=FALSE, out.width="100%"}
-knitr::include_graphics("CP.png")
-```
+<p align="center">
+  <img src="Wd.png" alt="serial + parallel mediation model" width="100%">
+</p>
 
 ---
 
@@ -159,16 +159,16 @@ CI_{\text{path}_1\text{vs}\text{path}_2} = \text{indirect}_{\text{path}_1} - \te
 
 ---
 
-## 5. Pre- and Post-Measurement Coefficients
+## 5. C1 and C2 Coefficients
 
 ### Definitions
 
-1. **Post-Measurement Coefficient (\( X1_{b,i} \)):**
+1. **C2-Measurement Coefficient (\( X1_{b,i} \)):**
    \[
    X1_{b,i} = b_i + d_i
    \]
 
-2. **Pre-Measurement Coefficient (\( X0_{b,i} \)):**
+2. **C1-Measurement Coefficient (\( X0_{b,i} \)):**
    \[
    X0_{b,i} = X1_{b,i} - d_i
    \]
@@ -227,6 +227,7 @@ CI_{\text{path}_1\text{vs}\text{path}_2} = \text{indirect}_{\text{path}_1} - \te
 
 
 ---
+
 
 ## 6. Summary of Regression Equations
 

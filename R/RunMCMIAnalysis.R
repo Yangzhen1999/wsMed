@@ -1,81 +1,80 @@
-#' @title Perform Monte Carlo Analysis with Multiple Imputation for SEM Models
+#' @title Monte Carlo SEM with Multiple Imputation (WsMed Workflow)
 #'
-#' @description Automates the process of handling missing data with multiple imputation
-#' and conducting Monte Carlo confidence interval (MCCI) analysis for structural equation modeling (SEM).
-#' The function prepares the imputed datasets, fits the specified SEM model, and generates Monte Carlo
-#' confidence intervals for the model parameters.
+#' @description
+#' `RunMCMIAnalysis()` is a helper that:
+#' \enumerate{
+#' \item imputes missing data via \code{\link{PrepareMissingData}};
+#' \item generates all WsMed variables in each completed data set;
+#' \item fits the user-supplied SEM model to each replicate; and
+#' \item pools the results via \code{MCMI2()}, producing Monte Carlo
+#'       confidence intervals (MCCI) for all model parameters.
+#' }
 #'
-#' @details This function streamlines the workflow for SEM analysis with missing data by integrating:
+#' @details
+#' Internally the function calls:
+#' \itemize{
+#'   \item \code{PrepareMissingData()} – performs multiple imputation
+#'         (\strong{logreg} / \strong{polyreg} for categorical variables,
+#'         and \code{method_num} for numeric) and applies
+#'         \code{\link{PrepareData}} to each imputed set;
+#'   \item \code{MCMI2()} – pools parameter estimates across the
+#'         \code{m} imputations and draws \code{R} Monte Carlo samples.
+#' }
 #'
-#' - **Multiple Imputation**: Uses [PrepareMissingData()] to impute missing values and calculate the necessary
-#' difference and centered average scores for mediators and the outcome variable.
+#' Only the missing-data strategy \code{Na = "MI"} is supported.
 #'
-#' - **SEM Fitting and Monte Carlo Analysis**: Uses [MCMI2()] to fit the specified SEM model to the imputed datasets,
-#' pool the parameter estimates, and compute Monte Carlo confidence intervals.
+#' @param data_missing Data frame with missing values.
+#' @param m Integer, number of imputations. Default \code{5}.
+#' @param method_num Character, imputation method for numeric variables
+#'   (e.g., \code{"pmm"}, \code{"norm"}). Default \code{"pmm"}.
+#' @param seed Integer random seed (passed to \code{mice} and \code{MCMI2}).
 #'
-#' This function is suitable for mediation or other SEM analyses where missing data need to be addressed
-#' through multiple imputation and Monte Carlo methods for enhanced precision.
+#' @param M_C1,M_C2 Character vectors: mediator names at condition 1 & 2
+#'   (same length).
+#' @param Y_C1,Y_C2 Character scalars: outcome names at condition 1 & 2.
 #'
-#' @param data_missing A data frame containing the raw dataset with missing values.
-#' @param m An integer specifying the number of imputations to perform. Default is `5`.
-#' @param method A character string specifying the imputation method. Default is `"pmm"`
-#' (predictive mean matching). Other methods supported by [mice()] can be used.
-#' @param seed An integer specifying the random seed for reproducibility. Default is `123`.
-#' @param M_C1 A character vector of column names representing mediators "before" the intervention.
-#' @param M_C2 A character vector of column names representing mediators "after" the intervention.
-#' Must match the length of `M_C1`.
-#' @param Y_C1 A character string representing the column name of the outcome variable "before" the intervention.
-#' @param Y_C2 A character string representing the column name of the outcome variable "after" the intervention.
-#' @param sem_model A character string specifying the SEM model syntax.
-#' @param Na A character string specifying the missing data handling strategy. Currently, only `"MI"` (Multiple Imputation) is supported. Default is `"MI"`.
-#' @param R An integer specifying the number of Monte Carlo samples. Default is `20000L`.
-#' @param alpha A numeric vector specifying significance levels for the confidence intervals. Default is `c(0.001, 0.01, 0.05)`.
-#' @param decomposition A character string specifying the decomposition method for the covariance matrix.
-#' Default is `"eigen"`. Options include `"chol"`, `"eigen"`, or `"svd"`.
-#' @param pd A logical value indicating whether to ensure positive definiteness of the covariance matrix. Default is `TRUE`.
-#' @param tol A numeric value specifying the tolerance for positive definiteness checks. Default is `1e-06`.
+#' @param C_C1,C_C2 Optional character vectors: within-subject controls.
+#' @param C Optional character vector: between-subject controls.
+#' @param C_type Optional vector (length = \code{C});
+#'   each element \code{"continuous"}, \code{"categorical"}, or
+#'   \code{"auto"} (default).
 #'
-#' @return A `semmcci` object containing the Monte Carlo analysis results, including:
-#' - `thetahat`: The pooled parameter estimates.
-#' - `thetahatstar`: Monte Carlo samples for parameter estimates.
-#' - Other components specific to the `semmcci` class.
+#' @param W Optional character vector: moderator name(s).
+#' @param W_type Optional vector (length = \code{W});
+#'   same coding as \code{C_type}.
+#' @param keep_W_raw,keep_C_raw Logical; keep raw W / C columns in the
+#'   processed data? Defaults \code{TRUE}.
 #'
-#' @seealso [PrepareMissingData()], [MCMI2()], [wsMed()]
+#' @param sem_model Character string, lavaan syntax of the SEM to be fitted.
 #'
-#' @examples
-#' # Example dataset with missing values
-#' data(example_data)
-#' set.seed(123)  
-#' example_dataN <- mice::ampute(
-#'    data = example_data,       
-#'    prop = 0.1,       
-#'    )$amp
+#' @param Na Character, missing-data strategy. Currently only
+#'   \code{"MI"} is implemented.
 #'
+#' @param R Integer, number of Monte Carlo samples (default \code{20000L}).
+#' @param alpha Numeric vector, significance levels for two-sided CIs
+#'   (default \code{c(0.001, 0.01, 0.05)}).
+#' @param decomposition Decomposition used by \code{MCMI2()}
+#'   (\code{"eigen"} | \code{"chol"} | \code{"svd"}). Default \code{"eigen"}.
+#' @param pd Logical, enforce positive-definite covariance (default \code{TRUE}).
+#' @param tol Numeric tolerance for PD checks. Default \code{1e-6}.
 #'
-#' # Example SEM model
-#' sem_model <- "
-#'   Ydiff ~ cp * 1 + b1 * M1diff
-#'   M1diff ~ a1 * 1
-#'   indirect := a1 * b1
-#'   total := cp + indirect
-#' "
+#' @return A list with three elements:
+#' \describe{
+#'   \item{\code{mc_result}}{A \code{semmcci} object returned by
+#'         \code{MCMI2()}.}
+#'   \item{\code{first_imputed_data}}{The first processed data frame
+#'         (useful for inspection or plotting).}
+#'   \item{\code{imputation_summary}}{Diagnostics from
+#'         \code{PrepareMissingData()}.}
+#' }
 #'
-#' # Perform Monte Carlo analysis with multiple imputation
-#' result <- RunMCMIAnalysis(
-#'   data_missing =  example_dataN,
-#'   m = 5,
-#'   method = "pmm",
-#'   seed = 123,
-#'   M_C1 = c("A2", "B2"),
-#'   M_C2 = c("A1", "B1"),
-#'   Y_C1 = "C2",
-#'   Y_C2 = "C1",
-#'   sem_model = sem_model,
-#'   R = 1000,
-#'   alpha = c(0.05, 0.01)
-#' )
+#' @seealso
+#' \code{\link{PrepareMissingData}}, \code{\link{PrepareData}}, \code{MCMI2},
+#' \code{wsMed}
 #'
-#' @export
+#' @keywords internal
+
+
 
 RunMCMIAnalysis <- function(data_missing,
                             m = 5,
@@ -85,6 +84,10 @@ RunMCMIAnalysis <- function(data_missing,
                             M_C2,
                             Y_C1,
                             Y_C2,
+                            C_C1 = NULL,
+                            C_C2 = NULL,
+                            C = NULL,
+                            W = NULL,  # <-- 添加对 W 的支持
                             sem_model,
                             Na = "MI",
                             R = 20000L,
@@ -92,12 +95,11 @@ RunMCMIAnalysis <- function(data_missing,
                             decomposition = "eigen",
                             pd = TRUE,
                             tol = 1e-06) {
-  # Step 1: 初始化结果变量
-  mi_result <- NULL
 
-  # Step 2: 检查是否启用 Monte Carlo (MC)
+  mi_result <- NULL
+  first_imputed_data <- NULL
+
   if (Na == "MI") {
-    # 插补并处理数据
     prepared_data <- PrepareMissingData(
       data_missing = data_missing,
       m = m,
@@ -106,13 +108,16 @@ RunMCMIAnalysis <- function(data_missing,
       M_C1 = M_C1,
       M_C2 = M_C2,
       Y_C1 = Y_C1,
-      Y_C2 = Y_C2
+      Y_C2 = Y_C2,
+      C_C1 = C_C1,
+      C_C2 = C_C2,
+      C = C,
+      W = W  # <-- 传递调节变量
     )
 
-    # 获取处理后的插补数据集列表
     processed_data_list <- prepared_data$processed_data_list
+    first_imputed_data <- processed_data_list[[1]]
 
-    # 调用 MCMI2 进行 Monte Carlo 分析
     mi_result <- MCMI2(
       sem_model = sem_model,
       imputations = processed_data_list,
@@ -127,6 +132,80 @@ RunMCMIAnalysis <- function(data_missing,
     stop("MI is set to FALSE. Currently, only MI = TRUE is supported.")
   }
 
-  # 返回分析结果
-  return(mi_result)
+  return(list(
+    mc_result = mi_result,
+    first_imputed_data = first_imputed_data
+  ))
 }
+
+RunMCMIAnalysis <- function(data_missing,
+                            m            = 5,
+                            method_num   = "pmm",   # ← 对连续变量的插补方法
+                            seed         = 123,
+                            ## ---------- 设计变量 ----------
+                            M_C1,  M_C2,
+                            Y_C1,  Y_C2,
+                            C_C1 = NULL,  C_C2 = NULL,
+                            C     = NULL, C_type = NULL,
+                            W     = NULL, W_type = NULL,
+                            keep_W_raw = TRUE,
+                            keep_C_raw = TRUE,
+                            ## ---------- SEM + MC ----------
+                            sem_model,
+                            Na           = "MI",
+                            R            = 20000L,
+                            alpha        = c(0.001, 0.01, 0.05),
+                            decomposition= "eigen",
+                            pd           = TRUE,
+                            tol          = 1e-06) {
+
+
+  if (Na != "MI")
+    stop("Currently RunMCMIAnalysis only supports Na = 'MI'.")
+
+  quiet <- function(expr){
+    nullfile <- if (.Platform$OS.type=="windows") "NUL" else "/dev/null"
+    zz <- file(nullfile, open="wt")
+    sink(zz); sink(zz, type="message")
+    on.exit({ sink(type="message"); sink(); close(zz) }, add = TRUE)
+    force(expr)
+  }
+
+  ## ---------- 1. PrepareMissingData ----------
+  prepared <- quiet (PrepareMissingData(
+    data_missing = data_missing,
+    m            = m,
+    method_num   = method_num,
+    seed         = seed,
+    M_C1         = M_C1,  M_C2 = M_C2,
+    Y_C1         = Y_C1,  Y_C2 = Y_C2,
+    C_C1         = C_C1,  C_C2 = C_C2,
+    C            = C,     C_type = C_type,
+    W            = W,     W_type = W_type,
+    keep_W_raw   = keep_W_raw,
+    keep_C_raw   = keep_C_raw
+  ))
+
+  processed_list     <- prepared$processed_data_list
+  first_imputed_data <- processed_list[[1]]
+
+  ## ---------- 2. Monte-Carlo multiple-imputation inference ----------
+  mi_result <- MCMI2(
+    sem_model   = sem_model,
+    imputations = processed_list,
+    R           = R,
+    alpha       = alpha,
+    decomposition = decomposition,
+    pd          = pd,
+    tol         = tol,
+    seed        = seed
+  )
+
+  ## ---------- 3. 返回 ----------
+  list(
+    mc_result          = mi_result,
+    first_imputed_data = first_imputed_data,
+    imputation_summary = prepared$imputation_summary
+  )
+}
+

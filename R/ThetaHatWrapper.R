@@ -18,7 +18,8 @@
 #'
 #' @examples NULL
 #'
-#' @export
+#' @keywords internal
+
 
 ThetaHatWrapper <- function(object,
                       est = NULL) {

@@ -1,0 +1,210 @@
+﻿
+Run MATRIX procedure:
+
+*********************** MEMORE Procedure for SPSS Version 3.0 ***********************
+
+                           Written by Amanda Montoya
+
+                    Documentation available at github.com/akmontoya/MEMORE
+
+**************************** ANALYSIS NOTES AND WARNINGS ****************************
+
+Number of samples for Monte Carlo condifidence intervals:
+  5000
+
+The following variables were mean centered prior to analysis:
+ (        TSRQ_T2   +       TSRQ_T1  )        /2
+ (        WEMBS_T2  +       WEMBS_T1 )        /2
+
+Level of confidence for all confidence intervals in output:
+      95.00
+
+**************************************************************************************
+
+Model:
+  14
+
+Variables:
+Y =   DASSS_T2 DASSS_T1
+W =   BMI
+M1 =  TSRQ_T2  TSRQ_T1
+M2 =  WEMBS_T2 WEMBS_T1
+
+Computed Variables:
+Ydiff =           DASSS_T2  -       DASSS_T1
+M1diff =          TSRQ_T2   -       TSRQ_T1
+M2diff =          WEMBS_T2  -       WEMBS_T1
+M1avg  = (        TSRQ_T2   +       TSRQ_T1  )        /2                         Centered
+M2avg  = (        WEMBS_T2  +       WEMBS_T1 )        /2                         Centered
+Int1  =  BMI      *        (        TSRQ_T2   +       TSRQ_T1  )        /2       Centered
+Int2  =  BMI      *        (        WEMBS_T2  +       WEMBS_T1 )        /2       Centered
+
+Sample Size:
+  63
+
+**************************************************************************************
+Outcome: Ydiff =  DASSS_T2  -       DASSS_T1
+
+Model Summary
+          R       R-sq        MSE          F        df1        df2          p
+      .1110      .0123    18.4397      .7612     1.0000    61.0000      .3864
+
+Model
+               Coef         SE          t          p       LLCI       ULCI
+constant    -4.7456     2.0201    -2.3493      .0221    -8.7837     -.7076
+W             .0683      .0782      .8724      .3864     -.0881      .2247
+
+Degrees of freedom for all regression coefficient estimates:
+  61
+
+Conditional Effect of Focal Predictor on Outcome at values of Moderator(s)
+ Focal:   'X'      (X)
+ Outcome: Ydiff    (Y)
+ Mod:     BMI      (W)
+
+
+        BMI     Effect         SE          t          p       LLCI       ULCI
+    17.9047    -3.5234      .7682    -4.5867      .0000    -5.0595    -1.9873
+    24.8748    -3.0476      .5410    -5.6332      .0000    -4.1294    -1.9658
+    31.8449    -2.5718      .7682    -3.3479      .0014    -4.1079    -1.0357
+
+     Values for quantitative moderators are the mean and plus/minus one SD from the mean.
+
+Degrees of freedom for all conditional effects:
+  61
+
+**************************************************************************************
+Outcome: M1diff = TSRQ_T2   -       TSRQ_T1
+
+Model
+               Coef         SE          t          p       LLCI       ULCI
+constant     1.2381      .8625     1.4355      .1562     -.4860     2.9621
+
+Degrees of freedom for all regression coefficient estimates:
+  62
+
+**************************************************************************************
+Outcome: M2diff = WEMBS_T2  -       WEMBS_T1
+
+Model
+               Coef         SE          t          p       LLCI       ULCI
+constant     1.6349      .6252     2.6152      .0112      .3852     2.8846
+
+Degrees of freedom for all regression coefficient estimates:
+  62
+
+**************************************************************************************
+Outcome: Ydiff =  DASSS_T2  -       DASSS_T1
+
+Model Summary
+          R       R-sq        MSE          F        df1        df2          p
+      .5157      .2660    15.1987     2.8473     7.0000    55.0000      .0131
+
+Model
+               Coef         SE          t          p       LLCI       ULCI
+constant    -4.1200     2.0477    -2.0120      .0491    -8.2237     -.0163
+W             .0617      .0773      .7976      .4285     -.0933      .2166
+M1diff        .0679      .0737      .9207      .3612     -.0799      .2156
+M2diff       -.3411      .1060    -3.2164      .0022     -.5536     -.1286
+M1avg         .0418      .2473      .1689      .8665     -.4539      .5375
+M2avg        -.2606      .5341     -.4880      .6275    -1.3311      .8098
+Int1         -.0019      .0102     -.1863      .8529     -.0224      .0186
+Int2         -.0004      .0219     -.0191      .9848     -.0442      .0434
+
+Degrees of freedom for all regression coefficient estimates:
+  55
+
+--------------------------------------------------------------------------------------
+
+Conditional Effect of Focal Predictor on Outcome at values of Moderator(s)
+ Focal:   'X'      (X)
+ Outcome: Ydiff    (Y)
+ Mod:     BMI      (W)
+
+
+        BMI      M1avg      M2avg     Effect         SE          t          p       LLCI       ULCI
+    17.9047     1.0269     -.5395    -2.8632      .7744    -3.6973      .0005    -4.4152    -1.3113
+    24.8748      .0000      .0000    -2.5859      .5373    -4.8127      .0000    -3.6627    -1.5091
+    31.8449    -1.0269      .5395    -2.2844      .7407    -3.0843      .0032    -3.7688     -.8001
+
+     Values for quantitative moderators are the mean and plus/minus one SD from the mean.
+
+     Values for mediator averages are the conditional values based on the values of the moderator.
+
+--------------------------------------------------------------------------------------
+
+Conditional Effect of Focal Predictor on Outcome at values of Moderator(s)
+ Focal:   M1avg    (XM)
+ Outcome: Ydiff    (Y)
+ Mod:     BMI      (W)
+
+
+        BMI     Effect         SE          t          p       LLCI       ULCI
+    17.9047      .0077      .0831      .0924      .9267     -.1588      .1742
+    24.8748     -.0056      .0623     -.0899      .9287     -.1304      .1192
+    31.8449     -.0189      .1049     -.1799      .8579     -.2291      .1913
+
+     Values for quantitative moderators are the mean and plus/minus one SD from the mean.
+
+--------------------------------------------------------------------------------------
+
+Conditional Effect of Focal Predictor on Outcome at values of Moderator(s)
+ Focal:   M2avg    (XM)
+ Outcome: Ydiff    (Y)
+ Mod:     BMI      (W)
+
+
+        BMI     Effect         SE          t          p       LLCI       ULCI
+    17.9047     -.2681      .1819    -1.4738      .1462     -.6327      .0965
+    24.8748     -.2710      .1334    -2.0322      .0470     -.5383     -.0037
+    31.8449     -.2739      .2212    -1.2385      .2208     -.7172      .1693
+
+     Values for quantitative moderators are the mean and plus/minus one SD from the mean.
+
+--------------------------------------------------------------------------------------
+
+Degrees of freedom for all conditional effects:
+  55
+
+******************* CONDITIONAL TOTAL, DIRECT, AND INDIRECT EFFECTS *******************
+
+Conditional Total Effect of X on Y at values of the Moderator(s)
+        BMI     Effect         SE          t         df          p       LLCI       ULCI
+    17.9047    -3.5234      .7682    -4.5867    61.0000      .0000    -5.0595    -1.9873
+    24.8748    -3.0476      .5410    -5.6332    61.0000      .0000    -4.1294    -1.9658
+    31.8449    -2.5718      .7682    -3.3479    61.0000      .0014    -4.1079    -1.0357
+
+     Values for quantitative moderators are the mean and plus/minus one SD from the mean.
+
+Conditional Direct Effect of X on Y at values of the Moderator(s)
+        BMI      M1avg      M2avg     Effect         SE          t         df          p       LLCI       ULCI
+    17.9047     1.0269     -.5395    -2.8632      .7744    -3.6973    55.0000      .0005    -4.4152    -1.3113
+    24.8748      .0000      .0000    -2.5859      .5373    -4.8127    55.0000      .0000    -3.6627    -1.5091
+    31.8449    -1.0269      .5395    -2.2844      .7407    -3.0843    55.0000      .0032    -3.7688     -.8001
+
+     Values for quantitative moderators are the mean and plus/minus one SD from the mean.
+
+     Values for mediator averages (Mavg) are the conditional values based on the values of the moderator.
+
+Indirect Effect of X on Y through M
+          Effect       MCSE     MCLLCI     MCULCI
+Ind1       .0840      .1220     -.1075      .3773
+Ind2      -.5577      .2790    -1.1816     -.0992
+Total     -.4736      .3095    -1.1217      .0841
+
+Indirect Key
+Ind1  'X'      ->       M1diff   ->       Ydiff
+Ind2  'X'      ->       M2diff   ->       Ydiff
+
+******************************** INDICES OF MODERATION ********************************
+
+Test of Moderation of the Total Effect
+      Effect         SE          t         df          p       LLCI       ULCI
+W      .0683      .0782      .8724    61.0000      .3864     -.0881      .2247
+
+Test of Moderation of the Direct Effect
+      Effect         SE          t         df          p       LLCI       ULCI
+W      .0617      .0773      .7976    55.0000      .4285     -.0933      .2166
+
+------ END MATRIX -----
+
