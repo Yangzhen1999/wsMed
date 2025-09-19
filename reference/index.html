@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,15 +20,15 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials"><li><a class="dropdown-item" href="../articles/wsMed.html">Introduction to wsMed</a></li>
-    <li><a class="dropdown-item" href="../articles/printGM.html">Using printGM() to generate SEM models in detail</a></li>
+    <li><a class="dropdown-item" href="../articles/printGM.html">Using printGM() to Generate SEM Models</a></li>
     <li><a class="dropdown-item" href="../articles/GenerateModelP.html">Parallel Mediation (P)</a></li>
     <li><a class="dropdown-item" href="../articles/GenerateModelCN.html">Chained Mediation (CN)</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelCP.html">Combined Parallel and Chained Mediation (CP)</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelPC.html">Parallel + Chained Mediation (PC)</a></li>
-    <li><a class="dropdown-item" href="../articles/MEMORE_vs_wsMed.html">Comparison of MEMORE 3.0 and wsMed Outputs</a></li>
+    <li><a class="dropdown-item" href="../articles/GenerateModelCP.html">Combined Parallel and Chained (CP)</a></li>
+    <li><a class="dropdown-item" href="../articles/GenerateModelPC.html">Parallel + Chained (PC)</a></li>
+    <li><a class="dropdown-item" href="../articles/MEMORE_vs_wsMed.html">Comparison: MEMORE 3.0 vs wsMed</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
-      </ul><ul class="navbar-nav"><li class="nav-item"><a class="nav-link" href="https://github.com/Yangzhen1999/wsMed" aria-label="GitHub Repository"><span class="fa fab fa-github"></span></a></li>
+      </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/Yangzhen1999/wsMed" aria-label="GitHub Repository"><span class="fa fab fa-github"></span></a></li>
       </ul></div>
 
 
@@ -43,7 +43,7 @@
     <div class="section level2">
       <h2 id="main-functions">Main Functions<a class="anchor" aria-label="anchor" href="#main-functions"></a></h2>
 
-      <div class="section-desc"><p>Core functions for mediation analysis</p></div>
+      <div class="section-desc"><p>Core functions for within-subject mediation analysis</p></div>
 
 
     </div><div class="section level2">
@@ -56,55 +56,7 @@
           <code><a href="wsMed.html">wsMed()</a></code>
 
         </dt>
-        <dd>Within-Subject Mediation Analysis</dd>
-      </dl><dl><dt>
-
-          <code><a href="ARIVwrapper.html">ARIVwrapper()</a></code>
-
-        </dt>
-        <dd>Average Relative Increase in Variance</dd>
-      </dl><dl><dt>
-
-          <code><a href="example_data.html">example_data</a></code>
-
-        </dt>
-        <dd>Example Data for within subject mediation</dd>
-      </dl><dl><dt>
-
-          <code><a href="ImputeData.html">ImputeData()</a></code>
-
-        </dt>
-        <dd>Impute Missing Data Using Multiple Imputation</dd>
-      </dl><dl><dt>
-
-          <code><a href="MCDefWrapper.html">MCDefWrapper()</a></code>
-
-        </dt>
-        <dd>Process Monte Carlo Samples for Defined Parameters in SEM</dd>
-      </dl><dl><dt>
-
-          <code><a href="MCMI2.html">MCMI2()</a></code>
-
-        </dt>
-        <dd>Monte Carlo Confidence Intervals for Multiple Imputation SEM Models</dd>
-      </dl><dl><dt>
-
-          <code><a href="MICombineWrapper.html">MICombineWrapper()</a></code>
-
-        </dt>
-        <dd>Wrapper for Internal Multiple Imputation Combining Function</dd>
-      </dl><dl><dt>
-
-          <code><a href="PrepareData.html">PrepareData()</a></code>
-
-        </dt>
-        <dd>Prepare Data for Within-Subject Mediation Analysis</dd>
-      </dl><dl><dt>
-
-          <code><a href="PrepareMissingData.html">PrepareMissingData()</a></code>
-
-        </dt>
-        <dd>Prepare Data with Missing Values for Mediation Analysis</dd>
+        <dd>Within-Subject Mediation Analysis (Two-Condition)</dd>
       </dl><dl><dt>
 
           <code><a href="print.wsMed.html">print(<i>&lt;wsMed&gt;</i>)</a></code>
@@ -113,34 +65,27 @@
         <dd>Print Method for wsMed Objects</dd>
       </dl><dl><dt>
 
-          <code><a href="RunMCMIAnalysis.html">RunMCMIAnalysis()</a></code>
+          <code><a href="printGM.html">printGM()</a></code>
 
         </dt>
-        <dd>Perform Monte Carlo Analysis with Multiple Imputation for SEM Models</dd>
-      </dl><dl><dt>
+        <dd>Print Formatted SEM Model Syntax</dd>
+      </dl></div><div class="section level2">
+      <h2 id="model-generation">Model Generation<a class="anchor" aria-label="anchor" href="#model-generation"></a></h2>
 
-          <code><a href="TestPositiveDefinitewrapper.html">TestPositiveDefinitewrapper()</a></code>
+      <div class="section-desc"><p>Functions for generating SEM syntax for different mediation structures</p></div>
 
-        </dt>
-        <dd>Test for a Positive Definite Matrix</dd>
-      </dl><dl><dt>
 
-          <code><a href="ThetaHatStarWrapper.html">ThetaHatStarWrapper()</a></code>
+    </div><div class="section level2">
 
-        </dt>
-        <dd>Monte Carlo Sampling for Parameter Estimates</dd>
-      </dl><dl><dt>
 
-          <code><a href="ThetaHatWrapper.html">ThetaHatWrapper()</a></code>
 
-        </dt>
-        <dd>Compute Updated Parameter Estimates for SEM Models</dd>
-      </dl><dl><dt>
 
-          <code><a href="TotalAdjwrapper.html">TotalAdjwrapper()</a></code>
+      <dl><dt>
+
+          <code><a href="GenerateModelP.html">GenerateModelP()</a></code>
 
         </dt>
-        <dd>Adjusted Total Sampling Covariance Matrix</dd>
+        <dd>Generate Parallel Mediation Model</dd>
       </dl><dl><dt>
 
           <code><a href="GenerateModelCN.html">GenerateModelCN()</a></code>
@@ -155,24 +100,65 @@
         <dd>Generate Combined Parallel and Chained Mediation Model</dd>
       </dl><dl><dt>
 
-          <code><a href="GenerateModelP.html">GenerateModelP()</a></code>
-
-        </dt>
-        <dd>Generate Parallel Mediation Model</dd>
-      </dl><dl><dt>
-
           <code><a href="GenerateModelPC.html">GenerateModelPC()</a></code>
 
         </dt>
         <dd>Generate Parallel and Chained Mediation Model</dd>
-      </dl><dl><dt>
+      </dl></div><div class="section level2">
+      <h2 id="missing-data-and-imputation">Missing Data and Imputation<a class="anchor" aria-label="anchor" href="#missing-data-and-imputation"></a></h2>
 
-          <code><a href="printGM.html">printGM()</a></code>
+      <div class="section-desc"><p>Functions to handle missing data with multiple imputation</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="ImputeData.html">ImputeData()</a></code>
 
         </dt>
-        <dd>Print Formatted SEM Model Syntax</dd>
+        <dd>Impute Missing Data Using Multiple Imputation</dd>
+      </dl><dl><dt>
+
+          <code><a href="PrepareMissingData.html">PrepareMissingData()</a></code>
+
+        </dt>
+        <dd>Prepare Data with Missing Values for Mediation Analysis</dd>
+      </dl><dl><dt>
+
+          <code><a href="MCMI2.html">MCMI2()</a></code>
+
+        </dt>
+        <dd>Monte Carlo Confidence Intervals for Multiple Imputation SEM Models</dd>
+      </dl><dl><dt>
+
+          <code><a href="PrepareData.html">PrepareData()</a></code>
+
+        </dt>
+        <dd>Prepare Data for Two-Condition Within-Subject Mediation (WsMed)</dd>
+      </dl></div><div class="section level2">
+      <h2 id="plotting-conditional-indirect-effects">Plotting Conditional Indirect Effects<a class="anchor" aria-label="anchor" href="#plotting-conditional-indirect-effects"></a></h2>
+
+      <div class="section-desc"><p>Functions for visualizing conditional indirect effect curves</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="plot_moderation_curve.html">plot_moderation_curve()</a></code>
+
+        </dt>
+        <dd>Plot moderation curves with Johnson-Neyman highlights</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
@@ -180,7 +166,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>

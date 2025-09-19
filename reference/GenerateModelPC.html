@@ -15,7 +15,7 @@ the outcome variable, emphasizing a downstream role for the chained mediator."><
 
     <a class="navbar-brand me-2" href="../index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,15 +28,15 @@ the outcome variable, emphasizing a downstream role for the chained mediator."><
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials"><li><a class="dropdown-item" href="../articles/wsMed.html">Introduction to wsMed</a></li>
-    <li><a class="dropdown-item" href="../articles/printGM.html">Using printGM() to generate SEM models in detail</a></li>
+    <li><a class="dropdown-item" href="../articles/printGM.html">Using printGM() to Generate SEM Models</a></li>
     <li><a class="dropdown-item" href="../articles/GenerateModelP.html">Parallel Mediation (P)</a></li>
     <li><a class="dropdown-item" href="../articles/GenerateModelCN.html">Chained Mediation (CN)</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelCP.html">Combined Parallel and Chained Mediation (CP)</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelPC.html">Parallel + Chained Mediation (PC)</a></li>
-    <li><a class="dropdown-item" href="../articles/MEMORE_vs_wsMed.html">Comparison of MEMORE 3.0 and wsMed Outputs</a></li>
+    <li><a class="dropdown-item" href="../articles/GenerateModelCP.html">Combined Parallel and Chained (CP)</a></li>
+    <li><a class="dropdown-item" href="../articles/GenerateModelPC.html">Parallel + Chained (PC)</a></li>
+    <li><a class="dropdown-item" href="../articles/MEMORE_vs_wsMed.html">Comparison: MEMORE 3.0 vs wsMed</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
-      </ul><ul class="navbar-nav"><li class="nav-item"><a class="nav-link" href="https://github.com/Yangzhen1999/wsMed" aria-label="GitHub Repository"><span class="fa fab fa-github"></span></a></li>
+      </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/Yangzhen1999/wsMed" aria-label="GitHub Repository"><span class="fa fab fa-github"></span></a></li>
       </ul></div>
 
 
@@ -46,7 +46,7 @@ the outcome variable, emphasizing a downstream role for the chained mediator."><
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Generate Parallel and Chained Mediation Model</h1>
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/master/R/GenerateModelPC.R"><code>R/GenerateModelPC.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/master/R/GenerateModelPC.R" class="external-link"><code>R/GenerateModelPC.R</code></a></small>
       <div class="d-none name"><code>GenerateModelPC.Rd</code></div>
     </div>
 
@@ -60,7 +60,7 @@ the outcome variable, emphasizing a downstream role for the chained mediator.</p
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">GenerateModelPC</span><span class="op">(</span><span class="va">prepared_data</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">GenerateModelPC</span><span class="op">(</span><span class="va">prepared_data</span>, MP <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -72,6 +72,19 @@ the outcome variable, emphasizing a downstream role for the chained mediator.</p
 within-subject mediator and outcome variables. The data frame must include columns for
 difference scores (<code>Mdiff</code>) and average scores (<code>Mavg</code>) of mediators, as well as the
 outcome difference score (<code>Ydiff</code>).</p></dd>
+
+
+<dt id="arg-mp">MP<a class="anchor" aria-label="anchor" href="#arg-mp"></a></dt>
+<dd><p>A character vector specifying which paths are moderated by variable(s) W.
+Acceptable values include:
+- <code>"a2"</code>, <code>"a3"</code>, ...: moderation on the a paths (W → Mdiff).
+- <code>"b2"</code>, <code>"b3"</code>, ...: moderation on the b paths (Mdiff × W → Ydiff).
+- <code>"b_2_1"</code>, <code>"b_3_1"</code>, ...: moderation on the cross-paths from parallel mediators to the chain mediator (e.g., M2 → M1).
+- <code>"d_2_1"</code>, <code>"d_3_1"</code>, ...: moderation on the paths from parallel mediators’ centered means to M1.
+- <code>"cp"</code>: moderation on the direct effect of X on Y (i.e., W → Ydiff).</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>      This argument controls which interaction <span class="fu">terms</span> (e.g., \code{int_Mdiff_W}, \code{int_Mavg_W}) are included</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>      <span class="cf">in</span> the regression equations. Variable names are automatically matched using the naming convention</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>      \code{<span class="st">"int_&lt;predictor&gt;_W&lt;index&gt;"</span>}.</span></code></pre><p></p></div></dd>
 
 </dl></div>
     <div class="section level2">
@@ -119,37 +132,17 @@ sequential chained paths, providing a comprehensive mediation analysis framework
 <span class="r-in"><span><span class="co"># Generate SEM model syntax</span></span></span>
 <span class="r-in"><span><span class="va">sem_model</span> <span class="op">&lt;-</span> <span class="fu">GenerateModelPC</span><span class="op">(</span><span class="va">prepared_data</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">sem_model</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Ydiff ~ cp*1 + b1*M1diff + b2*M2diff +  + b3*M3diff + d1*M1avg + d2*M2avg +  + d3*M3avg</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> M1diff ~ a1*1 + b21*M2diff + b31*M3diff + d21*M2avg + d31*M3avg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Ydiff ~ cp*1 + b1*M1diff + d1*M1avg + b2*M2diff + b3*M3diff + d2*M2avg + d3*M3avg</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> M2diff ~ a2*1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> M3diff ~ a3*1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> indirect2 := a2 * b2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> indirect3 := a3 * b3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> indirect1 := a1 * b1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> indirect21 := a2 * b21 * b1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> indirect31 := a3 * b31 * b1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> total_indirect := indirect1 + indirect2 + indirect3 + indirect21 + indirect31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> M1diff ~ a1*1 + b_2_1*M2diff + d_2_1*M2avg + b_3_1*M3diff + d_3_1*M3avg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> indirect_1 := a1 * b1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> indirect_2 := a2 * b2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> indirect_2_1 := a2 * b_2_1 * b1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> indirect_3 := a3 * b3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> indirect_3_1 := a3 * b_3_1 * b1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> total_indirect := indirect_1 + indirect_2 + indirect_2_1 + indirect_3 + indirect_3_1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> total_effect := cp + total_indirect</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI1vs2 := indirect1 - indirect2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI1vs3 := indirect1 - indirect3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI1vs21 := indirect1 - indirect21</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI1vs31 := indirect1 - indirect31</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI2vs3 := indirect2 - indirect3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI2vs21 := indirect2 - indirect21</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI2vs31 := indirect2 - indirect31</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI3vs21 := indirect3 - indirect21</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI3vs31 := indirect3 - indirect31</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI21vs31 := indirect21 - indirect31</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1_b1 := (2*b1 + d1)/2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X0_b1 := X1_b1 - d1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1_b2 := (2*b2 + d2)/2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X0_b2 := X1_b2 - d2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1_b3 := (2*b3 + d3)/2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X0_b3 := X1_b3 - d3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1_b21 := (2*b21 + d21)/2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X0_b21 := X1_b21 - d21</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1_b31 := (2*b31 + d31)/2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X0_b31 := X1_b31 - d31</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -162,7 +155,7 @@ sequential chained paths, providing a comprehensive mediation analysis framework
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>

@@ -1,5 +1,5 @@
 pandoc: 3.1.11
-pkgdown: 2.1.1
+pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   GenerateModelCN: GenerateModelCN.html
@@ -9,7 +9,7 @@ articles:
   MEMORE_vs_wsMed: MEMORE_vs_wsMed.html
   printGM: printGM.html
   WsMed: WsMed.html
-last_built: 2025-03-14T12:17Z
+last_built: 2025-09-19T04:32Z
 urls:
-  reference: https://github.com/Yangzhen1999/wsMed/reference
-  article: https://github.com/Yangzhen1999/wsMed/articles
+  reference: https://yangzhen1999.github.io/wsMed/reference
+  article: https://yangzhen1999.github.io/wsMed/articles
