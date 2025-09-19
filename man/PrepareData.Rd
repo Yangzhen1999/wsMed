@@ -24,36 +24,36 @@ PrepareData(
 \arguments{
 \item{data}{A data frame with the raw pre/post measures.}
 
-\item{M_C1, M_C2}{Character vectors: mediator names at occasion 1 / 2
+\item{M_C1, M_C2}{Character vectors: mediator names at occasion 1 and 2
 (equal length).}
 
-\item{Y_C1, Y_C2}{Character scalars: outcome names at occasion 1 / 2.}
+\item{Y_C1, Y_C2}{Character scalars: outcome names at occasion 1 and 2.}
 
 \item{C_C1, C_C2}{Optional character vectors: within-subject control names.}
 
 \item{C}{Optional character vector: between-subject control names.}
 
 \item{C_type}{Optional vector of the same length as \code{C}.
-Each element \code{"continuous"}, \code{"categorical"}, or \code{"auto"}
+Each element is one of \code{"continuous"}, \code{"categorical"}, or \code{"auto"}
 (default). Ignored when \code{C = NULL}.}
 
-\item{W}{Optional character vector: moderator names (≤ \emph{J}).}
+\item{W}{Optional character vector: moderator names (one or more).}
 
 \item{W_type}{Optional vector of the same length as \code{W}.
 Same coding as \code{C_type}. Ignored when \code{W = NULL}.}
 
-\item{center_W}{Logical. Whether to center the moderator variable W.}
+\item{center_W}{Logical. Whether to center the moderator variable \code{W}.}
 
-\item{keep_W_raw, keep_C_raw}{Logical; keep original W / C columns in the
-returned data?}
+\item{keep_W_raw, keep_C_raw}{Logical. If \code{TRUE}, keep the original
+\code{W} / \code{C} columns in the returned data.}
 }
 \value{
 A data frame containing at minimum:
 \itemize{
-\item \bold{Ydiff}
-\item \bold{Mi_diff}, \bold{Mi_avg} for each mediator \(i\)
-\item centred / dummy-coded \bold{Cb*}, \bold{Cw\emph{diff}, \bold{Cw}avg}
-\item centred / dummy-coded \bold{W*} and all \bold{int_*} interaction terms
+\item \code{Ydiff}
+\item \code{Mi_diff}, \code{Mi_avg} for each mediator
+\item centered or dummy-coded \code{Cb*}, \code{Cw*diff}, \code{Cw*avg}
+\item centered or dummy-coded \code{W*} and all \code{int_*} interaction terms
 }
 plus the attributes \code{"W_info"} and \code{"C_info"} described above.
 }
@@ -62,42 +62,44 @@ plus the attributes \code{"W_info"} and \code{"C_info"} described above.
 required by the \strong{WsMed} workflow.
 It handles \emph{mediators}, \emph{outcome}, \emph{within-subject controls}, \emph{between-subject
 controls}, \emph{moderators}, and all necessary \strong{interaction terms}, while
-automatically centring / dummy-coding variables as needed.
+automatically centering / dummy-coding variables as needed.
 }
 \details{
 The function performs the following steps:
 \enumerate{
-\item \strong{Outcome difference} (\code{Ydiff}) – \verb{Y_C2 − Y_C1}.
-\item \strong{Mediator variables} for each pair \verb{(M_C1[i], M_C2[i])}
+\item Outcome difference: \code{Ydiff = Y_C2 - Y_C1}.
+\item Mediator variables for each pair \code{(M_C1[i], M_C2[i])}:
 \itemize{
-\item \code{Mi_diff} = \verb{M_C2 − M_C1}
-\item \code{Mi_avg}  = mean-centred average of the two occasions.
+\item \code{Mi_diff = M_C2 - M_C1}
+\item \code{Mi_avg} is the mean-centered average of the two occasions.
 }
-\item \strong{Between-subject controls C}
+\item Between-subject controls \code{C}:
 \itemize{
-\item Continuous → grand-mean centred (\code{Cb1}, \code{Cb2}, …).
-\item Categorical (binary or multi-level) → \emph{k – 1} dummy variables
-(\code{Cb1_1}, \code{Cb2_1}, \code{Cb2_2}, …), with the first level as reference.
+\item Continuous variables are grand-mean centered (\code{Cb1}, \code{Cb2}, ...).
+\item Categorical variables (binary or multi-level) are expanded into \code{k - 1}
+dummy variables (\code{Cb1_1}, \code{Cb2_1}, \code{Cb2_2}, ...), using the
+first level as the reference.
 }
-\item \strong{Within-subject controls Cw} – difference & centred-average versions
-(\code{Cw1diff}, \code{Cw1avg}, …).
-\item \strong{Moderators W} (supports ≥ 1):
+\item Within-subject controls \code{Cw}: difference and centered-average versions
+(\code{Cw1diff}, \code{Cw1avg}, ...).
+\item Moderators \code{W} (one or more):
 \itemize{
-\item Continuous → grand-mean centred (\code{W1}, \code{W2}, …).
-\item Categorical → dummy-coded like C.
+\item Continuous variables are grand-mean centered (\code{W1}, \code{W2}, ...).
+\item Categorical variables are dummy-coded in the same way as \code{C}.
 }
-\item \strong{Interaction terms} between every moderator dummy/centred column and
-each \code{Mi_diff} / \code{Mi_avg}:
-\verb{int_<Mi_diff>_<Wj>}, \verb{int_<Mi_avg>_<Wj>}.
-\item Adds two attributes:
+\item Interaction terms between each moderator column and each mediator column:
 \itemize{
-\item \code{"W_info"} – raw names, dummy names, level mapping
-\item \code{"C_info"} – same for between-subject C.
+\item \code{int_<Mi_diff>_<Wj>}, \code{int_<Mi_avg>_<Wj>}.
+}
+\item Two attributes are added to the returned data:
+\itemize{
+\item \code{"W_info"}: raw names, dummy names, level mapping
+\item \code{"C_info"}: same structure for between-subject controls.
 }
 }
 
-Row counts are preserved even if input factors contain \emph{NA}
-(\code{model.matrix()} is called with \code{na.action = na.pass}).
+Row counts are preserved even if input factors contain NA values
+(model.matrix is called with \code{na.action = na.pass}).
 }
 \examples{
 set.seed(1)

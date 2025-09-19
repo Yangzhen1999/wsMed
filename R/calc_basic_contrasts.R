@@ -68,38 +68,34 @@ calc_basic_contrasts <- function(mc_result, ci_level=.95, digits=3){
        Xcoef        = if(length(X_tbl))  fix_pct_names(do.call(rbind,X_tbl))  else NULL)
 }
 
-#' @title 计算 Monte Carlo 样本的估计值、标准误与 CI（带百分号列名）
+
+#' @title Compute Monte Carlo Estimates, Standard Errors, and CIs (with Percent Labels)
 #'
 #' @description
-#' `mc_summary_pct()` 对 Monte Carlo 抽样样本向量 `x` 进行摘要，
-#' 计算其均值、标准差和置信区间，并生成带有百分号格式列名的
-#' `data.frame`。常用于生成具有路径标签的中介效应或路径系数估计表。
+#' `mc_summary_pct()` summarizes a numeric vector of Monte Carlo samples `x` by
+#' computing its mean, standard deviation, and percentile-based confidence interval.
+#' The result is returned as a `data.frame` with column names that include percentage
+#' signs. This function is typically used to generate tables of mediation effects or
+#' path coefficient estimates with path labels.
 #'
-#' 返回列包含：
-#' * `Path`: 路径标签；
-#' * `Estimate`: 样本均值；
-#' * `SE`: 样本标准差；
-#' * `<p%CI.Lo>`, `<p%CI.Up>`: 百分位置信区间上下限，列名中带 `%`。
+#' Returned columns include:
+#' * `Path`: Path label.
+#' * `Estimate`: Sample mean.
+#' * `SE`: Sample standard deviation.
+#' * `<p%CI.Lo>`, `<p%CI.Up>`: Lower and upper bounds of the percentile CI,
+#'   with `%` in the column names.
 #'
-#' @param x       数值向量，Monte Carlo 抽样结果。
-#' @param label   字符型，输出中 `Path` 列的名称。
-#' @param ci_level 置信区间水平（默认 `0.95`）。
-#' @param digits  保留小数位数（默认 `3`）。
+#' @param x       Numeric vector of Monte Carlo samples.
+#' @param label   Character string for the value in the `Path` column of the output.
+#' @param ci_level Confidence level for the CI (default `0.95`).
+#' @param digits  Number of decimal places to retain (default `3`).
 #'
 #' @return
-#' 一个 `data.frame`，包含路径标签、估计值、标准误与 CI。
-#' 列名格式如 `"2.5%CI.Lo"` 与 `"97.5%CI.Up"`。
+#' A `data.frame` containing the path label, estimate, standard error, and CI.
+#' Column names are formatted like `"2.5%CI.Lo"` and `"97.5%CI.Up"`.
 #'
-#' @examples
-#' \dontrun{
-#' x <- rnorm(10000, mean = 0.2, sd = 0.05)
-#' mc_summary_pct(x, label = "indirect_1")
-#' }
-#'
-#' @seealso
-#' [mc_summary_se()] – 返回标准命名列（`CI.LL`, `CI.UL`），适用于内部处理
-#'
-#' @export
+#' @keywords internal
+
 
 mc_summary_pct <- function(x, label, ci_level = .95, digits = 3) {
   lo <- (1 - ci_level)/2 * 100; up <- (1 + ci_level)/2 * 100

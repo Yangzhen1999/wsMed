@@ -40,7 +40,7 @@ test_that("analyze_mm_continuous works on wsMed output (continuous W)", {
   expect_setequal(names(cont_out),
                   c("mod_coeff","beta_coef","path_HML",
                     "conditional_overall",
-                    "theta_curve","path_curve"))
+                    "theta_curve","path_curve","IE_contrasts", "path_contrasts"))
 
   # ② mod_coeff 检测到与 MP 对应的调节列
   expect_false(is.null(cont_out$mod_coeff))

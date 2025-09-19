@@ -96,12 +96,6 @@ print.wsMed <- function(x, digits = 3, ...){
   .print_indirect_key(x)
 
   ## 3 Monte‑Carlo 总/直/间接 --------------------
-  ## ---------- 回归 / 方差 / 截距 ----------
-  .print_mc_RIV(x$mc$result, x$mc$fit, x$alpha, digits)
-  if (!is.null(x$param_boot)) {
-    .print_boot_RIV   (x$param_boot, x$alpha, digits)
-  }
-
 
   .print_mc_d_moderation(x$mc$result, x$alpha, digits)
   if (!is.null(x$param_boot))
@@ -141,6 +135,13 @@ print.wsMed <- function(x, digits = 3, ...){
     }
   }
 
+
+  ## ---------- 回归 / 方差 / 截距 ----------
+  .print_mc_RIV(x$mc$result, x$mc$fit, x$alpha, digits)
+  if (!is.null(x$param_boot)) {
+    .print_boot_RIV   (x$param_boot, x$alpha, digits)
+  }
+
   ## 5 标准化（若有） ---------------------------
   if (!is.null(x$mc$std_mc)){
     cat("\n")
@@ -148,7 +149,6 @@ print.wsMed <- function(x, digits = 3, ...){
     .print_tbl(x$mc$std_mc, digits = digits)
   }
 
-  ## ---- 新增：BOOT 版 ----------------------------------------------------------
   if (!is.null(x$mc$std_boot)){
      cat("\n")
     .print_boot_std_all(x$mc$std_boot, x$alpha, digits)

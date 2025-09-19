@@ -1,13 +1,13 @@
-#' @title Monte-Carlo SEM with Multiple Imputation (WsMed Workflow)
+#' @title Monte Carlo SEM with Multiple Imputation (WsMed Workflow)
 #'
 #' @description
-#' `RunMCMIAnalysis()` is a turnkey helper that
+#' `RunMCMIAnalysis()` is a helper that:
 #' \enumerate{
 #' \item imputes missing data via \code{\link{PrepareMissingData}};
-#' \item generates all WsMed variables in every completed data set;
+#' \item generates all WsMed variables in each completed data set;
 #' \item fits the user-supplied SEM model to each replicate; and
-#' \item pools the results via \code{MCMI2()}, producing Monte-Carlo
-#'       confidence intervals (MCCI) for every model parameter.
+#' \item pools the results via \code{MCMI2()}, producing Monte Carlo
+#'       confidence intervals (MCCI) for all model parameters.
 #' }
 #'
 #' @details
@@ -15,14 +15,13 @@
 #' \itemize{
 #'   \item \code{PrepareMissingData()} – performs multiple imputation
 #'         (\strong{logreg} / \strong{polyreg} for categorical variables,
-#'         \code{method_num} for numeric) and applies
+#'         and \code{method_num} for numeric) and applies
 #'         \code{\link{PrepareData}} to each imputed set;
 #'   \item \code{MCMI2()} – pools parameter estimates across the
-#'         \code{m} imputations and draws \code{R} Monte-Carlo samples from
-#'         the joint posterior.
+#'         \code{m} imputations and draws \code{R} Monte Carlo samples.
 #' }
 #'
-#' Only the missing-data strategy \code{Na = "MI"} is currently supported.
+#' Only the missing-data strategy \code{Na = "MI"} is supported.
 #'
 #' @param data_missing Data frame with missing values.
 #' @param m Integer, number of imputations. Default \code{5}.
@@ -30,9 +29,9 @@
 #'   (e.g., \code{"pmm"}, \code{"norm"}). Default \code{"pmm"}.
 #' @param seed Integer random seed (passed to \code{mice} and \code{MCMI2}).
 #'
-#' @param M_C1,M_C2 Character vectors: mediator names at occasion 1 & 2
+#' @param M_C1,M_C2 Character vectors: mediator names at condition 1 & 2
 #'   (same length).
-#' @param Y_C1,Y_C2 Character scalars: outcome names at occasion 1 & 2.
+#' @param Y_C1,Y_C2 Character scalars: outcome names at condition 1 & 2.
 #'
 #' @param C_C1,C_C2 Optional character vectors: within-subject controls.
 #' @param C Optional character vector: between-subject controls.
@@ -49,11 +48,11 @@
 #' @param sem_model Character string, lavaan syntax of the SEM to be fitted.
 #'
 #' @param Na Character, missing-data strategy. Currently only
-#'   \code{"MI"} (multiple imputation) is implemented.
+#'   \code{"MI"} is implemented.
 #'
-#' @param R Integer, number of Monte-Carlo samples (default \code{20000L}).
-#' @param alpha Numeric vector, α levels for two-sided CIs
-#'   (default \code{c(.001,.01,.05)}).
+#' @param R Integer, number of Monte Carlo samples (default \code{20000L}).
+#' @param alpha Numeric vector, significance levels for two-sided CIs
+#'   (default \code{c(0.001, 0.01, 0.05)}).
 #' @param decomposition Decomposition used by \code{MCMI2()}
 #'   (\code{"eigen"} | \code{"chol"} | \code{"svd"}). Default \code{"eigen"}.
 #' @param pd Logical, enforce positive-definite covariance (default \code{TRUE}).
@@ -64,7 +63,7 @@
 #'   \item{\code{mc_result}}{A \code{semmcci} object returned by
 #'         \code{MCMI2()}.}
 #'   \item{\code{first_imputed_data}}{The first processed data frame
-#'         (useful for inspection / plotting).}
+#'         (useful for inspection or plotting).}
 #'   \item{\code{imputation_summary}}{Diagnostics from
 #'         \code{PrepareMissingData()}.}
 #' }
@@ -74,6 +73,7 @@
 #' \code{wsMed}
 #'
 #' @keywords internal
+
 
 
 RunMCMIAnalysis <- function(data_missing,

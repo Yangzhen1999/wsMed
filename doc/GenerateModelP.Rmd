@@ -11,7 +11,7 @@ vignette: >
 The `GenerateModelP` function dynamically generates a Structural Equation Model (SEM) formula to analysis parallel mediation for 'lavaan' based on the prepared dataset. This document explains the mathematical principles and the structure of the generated model.
 
 <p align="center">
-  <img src="P.png" alt="Parallel within-subject mediation model" width="100%">
+  <img src="Wa.png" alt="Parallel within-subject mediation model" width="100%">
 </p>
 
 ---

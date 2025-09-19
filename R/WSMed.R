@@ -1,89 +1,89 @@
 #' @title Within-Subject Mediation Analysis (Two-Condition)
 #'
 #' @description
-#' wsMed() fits a structural-equation model (SEM) for two-condition
-#' within-subject mediation, optionally handles missing data (DE / FIML / MI),
-#' and quantifies unstandardised as well as standardised effects with either
-#' bootstrap or Monte-Carlo confidence intervals.
+#' \code{wsMed()} fits a structural equation model (SEM) for two-condition
+#' within-subject mediation. It can handle missing data (DE, FIML, MI) and
+#' computes both unstandardized and standardized effects with bootstrap or
+#' Monte Carlo confidence intervals.
 #'
 #' @details
-#' **Model structures**
+#' Model structures:
 #' \itemize{
-#'   \item \code{"P"}  Parallel mediation
-#'   \item \code{"CN"} Chained (serial) mediation
-#'   \item \code{"CP"} Chained → parallel
-#'   \item \code{"PC"} Parallel → chained
+#'   \item \code{"P"}: parallel mediation
+#'   \item \code{"CN"}: chained (serial) mediation
+#'   \item \code{"CP"}: chained then parallel
+#'   \item \code{"PC"}: parallel then chained
 #' }
 #'
-#' **Missing-data strategies**
+#' Missing-data strategies:
 #' \itemize{
-#'   \item \code{"DE"}   List-wise deletion
-#'   \item \code{"FIML"} Full-information maximum likelihood
-#'   \item \code{"MI"}   Multiple imputation via \pkg{mice}
+#'   \item \code{"DE"}: list-wise deletion
+#'   \item \code{"FIML"}: full-information maximum likelihood
+#'   \item \code{"MI"}: multiple imputation via \pkg{mice}
 #' }
 #'
-#' **Confidence-interval engines**
+#' Confidence-interval engines:
 #' \itemize{
-#'   \item \strong{Bootstrap} — percentile, BC, or BCa (DE / FIML only)
-#'   \item \strong{Monte Carlo} — draws from \code{semmcci} (all Na options)
+#'   \item Bootstrap: percentile, BC, or BCa (DE and FIML only)
+#'   \item Monte Carlo: draws via \pkg{semmcci} (all \code{Na} options)
 #' }
-#' For \code{Na = "FIML"} you may choose \code{MCmethod = "mc"} (default) or
+#' For \code{Na = "FIML"}, you may choose \code{MCmethod = "mc"} (default) or
 #' \code{"bootSD"} to add a finite-sample SD correction.
 #'
-#' Workflow: ① preprocess → ② generate SEM syntax → ③ fit → ④ compute CIs
-#' → ⑤ (optionally) standardise estimates.
+#' Workflow: (1) preprocess -> (2) generate SEM syntax -> (3) fit
+#' -> (4) compute confidence intervals -> (5) optional: standardize estimates.
 #'
 #' @param data A \link[base:data.frame]{data.frame} containing the raw scores.
 #' @param M_C1,M_C2 Character vectors of mediator names under condition 1 and 2.
 #' @param Y_C1,Y_C2 Character scalars for the outcome under each condition.
-#' @param form     Model type: \code{"P"}, \code{"CN"}, \code{"CP"}, or \code{"PC"}.
-#' @param standardized Logical; return standardised effects as well?  Default \code{FALSE}.
+#' @param form Model type: \code{"P"}, \code{"CN"}, \code{"CP"}, or \code{"PC"}.
+#' @param standardized Logical; if \code{TRUE}, return standardized effects. Default \code{FALSE}.
 #'
-#' @param Na          Missing-data method: \code{"DE"}, \code{"FIML"}, or \code{"MI"}.
-#' @param ci_method   CI engine: \code{"bootstrap"} or \code{"mc"}.
-#'                    If \code{NULL} (default) the choice is
-#'                    \code{"bootstrap"} for DE and \code{"mc"} otherwise.
-#' @param MCmethod    If \code{Na = "FIML"} and \code{ci_method = "mc"},
-#'                    choose \code{"mc"} (default) or \code{"bootSD"}.
+#' @param Na Missing-data method: \code{"DE"}, \code{"FIML"}, or \code{"MI"}.
+#' @param ci_method CI engine: \code{"bootstrap"} or \code{"mc"}.
+#'   If \code{NULL} (default) the choice is \code{"bootstrap"} for \code{Na = "DE"}
+#'   and \code{"mc"} otherwise.
+#' @param MCmethod If \code{Na = "FIML"} and \code{ci_method = "mc"},
+#'   choose \code{"mc"} (default) or \code{"bootSD"}.
 #'
-#' @param bootstrap   Integer; bootstrap replicates (DE / FIML only).
+#' @param bootstrap Integer; number of bootstrap replicates (DE and FIML only).
 #' @param boot_ci_type Character; bootstrap CI type: \code{"perc"}, \code{"bc"},
-#'                     or \code{"bca.simple"}.
-#' @param R       Integer; Monte-Carlo draws.  Default \code{20000L}.
-#' @param alpha   Numeric in (0,1); two-sided significance level(s).
-#' @param iseed,seed Integer seeds for bootstrap and Monte-Carlo respectively.
+#'   or \code{"bca.simple"}.
+#' @param R Integer; number of Monte Carlo draws. Default \code{20000L}.
+#' @param alpha Numeric vector in (0, 1); two-sided significance levels.
+#' @param iseed,seed Integer seeds for bootstrap and Monte Carlo, respectively.
 #'
-#' @param fixed.x  Logical; pass to \pkg{lavaan}.
+#' @param fixed.x Logical; passed to \pkg{lavaan}.
 #'
 #' @param C_C1,C_C2 Character vectors of within-subject covariates (per condition).
-#' @param C         Character vector of between-subject covariates.
-#' @param C_type    Character; type of \code{C}: \code{"continuous"} or \code{"categorical"}.
+#' @param C Character vector of between-subject covariates.
+#' @param C_type Character; type of \code{C}: \code{"continuous"} or \code{"categorical"}.
 #'
-#' @param W      Character vector of moderator(s); default \code{NULL}.
+#' @param W Character vector of moderators. Default \code{NULL}.
 #' @param W_type Character; \code{"continuous"} or \code{"categorical"}.
-#' @param MP     Character vector identifying which regression paths are
-#'               moderated (e.g., \code{"a1"}, \code{"b_1_2"}, \code{"cp"}).
+#' @param MP Character vector identifying which regression paths are moderated
+#'   (for example, \code{"a1"}, \code{"b_1_2"}, \code{"cp"}).
 #'
 #' @param mi_args List of MI-specific controls:
-#'   \describe{
-#'     \item{\code{m}}{Number of imputations (default 5).}
-#'     \item{\code{method_num}}{Imputation method for \code{mice()}.}
-#'     \item{\code{decomposition}}{Covariance-decomposition method
-#'           (\code{"eigen"}, \code{"chol"}, \code{"svd"}).}
-#'     \item{\code{pd}}{Logical; PD check.}
-#'     \item{\code{tol}}{Tolerance for PD check.}
-#'   }
+#' \describe{
+#'   \item{\code{m}}{Number of imputations. Default 5.}
+#'   \item{\code{method_num}}{Imputation method for \code{mice()}.}
+#'   \item{\code{decomposition}}{Covariance-decomposition method
+#'     (\code{"eigen"}, \code{"chol"}, \code{"svd"}).}
+#'   \item{\code{pd}}{Logical; positive-definiteness check.}
+#'   \item{\code{tol}}{Tolerance for the positive-definiteness check.}
+#' }
 #'
-#' @param verbose Logical; print progress messages?
+#' @param verbose Logical; print progress messages.
 #'
 #' @return An object of class \code{"wsMed"} with elements:
 #' \describe{
-#'   \item{data}{Pre-processed data frame}
-#'   \item{sem_model}{Generated lavaan syntax}
-#'   \item{mc}{List with Monte-Carlo draws, bootstrap tables (if any), and the fitted model}
-#'   \item{moderation}{Conditional / moderated effect tables}
-#'   \item{form,Na,alpha}{Analysis settings}
-#'   \item{input_vars}{Names of all user-supplied variables}
+#'   \item{data}{Preprocessed data frame.}
+#'   \item{sem_model}{Generated \pkg{lavaan} syntax.}
+#'   \item{mc}{List with Monte Carlo draws, bootstrap tables (if any), and the fitted model.}
+#'   \item{moderation}{Conditional or moderated effect tables.}
+#'   \item{form,Na,alpha}{Analysis settings.}
+#'   \item{input_vars}{Names of all user-supplied variables.}
 #' }
 #'
 #' @examples
@@ -113,7 +113,7 @@ wsMed <- function(data,
                   mi_args = list(),
                   R = 20000L,
                   ## ── bootstrap (DE) ───────────────────────────────────────
-                  bootstrap    = 1000,
+                  bootstrap    = 2000,
                   boot_ci_type = "perc",
                   iseed        = 123,
                   fixed.x      = FALSE,

@@ -1,6 +1,6 @@
 Package: wsMed
 Title: Title: Within-Subject Mediation Analysis Using 'SEM'
-Version: 0.5.1
+Version: 0.5.2
 Authors@R:
     c(person(given = "Wendie",
              family ="Yang",
@@ -16,14 +16,14 @@ Description: Within-subject mediation analysis using structural equation modelin
     Examine how changes in an outcome variable between two conditions are mediated 
     through one or more variables.
 License: GPL (>= 3)
-Depends: R (>= 2.10)
+Depends: R (>= 4.1.0)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Suggests:
     rmarkdown,
     devtools,
-    testthat (>= 3.0.0)
+    testthat
 Config/testthat/edition: 3
 Imports:
     knitr,
@@ -39,5 +39,5 @@ Imports:
     stats
 VignetteBuilder: knitr
 LazyData: true
-URL: https://github.com/Yangzhen1999/wsMed
+URL:  https://yangzhen1999.github.io/wsMed/
 BugReports: https://github.com/Yangzhen1999/wsMed/issues

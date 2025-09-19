@@ -2,7 +2,7 @@
 % Please edit documentation in R/RunMCMIAnalysis.R
 \name{RunMCMIAnalysis}
 \alias{RunMCMIAnalysis}
-\title{Monte-Carlo SEM with Multiple Imputation (WsMed Workflow)}
+\title{Monte Carlo SEM with Multiple Imputation (WsMed Workflow)}
 \usage{
 RunMCMIAnalysis(
   data_missing,
@@ -40,10 +40,10 @@ RunMCMIAnalysis(
 
 \item{seed}{Integer random seed (passed to \code{mice} and \code{MCMI2}).}
 
-\item{M_C1, M_C2}{Character vectors: mediator names at occasion 1 & 2
+\item{M_C1, M_C2}{Character vectors: mediator names at condition 1 & 2
 (same length).}
 
-\item{Y_C1, Y_C2}{Character scalars: outcome names at occasion 1 & 2.}
+\item{Y_C1, Y_C2}{Character scalars: outcome names at condition 1 & 2.}
 
 \item{C_C1, C_C2}{Optional character vectors: within-subject controls.}
 
@@ -64,12 +64,12 @@ processed data? Defaults \code{TRUE}.}
 \item{sem_model}{Character string, lavaan syntax of the SEM to be fitted.}
 
 \item{Na}{Character, missing-data strategy. Currently only
-\code{"MI"} (multiple imputation) is implemented.}
+\code{"MI"} is implemented.}
 
-\item{R}{Integer, number of Monte-Carlo samples (default \code{20000L}).}
+\item{R}{Integer, number of Monte Carlo samples (default \code{20000L}).}
 
-\item{alpha}{Numeric vector, α levels for two-sided CIs
-(default \code{c(.001,.01,.05)}).}
+\item{alpha}{Numeric vector, significance levels for two-sided CIs
+(default \code{c(0.001, 0.01, 0.05)}).}
 
 \item{decomposition}{Decomposition used by \code{MCMI2()}
 (\code{"eigen"} | \code{"chol"} | \code{"svd"}). Default \code{"eigen"}.}
@@ -84,19 +84,19 @@ A list with three elements:
 \item{\code{mc_result}}{A \code{semmcci} object returned by
 \code{MCMI2()}.}
 \item{\code{first_imputed_data}}{The first processed data frame
-(useful for inspection / plotting).}
+(useful for inspection or plotting).}
 \item{\code{imputation_summary}}{Diagnostics from
 \code{PrepareMissingData()}.}
 }
 }
 \description{
-\code{RunMCMIAnalysis()} is a turnkey helper that
+\code{RunMCMIAnalysis()} is a helper that:
 \enumerate{
 \item imputes missing data via \code{\link{PrepareMissingData}};
-\item generates all WsMed variables in every completed data set;
+\item generates all WsMed variables in each completed data set;
 \item fits the user-supplied SEM model to each replicate; and
-\item pools the results via \code{MCMI2()}, producing Monte-Carlo
-confidence intervals (MCCI) for every model parameter.
+\item pools the results via \code{MCMI2()}, producing Monte Carlo
+confidence intervals (MCCI) for all model parameters.
 }
 }
 \details{
@@ -104,14 +104,13 @@ Internally the function calls:
 \itemize{
 \item \code{PrepareMissingData()} – performs multiple imputation
 (\strong{logreg} / \strong{polyreg} for categorical variables,
-\code{method_num} for numeric) and applies
+and \code{method_num} for numeric) and applies
 \code{\link{PrepareData}} to each imputed set;
 \item \code{MCMI2()} – pools parameter estimates across the
-\code{m} imputations and draws \code{R} Monte-Carlo samples from
-the joint posterior.
+\code{m} imputations and draws \code{R} Monte Carlo samples.
 }
 
-Only the missing-data strategy \code{Na = "MI"} is currently supported.
+Only the missing-data strategy \code{Na = "MI"} is supported.
 }
 \seealso{
 \code{\link{PrepareMissingData}}, \code{\link{PrepareData}}, \code{MCMI2},

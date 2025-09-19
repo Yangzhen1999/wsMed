@@ -1,65 +1,75 @@
 #' @title Prepare Data with Missing Values for Mediation Analysis
 #'
-#' @description Handles missing values in the dataset through multiple imputation
-#' and prepares the imputed datasets for within-subject mediation analysis. The function
-#' imputes missing data, processes each imputed dataset, and provides diagnostics for the imputation process.
+#' @description
+#' Handles missing values in the dataset through multiple imputation
+#' and prepares the imputed datasets for within-subject mediation analysis.
+#' The function imputes missing data, processes each imputed dataset,
+#' and provides diagnostics for the imputation process.
 #'
-#' @details This function is designed to preprocess datasets with missing values for mediation analysis.
-#' It performs the following steps:
+#' @details
+#' This function is designed to preprocess datasets with missing values
+#' for mediation analysis. It performs the following steps:
 #'
-#' - **Multiple Imputation**: Uses specified imputation methods (e.g., predictive mean matching) to generate
-#' `m` imputed datasets.
+#' - Multiple imputation: Uses specified imputation methods
+#'   (for example, predictive mean matching) to generate
+#'   \code{m} imputed datasets.
 #'
-#' - **Data Preparation**: Applies [PrepareData()] to each of the `m` imputed datasets to calculate difference scores
-#' and centered averages for mediators and the outcome variable.
+#' - Data preparation: Applies \code{\link{PrepareData}} to each of the
+#'   \code{m} imputed datasets to calculate difference scores
+#'   and centered averages for mediators and the outcome variable.
 #'
-#' - **Imputation Diagnostics**: Provides summary diagnostics for the imputation process, including
-#' information about missing data patterns and convergence.
+#' - Imputation diagnostics: Provides summary diagnostics for the imputation
+#'   process, including information about missing data patterns and convergence.
 #'
-#' This function integrates imputation and data preparation, ensuring that the resulting datasets
-#' are ready for subsequent mediation analysis.
+#' This function integrates imputation and data preparation, ensuring that
+#' the resulting datasets are ready for subsequent mediation analysis.
 #'
 #' @param data_missing A data frame containing the raw dataset with missing values.
-#' @param m An integer specifying the number of imputations to perform. Default is `5`.
-#' @param seed An integer specifying the random seed for reproducibility. Default is `123`.
-#' @param M_C1 A character vector of column names representing mediators "before" the intervention.
-#' @param M_C2 A character vector of column names representing mediators "after" the intervention.
-#' Must match the length of `M_C1`.
-#' @param Y_C1 A character string representing the column name of the outcome variable "before" the intervention.
-#' @param Y_C2 A character string representing the column name of the outcome variable "after" the intervention.
+#' @param m An integer specifying the number of imputations to perform. Default is \code{5}.
+#' @param seed An integer specifying the random seed for reproducibility. Default is \code{123}.
+#' @param M_C1 A character vector of column names representing mediators at condition 1.
+#' @param M_C2 A character vector of column names representing mediators at condition 2.
+#'   Must match the length of \code{M_C1}.
+#' @param Y_C1 A character string representing the column name of the outcome variable at condition 1.
+#' @param Y_C2 A character string representing the column name of the outcome variable at condition 2.
 #' @param C_C1 Character vector of within-subject control variable names (condition 1).
 #' @param C_C2 Character vector of within-subject control variable names (condition 2).
 #' @param C Character vector of between-subject control variable names.
-#' @param W A character vector specifying the names of moderator variable(s)
+#' @param W A character vector specifying the names of moderator variables
 #'   that are used to generate interaction terms with mediators. These variables
-#'   will be included in the imputation model and passed to \code{PrepareData()}
-#'   for moderation effect processing. Default is \code{NULL}.
-#' @param method_num integer. …  (# 如果的确改名)
+#'   will be included in the imputation model and passed to \code{PrepareData}.
+#'   Default is \code{NULL}.
+#' @param method_num Character; imputation method for numeric variables
+#'   (for example, \code{"pmm"}, \code{"norm"}). Default is \code{"pmm"}.
 #' @param C_type Optional vector of the same length as \code{C}.
-#'   Each element \code{"continuous"}, \code{"categorical"}, or \code{"auto"}
+#'   Each element is \code{"continuous"}, \code{"categorical"}, or \code{"auto"}
 #'   (default). Ignored when \code{C = NULL}.
-#' @param W Optional character vector: moderator names (≤ *J*).
+#' @param W Optional character vector: moderator names (at most J).
 #' @param W_type Optional vector of the same length as \code{W}.
 #'   Same coding as \code{C_type}. Ignored when \code{W = NULL}.
 #' @param center_W Logical. Whether to center the moderator variable W.
-#' @param keep_W_raw,keep_C_raw Logical; keep original W / C columns in the
-#'   returned data?
+#' @param keep_W_raw,keep_C_raw Logical; keep the original W / C columns
+#'   in the returned data?
 #'
 #' @return A list containing:
-#' - `processed_data_list`: A list of `m` data frames, each representing an imputed and processed dataset,
-#' ready for within-subject mediation analysis.
-#' - `imputation_summary`: A summary of the imputation process, including diagnostics and convergence information.
+#' \describe{
+#'   \item{\code{processed_data_list}}{A list of \code{m} data frames,
+#'     each representing an imputed and processed dataset ready for
+#'     within-subject mediation analysis.}
+#'   \item{\code{imputation_summary}}{A summary of the imputation process,
+#'     including diagnostics and convergence information.}
+#' }
 #'
-#' @seealso [PrepareData()], [ImputeData()], [wsMed()]
+#' @seealso \code{\link{PrepareData}}, \code{\link{ImputeData}}, \code{\link{wsMed}}
 #'
 #' @examples
 #' # Example dataset with missing values
 #' data(example_data)
 #' set.seed(123)
 #' example_dataN <- mice::ampute(
-#'    data = example_data,
-#'    prop = 0.1,
-#'    )$amp
+#'   data = example_data,
+#'   prop = 0.1
+#' )$amp
 #'
 #' # Prepare the dataset with multiple imputations
 #' prepared_missing_data <- PrepareMissingData(
@@ -73,7 +83,7 @@
 #'
 #' # Access processed datasets
 #' processed_data_list <- prepared_missing_data$processed_data_list
-#' imputation_summary <- prepared_missing_data$imputation_summary
+#' imputation_summary  <- prepared_missing_data$imputation_summary
 #'
 #' @export
 

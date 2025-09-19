@@ -2,43 +2,37 @@
 % Please edit documentation in R/calc_basic_contrasts.R
 \name{mc_summary_pct}
 \alias{mc_summary_pct}
-\title{计算 Monte Carlo 样本的估计值、标准误与 CI（带百分号列名）}
+\title{Compute Monte Carlo Estimates, Standard Errors, and CIs (with Percent Labels)}
 \usage{
 mc_summary_pct(x, label, ci_level = 0.95, digits = 3)
 }
 \arguments{
-\item{x}{数值向量，Monte Carlo 抽样结果。}
+\item{x}{Numeric vector of Monte Carlo samples.}
 
-\item{label}{字符型，输出中 \code{Path} 列的名称。}
+\item{label}{Character string for the value in the \code{Path} column of the output.}
 
-\item{ci_level}{置信区间水平（默认 \code{0.95}）。}
+\item{ci_level}{Confidence level for the CI (default \code{0.95}).}
 
-\item{digits}{保留小数位数（默认 \code{3}）。}
+\item{digits}{Number of decimal places to retain (default \code{3}).}
 }
 \value{
-一个 \code{data.frame}，包含路径标签、估计值、标准误与 CI。
-列名格式如 \code{"2.5\%CI.Lo"} 与 \code{"97.5\%CI.Up"}。
+A \code{data.frame} containing the path label, estimate, standard error, and CI.
+Column names are formatted like \code{"2.5\%CI.Lo"} and \code{"97.5\%CI.Up"}.
 }
 \description{
-\code{mc_summary_pct()} 对 Monte Carlo 抽样样本向量 \code{x} 进行摘要，
-计算其均值、标准差和置信区间，并生成带有百分号格式列名的
-\code{data.frame}。常用于生成具有路径标签的中介效应或路径系数估计表。
+\code{mc_summary_pct()} summarizes a numeric vector of Monte Carlo samples \code{x} by
+computing its mean, standard deviation, and percentile-based confidence interval.
+The result is returned as a \code{data.frame} with column names that include percentage
+signs. This function is typically used to generate tables of mediation effects or
+path coefficient estimates with path labels.
 
-返回列包含：
+Returned columns include:
 \itemize{
-\item \code{Path}: 路径标签；
-\item \code{Estimate}: 样本均值；
-\item \code{SE}: 样本标准差；
-\item \verb{<p\%CI.Lo>}, \verb{<p\%CI.Up>}: 百分位置信区间上下限，列名中带 \verb{\%}。
+\item \code{Path}: Path label.
+\item \code{Estimate}: Sample mean.
+\item \code{SE}: Sample standard deviation.
+\item \verb{<p\%CI.Lo>}, \verb{<p\%CI.Up>}: Lower and upper bounds of the percentile CI,
+with \verb{\%} in the column names.
 }
 }
-\examples{
-\dontrun{
-x <- rnorm(10000, mean = 0.2, sd = 0.05)
-mc_summary_pct(x, label = "indirect_1")
-}
-
-}
-\seealso{
-\code{\link[=mc_summary_se]{mc_summary_se()}} – 返回标准命名列（\code{CI.LL}, \code{CI.UL}），适用于内部处理
-}
+\keyword{internal}

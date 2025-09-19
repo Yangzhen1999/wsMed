@@ -46,7 +46,8 @@
 #' @importFrom stats  model.matrix
 #' @importFrom methods slot
 #' @importFrom stats complete.cases
-#'
+#' @importFrom utils head
+
 #' @keywords internal
 
 # -----------------------------------------------------------------------------
@@ -240,7 +241,7 @@ analyze_mm_continuous <- function(mc_result, data, MP,
     order(match(overall_tbl$Effect, ord),
           overall_tbl$W_value),]
 
-  conditional_overall <- add_sig(.clean_ci_names(overall_tbl))
+  #conditional_overall <- add_sig(.clean_ci_names(overall_tbl))
 
 
   ## ---------- 5. 计算单路径 HML ----------
@@ -281,7 +282,6 @@ analyze_mm_continuous <- function(mc_result, data, MP,
   }
 
 
-  ## ---------- 输出 ----------
   beta_out <- if (length(beta_tbl))
     add_sig(.clean_ci_names(do.call(rbind, beta_tbl)))
   else NULL
@@ -290,12 +290,91 @@ analyze_mm_continuous <- function(mc_result, data, MP,
     add_sig(.clean_ci_names(do.call(rbind, path_HML)))
   else NULL
 
-  mod_coeff <- add_sig(fix_ci_names(mod_coeff, ci_level))
+  conditional_overall <- add_sig(.clean_ci_names(overall_tbl))
+
+  mod_coeff <- add_sig(.clean_ci_names(mod_coeff))
+
+
+
+
+
+  # ---------- 计算 Indirect Effect Contrasts ----------
+  IE_contrasts <- NULL
+  if (!is.null(beta_out)) {
+    IE_contrast_raw <- make_contrasts(beta_out, value_col = "Estimate", contrast_col = "Contrast")
+
+    IE_contrasts <- do.call(rbind, lapply(1:nrow(IE_contrast_raw), function(i) {
+      pth <- paths[[which(sapply(paths, \(x) x$path_name == IE_contrast_raw$Path[i]))]]
+      lvl_hi <- IE_contrast_raw$Contrast[i] |> strsplit(" - ") |> unlist() |> tail(1)
+      lvl_lo <- IE_contrast_raw$Contrast[i] |> strsplit(" - ") |> unlist() |> head(1)
+
+      wc_hi <- W_values[match(lvl_hi, Level_lbl)] - muW
+      wc_lo <- W_values[match(lvl_lo, Level_lbl)] - muW
+
+      samp_hi <- Reduce(`*`, lapply(pth$coefs, \(cn){
+        base <- th[, cn]
+        wcols <- grep(paste0("^", sub("^([abd])", "\\1w", cn), "(_|$)"), colnames(th), value=TRUE)
+        wsum <- if (length(wcols)) rowSums(th[, wcols, drop=FALSE]) else 0
+        base + wsum * wc_hi
+      }))
+
+      samp_lo <- Reduce(`*`, lapply(pth$coefs, \(cn){
+        base <- th[, cn]
+        wcols <- grep(paste0("^", sub("^([abd])", "\\1w", cn), "(_|$)"), colnames(th), value=TRUE)
+        wsum <- if (length(wcols)) rowSums(th[, wcols, drop=FALSE]) else 0
+        base + wsum * wc_lo
+      }))
+
+      diff_sample <- samp_hi - samp_lo
+      cbind(IE_contrast_raw[i, c("Path", "Contrast")],
+            t(mc_summary_se(diff_sample, ci_level, digits)))
+    }))
+
+    IE_contrasts <- .clean_ci_names(IE_contrasts)
+  }
+
+  # ---------- 计算 Path Coefficient Contrasts ----------
+  path_contrasts <- NULL
+  if (!is.null(path_HML)) {
+    path_contrast_raw <- make_contrasts(path_HML, value_col = "Estimate", contrast_col = "Contrast")
+
+    path_contrasts <- do.call(rbind, lapply(1:nrow(path_contrast_raw), function(i) {
+      bc <- path_contrast_raw$Path[i]
+
+      lvl_hi <- path_contrast_raw$Contrast[i] |> strsplit(" - ") |> unlist() |> tail(1)
+      lvl_lo <- path_contrast_raw$Contrast[i] |> strsplit(" - ") |> unlist() |> head(1)
+
+      wc_hi <- W_values[match(lvl_hi, Level_lbl)] - muW
+      wc_lo <- W_values[match(lvl_lo, Level_lbl)] - muW
+
+      wcols <- grep(paste0("^", sub("^([abd])", "\\1w", bc), "(_|$)"), colnames(th), value=TRUE)
+      base <- th[, bc]
+      wsum <- if (length(wcols)) rowSums(th[, wcols, drop=FALSE]) else 0
+
+      samp_hi <- base + wsum * wc_hi
+      samp_lo <- base + wsum * wc_lo
+      diff_sample <- samp_hi - samp_lo
+      cbind(path_contrast_raw[i, c("Path", "Contrast")],
+            t(mc_summary_se(diff_sample, ci_level, digits)))
+    }))
+
+    path_contrasts <- .clean_ci_names(path_contrasts)
+  }
+
+  IE_contrasts <- if (!is.null(IE_contrasts))
+    add_sig(fix_ci_names(.clean_ci_names(IE_contrasts), ci_level))
+  else NULL
+
+  path_contrasts <- if (!is.null(path_contrasts))
+    add_sig(fix_ci_names(.clean_ci_names(path_contrasts), ci_level))
+  else NULL
 
 
   list(
     mod_coeff         = mod_coeff,
     beta_coef         = beta_out,
+    IE_contrasts        = IE_contrasts,
+    path_contrasts      = path_contrasts,
     path_HML          = path_HML,
     conditional_overall = conditional_overall,   # ★ 新增 ★
     theta_curve       = if (length(theta_curve)) do.call(rbind, theta_curve) else NULL,
@@ -303,8 +382,6 @@ analyze_mm_continuous <- function(mc_result, data, MP,
   )
 
 }
-
-
 
 #' @title Parse All Possible Indirect Paths from Column Names
 #'
@@ -414,22 +491,6 @@ get_indirect_paths <- function(col_names) {
 }
 
 
-# -----------------------------------------------------------------------------
-# mc_summary_helpers.R ── Internal utils formerly in‑lined in analyze_mm_*() ----
-# -----------------------------------------------------------------------------
-#' @title  mc_summary_se
-#' @param x   Numeric vector of length *R* (e.g., one column of `thetahatstar`).
-#' @param ci  Two‑sided confidence level (default 0.95).
-#' @param digits Integer; round results to this many decimal places.
-#'
-#' @return A named numeric vector: *Estimate, SE, <lower>%CI.Lo, <upper>%CI.Up*.
-#' @keywords internal
-mc_summary_se <- function(x, ci = .95, digits = 3) {
-  qs <- quantile(x, c((1 - ci) / 2, (1 + ci) / 2), na.rm = TRUE)
-  names(qs) <- .make_ci_names(ci)
-  round(c(Estimate = mean(x), SE = sd(x), qs), digits)
-}
-
 #' Make CI column names like "2.5%CI.Lo / 97.5%CI.Up"
 #' @keywords internal
 .make_ci_names <- function(ci) {
@@ -476,11 +537,75 @@ fix_pct_names <- function(df) {
 #' @keywords internal
 .clean_ci_names <- function(df, ci_level = 0.95) {
   names(df) <- gsub(
-    pattern = "^X?([0-9.]+)(?:%?)?([._]CI)?[._]?(Lo|Up)$",
-    replacement = "\\1%CI.\\3",
+    pattern = "^X?([0-9.]+)(?:%?)?(?:[._]?CI)?[._]?(Lo|Up)?$",
+    replacement = "\\1%CI.\\2",
     x = names(df),
     ignore.case = TRUE
   )
+
+  # 找到所有匹配"%CI."结尾且未明确标记Lo/Up的列
+  ci_cols <- grep("%CI\\.$", names(df))
+  if (length(ci_cols) == 2) {
+    names(df)[ci_cols[1]] <- sub("%CI\\.$", "%CI.Lo", names(df)[ci_cols[1]])
+    names(df)[ci_cols[2]] <- sub("%CI\\.$", "%CI.Up", names(df)[ci_cols[2]])
+  } else if (length(ci_cols) == 1) {
+    # 如果只有一个匹配，默认当作Lo
+    names(df)[ci_cols] <- sub("%CI\\.$", "%CI.Lo", names(df)[ci_cols])
+  }
+
   df
+}
+
+
+#' make_contrasts
+#' @keywords internal
+make_contrasts <- function(df, value_col = "Estimate", contrast_col = "Contrast") {
+  combs <- combn(unique(df$Level), 2, simplify = FALSE)
+  contrast_list <- lapply(combs, function(pair) {
+    est_diff <- df[df$Level == pair[2], value_col] - df[df$Level == pair[1], value_col]
+    data.frame(
+      Path = unique(df$Path),
+      Mediators = if ("Mediators" %in% names(df)) unique(df$Mediators) else NA,
+      Contrast = paste(pair[2], "-", pair[1]),
+      Estimate = est_diff
+    )
+  })
+  do.call(rbind, contrast_list)
+}
+make_contrasts <- function(df, value_col = "Estimate", contrast_col = "Contrast") {
+  combs <- combn(unique(df$Level), 2, simplify = FALSE)
+  contrast_list <- lapply(combs, function(pair) {
+    est_diff <- df[df$Level == pair[2], value_col] - df[df$Level == pair[1], value_col]
+    data.frame(
+      Path = unique(df$Path),
+      Mediators = if ("Mediators" %in% names(df)) unique(df$Mediators) else NA,
+      Contrast = paste(pair[2], "-", pair[1]),
+      Estimate = est_diff
+    )
+  })
+  out <- do.call(rbind, contrast_list)
+
+  # 加入排序逻辑
+  ord <- c("a", "b", "cp", "indirect_effect")
+  out$sort_index <- sapply(out$Path, function(x) {
+    idx <- which(startsWith(x, ord))
+    if (length(idx)) idx else Inf
+  })
+  out <- out[order(out$sort_index, out$Path), ]
+  out$sort_index <- NULL  # 去掉临时列
+
+  out
+}
+
+#' mc_summary_se
+#' @keywords internal
+#' @noRd
+mc_summary_se <- function(x, ci_level, digits) {
+  probs <- c((1 - ci_level)/2, (1 + ci_level)/2)
+  est <- mean(x)
+  se  <- sd(x)
+  ci  <- quantile(x, probs = probs)
+  out <- c(Estimate = est, SE = se, ci)
+  round(out, digits)
 }
 

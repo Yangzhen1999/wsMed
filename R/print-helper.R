@@ -585,6 +585,49 @@
   }
   invisible()
 }
+.print_moderation_continuous <- function(m, digits = 3) {
+  if (is.null(m) || !is.list(m)) return(invisible())
+
+  cat("\n\n*************** MODERATION RESULTS (Continuous Moderator) ***************\n")
+
+  if (!is.null(m$mod_coeff)) {
+    cat("\n--- Moderated Coefficients ---\n")
+    .print_tbl(m$mod_coeff, digits)
+  }
+
+  if (!is.null(m$beta_coef)) {
+    cat("\n--- Conditional Indirect Effects ---\n")
+    .print_tbl(m$beta_coef, digits, right_align = "Level")
+  }
+
+  if (!is.null(m$IE_contrasts)) {
+    cat("\n--- Indirect Effect Contrasts ---\n")
+    parts <- regmatches(m$IE_contrasts$Contrast, regexec("^\\s*(\\+?-?\\d+ SD)\\s*-\\s*(\\+?-?\\d+ SD)\\s*$", m$IE_contrasts$Contrast))
+    formatted_contrasts <- vapply(parts, function(x) sprintf("%-8s - %8s", paste0("(", x[2], ")"), paste0("(", x[3], ")")), character(1))
+    m$IE_contrasts$Contrast <- formatted_contrasts
+    .print_tbl(m$IE_contrasts, digits, right_align = "Contrast")
+  }
+
+  if (!is.null(m$path_HML)) {
+    cat("\n--- Moderated Path Coefficients ---\n")
+    .print_tbl(m$path_HML, digits, right_align = "Level")
+  }
+
+  if (!is.null(m$path_contrasts)) {
+    cat("\n--- Path Coefficient Contrasts ---\n")
+    parts <- regmatches(m$path_contrasts$Contrast, regexec("^\\s*(\\+?-?\\d+ SD)\\s*-\\s*(\\+?-?\\d+ SD)\\s*$", m$path_contrasts$Contrast))
+    formatted_contrasts <- vapply(parts, function(x) sprintf("%-8s - %8s", paste0("(", x[2], ")"), paste0("(", x[3], ")")), character(1))
+    m$path_contrasts$Contrast <- formatted_contrasts
+    .print_tbl(m$path_contrasts, digits, right_align = "Contrast")
+  }
+
+  if (!is.null(m$conditional_overall)) {
+    cat("\n--- Conditional Total Effect and Total Indirect Effect ---\n")
+    .print_tbl(m$conditional_overall, digits, right_align = "Level")
+  }
+
+  invisible()
+}
 
 
 
