@@ -87,7 +87,7 @@
 #' }
 #'
 #' @examples
-#' data(example_data)
+#' data("example_data", package = "wsMed")
 #' set.seed(123)
 #' result <- wsMed(
 #'   data = example_data,

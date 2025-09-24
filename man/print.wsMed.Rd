@@ -68,7 +68,7 @@ analysis conducted using the \code{wsMed} function. Key features include:
 \examples{
 
 # Perform within-subject mediation analysis
-library(wsMed)
+data("example_data", package = "wsMed")
 result1 <- wsMed(
   data = example_data,
   M_C1 = c("A1", "B1"),

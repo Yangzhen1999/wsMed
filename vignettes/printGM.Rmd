@@ -33,38 +33,25 @@ printGM(result1)
 ```
 ## 
 ## Outcome Difference Model (Ydiff):
-## Ydiff ~ cp*1 + b1*M1diff + b2*M2diff + b3*M3diff + d1*M1avg + d2*M2avg + d3*M3avg 
+##  Ydiff ~ cp*1 + b1*M1diff + d1*M1avg + b2*M2diff + d2*M2avg + b3*M3diff + d3*M3avg 
 ## 
 ## Mediator Difference Model (Chained Mediator - M1diff):
 ## M1diff ~ a1*1 
 ## 
-## Mediator Difference Model (Parallel Mediators - M2diff, M3diff, ...):
+## Mediator Difference Model (Other Mediators):
 ## M2diff ~ a2*1
 ## M3diff ~ a3*1 
 ## 
 ## Indirect Effects:
-## indirect1 := a1 * b1
-## indirect2 := a2 * b2
-## indirect3 := a3 * b3 
+## indirect_1 := a1 * b1
+## indirect_2 := a2 * b2
+## indirect_3 := a3 * b3 
 ## 
 ## Total Indirect Effect:
-## total_indirect := indirect1 + indirect2 + indirect3 
+##  total_indirect := indirect_1 + indirect_2 + indirect_3 
 ## 
 ## Total Effect:
-## total_effect := cp + total_indirect 
-## 
-## Contrast of Indirect Effects:
-## CI1vs2 := indirect1 - indirect2
-## CI1vs3 := indirect1 - indirect3
-## CI2vs3 := indirect2 - indirect3 
-## 
-## C1-C2 Coefficients:
-## X1_b1 := (2*b1 + d1) / 2
-## X0_b1 := X1_b1 - d1
-## X1_b2 := (2*b2 + d2) / 2
-## X0_b2 := X1_b2 - d2
-## X1_b3 := (2*b3 + d3) / 2
-## X0_b3 := X1_b3 - d3
+##  total_effect := cp + total_indirect
 ```
 
 ### Using printGM() with GenerateModel*()
@@ -96,35 +83,22 @@ printGM(sem_model)
 ```
 ## 
 ## Outcome Difference Model (Ydiff):
-## Ydiff ~ cp*1 + b1*M1diff + b2*M2diff + d1*M1avg + d2*M2avg 
+##  Ydiff ~ cp*1 + b1*M1diff + d1*M1avg + b2*M2diff + d2*M2avg 
 ## 
 ## Mediator Difference Model (Chained Mediator - M1diff):
-## M1diff ~ a1*1 + b21*M2diff + d21*M2avg 
+## M1diff ~ a1*1 + b_2_1*M2diff + d_2_1*M2avg 
 ## 
-## Mediator Difference Model (Parallel Mediators - M2diff, M3diff, ...):
+## Mediator Difference Model (Other Mediators):
 ## M2diff ~ a2*1 
 ## 
 ## Indirect Effects:
-## indirect2 := a2 * b2
-## indirect1 := a1 * b1
-## indirect21 := a2 * b21 * b1 
+## indirect_1 := a1 * b1
+## indirect_2 := a2 * b2
+## indirect_2_1 := a2 * b_2_1 * b1 
 ## 
 ## Total Indirect Effect:
-## total_indirect := indirect1 + indirect2 + indirect21 
+##  total_indirect := indirect_1 + indirect_2 + indirect_2_1 
 ## 
 ## Total Effect:
-## total_effect := cp + total_indirect 
-## 
-## Contrast of Indirect Effects:
-## CI1vs2 := indirect1 - indirect2
-## CI1vs21 := indirect1 - indirect21
-## CI2vs21 := indirect2 - indirect21 
-## 
-## C1-C2 Coefficients:
-## X1_b1 := (2*b1 + d1)/2
-## X0_b1 := X1_b1 - d1
-## X1_b2 := (2*b2 + d2)/2
-## X0_b2 := X1_b2 - d2
-## X1_b21 := (2*b21 + d21)/2
-## X0_b21 := X1_b21 - d21
+##  total_effect := cp + total_indirect
 ```

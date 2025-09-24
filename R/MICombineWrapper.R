@@ -24,7 +24,6 @@
 #'
 #' @seealso [RunMCMIAnalysis()]
 #'
-#' @examples NULL
 #'
 #' @keywords internal
 

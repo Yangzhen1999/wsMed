@@ -11,9 +11,12 @@ vignette: >
 ## Introduction
 
 The `GenerateModelCN` function dynamically generates a Structural Equation Model (SEM) formula to analyze chained or nested mediation for 'lavaan' based on the prepared dataset. This document explains the mathematical principles and the structure of the generated model.
-<p align="center">
-  <img src="Wb.png" alt="serial within-subject mediation model" width="100%">
-</p>
+```{r, echo=FALSE, fig.align="center", out.width="100%"}
+library(wsMed)
+knitr::include_graphics(
+  system.file("extdata", "Wb.png", package = "wsMed")
+)
+```
 ---
 
 ## 1. Difference Model Description

@@ -136,7 +136,7 @@ Workflow: (1) preprocess -> (2) generate SEM syntax -> (3) fit
 -> (4) compute confidence intervals -> (5) optional: standardize estimates.
 }
 \examples{
-data(example_data)
+data("example_data", package = "wsMed")
 set.seed(123)
 result <- wsMed(
   data = example_data,

@@ -85,7 +85,6 @@ knitr::opts_chunk$set(
 ```
 
 ```{r,message = FALSE, warning = FALSE}
-devtools::load_all()
 library(wsMed)
 library(lavaan)
 library(semboottools)
@@ -123,6 +122,7 @@ ensures that within-subject changes can be properly analyzed.
 For example, the first rows of `example_data` look like this:
 
 ```{r}
+data("example_data", package = "wsMed")
 head(example_data)
 ```
 

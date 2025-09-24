@@ -38,10 +38,6 @@ It is primarily designed for use within workflows that involve multiple imputati
 equation modeling (SEM). Rubin's rules are applied to compute pooled parameter estimates and their
 covariance matrices.
 }
-\examples{
-NULL
-
-}
 \seealso{
 \code{\link[=RunMCMIAnalysis]{RunMCMIAnalysis()}}
 }

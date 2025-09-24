@@ -1,6 +1,6 @@
 Package: wsMed
-Title: Title: Within-Subject Mediation Analysis Using 'SEM'
-Version: 1.0.0
+Title: Within-subject mediation analysis using structural equation modeling
+Version: 1.0.1
 Authors@R:
     c(person(given = "Wendie",
              family ="Yang",

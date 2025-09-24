@@ -18,13 +18,16 @@ We analyze a **three-mediator parallel mediation model**, comparing the results 
 ### MEMORE 3.0 Analysis Report
 
 ```{r, echo=FALSE}
-txt_content <- readLines("OUTPUT.txt")
+path <- system.file("extdata", "OUTPUT.txt", package = "wsMed")
+txt_content <- readLines(path, warn = FALSE)
 cat("```\n", paste(txt_content, collapse = "\n"), "\n```")
 ```
 
 ### wsMed Analysis Report
 
 ```{r, echo=FALSE}
+data("example_data", package = "wsMed")
+
 library(wsMed)
 result1 <- wsMed(
   data = example_data, #dataset
@@ -46,8 +49,9 @@ We analyze a **Serial Mediation (`Serial = 1`)**.
 ### MEMORE 3.0 Analysis Report
 
 ```{r, echo=FALSE}
-txt_content <- readLines("OUTPUT2.txt")
-cat("```\n", paste(txt_content, collapse = "\n"), "\n```")
+path2 <- system.file("extdata", "OUTPUT2.txt", package = "wsMed")
+txt_content2 <- readLines(path2, warn = FALSE)
+cat("```\n", paste(txt_content2, collapse = "\n"), "\n```")
 ```
 
 ### wsMed Analysis Report

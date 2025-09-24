@@ -28,9 +28,6 @@ object to compute the defined parameters (e.g., indirect effects or user-defined
 based on the model syntax. It is particularly useful for examining derived quantities in SEM
 analyses using Monte Carlo methods.
 }
-\examples{
-NULL
-}
 \seealso{
 \code{\link[=MCMI2]{MCMI2()}}, \code{\link[=RunMCMIAnalysis]{RunMCMIAnalysis()}}
 }

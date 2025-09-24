@@ -39,10 +39,6 @@ Generates Monte Carlo samples for parameter estimates using a covariance matrix
 and a location vector. This function is a wrapper for the internal \code{.ThetaHatStar()}
 function from the \code{semmcci} package.
 }
-\examples{
-NULL
-
-}
 \seealso{
 \code{\link[=MCMI2]{MCMI2()}}, \code{\link[=RunMCMIAnalysis]{RunMCMIAnalysis()}}
 }

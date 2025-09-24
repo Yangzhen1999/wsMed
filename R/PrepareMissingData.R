@@ -64,7 +64,7 @@
 #'
 #' @examples
 #' # Example dataset with missing values
-#' data(example_data)
+#' data("example_data", package = "wsMed")
 #' set.seed(123)
 #' example_dataN <- mice::ampute(
 #'   data = example_data,

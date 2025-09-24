@@ -1,3 +1,9 @@
-Version: 1.0.0
-Date: 2025-09-19 05:39:05 UTC
-SHA: 049f2fc7dd6bc4c4167f983c9782394b07ce7135
+## Resubmission
+
+This is a resubmission. In this version I have:
+
+* Removed single quotes around SEM in DESCRIPTION.
+* Removed \dontrun{} in examples.
+* Added example/vignette files into inst/extdata and updated code to use system.file().
+* Fixed DESCRIPTION Title to avoid ending with a period.
+

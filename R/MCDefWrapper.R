@@ -18,7 +18,6 @@
 #'
 #' @seealso [MCMI2()], [RunMCMIAnalysis()]
 #'
-#' @examples NULL
 #' @keywords internal
 
 MCDefWrapper <- function(object,
