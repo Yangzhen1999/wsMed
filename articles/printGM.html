@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -95,38 +95,25 @@ and format the model equations.</p>
 <span><span class="fu"><a href="../reference/printGM.html">printGM</a></span><span class="op">(</span><span class="va">result1</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Outcome Difference Model (Ydiff):</span></span>
-<span><span class="co">## Ydiff ~ cp*1 + b1*M1diff + b2*M2diff + b3*M3diff + d1*M1avg + d2*M2avg + d3*M3avg </span></span>
+<span><span class="co">##  Ydiff ~ cp*1 + b1*M1diff + d1*M1avg + b2*M2diff + d2*M2avg + b3*M3diff + d3*M3avg </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Mediator Difference Model (Chained Mediator - M1diff):</span></span>
 <span><span class="co">## M1diff ~ a1*1 </span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Mediator Difference Model (Parallel Mediators - M2diff, M3diff, ...):</span></span>
+<span><span class="co">## Mediator Difference Model (Other Mediators):</span></span>
 <span><span class="co">## M2diff ~ a2*1</span></span>
 <span><span class="co">## M3diff ~ a3*1 </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Indirect Effects:</span></span>
-<span><span class="co">## indirect1 := a1 * b1</span></span>
-<span><span class="co">## indirect2 := a2 * b2</span></span>
-<span><span class="co">## indirect3 := a3 * b3 </span></span>
+<span><span class="co">## indirect_1 := a1 * b1</span></span>
+<span><span class="co">## indirect_2 := a2 * b2</span></span>
+<span><span class="co">## indirect_3 := a3 * b3 </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Total Indirect Effect:</span></span>
-<span><span class="co">## total_indirect := indirect1 + indirect2 + indirect3 </span></span>
+<span><span class="co">##  total_indirect := indirect_1 + indirect_2 + indirect_3 </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Total Effect:</span></span>
-<span><span class="co">## total_effect := cp + total_indirect </span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Contrast of Indirect Effects:</span></span>
-<span><span class="co">## CI1vs2 := indirect1 - indirect2</span></span>
-<span><span class="co">## CI1vs3 := indirect1 - indirect3</span></span>
-<span><span class="co">## CI2vs3 := indirect2 - indirect3 </span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## C1-C2 Coefficients:</span></span>
-<span><span class="co">## X1_b1 := (2*b1 + d1) / 2</span></span>
-<span><span class="co">## X0_b1 := X1_b1 - d1</span></span>
-<span><span class="co">## X1_b2 := (2*b2 + d2) / 2</span></span>
-<span><span class="co">## X0_b2 := X1_b2 - d2</span></span>
-<span><span class="co">## X1_b3 := (2*b3 + d3) / 2</span></span>
-<span><span class="co">## X0_b3 := X1_b3 - d3</span></span></code></pre>
+<span><span class="co">##  total_effect := cp + total_indirect</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="using-printgm-with-generatemodel">Using printGM() with GenerateModel*()<a class="anchor" aria-label="anchor" href="#using-printgm-with-generatemodel"></a>
@@ -156,37 +143,24 @@ functions.</p>
 <span><span class="fu"><a href="../reference/printGM.html">printGM</a></span><span class="op">(</span><span class="va">sem_model</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Outcome Difference Model (Ydiff):</span></span>
-<span><span class="co">## Ydiff ~ cp*1 + b1*M1diff + b2*M2diff + d1*M1avg + d2*M2avg </span></span>
+<span><span class="co">##  Ydiff ~ cp*1 + b1*M1diff + d1*M1avg + b2*M2diff + d2*M2avg </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Mediator Difference Model (Chained Mediator - M1diff):</span></span>
-<span><span class="co">## M1diff ~ a1*1 + b21*M2diff + d21*M2avg </span></span>
+<span><span class="co">## M1diff ~ a1*1 + b_2_1*M2diff + d_2_1*M2avg </span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Mediator Difference Model (Parallel Mediators - M2diff, M3diff, ...):</span></span>
+<span><span class="co">## Mediator Difference Model (Other Mediators):</span></span>
 <span><span class="co">## M2diff ~ a2*1 </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Indirect Effects:</span></span>
-<span><span class="co">## indirect2 := a2 * b2</span></span>
-<span><span class="co">## indirect1 := a1 * b1</span></span>
-<span><span class="co">## indirect21 := a2 * b21 * b1 </span></span>
+<span><span class="co">## indirect_1 := a1 * b1</span></span>
+<span><span class="co">## indirect_2 := a2 * b2</span></span>
+<span><span class="co">## indirect_2_1 := a2 * b_2_1 * b1 </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Total Indirect Effect:</span></span>
-<span><span class="co">## total_indirect := indirect1 + indirect2 + indirect21 </span></span>
+<span><span class="co">##  total_indirect := indirect_1 + indirect_2 + indirect_2_1 </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Total Effect:</span></span>
-<span><span class="co">## total_effect := cp + total_indirect </span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Contrast of Indirect Effects:</span></span>
-<span><span class="co">## CI1vs2 := indirect1 - indirect2</span></span>
-<span><span class="co">## CI1vs21 := indirect1 - indirect21</span></span>
-<span><span class="co">## CI2vs21 := indirect2 - indirect21 </span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## C1-C2 Coefficients:</span></span>
-<span><span class="co">## X1_b1 := (2*b1 + d1)/2</span></span>
-<span><span class="co">## X0_b1 := X1_b1 - d1</span></span>
-<span><span class="co">## X1_b2 := (2*b2 + d2)/2</span></span>
-<span><span class="co">## X0_b2 := X1_b2 - d2</span></span>
-<span><span class="co">## X1_b21 := (2*b21 + d21)/2</span></span>
-<span><span class="co">## X0_b21 := X1_b21 - d21</span></span></code></pre>
+<span><span class="co">##  total_effect := cp + total_indirect</span></span></code></pre>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
