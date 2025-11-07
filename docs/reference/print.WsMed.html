@@ -25,7 +25,7 @@ including dynamic confidence intervals, moderation keys, and C1-C2 coefficients.
 
     <a class="navbar-brand me-2" href="../index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -125,7 +125,7 @@ analysis conducted using the <code>wsMed</code> function. Key features include:<
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Perform within-subject mediation analysis</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Yangzhen1999/wsMed" class="external-link">wsMed</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"example_data"</span>, package <span class="op">=</span> <span class="st">"wsMed"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result1</span> <span class="op">&lt;-</span> <span class="fu"><a href="wsMed.html">wsMed</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  data <span class="op">=</span> <span class="va">example_data</span>,</span></span>
 <span class="r-in"><span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>,</span></span>
@@ -137,11 +137,137 @@ analysis conducted using the <code>wsMed</code> function. Key features include:<
 <span class="r-in"><span>  standardized <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>  alpha <span class="op">=</span> <span class="fl">0.05</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in wsMed(data = example_data, M_C1 = c("A1", "B1"), M_C2 = c("A2",     "B2"), Y_C1 = "C1", Y_C2 = "C2", form = "P", Na = "FIML",     standardized = FALSE, alpha = 0.05):</span> could not find function "wsMed"</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Print the results</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result1</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'result1' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> *************** VARIABLES ***************</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Outcome (Y):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Condition 1: C1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Condition 2: C2 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mediators (M):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   M1:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Condition 1: A1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Condition 2: A2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   M2:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Condition 1: B1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Condition 2: B2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Sample size (rows kept): 100 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> *************** MODEL FIT ***************</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Measure   |  Value|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |:---------|------:|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Chi-Sq    | 11.436|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |df        |  5.000|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |p         |  0.043|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |CFI       |  0.000|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |TLI       | -1.130|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |RMSEA     |  0.113|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |RMSEA Low |  0.018|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |RMSEA Up  |  0.202|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |SRMR      |  0.076|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ************* TOTAL / DIRECT / TOTAL-IND (MC) *************</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Label          | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |:--------------|--------:|-----:|---------:|----------:|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Total effect   |    0.015| 0.016|    -0.016|      0.047|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Direct effect  |    0.016| 0.016|    -0.015|      0.048|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Total indirect |   -0.001| 0.004|    -0.010|      0.008|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Indirect effects:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |:-----|--------:|-----:|---------:|----------:|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |ind_1 |    0.001| 0.003|    -0.005|      0.008|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |ind_2 |   -0.002| 0.003|    -0.009|      0.003|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Indirect-effect key:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Ind   |Path                 |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |:-----|:--------------------|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |ind_1 |X -&gt; M1diff -&gt; Ydiff |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |ind_2 |X -&gt; M2diff -&gt; Ydiff |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> *************** MODERATION EFFECTS (d-paths, MC) ***************</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Coefficient | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |:-----------|--------:|-----:|---------:|----------:|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |d1          |   -0.062| 0.091|    -0.241|      0.115|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |d2          |   -0.073| 0.086|    -0.241|      0.097|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> *************** MODERATION KEY (d-paths) ***************</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Coefficient |Path           |Moderated       |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |:-----------|:--------------|:---------------|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |d1          |M1avg -&gt; Ydiff |M1diff -&gt; Ydiff |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |d2          |M2avg -&gt; Ydiff |M2diff -&gt; Ydiff |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> *************** CONTRAST INDIRECT EFFECTS (No Moderator) ***************</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Contrast                  | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |:-------------------------|--------:|-----:|---------:|----------:|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |indirect_2  -  indirect_1 |   -0.003| 0.004|    -0.012|      0.005|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> *************** C1-C2 COEFFICIENTS (No Moderator) ***************</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Coeff | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |:-----|--------:|-----:|---------:|----------:|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |X1_b1 |   -0.067| 0.104|    -0.269|      0.137|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |X0_b1 |   -0.005| 0.104|    -0.209|      0.199|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |X1_b2 |   -0.149| 0.112|    -0.366|      0.073|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |X0_b2 |   -0.076| 0.093|    -0.258|      0.107|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> *************** REGRESSION PATHS (MC) ***************</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Path           |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |:--------------|:-----|--------:|-----:|---------:|----------:|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Ydiff ~ M1diff |b1    |   -0.036| 0.094|    -0.219|      0.145|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Ydiff ~ M1avg  |d1    |   -0.062| 0.091|    -0.241|      0.115|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Ydiff ~ M2diff |b2    |   -0.112| 0.094|    -0.296|      0.072|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Ydiff ~ M2avg  |d2    |   -0.073| 0.086|    -0.241|      0.097|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> *************** INTERCEPTS (MC) ***************</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Intercept |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |:---------|:-----|--------:|-----:|---------:|----------:|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Ydiff~1   |cp    |    0.016| 0.016|    -0.015|      0.048|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |M1diff~1  |a1    |   -0.027| 0.018|    -0.061|      0.007|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |M2diff~1  |a2    |    0.014| 0.018|    -0.021|      0.049|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |M1avg~1   |      |   -0.000| 0.018|    -0.036|      0.036|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |M2avg~1   |      |    0.000| 0.020|    -0.040|      0.039|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> *************** VARIANCES (MC) ***************</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Variance       |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |:--------------|:-----|--------:|-----:|---------:|----------:|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Ydiff~~Ydiff   |      |    0.026| 0.004|     0.019|      0.033|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |M1diff~~M1diff |      |    0.031| 0.004|     0.022|      0.039|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |M2diff~~M2diff |      |    0.032| 0.005|     0.023|      0.041|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |M1avg~~M1avg   |      |    0.034| 0.005|     0.025|      0.043|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |M2avg~~M2avg   |      |    0.041| 0.006|     0.030|      0.052|</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

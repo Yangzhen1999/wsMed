@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Title: Within-Subject Mediation Analysis Using SEM • wsMed</title>
+<title>Within-subject mediation analysis using structural equation modeling • wsMed</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Title: Within-Subject Mediation Analysis Using SEM">
-<meta name="description" content="Within-subject mediation analysis using structural equation modeling. Examine how changes in an outcome variable between two conditions are mediated through one or more variables.">
-<meta property="og:description" content="Within-subject mediation analysis using structural equation modeling. Examine how changes in an outcome variable between two conditions are mediated through one or more variables.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Within-subject mediation analysis using structural equation modeling">
+<meta name="description" content="Within-subject mediation analysis using structural equation modeling. Examine how changes in an outcome variable between two conditions are mediated through one or more variables. Supports within-subject mediation analysis using the lavaan package by Rosseel (2012) &lt;doi:10.18637/jss.v048.i02&gt;, and extends Monte Carlo confidence interval estimation to missing data scenarios using the semmcci package by Pesigan and Cheung (2023) &lt;doi:10.3758/s13428-023-02114-4&gt;.">
+<meta property="og:description" content="Within-subject mediation analysis using structural equation modeling. Examine how changes in an outcome variable between two conditions are mediated through one or more variables. Supports within-subject mediation analysis using the lavaan package by Rosseel (2012) &lt;doi:10.18637/jss.v048.i02&gt;, and extends Monte Carlo confidence interval estimation to missing data scenarios using the semmcci package by Pesigan and Cheung (2023) &lt;doi:10.3758/s13428-023-02114-4&gt;.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,7 +56,9 @@
   </div>
 </nav><div class="container template-home">
 <div class="row">
-  <main id="main" class="col-md-9"><p># wsMed</p>
+  <main id="main" class="col-md-9"><div class="section level1">
+<div class="page-header"><h1 id="wsmed">wsMed<a class="anchor" aria-label="anchor" href="#wsmed"></a>
+</h1></div>
 <p><!-- badges: start --></p>
 <p><!-- badges: end --></p>
 <p>The <code>wsMed</code> function is designed for two condition within-subject mediation analysis, incorporating SEM models through the <code>lavaan</code> package and Monte Carlo simulation methods. This document provides a detailed description of the function’s parameters, workflow, and usage, along with an example demonstration.</p>
@@ -77,7 +79,7 @@
 </h2>
 <p>This is a basic example which shows you how to solve a common problem:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Yangzhen1999/wsMed" class="external-link">wsMed</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://yangzhen1999.github.io/wsMed/">wsMed</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Load example data</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">)</span></span>
@@ -118,22 +120,22 @@
 <li>
 <code>"P"</code>: Parallel mediation
 <p align="center">
-<img src="articles/Wa.png" alt="parallel within-subject mediation model" width="60%"></p>
+<img src="reference/figures/Wa.png" alt="parallel within-subject mediation model" width="60%"></p>
 </li>
 <li>
 <code>"CN"</code>: Chained / serial mediation
 <p align="center">
-<img src="articles/Wb.png" alt="serial within-subject mediation model" width="60%"></p>
+<img src="reference/figures/Wb.png" alt="serial within-subject mediation model" width="60%"></p>
 </li>
 <li>
 <code>"CP"</code>: Chained + Parallel
 <p align="center">
-<img src="articles/Wc.png" alt="serial-parallel within-subject mediation model" width="60%"></p>
+<img src="reference/figures/Wc.png" alt="serial-parallel within-subject mediation model" width="60%"></p>
 </li>
 <li>
 <code>"PC"</code>: Parallel + Chained
 <p align="center">
-<img src="articles/Wd.png" alt="parallel-serial within-subject mediation model" width="60%"></p>
+<img src="reference/figures/Wd.png" alt="parallel-serial within-subject mediation model" width="60%"></p>
 </li>
 </ul>
 </li>
@@ -169,7 +171,7 @@
 </li>
 </ol>
 </div>
-
+</div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">

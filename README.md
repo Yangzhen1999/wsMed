@@ -74,19 +74,19 @@ Its main steps are:
 3. **Build the model** – generate SEM syntax according to the chosen structure:
    - `"P"`: Parallel mediation
     <p align="center">
-    <img src="inst/extdata/Wa.png" alt="parallel within-subject mediation model" width="60%">
+    <img src="man/figures/Wa.png" alt="parallel within-subject mediation model" width="60%">
   </p>
    - `"CN"`: Chained / serial mediation
     <p align="center">
-    <img src="inst/extdata/Wb.png" alt="serial within-subject mediation model" width="60%">
+    <img src="man/figures/Wb.png" alt="serial within-subject mediation model" width="60%">
   </p>
    - `"CP"`: Chained + Parallel
     <p align="center">
-    <img src="inst/extdata/Wc.png" alt="serial-parallel within-subject mediation model" width="60%">
+    <img src="man/figures/Wc.png" alt="serial-parallel within-subject mediation model" width="60%">
   </p>
    - `"PC"`: Parallel + Chained
    <p align="center">
-    <img src="inst/extdata/Wd.png" alt="parallel-serial within-subject mediation model" width="60%">
+    <img src="man/figures/Wd.png" alt="parallel-serial within-subject mediation model" width="60%">
   </p>
 
 4. **Fit the model** – estimate parameters while handling missing data:

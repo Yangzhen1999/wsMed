@@ -3,11 +3,11 @@
 required by the WsMed workflow.
 It handles mediators, outcome, within-subject controls, between-subject
 controls, moderators, and all necessary interaction terms, while
-automatically centring / dummy-coding variables as needed."><meta property="og:description" content="PrepareData() transforms raw pre/post data into the set of variables
+automatically centering / dummy-coding variables as needed."><meta property="og:description" content="PrepareData() transforms raw pre/post data into the set of variables
 required by the WsMed workflow.
 It handles mediators, outcome, within-subject controls, between-subject
 controls, moderators, and all necessary interaction terms, while
-automatically centring / dummy-coding variables as needed."></head><body>
+automatically centering / dummy-coding variables as needed."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -15,7 +15,7 @@ automatically centring / dummy-coding variables as needed."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,7 +55,7 @@ automatically centring / dummy-coding variables as needed."></head><body>
 required by the <strong>WsMed</strong> workflow.
 It handles <em>mediators</em>, <em>outcome</em>, <em>within-subject controls</em>, <em>between-subject
 controls</em>, <em>moderators</em>, and all necessary <strong>interaction terms</strong>, while
-automatically centring / dummy-coding variables as needed.</p>
+automatically centering / dummy-coding variables as needed.</p>
     </div>
 
     <div class="section level2">
@@ -87,12 +87,12 @@ automatically centring / dummy-coding variables as needed.</p>
 
 
 <dt id="arg-m-c-m-c-">M_C1, M_C2<a class="anchor" aria-label="anchor" href="#arg-m-c-m-c-"></a></dt>
-<dd><p>Character vectors: mediator names at occasion 1 / 2
+<dd><p>Character vectors: mediator names at occasion 1 and 2
 (equal length).</p></dd>
 
 
 <dt id="arg-y-c-y-c-">Y_C1, Y_C2<a class="anchor" aria-label="anchor" href="#arg-y-c-y-c-"></a></dt>
-<dd><p>Character scalars: outcome names at occasion 1 / 2.</p></dd>
+<dd><p>Character scalars: outcome names at occasion 1 and 2.</p></dd>
 
 
 <dt id="arg-c-c-c-c-">C_C1, C_C2<a class="anchor" aria-label="anchor" href="#arg-c-c-c-c-"></a></dt>
@@ -105,12 +105,12 @@ automatically centring / dummy-coding variables as needed.</p>
 
 <dt id="arg-c-type">C_type<a class="anchor" aria-label="anchor" href="#arg-c-type"></a></dt>
 <dd><p>Optional vector of the same length as <code>C</code>.
-Each element <code>"continuous"</code>, <code>"categorical"</code>, or <code>"auto"</code>
+Each element is one of <code>"continuous"</code>, <code>"categorical"</code>, or <code>"auto"</code>
 (default). Ignored when <code>C = NULL</code>.</p></dd>
 
 
 <dt id="arg-w">W<a class="anchor" aria-label="anchor" href="#arg-w"></a></dt>
-<dd><p>Optional character vector: moderator names (≤ <em>J</em>).</p></dd>
+<dd><p>Optional character vector: moderator names (one or more).</p></dd>
 
 
 <dt id="arg-w-type">W_type<a class="anchor" aria-label="anchor" href="#arg-w-type"></a></dt>
@@ -119,45 +119,45 @@ Same coding as <code>C_type</code>. Ignored when <code>W = NULL</code>.</p></dd>
 
 
 <dt id="arg-center-w">center_W<a class="anchor" aria-label="anchor" href="#arg-center-w"></a></dt>
-<dd><p>Logical. Whether to center the moderator variable W.</p></dd>
+<dd><p>Logical. Whether to center the moderator variable <code>W</code>.</p></dd>
 
 
 <dt id="arg-keep-w-raw-keep-c-raw">keep_W_raw, keep_C_raw<a class="anchor" aria-label="anchor" href="#arg-keep-w-raw-keep-c-raw"></a></dt>
-<dd><p>Logical; keep original W / C columns in the
-returned data?</p></dd>
+<dd><p>Logical. If <code>TRUE</code>, keep the original
+<code>W</code> / <code>C</code> columns in the returned data.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A data frame containing at minimum:</p><ul><li><p><b>Ydiff</b></p></li>
-<li><p><b>Mi_diff</b>, <b>Mi_avg</b> for each mediator \(i\)</p></li>
-<li><p>centred / dummy-coded <b>Cb*</b>, <b>Cw<em>diff</em>, <b>Cw</b>avg</b></p></li>
-<li><p>centred / dummy-coded <b>W*</b> and all <b>int_*</b> interaction terms</p></li>
+    <p>A data frame containing at minimum:</p><ul><li><p><code>Ydiff</code></p></li>
+<li><p><code>Mi_diff</code>, <code>Mi_avg</code> for each mediator</p></li>
+<li><p>centered or dummy-coded <code>Cb*</code>, <code>Cw*diff</code>, <code>Cw*avg</code></p></li>
+<li><p>centered or dummy-coded <code>W*</code> and all <code>int_*</code> interaction terms</p></li>
 </ul><p>plus the attributes <code>"W_info"</code> and <code>"C_info"</code> described above.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The function performs the following steps:</p><ol><li><p><strong>Outcome difference</strong> (<code>Ydiff</code>) – <code>Y_C2 − Y_C1</code>.</p></li>
-<li><p><strong>Mediator variables</strong> for each pair <code>(M_C1[i], M_C2[i])</code></p><ul><li><p><code>Mi_diff</code> = <code>M_C2 − M_C1</code></p></li>
-<li><p><code>Mi_avg</code>  = mean-centred average of the two occasions.</p></li>
+    <p>The function performs the following steps:</p><ol><li><p>Outcome difference: <code>Ydiff = Y_C2 - Y_C1</code>.</p></li>
+<li><p>Mediator variables for each pair <code>(M_C1[i], M_C2[i])</code>:</p><ul><li><p><code>Mi_diff = M_C2 - M_C1</code></p></li>
+<li><p><code>Mi_avg</code> is the mean-centered average of the two occasions.</p></li>
 </ul></li>
-<li><p><strong>Between-subject controls C</strong></p><ul><li><p>Continuous → grand-mean centred (<code>Cb1</code>, <code>Cb2</code>, …).</p></li>
-<li><p>Categorical (binary or multi-level) → <em>k – 1</em> dummy variables
-(<code>Cb1_1</code>, <code>Cb2_1</code>, <code>Cb2_2</code>, …), with the first level as reference.</p></li>
+<li><p>Between-subject controls <code>C</code>:</p><ul><li><p>Continuous variables are grand-mean centered (<code>Cb1</code>, <code>Cb2</code>, ...).</p></li>
+<li><p>Categorical variables (binary or multi-level) are expanded into <code>k - 1</code>
+dummy variables (<code>Cb1_1</code>, <code>Cb2_1</code>, <code>Cb2_2</code>, ...), using the
+first level as the reference.</p></li>
 </ul></li>
-<li><p><strong>Within-subject controls Cw</strong> – difference &amp; centred-average versions
-(<code>Cw1diff</code>, <code>Cw1avg</code>, …).</p></li>
-<li><p><strong>Moderators W</strong> (supports ≥ 1):</p><ul><li><p>Continuous → grand-mean centred (<code>W1</code>, <code>W2</code>, …).</p></li>
-<li><p>Categorical → dummy-coded like C.</p></li>
+<li><p>Within-subject controls <code>Cw</code>: difference and centered-average versions
+(<code>Cw1diff</code>, <code>Cw1avg</code>, ...).</p></li>
+<li><p>Moderators <code>W</code> (one or more):</p><ul><li><p>Continuous variables are grand-mean centered (<code>W1</code>, <code>W2</code>, ...).</p></li>
+<li><p>Categorical variables are dummy-coded in the same way as <code>C</code>.</p></li>
 </ul></li>
-<li><p><strong>Interaction terms</strong> between every moderator dummy/centred column and
-each <code>Mi_diff</code> / <code>Mi_avg</code>:
-<code>int_&lt;Mi_diff&gt;_&lt;Wj&gt;</code>, <code>int_&lt;Mi_avg&gt;_&lt;Wj&gt;</code>.</p></li>
-<li><p>Adds two attributes:</p><ul><li><p><code>"W_info"</code> – raw names, dummy names, level mapping</p></li>
-<li><p><code>"C_info"</code> – same for between-subject C.</p></li>
+<li><p>Interaction terms between each moderator column and each mediator column:</p><ul><li><p><code>int_&lt;Mi_diff&gt;_&lt;Wj&gt;</code>, <code>int_&lt;Mi_avg&gt;_&lt;Wj&gt;</code>.</p></li>
 </ul></li>
-</ol><p>Row counts are preserved even if input factors contain <em>NA</em>
-(<code><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix()</a></code> is called with <code>na.action = na.pass</code>).</p>
+<li><p>Two attributes are added to the returned data:</p><ul><li><p><code>"W_info"</code>: raw names, dummy names, level mapping</p></li>
+<li><p><code>"C_info"</code>: same structure for between-subject controls.</p></li>
+</ul></li>
+</ol><p>Row counts are preserved even if input factors contain NA values
+(model.matrix is called with <code>na.action = na.pass</code>).</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -185,9 +185,28 @@ each <code>Mi_diff</code> / <code>Mi_avg</code>:
 <span class="r-in"><span>  C     <span class="op">=</span> <span class="st">"W_bin"</span>,      C_type <span class="op">=</span> <span class="st">"categorical"</span>,</span></span>
 <span class="r-in"><span>  W     <span class="op">=</span> <span class="st">"W_fac3"</span>,     W_type <span class="op">=</span> <span class="st">"categorical"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in PrepareData(data = raw, M_C1 = c("A1", "B1"), M_C2 = c("A2",     "B2"), Y_C1 = "C1", Y_C2 = "C2", C_C1 = "D1", C_C2 = "D2",     C = "W_bin", C_type = "categorical", W = "W_fac3", W_type = "categorical"):</span> unused arguments (M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"), Y_C1 = "C1", Y_C2 = "C2", C_C1 = "D1", C_C2 = "D2", C = "W_bin", C_type = "categorical", W = "W_fac3", W_type = "categorical")</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">prep</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'prep' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   W_bin W_fac3       Ydiff     M1diff      M2diff      M1avg       M2avg Cb1_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     0    Med -0.27317995  1.0245597  1.07055378 -0.2230613 -0.04728171     0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     0    Low -1.28170568 -0.7956697 -0.06067571 -0.3230789  0.04958610     0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     1    Low -1.65624325  1.1767483  0.59285327 -0.3561418 -0.57668693     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     1    Med  0.08324346 -2.7246439 -1.08739092  0.1240715 -0.34785861     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5     0    Low  2.98078634  1.1035159 -0.83287567  0.7723784 -1.03321440     0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6     0    Med -1.35143323  2.8008683 -2.84247957  0.4710784  0.38385556     0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       Cw1diff     Cw1avg W1 W2 int_M1diff_W1 int_M1diff_W2 int_M2diff_W1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.69594079  1.1321756  0  1     0.0000000      1.024560    0.00000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  1.84029996 -0.2366167  1  0    -0.7956697      0.000000   -0.06067571</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -1.47564138  1.1240482  1  0     1.1767483      0.000000    0.59285327</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.30656699 -0.3398171  0  1     0.0000000     -2.724644    0.00000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.03947981  1.5644167  1  0     1.1035159      0.000000   -0.83287567</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 -0.80024527  1.0026215  0  1     0.0000000      2.800868    0.00000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   int_M2diff_W2 int_M1avg_W1 int_M1avg_W2 int_M2avg_W1 int_M2avg_W2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      1.070554    0.0000000   -0.2230613    0.0000000  -0.04728171</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      0.000000   -0.3230789    0.0000000    0.0495861   0.00000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      0.000000   -0.3561418    0.0000000   -0.5766869   0.00000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     -1.087391    0.0000000    0.1240715    0.0000000  -0.34785861</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5      0.000000    0.7723784    0.0000000   -1.0332144   0.00000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6     -2.842480    0.0000000    0.4710784    0.0000000   0.38385556</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

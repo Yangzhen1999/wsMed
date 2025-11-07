@@ -13,7 +13,7 @@ contrasts between indirect effect, and ."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -122,18 +122,13 @@ to observe the moderation effect of ‘X'.</p></li>
 <span class="r-in"><span><span class="co"># Generate SEM model syntax</span></span></span>
 <span class="r-in"><span><span class="va">sem_model</span> <span class="op">&lt;-</span> <span class="fu">GenerateModelP</span><span class="op">(</span><span class="va">prepared_data</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">sem_model</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Ydiff ~ cp*1 + b1*M1diff + b2*M2diff + d1*M1avg + d2*M2avg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Ydiff ~ cp*1 + b1*M1diff + d1*M1avg + b2*M2diff + d2*M2avg</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> M1diff ~ a1*1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> M2diff ~ a2*1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> indirect1 := a1 * b1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> indirect2 := a2 * b2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> total_indirect := indirect1 + indirect2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> indirect_1 := a1 * b1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> indirect_2 := a2 * b2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> total_indirect := indirect_1 + indirect_2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> total_effect := cp + total_indirect</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI1vs2 := indirect1 - indirect2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1_b1 := (2*b1 + d1) / 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X0_b1 := X1_b1 - d1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1_b2 := (2*b2 + d2) / 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X0_b2 := X1_b2 - d2</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

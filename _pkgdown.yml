@@ -1,10 +1,12 @@
 url: https://yangzhen1999.github.io/wsMed
 
 
-
 template:
   bootstrap: 5
   bootswatch: flatly
+
+assets:
+  - inst/extdata
 
 navbar:
   structure:

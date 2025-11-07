@@ -13,7 +13,7 @@ total effects, contrasts between indirect effects, and coefficients in different
 
     <a class="navbar-brand me-2" href="../index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -125,37 +125,17 @@ and independent parallel mediators.</p>
 <span class="r-in"><span><span class="co"># Generate SEM model syntax</span></span></span>
 <span class="r-in"><span><span class="va">sem_model</span> <span class="op">&lt;-</span> <span class="fu">GenerateModelCP</span><span class="op">(</span><span class="va">prepared_data</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">sem_model</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Ydiff ~ cp*1 + b1*M1diff + b2*M2diff + b3*M3diff + d1*M1avg + d2*M2avg + d3*M3avg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Ydiff ~ cp*1 + b1*M1diff + d1*M1avg + b2*M2diff + d2*M2avg + b3*M3diff + d3*M3avg</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> M1diff ~ a1*1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> M2diff ~ a2*1 + b12*M1diff + d12*M1avg</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> M3diff ~ a3*1 + b13*M1diff + d13*M1avg</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> indirect1 := a1 * b1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> indirect2 := a2 * b2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> indirect3 := a3 * b3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> indirect12 := a1 * b12 * b2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> indirect13 := a1 * b13 * b3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> total_indirect := indirect1 + indirect2 + indirect3 + indirect12 + indirect13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> M2diff ~ a2*1 + b_1_2*M1diff + d_1_2*M1avg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> M3diff ~ a3*1 + b_1_3*M1diff + d_1_3*M1avg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> indirect_1 := a1 * b1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> indirect_2 := a2 * b2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> indirect_1_2 := a1 * b_1_2 * b2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> indirect_3 := a3 * b3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> indirect_1_3 := a1 * b_1_3 * b3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> total_indirect := indirect_1 + indirect_2 + indirect_1_2 + indirect_3 + indirect_1_3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> total_effect := cp + total_indirect</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI1vs2 := indirect1 - indirect2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI1vs3 := indirect1 - indirect3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI1vs12 := indirect1 - indirect12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI1vs13 := indirect1 - indirect13</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI2vs3 := indirect2 - indirect3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI2vs12 := indirect2 - indirect12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI2vs13 := indirect2 - indirect13</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI3vs12 := indirect3 - indirect12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI3vs13 := indirect3 - indirect13</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI12vs13 := indirect12 - indirect13</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1_b1 := (2*b1 + d1)/2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X0_b1 := X1_b1 - d1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1_b2 := (2*b2 + d2)/2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X0_b2 := X1_b2 - d2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1_b3 := (2*b3 + d3)/2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X0_b3 := X1_b3 - d3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1_b12 := (2*b12 + d12)/2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X0_b12 := X1_b12 - d12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1_b13 := (2*b13 + d13)/2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X0_b13 := X1_b13 - d13</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

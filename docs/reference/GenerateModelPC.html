@@ -15,7 +15,7 @@ the outcome variable, emphasizing a downstream role for the chained mediator."><
 
     <a class="navbar-brand me-2" href="../index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -132,37 +132,17 @@ sequential chained paths, providing a comprehensive mediation analysis framework
 <span class="r-in"><span><span class="co"># Generate SEM model syntax</span></span></span>
 <span class="r-in"><span><span class="va">sem_model</span> <span class="op">&lt;-</span> <span class="fu">GenerateModelPC</span><span class="op">(</span><span class="va">prepared_data</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">sem_model</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Ydiff ~ cp*1 + b2*M2diff +  + b3*M3diff + b1*M1diff + d2*M2avg +  + d3*M3avg + d1*M1avg</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> M1diff ~ a1*1 + b21*M2diff + b31*M3diff + d21*M2avg + d31*M3avg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Ydiff ~ cp*1 + b1*M1diff + d1*M1avg + b2*M2diff + b3*M3diff + d2*M2avg + d3*M3avg</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> M2diff ~ a2*1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> M3diff ~ a3*1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> indirect2 := a2 * b2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> indirect3 := a3 * b3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> indirect1 := a1 * b1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> indirect21 := a2 * b21 * b1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> indirect31 := a3 * b31 * b1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> total_indirect := indirect2 + indirect3 + indirect1 + indirect21 + indirect31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> M1diff ~ a1*1 + b_2_1*M2diff + d_2_1*M2avg + b_3_1*M3diff + d_3_1*M3avg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> indirect_1 := a1 * b1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> indirect_2 := a2 * b2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> indirect_2_1 := a2 * b_2_1 * b1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> indirect_3 := a3 * b3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> indirect_3_1 := a3 * b_3_1 * b1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> total_indirect := indirect_1 + indirect_2 + indirect_2_1 + indirect_3 + indirect_3_1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> total_effect := cp + total_indirect</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI2vs3 := indirect2 - indirect3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI2vs1 := indirect2 - indirect1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI2vs21 := indirect2 - indirect21</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI2vs31 := indirect2 - indirect31</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI3vs1 := indirect3 - indirect1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI3vs21 := indirect3 - indirect21</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI3vs31 := indirect3 - indirect31</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI1vs21 := indirect1 - indirect21</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI1vs31 := indirect1 - indirect31</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CI21vs31 := indirect21 - indirect31</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1_b1 := (2*b1 + d1)/2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X0_b1 := X1_b1 - d1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1_b2 := (2*b2 + d2)/2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X0_b2 := X1_b2 - d2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1_b3 := (2*b3 + d3)/2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X0_b3 := X1_b3 - d3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1_b21 := (2*b21 + d21)/2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X0_b21 := X1_b21 - d21</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X1_b31 := (2*b31 + d31)/2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X0_b31 := X1_b31 - d31</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

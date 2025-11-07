@@ -10,12 +10,9 @@ vignette: >
 ## Introduction
 
 The `GenerateModelCP` function dynamically generates a Structural Equation Model (SEM) formula to analyze models with a single chained mediator and multiple parallel mediators for 'lavaan' based on the prepared dataset. This document explains the mathematical principles and the structure of the generated model.
-```{r, echo=FALSE, fig.align="center", out.width="100%"}
-library(wsMed)
-knitr::include_graphics(
-  system.file("extdata", "Wc.png", package = "wsMed")
-)
-```
+ <p align="center">
+    <img src="Wc.png" alt="serial-parallel within-subject mediation model" width="60%">
+  </p>
 ---
 
 ## 1. Model Description
