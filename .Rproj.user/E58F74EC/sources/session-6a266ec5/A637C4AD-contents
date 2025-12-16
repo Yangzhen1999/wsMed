@@ -1,0 +1,71 @@
+url: https://yangzhen1999.github.io/wsMed
+
+
+template:
+  bootstrap: 5
+  bootswatch: flatly
+
+assets:
+  - inst/extdata
+
+navbar:
+  structure:
+    left: [home, reference, articles, news]
+    right: [github]
+  components:
+    home:
+      text: "Home"
+      href: index.html
+    reference:
+      text: "Functions"
+      href: reference/index.html
+    articles:
+      text: "Tutorials"
+      menu:
+        - text: "Introduction to wsMed"
+          href: articles/wsMed.html
+        - text: "Using printGM() to Generate SEM Models"
+          href: articles/printGM.html
+        - text: "Parallel Mediation (P)"
+          href: articles/GenerateModelP.html
+        - text: "Chained Mediation (CN)"
+          href: articles/GenerateModelCN.html
+        - text: "Combined Parallel and Chained (CP)"
+          href: articles/GenerateModelCP.html
+        - text: "Parallel + Chained (PC)"
+          href: articles/GenerateModelPC.html
+        - text: "Comparison: MEMORE 3.0 vs wsMed"
+          href: articles/MEMORE_vs_wsMed.html
+    news:
+      text: "Changelog"
+      href: news/index.html
+    github:
+      icon: fab fa-github
+      href: https://github.com/Yangzhen1999/wsMed
+      aria-label: "GitHub Repository"
+
+reference:
+  - title: "Main Functions"
+    desc: "Core functions for within-subject mediation analysis"
+    contents:
+      - wsMed
+      - print.wsMed
+      - printGM
+  - title: "Model Generation"
+    desc: "Functions for generating SEM syntax for different mediation structures"
+    contents:
+      - GenerateModelP
+      - GenerateModelCN
+      - GenerateModelCP
+      - GenerateModelPC
+  - title: "Missing Data and Imputation"
+    desc: "Functions to handle missing data with multiple imputation"
+    contents:
+      - ImputeData
+      - PrepareMissingData
+      - MCMI2
+      - PrepareData
+  - title: "Plotting Conditional Indirect Effects"
+    desc: "Functions for visualizing conditional indirect effect curves"
+    contents:
+      - plot_moderation_curve
