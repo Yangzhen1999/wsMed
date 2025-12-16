@@ -27,8 +27,6 @@
 }
 
 #' Pretty print a data frame with smart alignment
-#'
-#' Numeric columns are formatted via [.fmt_num()] and printed with
 #' right alignment; non numeric columns default to left alignment.  Specific
 #' columns can be forced right aligned via *right_align*.
 #'

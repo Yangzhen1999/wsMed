@@ -37,24 +37,6 @@
 #'
 #' @return A `ggplot` object (add layers or save with `ggsave()`).
 #'
-#' @examples
-#'
-#' data("example_data", package = "wsMed")
-#' result <- wsMed(
-#'                 data = example_data,
-#'                 M_C1 = c("A1","B1","C1"),
-#'                 M_C2 = c("A2","B2","C2"),
-#'                 Y_C1 = "D1",
-#'                 Y_C2 = "D2",
-#'                 form = "CP",
-#'                 W      = "D3",
-#'                 W_type = "continuous",
-#'                 MP     = c("a1","b2","d1","cp","b_1_2","d_1_2"),
-#'                 )
-#' plot_moderation_curve(result, "indirect_effect_1_2") # indirect
-#' plot_moderation_curve(result, "b_1_2")               # direct path
-#'
-#'
 #' @importFrom dplyr filter arrange mutate bind_rows tibble
 #' @importFrom ggplot2 ggplot aes geom_line geom_ribbon geom_rect
 #' @importFrom ggplot2 geom_hline geom_vline geom_text scale_fill_manual

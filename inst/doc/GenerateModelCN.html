@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>GenerateModelCN</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">GenerateModelCN</h1>
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+The <code>GenerateModelCN</code> function dynamically generates a
+Structural Equation Model (SEM) formula to analyze chained or nested
+mediation for ‘lavaan’ based on the prepared dataset. This document
+explains the mathematical principles and the structure of the generated
+model.
+<p align="center">
+<img role="img" aria-label="serial within-subject mediation model" src="Wb.png" alt="serial within-subject mediation model" width="60%">
+</p>
+<hr />
+</div>
+<div id="difference-model-description" class="section level2">
+<h2>1. Difference Model Description</h2>
+<div id="regression-for-y_textdiff-and-m_textdiff" class="section level3">
+<h3>1.1 Regression for <span class="math inline">\(Y_{\text{diff}}\)</span> and <span class="math inline">\(M_{\text{diff}}\)</span></h3>
+<p>For <span class="math inline">\(N\)</span> mediators <span class="math inline">\(M_1, M_2, \dots, M_N\)</span>, the difference
+model is defined as:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Outcome Difference Model (<span class="math inline">\(Y_{\text{diff}}\)</span>):</strong> <span class="math display">\[
+Y_{\text{diff}} = cp + \sum_{i=1}^N \left( b_i M_{\text{diff},i} + d_i
+M_{\text{avg},i} \right) + e
+\]</span></p></li>
+<li><p><strong>Mediator Difference Model (<span class="math inline">\(M_{\text{diff},i}\)</span>):</strong> <span class="math display">\[
+M_{\text{diff},i} = a_i + \sum_{j&lt;i} \left( b_{ji} M_{\text{diff},j}
++ d_{ji} M_{\text{avg},j} \right) + \epsilon_i
+\]</span></p></li>
+</ol>
+<p>Where: - <span class="math inline">\(cp\)</span>: Intercept term for
+the outcome difference model. - <span class="math inline">\(b_i\)</span>: Average effect of mediator <span class="math inline">\(M_i\)</span> on <span class="math inline">\(Y_{\text{diff}}\)</span>. - <span class="math inline">\(d_i\)</span>: Moderator effect for <span class="math inline">\(M_{\text{avg},i}\)</span> in <span class="math inline">\(Y_{\text{diff}}\)</span>. - <span class="math inline">\(b_{ji}\)</span> and <span class="math inline">\(d_{ji}\)</span>: Regression coefficients for <span class="math inline">\(M_{\text{diff},j}\)</span> and <span class="math inline">\(M_{\text{avg},j}\)</span> on <span class="math inline">\(M_{\text{diff},i}\)</span>, respectively. - <span class="math inline">\(\epsilon_i\)</span>: Residual for <span class="math inline">\(M_{\text{diff},i}\)</span>.</p>
+<hr />
+</div>
+</div>
+<div id="indirect-effects" class="section level2">
+<h2>2. Indirect Effects</h2>
+<p>For each mediator <span class="math inline">\(M_i\)</span>, the
+indirect effect is defined as: <span class="math display">\[
+\text{indirect}_i = a_i \cdot b_i
+\]</span></p>
+<p>For chained mediators, the indirect effects follow the paths through
+the mediators: 1. For a single mediator <span class="math inline">\(M_i\)</span>: <span class="math display">\[
+   \text{indirect}_i = a_i \cdot b_i
+   \]</span></p>
+<ol start="2" style="list-style-type: decimal">
+<li>For a chained pathway <span class="math inline">\(M_1 \to M_2 \to
+\dots \to M_k\)</span>: <span class="math display">\[
+\text{indirect}_{1 \dots k} = a_1 \cdot b_{12} \cdot b_{23} \cdot \dots
+\cdot b_k
+\]</span></li>
+</ol>
+<p>The total indirect effect is: <span class="math display">\[
+\text{total_indirect} = \sum_{\text{all paths}}
+\text{indirect}_{\text{path}}
+\]</span></p>
+<hr />
+<div id="examples-of-indirect-effects" class="section level3">
+<h3>2.1 Examples of Indirect Effects</h3>
+<p>For three mediators <span class="math inline">\(M_1 \to M_2 \to
+M_3\)</span>, the indirect effects include:</p>
+<ol style="list-style-type: decimal">
+<li>The direct path through <span class="math inline">\(M_1,M_2,and
+M_3\)</span>: <span class="math display">\[
+\text{indirect}_1 = a_1 \cdot b_1
+\]</span> <span class="math display">\[
+\text{indirect}_2 = a_2 \cdot b_2
+\]</span> <span class="math display">\[
+\text{indirect}_3 = a_3 \cdot b_3
+\]</span></li>
+<li>The chained path through <span class="math inline">\(M_1 \to
+M_2\)</span>: <span class="math display">\[
+\text{indirect}_{12} = a_1 \cdot b_{12} \cdot b_2
+\]</span></li>
+<li>The chained path through <span class="math inline">\(M_2 \to
+M_3\)</span>: <span class="math display">\[
+\text{indirect}_{23} = a_2 \cdot b_{23} \cdot b_3
+\]</span></li>
+<li>The chained path through <span class="math inline">\(M_1 \to M_2 \to
+M_3\)</span>: <span class="math display">\[
+\text{indirect}_{123} = a_1 \cdot b_{12} \cdot b_{23} \cdot b_3
+\]</span></li>
+</ol>
+<hr />
+</div>
+</div>
+<div id="total-effect" class="section level2">
+<h2>3. Total Effect</h2>
+<p>The total effect combines the direct effect and the total indirect
+effect: <span class="math display">\[
+\text{total_effect} = cp + \text{total_indirect}
+\]</span></p>
+<p>Where <span class="math inline">\(cp\)</span> is the direct
+effect.</p>
+<hr />
+</div>
+<div id="comparison-of-indirect-effects" class="section level2">
+<h2>4. Comparison of Indirect Effects</h2>
+<p>When there are multiple mediators or pathways, comparing their
+indirect effects provides insights into the relative influence of each
+mediator or chain.</p>
+<hr />
+<div id="comparing-indirect-effects" class="section level3">
+<h3>4.1 Comparing Indirect Effects</h3>
+<p>The contrast between two indirect effects, <span class="math inline">\(\text{indirect}_{\text{path}_1}\)</span> and <span class="math inline">\(\text{indirect}_{\text{path}_2}\)</span>, is
+calculated as: <span class="math display">\[
+CI_{\text{path}_1\text{vs}\text{path}_2} =
+\text{indirect}_{\text{path}_1} - \text{indirect}_{\text{path}_2}
+\]</span></p>
+<div id="interpretation" class="section level4">
+<h4>Interpretation:</h4>
+<ul>
+<li><span class="math inline">\(CI_{\text{path}_1\text{vs}\text{path}_2}
+&gt; 0\)</span>: Pathway <span class="math inline">\(\text{path}_1\)</span> has a stronger indirect
+effect.</li>
+<li><span class="math inline">\(CI_{\text{path}_1\text{vs}\text{path}_2}
+&lt; 0\)</span>: Pathway <span class="math inline">\(\text{path}_2\)</span> has a stronger indirect
+effect.</li>
+</ul>
+<hr />
+</div>
+</div>
+<div id="example-three-mediators-m_1-m_2-m_3" class="section level3">
+<h3>4.2 Example: Three Mediators <span class="math inline">\(M_1, M_2,
+M_3\)</span></h3>
+<div id="indirect-effects-1" class="section level4">
+<h4>Indirect Effects</h4>
+<p>For three mediators, the following indirect effects are defined:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Direct Path Effects:</strong> <span class="math display">\[
+\text{indirect}_1 = a_1 \cdot b_1
+\]</span> <span class="math display">\[
+\text{indirect}_2 = a_2 \cdot b_2
+\]</span> <span class="math display">\[
+\text{indirect}_3 = a_3 \cdot b_3
+\]</span></p></li>
+<li><p><strong>Chained Path Effects:</strong> <span class="math display">\[
+\text{indirect}_{12} = a_1 \cdot b_{12} \cdot b_2
+\]</span> <span class="math display">\[
+\text{indirect}_{23} = a_2 \cdot b_{23} \cdot b_3
+\]</span> <span class="math display">\[
+\text{indirect}_{123} = a_1 \cdot b_{12} \cdot b_{23} \cdot b_3
+\]</span></p></li>
+</ol>
+</div>
+<div id="comparisons" class="section level4">
+<h4>Comparisons</h4>
+<p>The indirect effects are compared as follows: <span class="math display">\[
+   CI_{1\text{vs}2} = \text{indirect}_1 - \text{indirect}_2
+   \]</span> <span class="math display">\[
+   CI_{1\text{vs}3} = \text{indirect}_1 - \text{indirect}_3
+   \]</span> <span class="math display">\[
+   CI_{2\text{vs}3} = \text{indirect}_2 - \text{indirect}_3
+   \]</span> <span class="math display">\[
+   CI_{1\text{vs}12} = \text{indirect}_1 - \text{indirect}_{12}
+   \]</span> <span class="math display">\[
+   CI_{1\text{vs}23} = \text{indirect}_1 - \text{indirect}_{23}
+   \]</span> <span class="math display">\[
+   CI_{1\text{vs}123} = \text{indirect}_1 - \text{indirect}_{123}
+   \]</span> <span class="math display">\[
+   CI_{2\text{vs}12} = \text{indirect}_2 - \text{indirect}_{12}
+   \]</span> <span class="math display">\[
+   CI_{2\text{vs}23} = \text{indirect}_2 - \text{indirect}_{23}
+   \]</span> <span class="math display">\[
+   CI_{2\text{vs}123} = \text{indirect}_2 - \text{indirect}_{123}
+   \]</span> <span class="math display">\[
+   CI_{3\text{vs}12} = \text{indirect}_3 - \text{indirect}_{12}
+   \]</span> <span class="math display">\[
+   CI_{3\text{vs}23} = \text{indirect}_3 - \text{indirect}_{23}
+   \]</span> <span class="math display">\[
+   CI_{3\text{vs}123} = \text{indirect}_3 - \text{indirect}_{123}
+   \]</span> <span class="math display">\[
+   CI_{12\text{vs}23} = \text{indirect}_{12} - \text{indirect}_{23}
+   \]</span> <span class="math display">\[
+   CI_{12\text{vs}123} = \text{indirect}_{12} - \text{indirect}_{123}
+   \]</span> <span class="math display">\[
+   CI_{23\text{vs}123} = \text{indirect}_{23} - \text{indirect}_{123}
+   \]</span> —</p>
+</div>
+</div>
+</div>
+<div id="c1-and-c2-coefficients" class="section level2">
+<h2>5. C1 and C2 Coefficients</h2>
+<p>For C1- and C2-measurement conditions, the coefficients are
+calculated as follows:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>C2-Measurement Coefficient (<span class="math inline">\(X1_{b,i}\)</span>):</strong> <span class="math display">\[
+X1_{b,i} = b_i + d_i
+\]</span></p></li>
+<li><p><strong>C1-Measurement Coefficient (<span class="math inline">\(X0_{b,i}\)</span>):</strong> <span class="math display">\[
+X0_{b,i} = X1_{b,i} - d_i
+\]</span></p></li>
+</ol>
+<p>For chained pathways: 1. <strong>C2-Measurement Coefficient (<span class="math inline">\(X1_{b,ij}\)</span>):</strong> <span class="math display">\[
+   X1_{b,ij} = b_{ij} + d_{ij}
+   \]</span></p>
+<ol start="2" style="list-style-type: decimal">
+<li><p><strong>C1-Measurement Coefficient (<span class="math inline">\(X0_{b,ij}\)</span>):</strong> <span class="math display">\[
+X0_{b,ij} = X1_{b,ij} - d_{ij}
+\]</span> — For three mediators <span class="math inline">\(M_1, M_2,
+M_3\)</span>, the coefficients are calculated as follows:</p>
+<ul>
+<li><p>C2-Measurement Coefficient: <span class="math display">\[
+X1_{b,1} = b_1 + d_1
+\]</span></p></li>
+<li><p>C1-Measurement Coefficient: <span class="math display">\[
+X0_{b,1} = X1_{b,1} - d_1
+\]</span></p></li>
+<li><p>C2-Measurement Coefficient: <span class="math display">\[
+X1_{b,2} = b_2 + d_2
+\]</span></p></li>
+<li><p>C1-Measurement Coefficient: <span class="math display">\[
+X0_{b,2} = X1_{b,2} - d_2
+\]</span></p></li>
+<li><p>C2-Measurement Coefficient: <span class="math display">\[
+X1_{b,3} = b_3 + d_3
+\]</span></p></li>
+<li><p>C1-Measurement Coefficient: <span class="math display">\[
+X0_{b,3} = X1_{b,3} - d_3
+\]</span></p></li>
+<li><p>C2-Measurement Coefficient: <span class="math display">\[
+X1_{b,12} = b_{12} + d_{12}
+\]</span></p></li>
+<li><p>C1-Measurement Coefficient: <span class="math display">\[
+X0_{b,12} = X1_{b,12} - d_{12}
+\]</span> —</p></li>
+</ul></li>
+</ol>
+</div>
+<div id="summary-of-regression-equations" class="section level2">
+<h2>6. Summary of Regression Equations</h2>
+<p>This section summarizes all the regression equations:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Outcome Difference Model (<span class="math inline">\(Y_{\text{diff}}\)</span>):</strong> <span class="math display">\[
+Y_{\text{diff}} = cp + \sum_{i=1}^N \left( b_i M_{\text{diff},i} + d_i
+M_{\text{avg},i} \right) + e
+\]</span></p></li>
+<li><p><strong>Mediator Difference Model (<span class="math inline">\(M_{\text{diff},i}\)</span>):</strong> <span class="math display">\[
+M_{\text{diff},i} = a_i + \sum_{j&lt;i} \left( b_{ji} M_{\text{diff},j}
++ d_{ji} M_{\text{avg},j} \right) + \epsilon_i
+\]</span></p></li>
+<li><p><strong>Indirect Effects:</strong> <span class="math display">\[
+\text{indirect}_{1 \dots k} = a_1 \cdot b_{12} \cdot b_{23} \cdot \dots
+\cdot b_k
+\]</span></p></li>
+<li><p><strong>Comparison of Indirect Effects</strong> <span class="math display">\[
+CI_{\text{path}_1\text{vs}\text{path}_2} =
+\text{indirect}_{\text{path}_1} - \text{indirect}_{\text{path}_2}
+\]</span></p></li>
+<li><p><strong>C1- and C2-Measurement Coefficients:</strong> <span class="math display">\[
+X1_{b,i} = b_i + d_i, \quad X0_{b,i} = X1_{b,i} - d_i
+\]</span> <span class="math display">\[
+X1_{b,ij} = b_{ij} + d_{ij}, \quad X0_{b,ij} = X1_{b,ij} - d_{ij}
+\]</span></p></li>
+</ol>
+<p>By combining these equations, the <code>GenerateModelCN</code>
+function supports chained mediation analysis with flexibility in
+handling nested pathways.</p>
+<hr />
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

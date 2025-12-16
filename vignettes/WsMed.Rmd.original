@@ -374,7 +374,6 @@ result5 <- wsMed(
   form = "P",# parallel mediation
   W      = "D3", # name of the moderator variable (here "D3")
   W_type = "continuous", # type of the moderator ("continuous" or "categorical")
-  bootstrap = 2000, # Use bootstrap
   MP     = c("a1","b1","d1","cp"),
   #   MP: which regression paths are moderated by W.
   #   a1   : X -> M1diff
@@ -635,7 +634,6 @@ result5 <- wsMed(
   form = "P",# Parallel mediation
   W      = "D3", # name of the moderator variable (here "D3")
   W_type = "continuous", # type of the moderator ("continuous" or "categorical")
-  bootstrap = 2000, # Use bootstrap
   MP     = c("a1","b1","d1","cp"),
   #   MP: which regression paths are moderated by W.
   #   a1   : X -> M1diff

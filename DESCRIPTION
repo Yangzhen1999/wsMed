@@ -1,7 +1,8 @@
 Package: wsMed
-Title: Within-subject mediation analysis using structural equation modeling
-Version: 1.0.1
-Authors@R:
+Title: Within-Subject Mediation Analysis Using Structural Equation
+        Modeling
+Version: 1.0.2
+Authors@R: 
     c(person(given = "Wendie",
              family ="Yang",
              role = c("aut", "cre"),
@@ -21,26 +22,19 @@ Description: Within-subject mediation analysis using structural equation modelin
 License: GPL (>= 3)
 Depends: R (>= 4.1.0)
 Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
-Suggests:
-    rmarkdown,
-    devtools,
-    testthat
+RoxygenNote: 7.3.3
+Suggests: rmarkdown, devtools, testthat
 Config/testthat/edition: 3
-Imports:
-    knitr,
-    lavaan,
-    semmcci,
-    mice,
-    semboottools,
-    MASS,
-    rlang,
-    dplyr,
-    ggplot2,
-    methods,
-    stats
+Imports: knitr, lavaan, semmcci, mice, semboottools, MASS, rlang,
+        dplyr, ggplot2, methods, stats
 VignetteBuilder: knitr
 LazyData: true
-URL:  https://yangzhen1999.github.io/wsMed/
+URL: https://yangzhen1999.github.io/wsMed/
 BugReports: https://github.com/Yangzhen1999/wsMed/issues
+NeedsCompilation: no
+Packaged: 2025-12-06 12:34:07 UTC; Administrator
+Author: Wendie Yang [aut, cre] (ORCID: <https://orcid.org/0009-0000-8388-6481>),
+  Shu Fai Cheung [aut] (ORCID: <https://orcid.org/0000-0002-9871-9448>)
+Maintainer: Wendie Yang <1581075494q@gmail.com>
+Repository: CRAN
+Date/Publication: 2025-12-11 13:30:02 UTC
