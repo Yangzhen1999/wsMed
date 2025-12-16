@@ -1,0 +1,97 @@
+# Demonstration of printGM()
+
+## Demonstration of `printGM()`
+
+### Using `printGM()` with `WsMed()`
+
+The `WsMed()` function returns a list containing `sem_model`.
+[`printGM()`](https://yangzhen1999.github.io/wsMed/reference/printGM.md)
+can automatically extract and format the model equations.
+
+``` r
+library(wsMed)
+result1 <- wsMed(
+  data = example_data,
+  M_C1 = c("A1","B1","C1"),
+  M_C2 = c("A2","B2","C2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2",
+  form = "P",
+  Na = "DE",
+  standardized = TRUE,
+  bootstrap = 1000,
+  iseed = 123
+)
+printGM(result1)
+```
+
+    ## 
+    ## Outcome Difference Model (Ydiff):
+    ##  Ydiff ~ cp*1 + b1*M1diff + d1*M1avg + b2*M2diff + d2*M2avg + b3*M3diff + d3*M3avg 
+    ## 
+    ## Mediator Difference Model (Chained Mediator - M1diff):
+    ## M1diff ~ a1*1 
+    ## 
+    ## Mediator Difference Model (Other Mediators):
+    ## M2diff ~ a2*1
+    ## M3diff ~ a3*1 
+    ## 
+    ## Indirect Effects:
+    ## indirect_1 := a1 * b1
+    ## indirect_2 := a2 * b2
+    ## indirect_3 := a3 * b3 
+    ## 
+    ## Total Indirect Effect:
+    ##  total_indirect := indirect_1 + indirect_2 + indirect_3 
+    ## 
+    ## Total Effect:
+    ##  total_effect := cp + total_indirect
+
+### Using printGM() with GenerateModel\*()
+
+If you already have preprocessed data, you can directly generate the SEM
+model syntax using GenerateModelPC() or other GenerateModel\*()
+functions.
+
+``` r
+# Load necessary packages
+library(wsMed)
+# Load example data
+data(example_data)
+
+# Prepare data
+prepared_data <- PrepareData(
+  data = example_data,
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
+  Y_C1 = "C1",
+  Y_C2 = "C2"
+)
+
+# Generate Model
+sem_model <- GenerateModelPC(prepared_data)
+
+# print Model equations
+printGM(sem_model)
+```
+
+    ## 
+    ## Outcome Difference Model (Ydiff):
+    ##  Ydiff ~ cp*1 + b1*M1diff + d1*M1avg + b2*M2diff + d2*M2avg 
+    ## 
+    ## Mediator Difference Model (Chained Mediator - M1diff):
+    ## M1diff ~ a1*1 + b_2_1*M2diff + d_2_1*M2avg 
+    ## 
+    ## Mediator Difference Model (Other Mediators):
+    ## M2diff ~ a2*1 
+    ## 
+    ## Indirect Effects:
+    ## indirect_1 := a1 * b1
+    ## indirect_2 := a2 * b2
+    ## indirect_2_1 := a2 * b_2_1 * b1 
+    ## 
+    ## Total Indirect Effect:
+    ##  total_indirect := indirect_1 + indirect_2 + indirect_2_1 
+    ## 
+    ## Total Effect:
+    ##  total_effect := cp + total_indirect
