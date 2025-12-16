@@ -1,0 +1,35 @@
+result1 <- wsMed(
+  data = example_data, #dataset
+  M_C1 = c("A1","B1"), # A1/B1 is A/B mediator variable in condition 1
+  M_C2 = c("A2","B2"), # A2/B2 is A/B mediator variable in condition 2
+  Y_C1 = "C1", # C1 is outcome variable in condition 1
+  Y_C2 = "C2", # C2 is outcome variable in condition 2
+  form = "P", # Parallel mediation
+)
+print(result1)
+
+result1$sem_model
+summary(result1$data)
+fit0 <- sem(result1$sem_model, data = result1$data, fixed.x = FALSE)
+fit_b <- store_boot(fit0, R = 1500, do_bootstrapping = TRUE)
+
+raw_mat <- slot(fit_b, "external")$sbt_boot_ustd
+head(raw_mat)
+# theta 是送进 .make_moderation() 的矩阵
+na_cols <- which(colSums(is.na(raw_mat))> 0)
+na_rows <- which(rowSums(is.na(raw_mat)) > 0)
+
+cat("列含 NA:", colnames(raw_mat)[na_cols], "\n")
+cat("行含 NA:", length(na_rows), "个\n")
+
+
+
+moderation <- .make_moderation(
+  mc_res  = mc$result,
+  data    = prep,
+  W       = W,
+  MP      = MP,
+  W_type  = W_type,
+  alpha   = alpha,
+  verbose = verbose
+)

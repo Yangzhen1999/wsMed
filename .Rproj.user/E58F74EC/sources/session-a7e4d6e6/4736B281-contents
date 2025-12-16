@@ -1,0 +1,22 @@
+library(usethis)
+usethis::create_from_github("Yangzhen1999/semboottools", 
+                            destdir = "C:/Users/HP455G8") 
+
+cd C:/Users/HP455G8
+git clone https://github.com/Yangzhen1999/semboottools.git
+
+
+cd C:/Users/HP455G8
+
+
+ result1 <- wsMed(
+   data = example_dataN,
+   M_C1 = c("A1", "B1"),
+   M_C2 = c("A2", "B2"),
+   Y_C1 = "C1",
+   Y_C2 = "C2",
+   form = "P",
+   Na = "FIML",
+   standardized = FALSE,
+   alpha = 0.05
+ )

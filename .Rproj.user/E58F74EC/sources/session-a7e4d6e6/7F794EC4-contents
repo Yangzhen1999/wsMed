@@ -1,0 +1,27 @@
+result4 <- wsMed(
+  data = dat2,
+  M_C1 = c("TSRQ_auto_T1","WEMBS_total_T1","IPAQ_sitting_T1","ISI_T1","SMUF_day_T1"),
+  M_C2 = c("TSRQ_auto_T2","WEMBS_total_T2","IPAQ_sitting_T2","ISI_T2","SMUF_day_T2"),
+  Y_C1 = "DASSS_T1",
+  Y_C2 = "DASSS_T2",
+  form = "P",
+  C_C1 = c("HES_total_T1"),
+  C_C2 = c("HES_total_T2"),
+  C = c("Q7", "Q8", "Q9", "BMI"),
+  Na = "MI",
+  seed = 123)
+print(result4)
+
+result1 <- wsMed(
+  data = dat,
+  M_C1 = c("TSRQ_T1","WEMBS_T1","IPAQ_T1","ISI_T1","SMUF_T1"),
+  M_C2 = c("TSRQ_T2","WEMBS_T2","IPAQ_T2","ISI_T2","SMUF_T2"),
+  Y_C1 = "DASSS_T1",
+  Y_C2 = "DASSS_T2",
+  form = "P",
+  C_C1 = c("HES_T1"),
+  C_C2 = c("HES_T2"),
+  C = c("Q7", "Q8", "Q9", "BMI"),
+  Na = "MI",
+  seed = 123)
+print(result1)

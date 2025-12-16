@@ -1,0 +1,9 @@
+library(wsMed)
+devtools::load_all()
+
+system('git config --global user.name "Yangzhen1999"')
+system('git config --global user.email "2096735465@qq.com"')
+system('git config --global --list')
+
+library(haven)
+dat <- read_sav("D:/Personal/Downloads/example-data.sav")

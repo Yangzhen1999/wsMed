@@ -1,0 +1,44 @@
+library(haven)
+dat <- read_sav("D:/Personal/Desktop/example_data2.sav")
+datc <- read_sav("D:/Personal/Desktop/dat_clean.sav")
+dat2 <- read_sav("D:/Personal/Desktop/dat.sav")
+result2 <- wsMed(
+  data = datc,
+  M_C1 = c("TSRQ_T1","WEMBS_T1","IPAQ_T1","ISI_T1","SMUF_T1"),
+  M_C2 = c("TSRQ_T2","WEMBS_T2","IPAQ_T2","ISI_T2","SMUF_T2"),
+  Y_C1 = "DASSS_T1",
+  Y_C2 = "DASSS_T2",
+  form = "P",
+  seed = 123)
+print(result2,digits = 4)
+
+result2 <- wsMed(
+  data = datc,
+  M_C1 = c("TSRQ_T1","WEMBS_T1","IPAQ_T1","ISI_T1","SMUF_T1"),
+  M_C2 = c("TSRQ_T2","WEMBS_T2","IPAQ_T2","ISI_T2","SMUF_T2"),
+  Y_C1 = "DASSS_T1",
+  Y_C2 = "DASSS_T2",
+  form = "P",
+  ci_method = "bootstrap",
+  seed = 123)
+print(result2,digits = 4)
+
+
+result3 <- wsMed(
+  data = datc,
+  M_C1 = c("TSRQ_T1","WEMBS_T1","IPAQ_T1","ISI_T1","SMUF_T1"),
+  M_C2 = c("TSRQ_T2","WEMBS_T2","IPAQ_T2","ISI_T2","SMUF_T2"),
+  Y_C1 = "DASSS_T1",
+  Y_C2 = "DASSS_T2",
+  form = "P",
+  ci_method = "bootstrap",
+  C_C1 = c("HES_T1"),
+  C_C2 = c("HES_T2"),
+  C = c("Q7", "Q8", "Q9", "BMI"),
+  seed = 123)
+print(result3,digits = 4)
+  
+  Na = "MI",
+  
+summary(dat2)
+summary(dat)

@@ -1,0 +1,127 @@
+#semboottools
+fit_u <- semboottools::store_boot, boot
+mc$bootstrap <- semboottools::parameterEstimates_boot(
+  object = fit_u, level = 1 - alpha,
+  boot_ci_type = boot_ci_type, boot_pvalue = TRUE)
+
+# Set seed for reproducibility
+set.seed(1234)
+
+# Generate data
+n <- 1000
+x <- runif(n) - 0.5
+m <- 0.20 * x + rnorm(n)
+y <- 0.17 * m + rnorm(n)
+dat <- data.frame(x, y, m)
+
+# Specify mediation model in lavaan syntax
+mod <- '
+  m ~ a * x
+  y ~ b * m + cp * x
+  ab := a * b
+  total := a * b + cp
+'
+
+fit <- sem(mod, data = dat, fixed.x = FALSE)
+fit <- store_boot(fit) 
+
+
+std_boot <- standardizedSolution_boot(fit)
+est_boot <- parameterEstimates_boot(fit)
+
+
+
+
+
+library(lavaan)
+library(semboottools)
+
+## 0. 示范数据 & 显变量中介模型
+set.seed(1234)
+n <- 1000
+x <- runif(n) - 0.5
+m <- 0.20 * x + rnorm(n)
+y <- 0.17 * m + rnorm(n)
+dat <- data.frame(x, y, m)
+
+mod <- '
+  m ~ a * x
+  y ~ b * m + cp * x
+  ab := a*b
+  total := a*b + cp
+'
+
+fit0 <- sem(mod, data = dat, fixed.x = FALSE)
+
+## 1. 做 bootstrap；一定记得 do_bootstrapping = TRUE
+fit_b <- store_boot(fit0, R = 1500, do_bootstrapping = TRUE)
+
+## 2. 直接取出抽样矩阵：lavInspect(fit_b, "boot") 就行
+theta_raw <- lavInspect(fit_b, "boot")   # 维度: 1500 × 5
+#   若你的 lavaan 版本旧，或者想手动：
+#   theta_raw <- slot(fit_b, "boot")
+#   
+#   
+#   
+head(theta_raw[, 1:3])
+## 3. 过滤失败 replicates（可选）
+fail_idx <- lavInspect(fit_b, "boot.fails")   # 可能是整数向量或 integer(0)
+if (length(fail_idx)) theta_raw <- theta_raw[-fail_idx, , drop = FALSE]
+
+## 4. 转置，让行 = 抽样、列 = 系数
+theta <- t(theta_raw)
+
+## 5. 列名映射：必须用和 Monte-Carlo 分支同一个函数
+#    这里举例占位：把 "m~x" → "a"、"y~m" → "b"、"y~x" → "cp"……
+lav2coef <- function(x) switch(x,
+                               "m~x" = "a", "y~m" = "b", "y~x" = "cp", "ab" = "ab", "total" = "total", x)
+colnames(theta) <- vapply(colnames(theta), lav2coef, character(1))
+
+## 6. 现在 theta 就是 nDraw × nCoef 的 θ-矩阵
+dim(theta)
+head(theta[, 1:3])
+
+head(theta_boot[, 1:3])
+
+make_theta_from_sbt <- function(fit_b,
+                                label_fun,
+                                which_mat = c("ustd", "std"),
+                                add_def   = FALSE) {
+  
+  which_mat <- match.arg(which_mat)
+  ext <- slot(fit_b, "external")
+  
+  raw <- switch(which_mat,
+                ustd = ext$sbt_boot_ustd,
+                std  = ext$sbt_boot_std
+  )
+  if (is.null(raw) || !is.matrix(raw))
+    stop("找不到 ", which_mat, " 抽样矩阵；请确认 store_boot() 正常运行。")
+  
+  # 若要把 := 参数一起放进 θ-矩阵
+  if (add_def && !is.null(ext$sbt_boot_def)) {
+    raw <- cbind(raw, ext$sbt_boot_def)
+  }
+  
+  theta <- t(raw)   # 行 = 抽样，列 = 系数
+  
+  colnames(theta) <- vapply(colnames(theta), label_fun, character(1))
+  theta
+}
+
+
+# 你的标签转换函数（示例占位）
+
+# 提取非标准化 θ-矩阵
+theta_boot <- make_theta_from_sbt(fit_b, lav2coef, which_mat = "ustd")
+
+# ——> 现在 theta_boot 就与 mc_result$thetahatstar 完全同形
+#      可以直接喂给 analyze_mm_*()
+res_boot <- analyze_mm_categorical(
+  mc_result      = theta_boot,
+  prepared_data  = prep,      # PrepareData() 的输出
+  MP             = MP,
+  ci_level       = 0.95
+)
+
+

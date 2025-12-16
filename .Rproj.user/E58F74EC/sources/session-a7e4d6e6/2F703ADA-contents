@@ -1,0 +1,135 @@
+---
+title: "Activity: MASEM: Template (Weight: 5)"
+author: "Wendie Yang"
+format:
+  html:
+    embed-resources: true
+---
+
+```{r}
+library(metaSEM)
+library(lavaan)
+```
+
+```{r}
+library(readxl)
+dat <- read_xlsx("D:/Personal/Downloads/data4.xlsx")
+head(dat)
+```
+
+```{r}
+r_to_matrix <- function(x, vnames) {
+    out <-  metaSEM::vec2symMat(unlist(x),
+                                diag = FALSE)
+    colnames(out) <- vnames
+    rownames(out) <- vnames
+    out
+}
+```
+
+```{r}
+dat[3,3:8]
+r_to_matrix(dat[3,3:8],
+            vnames = c("att","sn","bi","beh"))
+```
+
+
+```{r}
+r_matrix <- apply(dat[, 3:8],
+                  MARGIN = 1,
+                  r_to_matrix,
+                  vnames = c("att", "sn", "bi", "beh"),
+                  simplify = FALSE)
+names(r_matrix) <- dat$study
+head(r_matrix)
+```
+
+```{r}
+n_vector <- dat[, "n", drop = TRUE]
+n_vector <- dat$n
+names(n_vector) <- dat$study
+head(n_vector)
+as.data.frame(dat)$n
+```
+```{r}
+dat_metaSEM <- list(r= r_matrix,n=n_vector)
+head(dat_metaSEM)
+```
+
+```{r}
+vo_out_1 <- uniR1(r_matrix,
+                  n_vector)
+vo_out_1
+
+mod_tra <-
+"
+bi ~ att + sn
+beh ~ bi
+att ~~ sn
+"
+vo_out_2 <- uniR2lavaan(vo_out_1, mod_tra)
+summary(vo_out_2, fit.measures = TRUE)
+```
+
+```{r}
+library(metafor)
+dat_cor <- escalc(measure = "COR",
+ri = sn_att,
+ni = n,
+data = dat,
+slab = study)
+head(dat_cor)
+```
+
+
+```{r}
+out_re <- rma(yi = yi,
+vi = vi,
+data = dat_cor,
+method = "REML")
+summary(out_re)
+
+```
+
+```{r}
+vo_out_1 <- uniR1(r_matrix,
+                  n_vector)
+vo_out_1
+```
+
+```{r}
+vo_out_2 <- uniR2lavaan(vo_out_1, mod_tra)
+vo_out_2
+summary(vo_out_2, fit.measures = TRUE)
+```
+
+```{r}
+tssem1_out <- tssem1(r_matrix, n_vector, method="REM", RE.type=c("Diag"))
+summary(tssem1_out)
+```
+
+```{r}
+labels <- c("att", "sn", "bi", "beh")
+mS <- Diag(c("1", "1", ".2*e_bi", ".2*e_beh"))
+mS[2,1] <- mS[1,2] <- ".2*c_att_sn"
+dimnames(mS) <- list(labels, labels)
+mS
+```
+
+```{r}
+mA <- matrix(c( "0", "0", "0", "0",
+"0", "0", "0", "0",
+".2*att2bi", ".2*sn2bi", "0", "0",
+"0", "0", ".2*bi2beh", "0"),
+byrow= TRUE, 4, 4)
+dimnames(mA) <- list(labels, labels)
+mA
+```
+
+```{r}
+tssem_2_out <- tssem2(tssem1_out,
+Amatrix = mA,
+Smatrix = mS,
+intervals.type = "z")
+summary(tssem_2_out)
+```

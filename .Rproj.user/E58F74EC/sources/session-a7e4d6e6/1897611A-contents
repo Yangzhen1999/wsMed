@@ -1,0 +1,178 @@
+---
+title: "Activity: Meta-Analysis: Template (Weight: 5)"
+author: "(Type Your Name Here)"
+format:
+  html:
+    embed-resources: true
+---
+
+# Goal
+
+For you to practice the steps to be illustrated
+in the class.
+
+Steps will be illustrated in the class.
+
+# Read Data
+
+```{r}
+library(readxl)
+dat <- read_xlsx("D:/Personal/Downloads/data3.xlsx")
+head(dat)
+```
+
+# Part 1: Basic Meta-Analysis
+
+- Compute the effect sizes (SMD in this activity)
+
+- Fit a fixed-effects model.
+
+- Fit a random-effects model.
+
+- Fit a meta-regression with a categorical moderator.
+
+```{r}
+library(metafor)
+dat_smd <- escalc(measure = "SMD",
+                  m1i = m1i,
+                  m2i = m2i,
+                  sd1i = sd1i,
+                  sd2i = sd2i,
+                  n1i = n1i,
+                  n2i = n2i,
+                  data = dat)
+head(dat_smd)
+```
+
+
+```{r}
+
+#Fit a Fixed-Effects Model
+fe_model <- rma(yi = yi, vi = vi, data = dat_smd, method = "FE", slab = id)
+summary(fe_model)
+forest(fe_model,
+       mlab = "Fixed-Effects Model",
+       main = "Fixed-Effects Meta-Analysis")
+```
+
+```{r}
+# Fit a Random-Effects Model
+re_model <- rma(yi = yi, vi = vi, data = dat_smd, method = "REML", slab = id)
+summary(re_model)
+forest(re_model,
+       mlab = "Random-Effects Model",
+       main = "Random-Effects Meta-Analysis")
+```
+
+```{r}
+#Fit a Meta-Regression with Moderator
+meta_reg_model <- rma(yi ~ cond, vi = vi, data = dat_smd, method = "REML", slab = id)
+summary(meta_reg_model)
+forest(meta_reg_model,
+       mlab = "Mixed-Effects Model",
+       main = "Meta-Regression with Moderator")
+```
+
+# Part 2: Understand the Measures
+
+- Change some columns as discussed in the class.
+
+- Redo the analysis and compare the results.
+
+## Part 2a
+
+- Make a copy of your dataset. Use this for this part.
+
+- Find the mean sample sizes for `n1i` and `n2i`.
+
+- Set `n1i` and `n2i` to their means.
+
+- Fit the following two models and examine the results.
+
+  - Random-effects model
+
+  - Meta-regression
+```{r}
+dat_copy <- dat
+mean_n1i <- mean(dat_copy$n1i)
+mean_n2i <- mean(dat_copy$n2i)
+mean_n1i
+mean_n2i
+dat_copy$n1i <- mean_n1i
+dat_copy$n2i <- mean_n2i
+library(metafor)
+dat_copy_smd <- escalc(measure = "SMD",
+                       m1i = m1i,
+                       m2i = m2i,
+                       sd1i = sd1i,
+                       sd2i = sd2i,
+                       n1i = n1i,
+                       n2i = n2i,
+                       data = dat_copy)
+re_model_copy <- rma(yi = yi, vi = vi, data = dat_copy_smd, method = "REML", slab = id)
+summary(re_model_copy)
+```
+
+
+```{r}
+meta_reg_model_copy <- rma(yi ~ cond, vi = vi, data = dat_copy_smd, method = "REML", slab = id)
+summary(meta_reg_model_copy)
+```
+
+## Part 2b
+
+- Make a copy of the dataset in Part 2a.
+
+- Decrease `n1i` and `n2i` by 50%.
+
+- Fit the following two models and examine the results.
+
+  - Random-effects model
+
+  - Meta-regression
+```{r}
+dat_copy_b <- dat_copy
+dat_copy_b$n1i <- dat_copy_b$n1i * 0.5
+dat_copy_b$n2i <- dat_copy_b$n2i * 0.5
+dat_copy_b_smd <- escalc(measure = "SMD",
+                         m1i = m1i,
+                         m2i = m2i,
+                         sd1i = sd1i,
+                         sd2i = sd2i,
+                         n1i = n1i,
+                         n2i = n2i,
+                         data = dat_copy_b)
+re_model_b <- rma(yi = yi, vi = vi, data = dat_copy_b_smd, method = "REML", slab = id)
+summary(re_model_b)
+meta_reg_model_b <- rma(yi ~ cond, vi = vi, data = dat_copy_b_smd, method = "REML", slab = id)
+summary(meta_reg_model_b)
+```
+## Part 2c
+
+- Make a copy of the dataset in Part 2a.
+
+- Double `n1i` and `n2i`.
+
+- Fit the following two models and examine the results.
+
+  - Random-effects model
+
+  - Meta-regression
+```{r}
+dat_copy_c <- dat_copy
+dat_copy_c$n1i <- dat_copy_c$n1i * 2
+dat_copy_c$n2i <- dat_copy_c$n2i * 2
+dat_copy_c_smd <- escalc(measure = "SMD",
+                         m1i = m1i,
+                         m2i = m2i,
+                         sd1i = sd1i,
+                         sd2i = sd2i,
+                         n1i = n1i,
+                         n2i = n2i,
+                         data = dat_copy_c)
+re_model_c <- rma(yi = yi, vi = vi, data = dat_copy_c_smd, method = "REML", slab = id)
+summary(re_model_c)
+meta_reg_model_c <- rma(yi ~ cond, vi = vi, data = dat_copy_c_smd, method = "REML", slab = id)
+summary(meta_reg_model_c)
+```
+

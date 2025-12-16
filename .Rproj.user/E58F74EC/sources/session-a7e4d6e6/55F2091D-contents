@@ -1,0 +1,97 @@
+library(wsMed)
+library(testthat)
+library(lavaan)
+library(knitr)
+library(semboottools)
+library(semmcci)
+
+data(example_data)
+set.seed(123)
+example_dataN <- mice::ampute(
+  data = example_data,
+  prop = 0.1,
+)$amp
+
+
+expect_wsMed_structure <- function(obj) {
+  expect_s3_class(obj, "wsMed")
+  expect_named(obj,
+               c("data","sem_model","input_vars","mc",
+                 "moderation","alpha","Na","form"),
+               ignore.order = TRUE)
+
+  expect_true(!is.null(obj$mc$result$thetahatstar))
+}
+
+
+# ── helper: 生成 wsMed 对象 (快速) ------------------------------------------
+quick_ws <- function(..., .data = example_data) {
+  wsMed(
+    data   = .data,
+    M_C1   = c("A1","B1"),
+    M_C2   = c("A2","B2"),
+    Y_C1   = "C1",
+    Y_C2   = "C2",
+    form   = "P",
+    Na     = "DE",
+    R      = 80,
+    ...
+  )
+}
+
+# ── 1. No-moderation print smoke-test --------------------------------------
+test_that("print.wsMed works without moderator", {
+  obj <- quick_ws()
+  expect_invisible( out <- capture.output(print(obj, digits = 2)) )
+  expect_true(any(grepl("VARIABLES",          out)))
+  expect_true(any(grepl("MODEL FIT",          out)))
+  expect_true(any(grepl("TOTAL / DIRECT",     out)))
+  # 无调节 → 不应出现 MODERATION RESULTS
+  expect_false(any(grepl("MODERATION RESULTS", out)))
+})
+
+# ── 2. Continuous moderation ------------------------------------------------
+test_that("print.wsMed shows continuous moderation sections", {
+  obj <- quick_ws(W = "D3", W_type = "continuous", MP = "a1")
+  out <- capture.output(print(obj, digits = 2))
+  expect_true(any(grepl("MODERATION RESULTS \\(Continuous", out)))
+  expect_true(any(grepl("Conditional Total Effect",         out)))
+})
+
+# ── 3. Categorical moderation ---------------------------------------------
+test_that("print.wsMed shows categorical moderation sections", {
+  skip_on_cran()
+  obj <- quick_ws(W = "Group", W_type = "categorical",
+                  MP = "a1")
+  out <- capture.output(print(obj, digits = 2))
+  expect_true(any(grepl("MODERATION RESULTS \\(Categorical", out)))
+  expect_true(any(grepl("Conditional Indirect Effects",      out)))
+})
+
+
+# tests/testthat/test-wsMed-structure.R  （或你喜欢的文件）
+
+test_that("wsMed handles missing data with standardized effects (FIML)", {
+  set.seed(4242)
+
+  res_fiml <- wsMed(
+    data = example_dataN,
+    M_C1 = c("A1","B1"),
+    M_C2 = c("A2","B2"),
+    Y_C1 = "C1",
+    Y_C2 = "C2",
+    W      = "D3",
+    W_type = "continuous",
+    MP     = "a1",
+    form   = "P",
+    Na     = "FIML",
+    R      = 200,
+    standardized = TRUE
+  )
+
+  # ---- 结构与关键插槽断言 -------------------------------
+  expect_wsMed_structure(res_fiml)
+  expect_equal(res_fiml$Na, "FIML")
+  expect_true(!is.null(res_fiml$mc$std))            # standardized 结果应存在
+  expect_equal(res_fiml$moderation$type, "continuous")
+})
