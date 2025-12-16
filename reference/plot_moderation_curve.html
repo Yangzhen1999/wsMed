@@ -51,7 +51,7 @@ Dashed v-lines – J–N bounds.
 
     <a class="navbar-brand me-2" href="../index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -163,29 +163,6 @@ significant regions.</p></dd>
     <p>A <code>ggplot</code> object (add layers or save with <code>ggsave()</code>).</p>
     </div>
 
-    <div class="section level2">
-    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"example_data"</span>, package <span class="op">=</span> <span class="st">"wsMed"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="wsMed.html">wsMed</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>                data <span class="op">=</span> <span class="va">example_data</span>,</span></span>
-<span class="r-in"><span>                M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>,<span class="st">"B1"</span>,<span class="st">"C1"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>,<span class="st">"B2"</span>,<span class="st">"C2"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                Y_C1 <span class="op">=</span> <span class="st">"D1"</span>,</span></span>
-<span class="r-in"><span>                Y_C2 <span class="op">=</span> <span class="st">"D2"</span>,</span></span>
-<span class="r-in"><span>                form <span class="op">=</span> <span class="st">"CP"</span>,</span></span>
-<span class="r-in"><span>                W      <span class="op">=</span> <span class="st">"D3"</span>,</span></span>
-<span class="r-in"><span>                W_type <span class="op">=</span> <span class="st">"continuous"</span>,</span></span>
-<span class="r-in"><span>                MP     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a1"</span>,<span class="st">"b2"</span>,<span class="st">"d1"</span>,<span class="st">"cp"</span>,<span class="st">"b_1_2"</span>,<span class="st">"d_1_2"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                <span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">plot_moderation_curve</span><span class="op">(</span><span class="va">result</span>, <span class="st">"indirect_effect_1_2"</span><span class="op">)</span> <span class="co"># indirect</span></span></span>
-<span class="r-plt img"><img src="plot_moderation_curve-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu">plot_moderation_curve</span><span class="op">(</span><span class="va">result</span>, <span class="st">"b_1_2"</span><span class="op">)</span>               <span class="co"># direct path</span></span></span>
-<span class="r-plt img"><img src="plot_moderation_curve-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-</code></pre></div>
-    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
