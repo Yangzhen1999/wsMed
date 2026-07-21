@@ -1,41 +1,58 @@
-library(wsMed)
 library(testthat)
-library(lavaan)
-library(knitr)
-library(semboottools)
-library(semmcci)
 
-data(example_data)
+data("example_data", package = "wsMed")
+
 set.seed(123)
-example_dataN <- mice::ampute(
-  data = example_data,
-  prop = 0.1,
-)$amp
 
+example_dataN <- suppressWarnings(
+  mice::ampute(
+    data = example_data,
+    prop = 0.1
+  )$amp
+)
 
 expect_wsMed_structure <- function(obj) {
+
   expect_s3_class(obj, "wsMed")
+
   expect_setequal(
     names(obj),
-    c("Na", "alpha", "ci_method", "data", "fit_u", "form",
-      "input_vars", "mc", "moderation", "param_boot", "sem_model")
+    c(
+      "Na",
+      "alpha",
+      "ci_method",
+      "data",
+      "fit_u",
+      "form",
+      "paths",
+      "input_vars",
+      "mc",
+      "moderation",
+      "param_boot",
+      "sem_model"
+    )
   )
 
-  expect_true(!is.null(obj$mc$result$thetahatstar))
+  expect_true(
+    !is.null(obj$mc$result$thetahatstar)
+  )
 }
 
 
 # ── helper: 生成 wsMed 对象 (快速) ------------------------------------------
 quick_ws <- function(..., .data = example_data) {
+
   wsMed(
-    data   = .data,
-    M_C1   = c("A1","B1"),
-    M_C2   = c("A2","B2"),
-    Y_C1   = "C1",
-    Y_C2   = "C2",
-    form   = "P",
-    Na     = "DE",
-    R      = 80,
+    data = .data,
+    M_C1 = c("A1", "B1"),
+    M_C2 = c("A2", "B2"),
+    Y_C1 = "C1",
+    Y_C2 = "C2",
+    form = "P",
+    Na = "DE",
+    ci_method = "mc",
+    R = 80,
+    verbose = FALSE,
     ...
   )
 }
@@ -95,4 +112,187 @@ test_that("wsMed handles missing data with standardized effects (FIML)", {
   expect_equal(res_fiml$Na, "FIML")
   expect_true(!is.null(res_fiml$mc$std))            # standardized 结果应存在
   expect_equal(res_fiml$moderation$type, "continuous")
+})
+
+
+# ============================================================================
+# User-defined model
+# ============================================================================
+
+test_that("print.wsMed works for a user-defined model", {
+
+  paths_ud <- c(
+    "M1 -> M3",
+    "M3 -> Y",
+    "M2 -> Y"
+  )
+
+  obj <- wsMed(
+    data = example_data,
+    M_C1 = c("A1", "B1", "C1"),
+    M_C2 = c("A2", "B2", "C2"),
+    Y_C1 = "D1",
+    Y_C2 = "D2",
+    form = "UD",
+    paths = paths_ud,
+    Na = "DE",
+    ci_method = "mc",
+    R = 80,
+    standardized = FALSE,
+    verbose = FALSE
+  )
+
+  ## Check the object before testing the print method
+  expect_wsMed_structure(obj)
+
+  expect_equal(
+    obj$form,
+    "UD"
+  )
+
+  expect_equal(
+    obj$paths,
+    paths_ud
+  )
+
+  ## Capture console output produced by print.wsMed()
+  out <- capture.output(
+    print(
+      obj,
+      digits = 2
+    )
+  )
+
+  ## Basic output sections
+  expect_true(
+    any(grepl(
+      "VARIABLES",
+      out,
+      fixed = TRUE
+    ))
+  )
+
+  expect_true(
+    any(grepl(
+      "MODEL FIT",
+      out,
+      fixed = TRUE
+    ))
+  )
+
+  expect_true(
+    any(grepl(
+      "TOTAL / DIRECT / TOTAL-IND",
+      out,
+      fixed = TRUE
+    ))
+  )
+
+  expect_true(
+    any(grepl(
+      "REGRESSION PATHS",
+      out,
+      fixed = TRUE
+    ))
+  )
+
+  ## Check the three indirect-effect labels
+  expect_true(
+    any(grepl(
+      "ind_1_3",
+      out,
+      fixed = TRUE
+    ))
+  )
+
+  expect_true(
+    any(grepl(
+      "ind_2",
+      out,
+      fixed = TRUE
+    ))
+  )
+
+  expect_true(
+    any(grepl(
+      "ind_3",
+      out,
+      fixed = TRUE
+    ))
+  )
+
+  ## Check the indirect-effect key
+  expect_true(
+    any(grepl(
+      "X -> M1diff -> M3diff -> Ydiff",
+      out,
+      fixed = TRUE
+    ))
+  )
+
+  expect_true(
+    any(grepl(
+      "X -> M2diff -> Ydiff",
+      out,
+      fixed = TRUE
+    ))
+  )
+
+  expect_true(
+    any(grepl(
+      "X -> M3diff -> Ydiff",
+      out,
+      fixed = TRUE
+    ))
+  )
+
+  ## Check the user-defined regression paths
+  expect_true(
+    any(grepl(
+      "M3diff ~ M1diff",
+      out,
+      fixed = TRUE
+    ))
+  )
+
+  expect_true(
+    any(grepl(
+      "Ydiff ~ M2diff",
+      out,
+      fixed = TRUE
+    ))
+  )
+
+  expect_true(
+    any(grepl(
+      "Ydiff ~ M3diff",
+      out,
+      fixed = TRUE
+    ))
+  )
+
+  ## Paths that were not specified should not be printed
+  expect_false(
+    any(grepl(
+      "Ydiff ~ M1diff",
+      out,
+      fixed = TRUE
+    ))
+  )
+
+  expect_false(
+    any(grepl(
+      "M2diff ~ M1diff",
+      out,
+      fixed = TRUE
+    ))
+  )
+
+  expect_false(
+    any(grepl(
+      "M3diff ~ M2diff",
+      out,
+      fixed = TRUE
+    ))
+  )
 })

@@ -9,8 +9,9 @@ validate_wsMed_inputs <- function(data,
                                   C_C1 = NULL, C_C2 = NULL, C = NULL,
                                   W     = NULL, W_type = NULL,
                                   MP    = NULL,
-                                  form  = c("P","CN","CP","PC"),
-                                  Na    = c("DE","FIML","MI"),
+                                  form  = c("P", "CN", "CP", "PC", "UD"),
+                                  paths = NULL,
+                                  Na    = c("DE", "FIML", "MI"),
                                   R           = 20000L,
                                   bootstrap   = 1000L,
                                   m           = 5L,
@@ -80,7 +81,41 @@ validate_wsMed_inputs <- function(data,
   }
 
   ## ---- 3. form & Na -------------------------------------------------------
-  form <- match.arg(form, c("P", "CN", "CP", "PC"))
+  form <- match.arg(
+    form,
+    c("P", "CN", "CP", "PC", "UD")
+  )
+
+  if (form == "UD") {
+
+    if (is.null(paths)) {
+      stop(
+        "`paths` must be supplied when `form = \"UD\"`.",
+        call. = FALSE
+      )
+    }
+
+    if (!is.character(paths) ||
+        length(paths) == 0L ||
+        anyNA(paths) ||
+        any(!nzchar(trimws(paths)))) {
+      stop(
+        paste0(
+          "`paths` must be a non-empty character vector ",
+          "when `form = \"UD\"`."
+        ),
+        call. = FALSE
+      )
+    }
+
+  } else if (!is.null(paths)) {
+
+    stop(
+      "`paths` can only be supplied when `form = \"UD\"`.",
+      call. = FALSE
+    )
+  }
+
   Na   <- match.arg(Na,   c("DE", "FIML", "MI"))
 
   ## ---- 4. scalar integer parameters --------------------------------------
@@ -137,10 +172,27 @@ validate_wsMed_inputs <- function(data,
 
   ## ---- 9. mediator count by form -----------------------------------------
   k <- length(M_C1)
-  if (form == "CN" && k < 2)
-    stop("Form 'CN' requires at least 2 mediators.", call. = FALSE)
-  if (form %in% c("PC","CP") && k < 3)
-    stop("Forms 'PC' and 'CP' require at least 3 mediators.", call. = FALSE)
+
+  if (form == "CN" && k < 2L) {
+    stop(
+      "Form 'CN' requires at least 2 mediators.",
+      call. = FALSE
+    )
+  }
+
+  if (form %in% c("PC", "CP") && k < 3L) {
+    stop(
+      "Forms 'PC' and 'CP' require at least 3 mediators.",
+      call. = FALSE
+    )
+  }
+
+  if (form == "UD" && k < 1L) {
+    stop(
+      "Form 'UD' requires at least one mediator.",
+      call. = FALSE
+    )
+  }
 
   invisible(TRUE)
 }
@@ -196,12 +248,23 @@ assert_scalar_int <- function(x,
 #' Debug printer with indentation (internal)
 #' @keywords internal
 dbg <- function(..., .lvl = 0, verbose = TRUE) {
-  if (verbose) {
-    pref <- paste(rep(".", .lvl), collapse = "")
-    message("[DBG] ", pref, sprintf(...))
-  }
-}
 
+  debug_enabled <- isTRUE(
+    getOption("wsMed.debug", FALSE)
+  )
+
+  if (isTRUE(verbose) && debug_enabled) {
+    pref <- paste(rep(".", .lvl), collapse = "")
+
+    message(
+      "[DBG] ",
+      pref,
+      sprintf(...)
+    )
+  }
+
+  invisible(NULL)
+}
 #' Fit SEM and run Monte-Carlo draws
 #'
 #' @keywords internal

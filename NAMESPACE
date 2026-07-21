@@ -3,6 +3,7 @@
 S3method(print,wsMed)
 export(GenerateModelCN)
 export(GenerateModelCP)
+export(GenerateModelCustom)
 export(GenerateModelP)
 export(GenerateModelPC)
 export(ImputeData)

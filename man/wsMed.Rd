@@ -17,7 +17,7 @@ wsMed(
   W = NULL,
   W_type = NULL,
   MP = NULL,
-  form = c("P", "CN", "CP", "PC"),
+  form = c("P", "CN", "CP", "PC", "UD"),
   Na = c("DE", "FIML", "MI"),
   alpha = 0.05,
   mi_args = list(),
@@ -30,7 +30,8 @@ wsMed(
   MCmethod = NULL,
   seed = 123,
   standardized = FALSE,
-  verbose = FALSE
+  verbose = FALSE,
+  paths = NULL
 )
 }
 \arguments{
@@ -53,7 +54,9 @@ wsMed(
 \item{MP}{Character vector identifying which regression paths are moderated
 (for example, \code{"a1"}, \code{"b_1_2"}, \code{"cp"}).}
 
-\item{form}{Model type: \code{"P"}, \code{"CN"}, \code{"CP"}, or \code{"PC"}.}
+\item{form}{Model type: \code{"P"}, \code{"CN"}, \code{"CP"},
+\code{"PC"}, or \code{"UD"}. Use \code{"UD"} to specify a
+user-defined mediation model.}
 
 \item{Na}{Missing-data method: \code{"DE"}, \code{"FIML"}, or \code{"MI"}.}
 
@@ -61,12 +64,12 @@ wsMed(
 
 \item{mi_args}{List of MI-specific controls:
 \describe{
-\item{\code{m}}{Number of imputations. Default 5.}
-\item{\code{method_num}}{Imputation method for \code{mice()}.}
-\item{\code{decomposition}}{Covariance-decomposition method
-(\code{"eigen"}, \code{"chol"}, \code{"svd"}).}
-\item{\code{pd}}{Logical; positive-definiteness check.}
-\item{\code{tol}}{Tolerance for the positive-definiteness check.}
+  \item{\code{m}}{Number of imputations. Default 5.}
+  \item{\code{method_num}}{Imputation method for \code{mice()}.}
+  \item{\code{decomposition}}{Covariance-decomposition method
+    (\code{"eigen"}, \code{"chol"}, \code{"svd"}).}
+  \item{\code{pd}}{Logical; positive-definiteness check.}
+  \item{\code{tol}}{Tolerance for the positive-definiteness check.}
 }}
 
 \item{R}{Integer; number of Monte Carlo draws. Default \code{20000L}.}
@@ -90,16 +93,25 @@ choose \code{"mc"} (default) or \code{"bootSD"}.}
 \item{standardized}{Logical; if \code{TRUE}, return standardized effects. Default \code{FALSE}.}
 
 \item{verbose}{Logical; print progress messages.}
+
+\item{paths}{A character vector defining directed paths when
+\code{form = "UD"}. Paths are specified using mediator labels
+\code{M1}, \code{M2}, and so on, with \code{Y} denoting the outcome.
+For example, \code{c("M1 -> M3", "M3 -> Y", "M2 -> Y")}.
+Must be \code{NULL} for the predefined model forms.}
 }
 \value{
 An object of class \code{"wsMed"} with elements:
 \describe{
-\item{data}{Preprocessed data frame.}
-\item{sem_model}{Generated \pkg{lavaan} syntax.}
-\item{mc}{List with Monte Carlo draws, bootstrap tables (if any), and the fitted model.}
-\item{moderation}{Conditional or moderated effect tables.}
-\item{form,Na,alpha}{Analysis settings.}
-\item{input_vars}{Names of all user-supplied variables.}
+  \item{data}{Preprocessed data frame.}
+  \item{sem_model}{Generated \pkg{lavaan} syntax.}
+  \item{mc}{List with Monte Carlo draws, bootstrap tables (if any),
+    and the fitted model.}
+  \item{moderation}{Conditional or moderated effect tables.}
+  \item{form,Na,alpha}{Analysis settings.}
+  \item{paths}{The user-defined paths when \code{form = "UD"};
+    otherwise \code{NULL}.}
+  \item{input_vars}{Names of all user-supplied variables.}
 }
 }
 \description{
@@ -111,23 +123,24 @@ Monte Carlo confidence intervals.
 \details{
 Model structures:
 \itemize{
-\item \code{"P"}: parallel mediation
-\item \code{"CN"}: chained (serial) mediation
-\item \code{"CP"}: chained then parallel
-\item \code{"PC"}: parallel then chained
+  \item \code{"P"}: parallel mediation
+  \item \code{"CN"}: chained (serial) mediation
+  \item \code{"CP"}: chained then parallel
+  \item \code{"PC"}: parallel then chained
+  \item \code{"UD"}: user-defined mediation model
 }
 
 Missing-data strategies:
 \itemize{
-\item \code{"DE"}: list-wise deletion
-\item \code{"FIML"}: full-information maximum likelihood
-\item \code{"MI"}: multiple imputation via \pkg{mice}
+  \item \code{"DE"}: list-wise deletion
+  \item \code{"FIML"}: full-information maximum likelihood
+  \item \code{"MI"}: multiple imputation via \pkg{mice}
 }
 
 Confidence-interval engines:
 \itemize{
-\item Bootstrap: percentile, BC, or BCa (DE and FIML only)
-\item Monte Carlo: draws via \pkg{semmcci} (all \code{Na} options)
+  \item Bootstrap: percentile, BC, or BCa (DE and FIML only)
+  \item Monte Carlo: draws via \pkg{semmcci} (all \code{Na} options)
 }
 For \code{Na = "FIML"}, you may choose \code{MCmethod = "mc"} (default) or
 \code{"bootSD"} to add a finite-sample SD correction.

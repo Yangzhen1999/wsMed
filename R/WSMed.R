@@ -13,6 +13,7 @@
 #'   \item \code{"CN"}: chained (serial) mediation
 #'   \item \code{"CP"}: chained then parallel
 #'   \item \code{"PC"}: parallel then chained
+#'   \item \code{"UD"}: user-defined mediation model
 #' }
 #'
 #' Missing-data strategies:
@@ -36,7 +37,14 @@
 #' @param data A \link[base:data.frame]{data.frame} containing the raw scores.
 #' @param M_C1,M_C2 Character vectors of mediator names under condition 1 and 2.
 #' @param Y_C1,Y_C2 Character scalars for the outcome under each condition.
-#' @param form Model type: \code{"P"}, \code{"CN"}, \code{"CP"}, or \code{"PC"}.
+#' @param form Model type: \code{"P"}, \code{"CN"}, \code{"CP"},
+#'   \code{"PC"}, or \code{"UD"}. Use \code{"UD"} to specify a
+#'   user-defined mediation model.
+#' @param paths A character vector defining directed paths when
+#'   \code{form = "UD"}. Paths are specified using mediator labels
+#'   \code{M1}, \code{M2}, and so on, with \code{Y} denoting the outcome.
+#'   For example, \code{c("M1 -> M3", "M3 -> Y", "M2 -> Y")}.
+#'   Must be \code{NULL} for the predefined model forms.
 #' @param standardized Logical; if \code{TRUE}, return standardized effects. Default \code{FALSE}.
 #'
 #' @param Na Missing-data method: \code{"DE"}, \code{"FIML"}, or \code{"MI"}.
@@ -80,9 +88,12 @@
 #' \describe{
 #'   \item{data}{Preprocessed data frame.}
 #'   \item{sem_model}{Generated \pkg{lavaan} syntax.}
-#'   \item{mc}{List with Monte Carlo draws, bootstrap tables (if any), and the fitted model.}
+#'   \item{mc}{List with Monte Carlo draws, bootstrap tables (if any),
+#'     and the fitted model.}
 #'   \item{moderation}{Conditional or moderated effect tables.}
 #'   \item{form,Na,alpha}{Analysis settings.}
+#'   \item{paths}{The user-defined paths when \code{form = "UD"};
+#'     otherwise \code{NULL}.}
 #'   \item{input_vars}{Names of all user-supplied variables.}
 #' }
 #'
@@ -107,7 +118,7 @@ wsMed <- function(data,
                   C     = NULL, C_type = NULL,
                   W     = NULL, W_type = NULL,
                   MP    = NULL,
-                  form  = c("P", "CN", "CP", "PC"),
+                  form = c("P", "CN", "CP", "PC", "UD"),
                   Na    = c("DE", "FIML", "MI"),
                   alpha = .05,
                   mi_args = list(),
@@ -122,7 +133,8 @@ wsMed <- function(data,
                   MCmethod     = NULL,
                   seed         = 123,
                   standardized = FALSE,
-                  verbose      = FALSE) {
+                  verbose      = FALSE,
+                  paths = NULL) {
 
   ## ── 0  输入验证 ──────────────────────────────────────────────────────
   ci_method <- match.arg(ci_method)
@@ -137,6 +149,7 @@ wsMed <- function(data,
     W         = W,     W_type = W_type,
     MP        = MP,
     form      = form,
+    paths     = paths,
     Na        = Na,
     R         = R,
     bootstrap = bootstrap,
@@ -173,14 +186,30 @@ wsMed <- function(data,
 
   ## ── 2  构建 SEM 语法 ────────────────────────────────────────────────
   .v(sprintf("Building SEM syntax (%s) ...", form), verbose = verbose)
-  sem_model <- switch(form,
-                      P  = GenerateModelP (prep, MP),
-                      CN = GenerateModelCN(prep, MP),
-                      CP = GenerateModelCP(prep, MP),
-                      PC = GenerateModelPC(prep, MP)
+  sem_model <- switch(
+    form,
+    P = GenerateModelP(
+      prepared_data = prep,
+      MP = MP
+    ),
+    CN = GenerateModelCN(
+      prepared_data = prep,
+      MP = MP
+    ),
+    CP = GenerateModelCP(
+      prepared_data = prep,
+      MP = MP
+    ),
+    PC = GenerateModelPC(
+      prepared_data = prep,
+      MP = MP
+    ),
+    UD = GenerateModelCustom(
+      prepared_data = prep,
+      paths = paths,
+      MP = MP
+    )
   )
-
-
   ## ── 3  拟合 + 抽样（按 Na & ci_method 分流） ──────────────────────
   .v(sprintf("Na = %s  |  ci_method = %s", Na, ci_method), verbose = verbose)
 
@@ -359,9 +388,17 @@ wsMed <- function(data,
     form       = form,
     ci_method  = ci_method,
     input_vars = input_vars,
-    fit_u  = fit_u
+    fit_u  = fit_u,
+    paths = paths
   )
+
   class(out) <- "wsMed"
+
+  .v(
+    "Analysis completed successfully.",
+    verbose = verbose
+  )
+
   out
 }
 
