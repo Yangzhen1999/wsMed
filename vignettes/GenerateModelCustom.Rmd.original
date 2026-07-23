@@ -1,0 +1,301 @@
+---
+title: "User-defined mediation models with GenerateModelCustom"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{User-defined mediation models with GenerateModelCustom}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
+)
+
+# This makes the file work when it is knitted directly from the
+# wsMed RStudio project, even before the development version is installed.
+find_wsmed_root <- function(start = getwd(), max_levels = 10L) {
+  current <- normalizePath(start, winslash = "/", mustWork = TRUE)
+
+  for (i in seq_len(max_levels)) {
+    description_file <- file.path(current, "DESCRIPTION")
+
+    if (file.exists(description_file)) {
+      description_lines <- readLines(description_file, warn = FALSE)
+
+      if (any(grepl("^Package:[[:space:]]*wsMed[[:space:]]*$",
+                    description_lines))) {
+        return(current)
+      }
+    }
+
+    parent <- dirname(current)
+
+    if (identical(parent, current)) {
+      break
+    }
+
+    current <- parent
+  }
+
+  NULL
+}
+
+wsmed_root <- find_wsmed_root()
+
+if (!is.null(wsmed_root)) {
+  if (!requireNamespace("devtools", quietly = TRUE)) {
+    stop(
+      "Install the 'devtools' package before knitting this development vignette."
+    )
+  }
+
+  devtools::load_all(wsmed_root, quiet = TRUE)
+} else {
+  library(wsMed)
+}
+
+if (!exists("GenerateModelCustom", mode = "function")) {
+  stop(
+    paste(
+      "GenerateModelCustom() was not found.",
+      "Open the feature/custom-model version of the wsMed RStudio project",
+      "and knit this file from its vignettes folder."
+    )
+  )
+}
+```
+
+## Introduction
+
+`GenerateModelCustom()` generates `lavaan` syntax for a user-defined
+two-condition within-subject mediation model. It is useful when the intended
+mediator structure cannot be represented by one of the predefined parallel,
+chained, chained--parallel, or parallel--chained models in `wsMed`.
+
+Users specify directed paths among mediators and from mediators to the outcome.
+For example:
+
+```{r path-example}
+custom_paths <- c(
+  "M1 -> M3",
+  "M3 -> Y",
+  "M2 -> Y"
+)
+```
+
+Here, `M1`, `M2`, and `M3` denote the mediators, and `Y` denotes the outcome.
+The user does not specify paths beginning with `X`. The function automatically
+adds an \(a_i\) path from the within-subject condition to every mediator and
+the direct effect \(cp\) from the condition to the outcome.
+
+## Mediator numbering
+
+Mediator labels are assigned according to the order of the variables supplied
+to `M_C1` and `M_C2`. For example:
+
+| Construct | Condition 1 | Condition 2 | Model label |
+|:----------|:------------|:------------|:------------|
+| A         | `A1`        | `A2`        | `M1`        |
+| B         | `B1`        | `B2`        | `M2`        |
+| C         | `C1`        | `C2`        | `M3`        |
+| D         | `D1`        | `D2`        | `Y`         |
+
+Therefore, `"M1 -> M3"` represents a path from construct A to construct C.
+Mediator numbering identifies variables; it does not determine path direction.
+
+## Preparing example data
+
+The following reproducible example creates three mediator pairs and one
+outcome pair. It does not depend on an external data file.
+
+```{r create-data}
+set.seed(123)
+n <- 200
+
+example_custom <- data.frame(
+  A1 = rnorm(n),
+  A2 = rnorm(n, mean = 0.30),
+  B1 = rnorm(n),
+  B2 = rnorm(n, mean = 0.20),
+  C1 = rnorm(n),
+  C2 = rnorm(n, mean = 0.25),
+  D1 = rnorm(n),
+  D2 = rnorm(n, mean = 0.35)
+)
+```
+
+`PrepareData()` converts the raw condition-specific variables into mediator
+difference and centered level components and an outcome difference score.
+
+```{r prepare-data}
+prepared_data <- PrepareData(
+  data = example_custom,
+  M_C1 = c("A1", "B1", "C1"),
+  M_C2 = c("A2", "B2", "C2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2"
+)
+
+names(prepared_data)
+```
+
+For mediator \(M_i\), the two components are
+
+\[
+M_{i,\mathrm{diff}} = M_{i2} - M_{i1}
+\]
+
+and
+
+\[
+M_{i,\mathrm{avg}}
+=
+\frac{M_{i1} + M_{i2}}{2},
+\]
+
+where the average component is centered by `PrepareData()`.
+
+## Specifying a custom model
+
+Each element of `paths` must describe either a mediator-to-mediator path or a
+mediator-to-outcome path:
+
+```{r define-paths}
+custom_paths <- c(
+  "M1 -> M3",
+  "M3 -> Y",
+  "M2 -> Y"
+)
+```
+
+Spaces around `->` are optional. For example, `"M1 -> M3"` and `"M1->M3"`
+are equivalent.
+
+The corresponding model syntax is generated as follows:
+
+```{r generate-model}
+custom_model <- GenerateModelCustom(
+  prepared_data = prepared_data,
+  paths = custom_paths
+)
+
+cat(custom_model)
+```
+
+For every specified structural edge, the generated regression includes both
+the difference and level components of the predictor mediator. Thus,
+`"M1 -> M3"` contributes
+
+```r
+b_1_3*M1diff + d_1_3*M1avg
+```
+
+to the regression equation for `M3diff`.
+
+Only specified structural paths are added. Because `"M1 -> Y"` is absent from
+`custom_paths`, `M1diff` and `M1avg` do not appear directly in the regression
+equation for `Ydiff`.
+
+## Indirect effects
+
+`GenerateModelCustom()` identifies every directed path from a mediator to `Y`.
+The model above contains three indirect effects:
+\[
+\mathtt{indirect\_1\_3}
+=
+\mathtt{a1}\,
+\mathtt{b\_1\_3}\,
+\mathtt{b3},
+\]
+
+\[
+\mathtt{indirect\_2}
+=
+\mathtt{a2}\,
+\mathtt{b2},
+\]
+
+\[
+\mathtt{indirect\_3}
+=
+\mathtt{a3}\,
+\mathtt{b3}.
+\]
+
+The last effect exists because the path from the condition to every mediator,
+including \(M_3\), is added automatically. All identified indirect effects are
+summed to form `total_indirect`, and the total effect is defined as
+`cp + total_indirect`.
+
+## Parameter labels
+
+The generated model uses the following labels:
+
+| Path | Difference component | Level component |
+|:-----|:---------------------|:----------------|
+| \(X \rightarrow M_i\) | `ai` | -- |
+| \(M_i \rightarrow Y\) | `bi` | `di` |
+| \(M_j \rightarrow M_i\) | `b_j_i` | `d_j_i` |
+| \(X \rightarrow Y\) | `cp` | -- |
+
+For example, the path \(M_1 \rightarrow M_3\) uses `b_1_3` and `d_1_3`,
+whereas \(M_3 \rightarrow Y\) uses `b3` and `d3`.
+
+## Fitting the complete model with wsMed
+
+For an applied analysis, users can pass the same path specification directly
+to `wsMed()` by setting `form = "UD"`.
+
+The following chunk is not evaluated while the vignette is knitted because
+Monte Carlo confidence intervals can take some time. Remove `eval=FALSE` to
+run it.
+
+```{r fit-model, eval=FALSE}
+result_custom <- wsMed(
+  data = example_custom,
+  M_C1 = c("A1", "B1", "C1"),
+  M_C2 = c("A2", "B2", "C2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2",
+  form = "UD",
+  paths = custom_paths,
+  Na = "DE",
+  ci_method = "mc",
+  R = 5000,
+  standardized = TRUE,
+  seed = 123
+)
+
+print(result_custom)
+```
+
+## Input requirements
+
+A valid custom path specification must meet the following requirements:
+
+1. Each path must use a form such as `"M1 -> M2"` or `"M2 -> Y"`.
+2. Every referenced mediator must be present in `prepared_data`.
+3. Duplicate paths and self-loops such as `"M1 -> M1"` are not allowed.
+4. The mediator structure must be acyclic.
+5. At least one mediator must have a path ending in `Y`.
+
+Paths beginning with `X`, such as `"X -> M1"` or `"X -> Y"`, should not be
+included because these paths are added automatically. Paths beginning with
+`Y` are not permitted because `Y` is the final outcome.
+
+## Summary
+
+To fit a user-defined model:
+
+1. Supply matched mediator variables through `M_C1` and `M_C2`.
+2. Define the structural edges using mediator labels and `Y`.
+3. Use `GenerateModelCustom()` to inspect the generated syntax or call
+   `wsMed(form = "UD", paths = ...)` for the complete analysis.
+
+This workflow retains the existing difference-and-level parameterization in
+`wsMed` while allowing users to specify mediation structures beyond the four
+predefined model forms.

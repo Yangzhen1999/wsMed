@@ -10,8 +10,8 @@ vignette: >
 ## Demonstration of `printGM()`
 
 ### Using `printGM()` with `WsMed()`
-
 The `WsMed()` function returns a list containing `sem_model`. `printGM()` can automatically extract and format the model equations.
+
 
 ``` r
 library(wsMed)
@@ -30,7 +30,7 @@ result1 <- wsMed(
 printGM(result1)
 ```
 
-```         
+```
 ## 
 ## Outcome Difference Model (Ydiff):
 ##  Ydiff ~ cp*1 + b1*M1diff + d1*M1avg + b2*M2diff + d2*M2avg + b3*M3diff + d3*M3avg 
@@ -54,9 +54,9 @@ printGM(result1)
 ##  total_effect := cp + total_indirect
 ```
 
-### Using printGM() with GenerateModel\*()
+### Using printGM() with GenerateModel*()
+If you already have preprocessed data, you can directly generate the SEM model syntax using GenerateModelPC() or other GenerateModel*() functions.
 
-If you already have preprocessed data, you can directly generate the SEM model syntax using GenerateModelPC() or other GenerateModel\*() functions.
 
 ``` r
 # Load necessary packages
@@ -80,7 +80,7 @@ sem_model <- GenerateModelPC(prepared_data)
 printGM(sem_model)
 ```
 
-```         
+```
 ## 
 ## Outcome Difference Model (Ydiff):
 ##  Ydiff ~ cp*1 + b1*M1diff + d1*M1avg + b2*M2diff + d2*M2avg 

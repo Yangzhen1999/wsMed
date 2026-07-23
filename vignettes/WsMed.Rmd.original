@@ -1,9 +1,8 @@
 ---
-title: "wsMed"
-output:
-  rmarkdown::html_vignette: default
+title: "Using wsMed: A step-by-step tutorial"
+output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{wsMed}
+  %\VignetteIndexEntry{Using wsMed: A step-by-step tutorial}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 editor_options:
@@ -11,727 +10,942 @@ editor_options:
     wrap: 72
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
+)
+
+# Load the development version when this file is knitted from the wsMed
+# project; otherwise, load the installed package.
+find_wsmed_root <- function(start = getwd(), max_levels = 10L) {
+  current <- normalizePath(start, winslash = "/", mustWork = TRUE)
+
+  for (i in seq_len(max_levels)) {
+    description_file <- file.path(current, "DESCRIPTION")
+
+    if (file.exists(description_file)) {
+      description_lines <- readLines(description_file, warn = FALSE)
+
+      if (any(grepl(
+        "^Package:[[:space:]]*wsMed[[:space:]]*$",
+        description_lines
+      ))) {
+        return(current)
+      }
+    }
+
+    parent <- dirname(current)
+
+    if (identical(parent, current)) {
+      break
+    }
+
+    current <- parent
+  }
+
+  NULL
+}
+
+wsmed_root <- find_wsmed_root()
+
+if (!is.null(wsmed_root)) {
+  if (!requireNamespace("devtools", quietly = TRUE)) {
+    stop(
+      "Install the 'devtools' package before knitting this development vignette."
+    )
+  }
+
+  devtools::load_all(wsmed_root, quiet = TRUE)
+} else {
+  library(wsMed)
+}
+```
+
 ## Introduction
 
-The `wsMed` function is designed for two condition within-subject
-mediation analysis, incorporating SEM models through the `lavaan`
-package and Monte Carlo simulation methods. This document provides a
-detailed description of the function's parameters, workflow, and usage,
-along with an example demonstration.
+`wsMed()` fits multiple mediation and moderated mediation models for
+two-condition within-subject designs. A complete call identifies the paired
+mediator and outcome variables, selects the mediation structure, specifies
+the estimation options, and, when needed, adds moderators or covariates.
 
-------------------------------------------------------------------------
+This tutorial shows how to construct a `wsMed()` call one step at a time.
+Each section begins with the same basic call and changes only the arguments
+needed for the next part of the analysis.
 
-## Main Function Overview
+## Quick start
 
-The `wsMed()` function automates the full workflow for two-condition within-subject mediation analysis.
-Its main steps are:
+The following example fits a parallel mediation model with two mediators.
+It uses `example_data`, which is included in the package.
 
-1. **Validate inputs** – check dataset structure, mediation model type (`form`), and missing-data settings.
-
-2. **Prepare data** – compute difference scores (`Mdiff`, `Ydiff`) and centered averages (`Mavg`)
-   from the two-condition variables.
-
-3. **Build the model** – generate SEM syntax according to the chosen structure:
-   - `"P"`: Parallel mediation
-    <p align="center">
-    <img src="Wa.png" alt="parallel within-subject mediation model" width="60%">
-  </p>
-   - `"CN"`: Chained / serial mediation
-    <p align="center">
-    <img src="Wb.png" alt="serial within-subject mediation model" width="60%">
-  </p>
-   - `"CP"`: Chained + Parallel
-    <p align="center">
-    <img src="Wc.png" alt="serial-parallel within-subject mediation model" width="60%">
-  </p>
-   - `"PC"`: Parallel + Chained
-   <p align="center">
-    <img src="Wd.png" alt="parallel-serial within-subject mediation model" width="60%">
-  </p>
-
-4. **Fit the model** – estimate parameters while handling missing data:
-   - `"DE"`: listwise deletion
-   - `"FIML"`: full-information ML
-   - `"MI"`: multiple imputation
-
-5. **Compute inference** – provide confidence intervals using:
-   - **Bootstrap** (`ci_method = "bootstrap"`)
-   - **Monte Carlo** (`ci_method = "mc"`)
-
-6. **Optional: Standardization** – if `standardized = TRUE`, return standardized effects with CIs.
-
-7. **Optional: Covariates** – automatically center and include:
-   - **Between-subject covariates** (`C`): mean-centered and added to all regressions.
-   - **Within-subject covariates** (`C_C1`, `C_C2`): difference scores and centered averages are computed and included.
-
-------------------------------------------------------------------------
-
-The dataset should be in wide format, where each participant has
-separate columns for measurements in different conditions. Specifically,
-each mediator variable (e.g., M1) should be split into two columns: one
-for Condition 1 and one for Condition 2. Similarly, the outcome variable
-should also have separate columns for each condition. This structure
-ensures that within-subject changes can be properly analyzed.
-
-
-## Calling wsMed
-
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  dev = "png", dpi = 96,
-  fig.process = knitr::image_uri
-)
-```
-
-```{r,message = FALSE, warning = FALSE}
-library(wsMed)
-library(lavaan)
-library(semboottools)
-```
-
-## Examples at a Glance
-
-Below is a quick guide to what each example demonstrates so you can jump
-to the one you need.
-
--   Example 1 — Quick Start.
-
--   Example 2 — Using Bootstrap Confidence Intervals
-
--   Example 3 — Requesting Standardized Effects.
-
--   Example 4 — Handling Missing Data
-
--   Example 5 — Moderated mediation with a continuous moderator.
-
--   Example 6 — Moderated mediation with a categorical moderator.
-
--   Example 7 — Covariates (within-subject & between-subject).
-
-## Example
-
-### Dataset
-The dataset should be in wide format, where each participant has
-separate columns for measurements in different conditions. Specifically,
-each mediator variable (e.g., M1) should be split into two columns: one
-for Condition 1 and one for Condition 2. Similarly, the outcome variable
-should also have separate columns for each condition. This structure
-ensures that within-subject changes can be properly analyzed.
-
-For example, the first rows of `example_data` look like this:
-
-```{r}
+```{r load-data}
 data("example_data", package = "wsMed")
-head(example_data)
 ```
 
-**How to interpret these columns:**
-
--   A1 / A2 – the same mediator **A**, measured under **Condition 1** and
-    **Condition 2**.\
--   B1 / B2 – the same mediator **B**, measured under **Condition 1**
-    and **Condition 2**.\
--   C1 / C2 – the outcome variable measured under each condition.
-
-
-### Example 1 -- Quick Start
-
-```{r, eval = FALSE}
-result1 <- wsMed(
-  data = example_data,         # Input dataset with scores from both conditions
-  M_C1  = c("A1", "B1"),       # Mediators measured under Condition 1
-  M_C2  = c("A2", "B2"),       # Same mediators measured under Condition 2
-  Y_C1  = "C1",                # Outcome under Condition 1
-  Y_C2  = "C2",                # Outcome under Condition 2
-  form  = "P"                  # Model type: "P" | "CN" | "CP" | "PC"
-)
-
-print(result1)
-```
-
-#### Key Arguments in Example 1
-- **`data`** – a data frame containing raw scores; variables must be named consistently with suffix `1` / `2` for the two conditions.
-- **`M_C1`, `M_C2`** – character vectors with the mediator names for each condition.
-- **`Y_C1`, `Y_C2`** – outcome variable names for each condition.
-- **`form`** – specifies the mediation model:
-  - `"P"` – parallel mediation
-  - `"CN"` – chained / serial mediation (e.g., A → B → Y)
-  - `"CP"` – combined parallel + serial model
-  - `"PC"` – parallel-to-serial model (alternative structure)
-
-**Additional options often used with Example 1:**
-- `alpha` – set the significance level for Monte Carlo confidence intervals (default = 0.05).
-- `print(..., digits = k)` – control number of decimals printed in the summary.
-- `R` – number of Monte Carlo draws (default = 20000L).
-
-By default, `wsMed()` uses **Monte Carlo confidence intervals** if `ci_method` is not specified.
-
-You can adjust the settings as follows:
-
-```{r, eval = FALSE}
-result1 <- wsMed(
+```{r quick-start, eval=FALSE}
+result <- wsMed(
   data = example_data,
   M_C1 = c("A1", "B1"),
   M_C2 = c("A2", "B2"),
   Y_C1 = "C1",
   Y_C2 = "C2",
   form = "P",
-  alpha = 0.01,  # 99% confidence intervals
-  R = 5000       # reduce MC draws for faster runtime in demos
+  Na = "DE",
+  ci_method = "mc",
+  R = 5000,
+  seed = 123
 )
 
-# Control printed precision
-print(result1, digits = 4) # Use 'digits' to control decimal places
+print(result)
 ```
 
+The arguments in this call answer four basic questions:
 
+- Which data set should be analyzed?
+- Which columns contain the mediator and outcome measurements under the two
+  conditions?
+- What is the mediation structure?
+- How should missing data and confidence intervals be handled?
 
-### Example 2 -- Using Bootstrap Confidence Intervals
+The following sections explain how to answer each question.
 
-In this example we demonstrate how to switch from Monte Carlo to **bootstrap confidence intervals**, and how to control the number of replicates and the random seed.
+## Step 1: Specify the repeated-measures variables
 
-```{r, eval = FALSE}
-result2 <- wsMed(
-  data = example_data,        # Input dataset with scores from both conditions
-  M_C1  = c("A1", "B1"),      # Mediators measured under Condition 1
-  M_C2  = c("A2", "B2"),      # Same mediators measured under Condition 2
-  Y_C1  = "C1",               # Outcome under Condition 1
-  Y_C2  = "C2",               # Outcome under Condition 2
-  form = "P",                 # Parallel mediation, also can use "CN","CP","PC"
+The data must be in wide format. Each row represents one participant, and
+each repeated measure has a separate column for each condition.
 
-  # additional argument for bootstrap
+The mediator names are supplied through `M_C1` and `M_C2`. Their positions
+must match. For example:
 
-  ci_method = "bootstrap",    # Use bootstrap CI instead of Monte Carlo CI
-  boot_ci_type = "perc",      # CI type: "perc" | "bc" | "bca.simple"
-  bootstrap = 2000,           # Number of bootstrap replicates
-  iseed = 123                 # Seed for reproducibility
-)
-
-print(result2)
+```r
+M_C1 = c("A1", "B1")
+M_C2 = c("A2", "B2")
 ```
 
+This tells `wsMed()` that `A1` and `A2` are the two measurements of the
+first mediator, whereas `B1` and `B2` are the two measurements of the
+second mediator. The outcome pair is supplied through `Y_C1` and `Y_C2`:
 
-#### Key Arguments in This Example
-- **`ci_method`** – choose the CI engine (`"bootstrap"` or `"mc"`).
-- **`boot_ci_type`** –`"perc"`is percentile CI and `"bc"`is bias-corrected percentile CI.
-- **`bootstrap`** – number of bootstrap samples to draw (default = 2000).
-- **`iseed`** – random seed to ensure reproducible bootstrap results.
+```r
+Y_C1 = "C1"
+Y_C2 = "C2"
+```
 
+The variable mapping in the quick-start example is therefore:
 
-You can combine these with other arguments, such as `alpha` in wsMed() to set a different confidence level, or `digits` in print() to control the number of decimal places.
+| Construct | Condition 1 | Condition 2 | Internal label |
+|:----------|:------------|:------------|:---------------|
+| A | `A1` | `A2` | `M1` |
+| B | `B1` | `B2` | `M2` |
+| C | `C1` | `C2` | `Y` |
 
+The internal mediator labels are determined by position. If three mediators
+are supplied as follows:
 
-### Example 3 -- Requesting Standardized Effects
+```r
+M_C1 = c("A1", "B1", "C1")
+M_C2 = c("A2", "B2", "C2")
+```
 
-You can ask `wsMed()` to compute **standardized path coefficients and effects**
-by setting `standardized = TRUE`.
+then A, B, and C are labeled `M1`, `M2`, and `M3`, respectively. This
+numbering is especially important when specifying a user-defined model in
+Step 2.
 
-```{r, eval = FALSE}
-result3 <- wsMed(
+`wsMed()` automatically prepares the difference and level components used
+in the model. Users should supply the original condition-specific columns,
+not manually computed difference or average scores.
+
+## Step 2: Choose the mediation structure
+
+The mediation structure is selected with `form`. Users can choose one of
+four predefined structures or define the mediator paths themselves.
+
+### Predefined models
+
+The predefined options are:
+
+| `form` | Structure | How the mediators are connected |
+|:-------|:----------|:---------------------------------|
+| `"P"` | Parallel | All mediators operate in parallel. |
+| `"CN"` | Chained/serial | The mediators form one serial chain. |
+| `"CP"` | Chained--parallel | The first mediator predicts multiple later mediators. |
+| `"PC"` | Parallel--chained | Multiple mediators predict one final mediator. |
+
+For a predefined model, the mediator order in `M_C1` and `M_C2` determines
+their positions in the structure. To fit a different predefined structure,
+replace the value of `form` in the basic call:
+
+```r
+form = "P"
+form = "CN"
+form = "CP"
+form = "PC"
+```
+
+For example, the following call fits a three-mediator chained model:
+
+```{r predefined-cn, eval=FALSE}
+result_chained <- wsMed(
   data = example_data,
-  M_C1 = c("A1","B1","C1"),  # Three mediators measured under Condition 1
-  M_C2 = c("A2","B2","C2"),  # Same mediators measured under Condition 2
-  Y_C1 = "D1",               # Outcome variable in Condition 1
-  Y_C2 = "D2",               # Outcome variable in Condition 2
-  form = "CN",               # "CN" = Chained / Serial mediation
-  standardized = TRUE,       # Request standardized path coefficients and effects
-  alpha = 0.05            # Use 95% CI for standardized effects, also can use`0.01` for 99% CI
+  M_C1 = c("A1", "B1", "C1"),
+  M_C2 = c("A2", "B2", "C2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2",
+  form = "CN",
+  Na = "DE",
+  ci_method = "mc",
+  R = 5000,
+  seed = 123
 )
-
-# Print summary with more decimals for clarity
-print(result3)
 ```
 
-#### Key Arguments in This Example
-- **`standardized`** – returns standardized estimates, enabling effect size comparison.
-- **`alpha`** – sets the confidence level for both unstandardized and standardized effects (default = 0.05)
+Here, the mediator order defines the chain from A (`M1`) to B (`M2`) and
+then to C (`M3`).
 
+### User-defined models
 
-### Example 4 -- Handling Missing Data
+Use `form = "UD"` when the intended paths cannot be represented by one of
+the four predefined structures. The mediator labels still come from the
+order of `M_C1` and `M_C2`, but the paths are supplied through `paths`.
 
-`wsMed()` supports three strategies via the `Na` argument:
+Suppose A, B, and C are the three mediators and the intended structure
+contains:
 
-- `"DE"` — **listwise deletion** (default if `Na` is omitted).
-- `"MI"` — **multiple imputation** (via the *mice* package).
-- `"FIML"` — **full information maximum likelihood** (via *lavaan*).
+- a path from A (`M1`) to C (`M3`);
+- a path from C (`M3`) to the outcome; and
+- a path from B (`M2`) to the outcome.
 
-**Note:** When `Na = "MI"`, only monte carlo CIs are available,  bootstrap CIs are **not** available.
+The path vector is:
 
-Generate a dataset with missing data:
+```{r custom-paths}
+custom_paths <- c(
+  "M1 -> M3",
+  "M3 -> Y",
+  "M2 -> Y"
+)
+```
 
-```{r}
-library(knitr)
-data(example_data)
+Pass this vector to `wsMed()` together with `form = "UD"`:
+
+```{r user-defined-model, eval=FALSE}
+result_custom <- wsMed(
+  data = example_data,
+  M_C1 = c("A1", "B1", "C1"),
+  M_C2 = c("A2", "B2", "C2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2",
+  form = "UD",
+  paths = custom_paths,
+  Na = "DE",
+  ci_method = "mc",
+  R = 5000,
+  seed = 123
+)
+```
+
+Only mediator-to-mediator and mediator-to-outcome paths are included in
+`paths`. Do not add paths beginning with `X`: `wsMed()` automatically adds
+the condition-to-mediator paths and the direct path from the condition to
+the outcome.
+
+The specified mediator structure must be acyclic. Detailed path rules,
+parameter labels, generated equations, and indirect-effect definitions are
+described in the `GenerateModelCustom()` vignette.
+
+## Step 3: Choose the estimation options
+
+After selecting the mediation structure, choose how to handle missing data,
+construct confidence intervals, and, if required, standardize the effects.
+
+### Missing data and confidence intervals
+
+The `Na` argument selects the missing-data method, and `ci_method` selects
+the confidence-interval method.
+
+| `Na` | Missing-data method | Available `ci_method` |
+|:-----|:--------------------|:----------------------|
+| `"DE"` | Listwise deletion | `"mc"`, `"bootstrap"`, or `"both"` |
+| `"FIML"` | Full-information maximum likelihood | `"mc"`, `"bootstrap"`, or `"both"` |
+| `"MI"` | Multiple imputation | `"mc"` |
+
+For a complete data analysis using Monte Carlo confidence intervals, use:
+
+```r
+Na = "DE"
+ci_method = "mc"
+R = 5000
+seed = 123
+```
+
+`R` controls the number of Monte Carlo draws, and `seed` makes the results
+reproducible.
+
+To use bootstrap confidence intervals instead, use:
+
+```r
+Na = "DE"
+ci_method = "bootstrap"
+bootstrap = 2000
+boot_ci_type = "perc"
+iseed = 123
+```
+
+The supported values of `boot_ci_type` are `"perc"`, `"bc"`, and
+`"bca.simple"`. Setting `ci_method = "both"` requests Monte Carlo and
+bootstrap intervals in the same analysis.
+
+The following code creates a copy of `example_data` with missing values for
+the FIML and multiple-imputation examples:
+
+```{r create-missing-data}
 set.seed(123)
-example_dataN <- mice::ampute(
-  data = example_data,
-  prop = 0.1,
-)$amp
+example_data_missing <- example_data
+analysis_variables <- c("A1", "A2", "B1", "B2", "C1", "C2")
+
+for (variable in analysis_variables) {
+  missing_rows <- sample(
+    seq_len(nrow(example_data_missing)),
+    size = ceiling(0.10 * nrow(example_data_missing))
+  )
+  example_data_missing[missing_rows, variable] <- NA_real_
+}
 ```
 
-```{r,eval=FALSE}
-# (A) Multiple Imputation (MI) + Monte Carlo CI
-result4_mi <- wsMed(
-  data = example_dataN,        # dataset with missing values (wide format)
-  M_C1 = c("A1","B1"),        # mediators under Condition 1
-  M_C2 = c("A2","B2"),        # mediators under Condition 2
-  Y_C1 = "C1",                # outcome under Condition 1
-  Y_C2 = "C2",                # outcome under Condition 2
-  form = "P",                 # parallel mediation
-  Na   = "MI",                # handle missing data via Multiple Imputation
-  standardized = TRUE         # Request standardized path coefficients and effects
-)
-print(result4_mi)
-```
+For data with missing values, FIML can be requested by changing `Na`:
 
-```{r,eval=FALSE}
-# (B) Full Information Maximum Likelihood (FIML) + Bootstrap CI
-
-result4_fiml <- wsMed(
-  data = example_data,        # dataset with missing values (wide format)
-  M_C1 = c("A1","B1"),        # mediators under Condition 1
-  M_C2 = c("A2","B2"),        # mediators under Condition 2
+```{r fiml-example, eval=FALSE}
+result_fiml <- wsMed(
+  data = example_data_missing,
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
   Y_C1 = "C1",
   Y_C2 = "C2",
-  form = "CN",                # chained/serial mediation (A -> B -> Y)
+  form = "P",
+  Na = "FIML",
+  ci_method = "mc",
+  R = 5000,
+  seed = 123
+)
+```
 
-  # additional argument for FIML and bootstrap
-  Na   = "FIML",              # full information maximum likelihood
-  ci_method = "bootstrap",    # use Bootstrap CIs with FIML
-  bootstrap = 2000,            # number of resamples (small for demo; typical 2000)
-  boot_ci_type = "perc",      # CI type: "perc" or "bc"
-  iseed = 123                 # seed for bootstrap reproducibility
+For FIML with Monte Carlo intervals, `MCmethod` can be set to `"mc"` or
+`"bootSD"`.
+
+Multiple imputation is requested with `Na = "MI"`. Its controls are supplied
+through `mi_args`:
+
+```{r mi-example, eval=FALSE}
+result_mi <- wsMed(
+  data = example_data_missing,
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
+  Y_C1 = "C1",
+  Y_C2 = "C2",
+  form = "P",
+  Na = "MI",
+  ci_method = "mc",
+  mi_args = list(
+    m = 20,
+    method_num = "pmm"
+  ),
+  R = 5000,
+  seed = 123
+)
+```
+
+Here, `m` is the number of imputed data sets and `method_num` is the
+imputation method passed to the multiple-imputation procedure.
+
+### Standardized effects
+
+Set `standardized = TRUE` when standardized path coefficients and effects
+are needed:
+
+```{r standardized-example, eval=FALSE}
+result_standardized <- wsMed(
+  data = example_data,
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
+  Y_C1 = "C1",
+  Y_C2 = "C2",
+  form = "P",
+  Na = "DE",
+  ci_method = "mc",
+  R = 5000,
+  standardized = TRUE,
+  seed = 123
+)
+```
+
+## Step 4: Add optional model components
+
+Moderators and covariates are added to the same `wsMed()` call. They do not
+require a separate analysis workflow.
+
+### Moderators
+
+A moderated mediation analysis requires three arguments:
+
+- `W` identifies the moderator variable;
+- `W_type` specifies whether it is `"continuous"` or `"categorical"`; and
+- `MP` identifies the paths moderated by `W`.
+
+For example:
+
+```{r continuous-moderator, eval=FALSE}
+result_moderated <- wsMed(
+  data = example_data,
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
+  Y_C1 = "C1",
+  Y_C2 = "C2",
+  form = "CN",
+  W = "D3",
+  W_type = "continuous",
+  MP = c("a1", "b_1_2", "b2", "cp"),
+  Na = "DE",
+  ci_method = "mc",
+  R = 5000,
+  seed = 123
+)
+```
+
+In this chained model, `a1` is the condition-to-`M1` path, `b_1_2` is the
+`M1`-to-`M2` difference-component path, `b2` is the `M2`-to-outcome
+difference-component path, and `cp` is the direct effect. Every label in
+`MP` must correspond to a path that exists in the selected model.
+
+The same arguments can be used with `form = "UD"`. For example, the
+user-defined model in Step 2 contains the labels `b_1_3`, `b2`, and `b3`,
+but it does not contain `b1` because `"M1 -> Y"` was not specified.
+
+For a categorical moderator, change the relevant arguments:
+
+```r
+W = "Group"
+W_type = "categorical"
+```
+
+After fitting a moderated model, `plot_moderation_curve()` can be used to
+display conditional effects:
+
+```{r moderation-plot, eval=FALSE}
+plot_moderation_curve(
+  result_moderated,
+  "indirect_effect_1_2"
 )
 
-print(result4_fiml)
-```
-
-
-
-
-### Example 5 -- Moderated mediation with a continuous moderator `W`
-
-Continuous moderator W + serial-parallel mediation + missing data
-```{r, eval=FALSE}
-result5 <- wsMed(
-  data = example_dataN,
-  M_C1 = c("A1","B1","C1"),# A1/B1/C1 is A/B/C mediator variable in condition 1
-  M_C2 = c("A2","B2","C2"),# A2/B2/C2 is A/B/C mediator variable in condition 2
-  Y_C1 = "D1",# D1 is outcome variable in condition 1
-  Y_C2 = "D2",# D2 is outcome variable in condition 2
-  form = "CP",# chained + parallel mediation, M1 is chained mediator by default
-  W      = "D3",# name of the moderator variable (here "D3")
-  W_type = "continuous", # type of the moderator ("continuous" or "categorical")
-  MP     = c("a1","b2","d1","cp","b_1_2","d_1_2"),
-  #   MP: which regression paths are moderated by W.
-  #   a1   : X -> M1
-  #   b2   : M2 -> Y
-  #   d1   : M1avg -> Y
-  #   cp   : X -> Y
-  #   b_1_2: M1 -> M2
-  #   d_1_2: M1avg -> M2avg
+plot_moderation_curve(
+  result_moderated,
+  "b_1_2"
 )
-print(result5)
-
-# Conditional indirect effect through X -> M1 -> M2 -> Y (indices 1_2)
-plot_moderation_curve(result5, "indirect_effect_1_2")
-# Conditional path coefficient labeled b_1_2 (M1 -> M2)
-plot_moderation_curve(result5, "b_1_2")
-# Conditional total effect
-plot_moderation_curve(result5, "total_effect")
 ```
 
-#### Key Arguments in This Example
+The conditional indirect effect used by `plot_moderation_curve()` is named
+`indirect_effect_1_2`; the corresponding indirect effect in the generated
+SEM syntax is named `indirect_1_2`.
 
-- **`W`** – name of the moderator variable (must be a column in `data`).
-- **`W_type`** – type of the moderator:
-  - `"continuous"` – moderator is numeric; `wsMed()` will estimate conditional effects across the range of `W`.
-  - `"categorical"` – moderator is a factor/character; model estimates effects for each level or group.
-- **`MP`** – character vector specifying **which regression paths are moderated by `W`**.
-  - `"a1"` – first-stage path (X → M1diff)
-  - `"b2"` – second-stage path (M2diff → Y)
-  - `"d1"` – cross path (M1avg → Y)
-  - `"cp"` – direct effect (X → Y)
-  - `"b_1_2"` – chain path (M1 → M2)
-  - `"d_1_2"` – cross/average path (M1avg → M2avg)
+### Covariates
 
-> **Tip:**
-> After fitting the model, use `plot_moderation_curve()` to visualize conditional effects or path coefficients as a function of `W`.
-> Typical targets include `"indirect_1_2"`, `"b_1_2"`, and `"total_effect"` as shown above.
+Within-subject covariates are supplied as matched pairs through `C_C1` and
+`C_C2`. Between-subject covariates are supplied through `C`, with their type
+identified by `C_type`.
 
-
-Or, you can use **bootstrap confidence intervals**, switch to a **parallel mediation** model,
-and choose a different set of moderated paths:
-
-```{r,eval = FALSE}
-result5 <- wsMed(
-  data = example_dataN,
-  M_C1 = c("A1","B1","C1"),# A1/B1/C1 is A/B/C mediator variable in condition 1
-  M_C2 = c("A2","B2","C2"),# A2/B2/C2 is A/B/C mediator variable in condition 2
-  Y_C1 = "D1",# D1 is outcome variable in condition 1
-  Y_C2 = "D2",# D2 is outcome variable in condition 2
-  form = "P",# parallel mediation
-  W      = "D3", # name of the moderator variable (here "D3")
-  W_type = "continuous", # type of the moderator ("continuous" or "categorical")
-  MP     = c("a1","b1","d1","cp"),
-  #   MP: which regression paths are moderated by W.
-  #   a1   : X -> M1diff
-  #   b1   : M1diff -> Y
-  #   d1   : M1avg -> Y
-  #   cp   : X -> Y
+```{r covariate-example, eval=FALSE}
+result_covariates <- wsMed(
+  data = example_data,
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
+  Y_C1 = "C1",
+  Y_C2 = "C2",
+  form = "P",
+  C_C1 = "D1",
+  C_C2 = "D2",
+  C = "D3",
+  C_type = "continuous",
+  Na = "DE",
+  ci_method = "mc",
+  R = 5000,
+  seed = 123
 )
-# Conditional indirect effect through X -> M1 -> M2 -> Y (indices 1_2)
-plot_moderation_curve(result5, "indirect_effect_1")
-# Conditional path coefficient labeled b_1_2 (M1 -> M2)
-plot_moderation_curve(result5, "b1")
-# Conditional total effect
-plot_moderation_curve(result5, "total_effect")
 ```
 
+In this example, `D1` and `D2` form one within-subject covariate, and `D3`
+is a continuous between-subject covariate. The prepared covariate terms are
+included in the mediator and outcome regressions.
 
+## Step 5: Inspect the results
 
-### Example 6 -- Moderated mediation with a categorical moderator `W`
+Print the fitted object to obtain the main analysis summary:
 
-Generate a categorical moderator `Group`
-```{r,eval=FALSE}
-example_data2 <- example_data
-set.seed(123)
-example_data2$Group <- factor(
-  sample(c("G1", "G2", "G3"),
-         nrow(example_data2),
-         replace = TRUE)
-) # generate dataset with categorical W
+```{r print-result, eval=FALSE}
+print(result)
 ```
 
-This example demonstrates **moderated mediation** with a **categorical** moderator `W`.
-```{r, eval = FALSE}
-result6 <- wsMed(
-  data   = example_data2,           # dataset (wide format)
-  M_C1   = c("A1","B1","C1"),       # mediators under Condition 1 (A/B/C)
-  M_C2   = c("A2","B2","C2"),       # same mediators under Condition 2
-  Y_C1   = "D1",                    # outcome under Condition 1
-  Y_C2   = "D2",                    # outcome under Condition 2
-  W      = "Group",                 # categorical moderator (factor/character)
-  W_type = "categorical",           # declare moderator type
-  MP     = c("a1","b1","d1","cp","b_1_2","b_2_3"),
-  # MP: which regression paths are moderated by W.
-  #   a1   : X -> M1diff
-  #   b1   : M1diff -> Y
-  #   d1   : M1avg -> Y
-  #   cp   : X -> Y
-  #   b_1_2: M1diff -> M2diff
-  #   b_2_3: M2diff -> M3diff
-  form   = "CN"                     # chained/serial mediation
-)
+Depending on the selected options, the printed output includes:
 
-print(result6)
+- the variables included in the analysis;
+- model-fit information;
+- regression paths;
+- specific indirect effects;
+- the total indirect effect;
+- the direct and total effects;
+- confidence intervals;
+- standardized effects; and
+- conditional effects for moderated models.
+
+Use `printGM()` to display the generated model equations:
+
+```{r print-model, eval=FALSE}
+printGM(result)
 ```
 
-#### Key Arguments in This Example
+Frequently used components of the fitted object can also be accessed
+directly:
 
-- **`data`** — the dataset in **wide format**, with each participant as a row and condition-specific variables as separate columns.
-
-- **`M_C1`, `M_C2`** — character vectors naming the mediators under Condition 1 and Condition 2.
-  In this example we specify three mediators (A, B, C), so the serial chain is A → B → C → Y.
-
-- **`Y_C1`, `Y_C2`** — outcome variable names under Condition 1 and Condition 2.
-
-- **`W`** — the moderator variable; here `"Group"` is a categorical variable with multiple levels.
-
-- **`W_type = "categorical"`** — instructs `wsMed()` to estimate group-specific conditional effects and to compute pairwise contrasts relative to the reference level of `W`.
-
-- **`MP`** — character vector specifying **which regression paths are moderated** by `W`.
-  - `a1` – first-stage path (X → M1diff)
-  - `b1` – mediator 1 path to Y (M1diff → Y)
-  - `d1` – cross/average path (M1avg → Y)
-  - `cp` – direct effect (X → Y)
-  - `b_1_2` – chained path from M1 to M2
-  - `b_2_3` – chained path from M2 to M3
-
-- **`form = "CN"`** — selects the chained/serial mediation model structure.
-  Mediators are linked sequentially, so indirect effects include single-step and multi-step paths.
-
-
-
-### Example 7 -- Covariates
-
-In this example,three covariates are included:
-
--   `D3` is specified as a **between-subject covariate**, representing a
-    stable individual difference (e.g., trait-level variable). It is
-    mean-centered and entered as a predictor in all regression models.
-
--   `D1` and `D2` form a **within-subject covariate pair**, assumed to
-    be measured under Condition 1 and Condition 2, respectively. The
-    function automatically computes:
-
-    -   `Cw1diff = D2 - D1` (difference score)
-    -   `Cw1avg = mean-centered average of D1 and D2`
-
-These covariates are included as predictors of both the mediators and
-the outcome in the SEM model.
-
-```{r, eval=FALSE}
-result7 <- wsMed(
-  data = example_data, #dataset
-  M_C1 = c("A1","B1"), # A1/B1 is A/B mediator variable in condition 1
-  M_C2 = c("A2","B2"), # A2/B2 is A/B mediator variable in condition 2
-  Y_C1 = "C1", # C1 is outcome variable in condition 1
-  Y_C2 = "C2", # C2 is outcome variable in condition 2
-  form = "P", # Parallel mediation
-  C_C1 = "D1", # within-subject covariate (e.g., measured under D1)
-  C_C2 = "D2", # within-subject covariate (e.g., measured under C2)
-  C = "D3" # between-subject covariates
-)
-
-print(result7)
+```{r result-components, eval=FALSE}
+result$sem_model       # generated lavaan syntax
+result$mc$fit          # fitted lavaan object
+result$moderation      # moderation results, when requested
+result$paths           # path vector when form = "UD"
 ```
 
-#### Key Arguments in This Example
+The exact contents depend on the selected missing-data and
+confidence-interval methods.
 
-- **`C_C1`, `C_C2`** — character vectors naming **within-subject covariates**
-  measured under Condition 1 and Condition 2.
-  `wsMed()` automatically computes:
-  - **`Cw1diff`** — difference score (C_C2 − C_C1)
-  - **`Cw1avg`** — mean-centered average of the two conditions
+## Step 6: Interpret the printed results
 
-  These transformed covariates are included as predictors for all mediators and the outcome.
+This section uses two examples to explain the object returned by
+`wsMed()`. Example 1 describes the output shared by analyses without an
+external moderator. Example 2 then focuses on the additional output
+produced when a continuous moderator is included.
 
-- **`C`** — character vector naming **between-subject covariates**
-  (e.g., stable traits). They are automatically mean-centered
-  and entered into all regression equations.
+The explanations follow the order of the sections printed by `print()`.
+They describe what each section contains and how to locate the relevant
+results; they are not substantive interpretations of the example data.
 
-- **`form`** — model structure (`"P"` here, but can be `"CN"`, `"CP"`, `"PC"`).
+### Example 1: A model without an external moderator
 
+The first example fits a parallel mediation model using multiple
+imputation and Monte Carlo confidence intervals. Standardized results are
+also requested so that all principal output sections are illustrated.
 
-Only including within-subject covariate D1 and D2
-
-```{r,eval = FALSE}
-result7 <- wsMed(
-  data = example_data, #dataset
-  M_C1 = c("A1","B1"), # A1/B1 is A/B mediator variable in condition 1
-  M_C2 = c("A2","B2"), # A2/B2 is A/B mediator variable in condition 2
-  Y_C1 = "C1", # C1 is outcome variable in condition 1
-  Y_C2 = "C2", # C2 is outcome variable in condition 2
-  form = "P", # Parallel mediation
-  C_C1 = "D1", # within-subject covariate (e.g., measured under D1)
-  C_C2 = "D2", # within-subject covariate (e.g., measured under C2)
-)
-
-print(result7)
-```
-
-Only including between-subject covariate D3
-
-```{r,eval = FALSE}
-result7 <- wsMed(
-  data = example_data, #dataset
-  M_C1 = c("A1","B1"), # A1/B1 is A/B mediator variable in condition 1
-  M_C2 = c("A2","B2"), # A2/B2 is A/B mediator variable in condition 2
-  Y_C1 = "C1", # C1 is outcome variable in condition 1
-  Y_C2 = "C2", # C2 is outcome variable in condition 2
-  form = "P", # Parallel mediation
-  C = "D3" # between-subject covariates
-)
-
-print(result7)
-```
-
-
-
-
-## Understanding the Output
-
-The printed output from `wsMed()` is divided into several sections.
-Below we briefly explain what each section contains and how to read it.
-
-### 1. Multiple Mediation (No Moderator)
-
-We use Example 4 (parallel mediation, MI + Monte Carlo CI) as a template.
-Each section in the printed output serves the following purpose:
-
-```{r}
-# (A) Multiple Imputation (MI) + Monte Carlo CI
+```{r result-example-no-moderator, cache=TRUE}
 result4_mi <- wsMed(
-  data = example_data,        # dataset with missing values (wide format)
-  M_C1 = c("A1","B1"),        # mediators under Condition 1
-  M_C2 = c("A2","B2"),        # mediators under Condition 2
-  Y_C1 = "C1",                # outcome under Condition 1
-  Y_C2 = "C2",                # outcome under Condition 2
-  form = "P",                 # parallel mediation
-  Na   = "MI",                # handle missing data via Multiple Imputation
-  standardized = TRUE         # Request standardized path coefficients and effects
+  data = example_data_missing,
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
+  Y_C1 = "C1",
+  Y_C2 = "C2",
+  form = "P",
+  Na = "MI",
+  ci_method = "mc",
+  mi_args = list(
+    m = 20,
+    method_num = "pmm"
+  ),
+  R = 5000,
+  standardized = TRUE,
+  seed = 123
 )
+
 print(result4_mi)
-printGM(result4_mi)           # prints and returns the model equations
 ```
 
+The output sections and their main purposes are:
 
-- **VARIABLES**
-  Lists all outcome variables, mediators (with Condition 1 / 2 names),
-  and the final sample size used in the analysis.
+| Printed section | What it answers |
+|:----------------|:----------------|
+| `VARIABLES` | Which observed variables and how many cases were used? |
+| `MODEL FIT` | How well does the complete SEM reproduce the observed covariance structure? |
+| `TOTAL / DIRECT / TOTAL-IND` | What are the overall, direct, and combined indirect effects? |
+| `Indirect effects` and `Indirect-effect key` | What is the estimate for each mediation route, and which route does each label represent? |
+| `MODERATION EFFECTS (d-paths)` and its key | What are the level-component coefficients associated with the mediator paths? |
+| `CONTRAST INDIRECT EFFECTS` | How do the specific indirect effects differ from one another? |
+| `C1-C2 COEFFICIENTS` | What are the reconstructed coefficients for the two conditions? |
+| `REGRESSION PATHS` | What are the estimates for the individual regression paths? |
+| `INTERCEPTS` | What are the estimated difference-score intercepts, including the `a` and `cp` paths? |
+| `VARIANCES` | What are the estimated residual variances? |
+| `STANDARDIZED` | What are the standardized estimates and confidence intervals? |
 
-- **MODEL FIT**
-  Reports SEM model fit statistics from `lavaan`:
-  χ², df, p-value, CFI, TLI, RMSEA (with CI), and SRMR.
-  Use these to assess whether the SEM model adequately fits the data.
+The suffix in a heading identifies the requested confidence-interval
+engine. For example, `(MC)` denotes Monte Carlo results. When bootstrap
+intervals are requested, the corresponding bootstrap output is printed;
+with `ci_method = "both"`, both sets of results can be returned.
 
-- **TOTAL / DIRECT / TOTAL-IND (MC)**
-  Shows the total effect, direct effect (c′ path), and total indirect effect,
-  with Monte Carlo or bootstrap-based SEs and confidence intervals.
+#### Variables and analysis sample
 
-- **Indirect effects**
-  Breaks down the total indirect effect into individual paths
-  (e.g., X → M1 → Y, X → M2 → Y), with point estimates, SEs, and CIs.
+The `VARIABLES` section restates the condition-specific outcome and
+mediator columns. It also maps each mediator pair to its internal label
+(`M1`, `M2`, and so on) and reports the number of rows retained for the
+analysis.
 
-- **Indirect-effect key**
-  Provides a legend mapping labels like `ind_1`, `ind_2`, `ind_1_2`
-  to the actual mediator paths they represent.
+This section should be checked before interpreting any estimates. In
+particular, verify that:
 
-- **MODERATION EFFECTS (d-paths, MC)**
-  When d-paths are present (paths using mediator averages),
-  lists their coefficients and CIs.
-  Appears even in no-moderator models for completeness.
+- the Condition 1 and Condition 2 columns have not been reversed;
+- the order of the mediator pairs matches the intended model; and
+- the retained sample size is consistent with the selected missing-data
+  method.
 
-- **MODERATION KEY (d-paths)**
-  Explains which d-path coefficients correspond to which paths in the model.
+#### Model fit
 
-- **CONTRAST INDIRECT EFFECTS (No Moderator)**
-  Displays pairwise contrasts between indirect effects
-  (e.g., indirect_2 − indirect_1) with SEs and CIs.
+The `MODEL FIT` section reports the model chi-squared statistic, degrees of
+freedom, its \(p\) value, CFI, TLI, RMSEA with its confidence interval, and
+SRMR. These indices evaluate the model as a whole; they do not test an
+individual direct or indirect effect.
 
-- **C1–C2 COEFFICIENTS (No Moderator)**
-  Shows regression coefficients linking Condition 1 / Condition 2 scores
-  (e.g., X1_b1, X0_b1), useful for checking consistency across conditions.
+Fit indices should be interpreted in light of the fitted model. For a
+just-identified or saturated model, global fit is perfect by construction
+and does not provide evidence that the individual paths are substantively
+appropriate.
 
-- **REGRESSION PATHS (MC)**
-  Lists parameter estimates for all regression paths,
-  including a, b, d, and cp paths, with SEs and Monte Carlo CIs.
+#### Total, direct, and indirect effects
 
-- **INTERCEPTS (MC)**
-  Estimated intercepts for mediators and outcome equations.
+The `TOTAL / DIRECT / TOTAL-IND` section gives a compact decomposition:
 
-- **VARIANCES (MC)**
-  Residual variances for mediators and outcome variables.
+\[
+\text{total effect}
+=
+\text{direct effect}
++
+\text{total indirect effect}.
+\]
 
-- **STANDARDIZED (MC)**
-  Provides standardized estimates for all parameters (if `standardized = TRUE`),
-  including indirect and total effects.
+The rows have the following meanings:
 
-### 2. Moderated Mediation
+- `Total effect` is the overall condition effect on the outcome
+  difference.
+- `Direct effect` is the remaining condition effect after accounting for
+  the mediators; its model label is `cp`.
+- `Total indirect` is the sum of all specific indirect effects identified
+  by the selected mediation structure.
 
-When a continuous moderator (`W`) and a set of moderated paths (`MP`) are specified,
-`print.wsMed()` produces additional sections to help interpret conditional effects.
+The `Indirect effects` table then reports each specific route separately.
+The accompanying `Indirect-effect key` should be used to translate a
+printed label into a path. For example, a key may map `ind_1` to
+`X -> M1diff -> Ydiff`. For serial or user-defined models, a label can
+refer to a route through more than one mediator.
 
-```{r}
+Each row reports an estimate, its standard error, and confidence limits.
+For an indirect effect, inference should be based on the confidence
+interval for the complete product rather than on whether every component
+path is individually significant. An interval that excludes zero provides
+evidence that the corresponding effect differs from zero at the stated
+confidence level.
+
+#### Level-component paths and condition-specific coefficients
+
+The printed heading `MODERATION EFFECTS (d-paths)` can appear even when no
+external moderator was supplied through `W`. In this section, the
+`d` coefficients are the effects of mediator level components, such as
+`M1avg`, in the outcome or mediator-difference equation. They are part of
+the within-subject parameterization and should not be confused with
+moderation by a user-supplied variable.
+
+The associated key maps each `d` label to its regression path. For a
+direct mediator-to-outcome path, the difference-component and
+level-component terms appear together, for example:
+
+```text
+Ydiff ~ b1 * M1diff + d1 * M1avg
+```
+
+The `C1-C2 COEFFICIENTS` section expresses this pair as coefficients for
+the two conditions. It is useful when the research question concerns
+whether the corresponding mediator-to-outcome relation is the same under
+both conditions. The `b` coefficient summarizes the common component,
+whereas the `d` coefficient captures the difference between the two
+condition-specific coefficients.
+
+#### Contrasts between indirect effects
+
+When the model contains more than one specific indirect effect,
+`CONTRAST INDIRECT EFFECTS` reports pairwise differences between them. A
+contrast should be read according to the order shown in its label. For
+example:
+
+```text
+indirect_2 - indirect_1
+```
+
+compares the second specific indirect effect with the first. Its confidence
+interval evaluates the difference between the two effects, not whether
+either effect separately differs from zero.
+
+#### Regression paths, intercepts, and variances
+
+`REGRESSION PATHS` lists the individual regression coefficients in the
+generated SEM. The `Path` column shows the regression in `lavaan` notation,
+whereas `Label` gives the name used elsewhere in the output and in `MP`.
+Common labels include:
+
+- `b1`, `b2`, and so on for mediator difference-component paths to the
+  outcome;
+- `d1`, `d2`, and so on for the corresponding level-component paths; and
+- labels such as `b_1_2` and `d_1_2` for paths from one mediator to
+  another.
+
+`INTERCEPTS` contains the `a` paths and the direct effect because, after
+the paired measurements are transformed, the condition effects are
+represented as intercepts of the difference-score equations. Thus,
+`a1` is found on the `M1diff ~ 1` row, and `cp` is found on the
+`Ydiff ~ 1` row.
+
+`VARIANCES` reports the estimated residual variances for the endogenous
+difference components and any other modeled variables. These rows describe
+unexplained variability; they are not additional mediation effects.
+
+#### Standardized results
+
+The `STANDARDIZED` section is printed when `standardized = TRUE`. It
+contains standardized versions of the path coefficients and derived
+effects, including the specific indirect, total indirect, and total
+effects when available.
+
+Standardized and unstandardized results answer different reporting needs.
+Unstandardized estimates retain the scale of the original variables,
+whereas standardized estimates facilitate comparisons across variables or
+effects. A report should state explicitly which version is presented and
+should not combine an unstandardized estimate with a standardized
+confidence interval.
+
+#### Inspecting and extracting Example 1
+
+Use `printGM()` to connect the printed labels to the generated model:
+
+```{r inspect-result-example-1, eval=FALSE}
+printGM(result4_mi)
+```
+
+The returned object can also be inspected programmatically:
+
+```{r extract-result-example-1, eval=FALSE}
+names(result4_mi)
+
+result4_mi$input_vars    # variables supplied to wsMed()
+result4_mi$sem_model     # generated lavaan syntax
+result4_mi$mc$fit        # fitted lavaan model
+result4_mi$mc$result     # Monte Carlo results
+result4_mi$mc$std_mc     # standardized Monte Carlo results
+```
+
+`print(result4_mi)` is intended for reading the analysis summary, whereas
+the stored components are intended for inspection or downstream
+programming.
+
+### Example 2: A model with a continuous moderator
+
+The second example fits a chained--parallel model and adds `D3` as a
+continuous moderator. The paths listed in `MP` are allowed to vary with
+the moderator.
+
+```{r result-example-continuous-moderator, cache=TRUE}
 result5 <- wsMed(
-  data = example_dataN,
-  M_C1 = c("A1","B1","C1"),# A1/B1/C1 is A/B/C mediator variable in condition 1
-  M_C2 = c("A2","B2","C2"),# A2/B2/C2 is A/B/C mediator variable in condition 2
-  Y_C1 = "D1",# D1 is outcome variable in condition 1
-  Y_C2 = "D2",# D2 is outcome variable in condition 2
-  form = "P",# Parallel mediation
-  W      = "D3", # name of the moderator variable (here "D3")
-  W_type = "continuous", # type of the moderator ("continuous" or "categorical")
-  MP     = c("a1","b1","d1","cp"),
-  #   MP: which regression paths are moderated by W.
-  #   a1   : X -> M1diff
-  #   b1   : M1diff -> Y
-  #   d1   : M1avg -> Y
-  #   cp   : X -> Y
+  data = example_data_missing,
+  M_C1 = c("A1", "B1", "C1"),
+  M_C2 = c("A2", "B2", "C2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2",
+  form = "CP",
+  W = "D3",
+  W_type = "continuous",
+  MP = c("a1", "b2", "d1", "cp", "b_1_2", "d_1_2"),
+  Na = "DE",
+  ci_method = "mc",
+  R = 5000,
+  seed = 123
 )
 
 print(result5)
-printGM(result5)
-
-# Conditional indirect effect through X -> M1 -> Y (indices_1)
-plot_moderation_curve(result5, "indirect_effect_1")
-
-# Conditional path coefficient labeled b_1_2 (M1 -> M2)
-plot_moderation_curve(result5, "b1")
-
-# Conditional total effect
-plot_moderation_curve(result5, "total_effect")
 ```
 
-- **VARIABLES**
-  Lists the outcome variable(s), mediators (with their condition-specific names),
-  moderators, and the sample size used in the analysis.
+Most printed sections have the same interpretation as in Example 1. The
+important additions are:
 
-- **MODEL FIT**
-  Shows standard SEM model fit indices, allowing readers to evaluate
-  whether the specified model adequately represents the data.
+| Additional output | What it contains |
+|:------------------|:-----------------|
+| Moderator in `VARIABLES` | The observed variable mapped to the internal moderator label, such as `W1`. |
+| `Moderated Coefficients` | Interaction terms for the paths named in `MP`. |
+| `Conditional Indirect Effects` | Indirect effects evaluated at selected moderator values. |
+| `Indirect Effect Contrasts` | Differences between conditional indirect effects at those values. |
+| `Moderated Path Coefficients` | The selected path coefficients evaluated at each moderator value. |
+| `Path Coefficient Contrasts` | Differences between conditional path coefficients. |
+| `Conditional Total Effect and Total Indirect Effect` | Overall and combined indirect effects evaluated at each moderator value. |
 
-- **TOTAL / DIRECT / TOTAL-IND (MC)**
-  Reports the total, direct (c′), and total indirect effects,
-  estimated via Monte Carlo simulations.
+#### Moderated coefficients
 
-- **Indirect effects & key**
-  Presents the estimates for all indirect paths and provides a key
-  showing which mediators each path passes through.
+The `Moderated Coefficients` table reports the interaction term associated
+with each path in `MP`. The `BaseCoef` column links the interaction to the
+original path. For example, a row whose base coefficient is `a1` indicates
+whether the condition-to-`M1` path changes with `D3`.
 
-- **MODERATION EFFECTS (d-paths, MC)**
-  Summarizes moderated effects for average-score (d) paths,
-  indicating whether these paths are significantly influenced by the moderator.
+The interaction estimate describes the expected change in the base path
+for a one-unit increase in the moderator. Its confidence interval evaluates
+whether that change differs from zero. This table should be consulted
+before interpreting the pattern of conditional path coefficients.
 
-- **MODERATION KEY (d-paths)**
-  Provides a mapping of each d-path to its corresponding regression path
-  to clarify which paths are being moderated.
+Because the continuous moderator is centered during data preparation, the
+ordinary path estimates in the main output refer to the value represented
+by centered \(W=0\), typically the sample mean of the original moderator.
+The conditional tables make the values used for interpretation explicit.
 
-- **MODERATION RESULTS (Continuous Moderator)**
-  Contains detailed results for continuous moderators, including:
+#### Conditional effects
 
-  - **Moderated Coefficients** — estimates for interaction terms.
-  - **Conditional Indirect Effects** — indirect effects at different moderator levels.
-  - **Indirect Effect Contrasts** — pairwise comparisons of indirect effects.
-  - **Moderated Path Coefficients** — conditional estimates for key paths at each moderator level.
-  - **Path Coefficient Contrasts** — comparisons of path coefficients across moderator levels.
-  - **Conditional Total and Total Indirect Effects** — total effects reported at each moderator level.
+For a continuous moderator, conditional results are commonly reported at
+three reference levels:
 
-- **REGRESSION PATHS (MC)**
-  Lists estimates for all unmoderated regression paths in the model.
+- one standard deviation below the mean (`-1 SD`);
+- the mean (`0 SD`); and
+- one standard deviation above the mean (`+1 SD`).
 
-- **INTERCEPTS (MC)**
-  Provides intercept estimates for mediator and outcome equations.
+The `W_value` column gives the corresponding value on the moderator's
+original scale. The `Estimate`, `SE`, and confidence-limit columns describe
+the effect at that value of \(W\).
 
-- **VARIANCES (MC)**
-  Reports residual variances for mediators, outcomes, and interaction terms.
+`Conditional Indirect Effects` reports how each mediation route changes
+across these values. Labels used here have the prefix `indirect_effect_`.
+For example:
 
-> **Tip:** Use `plot_moderation_curve(result5, "path_name")`
-> to visualize how indirect effects or path coefficients change across the range of `W`.
+```text
+indirect_effect_1_2
+```
 
+refers to the conditional indirect route through `M1` and `M2`. This name
+is used by the moderation output and plotting functions. The corresponding
+defined parameter in the generated SEM uses:
 
+```text
+indirect_1_2
+```
 
+The `Indirect Effect Contrasts` table directly compares the conditional
+indirect effect between moderator levels. These contrasts answer whether
+the indirect effect changes between the selected values; they are distinct
+from testing the indirect effect against zero at any one value.
 
-## All Parameters Descriptions
+`Moderated Path Coefficients` and `Path Coefficient Contrasts` provide the
+same two views for the individual paths listed in `MP`. The first table
+shows each conditional coefficient, and the second tests differences
+between the selected moderator levels.
 
-The `wsMed()` function accepts the following parameters:
+Finally, `Conditional Total Effect and Total Indirect Effect` combines the
+relevant paths at each moderator value. When a specific indirect effect is
+of primary interest, its row in `Conditional Indirect Effects` should
+still be reported separately rather than relying only on the conditional
+total indirect effect.
 
-| **Parameter** | **Type** | **Default** | **Description** |
-|------------------|-------------------|------------------|------------------|
-| `data` | Data frame | Required | Input dataset of raw scores. |
-| `M_C1` | String vector | Required | Mediator names under **Condition 1**. |
-| `M_C2` | String vector | Required | Mediator names under **Condition 2**. |
-| `Y_C1` | String | Required | Outcome under **Condition 1**. |
-| `Y_C2` | String | Required | Outcome under **Condition 2**. |
-| `form` | String | `"P"` | Model type: `"P"`, `"CN"`, `"CP"`, or `"PC"`. |
-| `standardized` | Boolean | `FALSE` | Also compute standardized effects. |
-| `Na` | String | `"DE"` | Missing-data method: `"DE"`, `"FIML"`, or `"MI"`. |
-| `ci_method` | String / `NULL` | `NULL` | CI engine: `"bootstrap"` or `"mc"`. If `NULL`, defaults to `"bootstrap"` for `Na = "DE"` and `"mc"` for `Na = "MI"`/`"FIML"`. |
-| `bootstrap` | Integer | `1000` | Bootstrap replicates (used when `ci_method = "bootstrap"` for `Na = "DE"`/`"FIML"`). |
-| `boot_ci_type` | String | `"perc"` | Bootstrap CI type: `"perc"`, `"bc"`, or `"bca.simple"`. |
-| `R` | Integer | `20000L` | Monte Carlo draws (used when `ci_method = "mc"`). |
-| `alpha` | Numeric | `0.05` | Two-sided significance level(s) for **unstandardized** CIs. |
-| `iseed` | Integer | `123` | Seed for **bootstrap** resampling. |
-| `seed` | Integer | `123` | Seed for **Monte Carlo** simulation. |
-| `fixed.x` | Boolean | `FALSE` | Passed to **lavaan**; whether exogenous variables are fixed. |
-| `C_C1` | String vector | `NULL` | Within-subject covariates under **Condition 1** (length must match `C_C2`). |
-| `C_C2` | String vector | `NULL` | Within-subject covariates under **Condition 2**. |
-| `C` | String vector | `NULL` | Between-subject covariates to be mean-centered and added to all regressions. |
-| `C_type` | String | `"continuous"` | Type of `C`: `"continuous"` or `"categorical"`. |
-| `W` | String vector | `NULL` | Moderator(s). Centering is controlled during data preparation. |
-| `W_type` | String | `"continuous"` | Type of `W`: `"continuous"` or `"categorical"`. |
-| `MP` | String vector | `NULL` | Which paths are moderated (e.g., `"a1"`, `"b_1_2"`, `"cp"`); used to inject main/interaction terms into the generated model syntax. |
-| `alphastd` | Numeric | `0.05` | Significance level for **standardized** CIs. |
+#### Significance markers and confidence intervals
 
+The `Sig` column provides a compact marker when the reported confidence
+interval excludes zero. The confidence limits should remain the primary
+basis for interpretation because they show both the direction and
+precision of the estimate.
+
+A blank marker does not show that two moderator levels are equivalent. To
+evaluate a difference between levels, use the relevant contrast table
+rather than comparing the two significance markers.
+
+#### Visualizing conditional effects
+
+`plot_moderation_curve()` displays a conditional indirect effect, an
+individual path coefficient, or a total effect across the observed range
+of a continuous moderator:
+
+```{r interpret-moderation-curves, eval=FALSE}
+plot_moderation_curve(
+  result5,
+  "indirect_effect_1_2"
+)
+
+plot_moderation_curve(
+  result5,
+  "b_1_2"
+)
+
+plot_moderation_curve(
+  result5,
+  "total_effect"
+)
+```
+
+The first call uses a conditional-effect label from the moderation output.
+The second uses an individual model-path label. The third displays the
+conditional total effect. The curve shows the estimated effect over
+\(W\), the confidence band shows its uncertainty, and the zero reference
+line indicates where the interval changes from including to excluding
+zero.
+
+Available curve labels can be checked before plotting:
+
+```{r extract-result-example-2, eval=FALSE}
+names(result5$moderation)
+
+unique(result5$moderation$theta_curve$Path)
+unique(result5$moderation$path_curve$Path)
+```
+
+When `ci_method = "both"`, the Monte Carlo and bootstrap moderation results
+are stored separately. Select the desired branch before accessing its
+curve data:
+
+```{r extract-both-moderation-results, eval=FALSE}
+result_both$moderation$mc$theta_curve
+result_both$moderation$boot$theta_curve
+```
+
+### What to report
+
+The exact reporting format depends on the research question, but a
+reproducible summary should identify:
+
+1. the selected model form and the order of the mediators;
+2. the missing-data method and confidence-interval method;
+3. the number of Monte Carlo draws or bootstrap samples;
+4. model-fit information when it is informative for the fitted model;
+5. the direct, specific indirect, total indirect, and total effects, with
+   confidence intervals;
+6. whether the reported estimates are standardized or unstandardized; and
+7. for moderated models, the moderator, the paths in `MP`, their
+   interaction estimates, and the relevant conditional effects or
+   contrasts.
+
+For every indirect-effect label, use the printed key or `printGM()` to
+verify the exact mediator route before reporting it.
+
+## Further model details
+
+This tutorial focuses on constructing and running `wsMed()` calls. The
+model-generation vignettes provide the corresponding equations,
+parameter-label conventions, and indirect-effect definitions:
+
+- `GenerateModelP()` for parallel models;
+- `GenerateModelCN()` for chained models;
+- `GenerateModelCP()` for chained--parallel models;
+- `GenerateModelPC()` for parallel--chained models; and
+- `GenerateModelCustom()` for user-defined models.
+
+These vignettes are most useful when users need to inspect how a selected
+structure is translated into `lavaan` syntax or determine the label of a
+path supplied through `MP`.
+
+## Summary
+
+A `wsMed()` analysis can be completed in six steps:
+
+1. Supply matched mediator and outcome variables for the two conditions.
+2. Select a predefined model with `form`, or use `form = "UD"` together
+   with `paths`.
+3. Choose `Na`, `ci_method`, and whether standardized effects are required.
+4. Add moderators or covariates when they are part of the analysis.
+5. Print the fitted object and inspect the generated model.
+6. Read the shared output first, then interpret any additional conditional
+   results for a moderated model.
+
+The same basic call is therefore used across simple, user-defined,
+missing-data, moderated, and covariate-adjusted analyses. Only the arguments
+needed for the intended analysis have to be added or changed. The returned
+object can be read through `print()`, connected to the generated model with
+`printGM()`, and accessed directly for further analysis or reporting.
