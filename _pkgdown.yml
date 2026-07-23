@@ -22,8 +22,8 @@ navbar:
     articles:
       text: "Tutorials"
       menu:
-        - text: "Introduction to wsMed"
-          href: articles/wsMed.html
+        - text: "Using wsMed: A step-by-step tutorial"
+          href: articles/WsMed.html
         - text: "Using printGM() to Generate SEM Models"
           href: articles/printGM.html
         - text: "Parallel Mediation (P)"
@@ -36,6 +36,8 @@ navbar:
           href: articles/GenerateModelPC.html
         - text: "Comparison: MEMORE 3.0 vs wsMed"
           href: articles/MEMORE_vs_wsMed.html
+        - text: "User-defined mediation models"
+          href: articles/GenerateModelCustom.html
     news:
       text: "Changelog"
       href: news/index.html
@@ -58,6 +60,7 @@ reference:
       - GenerateModelCN
       - GenerateModelCP
       - GenerateModelPC
+      - GenerateModelCustom
   - title: "Missing Data and Imputation"
     desc: "Functions to handle missing data with multiple imputation"
     contents:
