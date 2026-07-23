@@ -23,6 +23,8 @@ Functions for generating SEM syntax for different mediation structures
   : Generate Combined Parallel and Chained Mediation Model
 - [`GenerateModelPC()`](https://yangzhen1999.github.io/wsMed/reference/GenerateModelPC.md)
   : Generate Parallel and Chained Mediation Model
+- [`GenerateModelCustom()`](https://yangzhen1999.github.io/wsMed/reference/GenerateModelCustom.md)
+  : Generate a User-Defined Within-Subject Mediation Model
 
 ## Missing Data and Imputation
 

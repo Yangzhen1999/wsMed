@@ -9,6 +9,7 @@ The `WsMed()` function returns a list containing `sem_model`.
 can automatically extract and format the model equations.
 
 ``` r
+
 library(wsMed)
 result1 <- wsMed(
   data = example_data,
@@ -54,6 +55,7 @@ model syntax using GenerateModelPC() or other GenerateModel\*()
 functions.
 
 ``` r
+
 # Load necessary packages
 library(wsMed)
 # Load example data

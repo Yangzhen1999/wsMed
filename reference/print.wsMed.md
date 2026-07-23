@@ -99,6 +99,7 @@ Key features include:
 ## Examples
 
 ``` r
+
 # Perform within-subject mediation analysis
 data("example_data", package = "wsMed")
 result1 <- wsMed(
@@ -227,7 +228,7 @@ print(result1)
 #> |Intercept |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
 #> |:---------|:-----|--------:|-----:|---------:|----------:|
 #> |Ydiff~1   |cp    |    0.016| 0.016|    -0.015|      0.048|
-#> |M1diff~1  |a1    |   -0.027| 0.018|    -0.061|      0.007|
+#> |M1diff~1  |a1    |   -0.027| 0.018|    -0.062|      0.007|
 #> |M2diff~1  |a2    |    0.014| 0.018|    -0.021|      0.049|
 #> |M1avg~1   |      |   -0.000| 0.019|    -0.036|      0.036|
 #> |M2avg~1   |      |    0.000| 0.020|    -0.040|      0.040|

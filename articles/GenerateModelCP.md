@@ -14,23 +14,32 @@ the structure of the generated model.
 
 ## 1. Model Description
 
-### 1.1 Regression for $Y_{\text{diff}}$ and $M_{\text{diff}}$
+### 1.1 Regression for $`Y_{\text{diff}}`$ and $`M_{\text{diff}}`$
 
-For a single chained mediator $M_{1}$ and $N$ parallel mediators
-$M_{2},M_{3},\ldots,M_{N + 1}$, the model is defined as:
+For a single chained mediator $`M_1`$ and $`N`$ parallel mediators
+$`M_2, M_3, \dots, M_{N+1}`$, the model is defined as:
 
-1.  **Outcome Difference Model ($Y_{\text{diff}}$):**
-    $$Y_{\text{diff}} = cp + b_{1}M_{1\text{diff}} + \sum\limits_{i = 2}^{N + 1}\left( b_{i}M_{i\text{diff}} + d_{i}M_{i\text{avg}} \right) + d_{1}M_{1\text{avg}} + e$$
+1.  **Outcome Difference Model ($`Y_{\text{diff}}`$):**
+    ``` math
+    Y_{\text{diff}} = cp + b_1 M_{1\text{diff}} + \sum_{i=2}^{N+1} \left( b_i M_{i\text{diff}} + d_i M_{i\text{avg}} \right) + d_1 M_{1\text{avg}} + e
+    ```
 
-2.  **Mediator Difference Model ($M_{i\text{diff}}$):** For the chained
-    mediator ($M_{1}$): $$M_{1\text{diff}} = a_{1} + \epsilon_{1}$$ For
-    parallel mediators ($M_{2},\ldots,M_{N + 1}$):
-    $$M_{i\text{diff}} = a_{i} + b_{1i}M_{1\text{diff}} + d_{1i}M_{1\text{avg}} + \epsilon_{i}$$
+2.  **Mediator Difference Model ($`M_{i\text{diff}}`$):** For the
+    chained mediator ($`M_1`$):
+    ``` math
+      M_{1\text{diff}} = a_1 + \epsilon_1
+      
+    ```
+    For parallel mediators ($`M_2, \dots, M_{N+1}`$):
+    ``` math
+      M_{i\text{diff}} = a_i + b_{1i} M_{1\text{diff}} + d_{1i} M_{1\text{avg}} + \epsilon_i
+      
+    ```
 
-Where: - $cp$: Direct effect of the independent variable. -
-$b_{1},b_{i}$: Effects of the chained and parallel mediators. -
-$d_{1},d_{i},d_{1i}$: Moderating effects of mediator averages. -
-$\epsilon_{i}$: Residuals.
+Where: - $`cp`$: Direct effect of the independent variable. -
+$`b_1, b_i`$: Effects of the chained and parallel mediators. -
+$`d_1, d_i, d_{1i}`$: Moderating effects of mediator averages. -
+$`\epsilon_i`$: Residuals.
 
 ------------------------------------------------------------------------
 
@@ -39,26 +48,39 @@ $\epsilon_{i}$: Residuals.
 For each mediator, the indirect effects are calculated as:
 
 1.  **Single-Mediator Effects:** For the chained mediator:
-    $$\text{indirect}_{1} = a_{1} \cdot b_{1}$$ For the parallel
-    mediators ($M_{2},\ldots,M_{N + 1}$):
-    $$\text{indirect}_{i} = a_{i} \cdot b_{i}$$
+    ``` math
+      \text{indirect}_1 = a_1 \cdot b_1
+      
+    ```
+    For the parallel mediators ($`M_2, \dots, M_{N+1}`$):
+    ``` math
+      \text{indirect}_i = a_i \cdot b_i
+      
+    ```
 
 2.  **Chained Path Effects:** For paths from the chained mediator
     through the parallel mediators:
-    $$\text{indirect}_{1i} = a_{1} \cdot b_{1i} \cdot b_{i}$$
+    ``` math
+    \text{indirect}_{1i} = a_1 \cdot b_{1i} \cdot b_i
+    ```
 
 3.  **Total Indirect Effect:** The total indirect effect is the sum of
     all individual indirect effects:
-    $$\text{total\_indirect} = \text{indirect}_{1} + \sum\limits_{i = 2}^{N + 1}\left( \text{indirect}_{i} + \text{indirect}_{1i} \right)$$
+    ``` math
+    \text{total_indirect} = \text{indirect}_1 + \sum_{i=2}^{N+1} \left( \text{indirect}_i + \text{indirect}_{1i} \right)
+    ```
 
 ------------------------------------------------------------------------
 
 ## 3. Total Effect
 
 The total effect combines the direct effect and the total indirect
-effect: $$\text{total\_effect} = cp + \text{total\_indirect}$$
+effect:
+``` math
+\text{total_effect} = cp + \text{total_indirect}
+```
 
-Where $cp$ is the direct effect.
+Where $`cp`$ is the direct effect.
 
 ------------------------------------------------------------------------
 
@@ -66,43 +88,75 @@ Where $cp$ is the direct effect.
 
 When comparing the strengths of indirect effects, the contrast between
 two effects is calculated as:
-$$CI_{\text{path}_{1}\text{vs}\text{path}_{2}} = \text{indirect}_{\text{path}_{1}} - \text{indirect}_{\text{path}_{2}}$$
+``` math
+CI_{\text{path}_1\text{vs}\text{path}_2} = \text{indirect}_{\text{path}_1} - \text{indirect}_{\text{path}_2}
+```
 
-### 4.1 Example: Three Mediators ($M_{1},M_{2},M_{3}$)
+### 4.1 Example: Three Mediators ($`M_1, M_2, M_3`$)
 
 1.  **Indirect Effects:**
 
-    $$\text{indirect}_{1} = a_{1} \cdot b_{1}$$
+    ``` math
+    \text{indirect}_1 = a_1 \cdot b_1
+    ```
 
-    $$\text{indirect}_{2} = a_{2} \cdot b_{2}$$
+    ``` math
+    \text{indirect}_2 = a_2 \cdot b_2
+    ```
 
-    $$\text{indirect}_{3} = a_{3} \cdot b_{3}$$
+    ``` math
+    \text{indirect}_3 = a_3 \cdot b_3
+    ```
 
-    $$\text{indirect}_{12} = a_{1} \cdot b_{12} \cdot b_{2}$$
+    ``` math
+    \text{indirect}_{12} = a_1 \cdot b_{12} \cdot b_2
+    ```
 
-    $$\text{indirect}_{13} = a_{1} \cdot b_{13} \cdot b_{3}$$
+    ``` math
+    \text{indirect}_{13} = a_1 \cdot b_{13} \cdot b_3
+    ```
 
 2.  **Comparisons:**
 
-    $$CI_{1\text{vs}2} = \text{indirect}_{1} - \text{indirect}_{2}$$
+    ``` math
+    CI_{1\text{vs}2} = \text{indirect}_1 - \text{indirect}_2
+    ```
 
-    $$CI_{1\text{vs}3} = \text{indirect}_{1} - \text{indirect}_{3}$$
+    ``` math
+    CI_{1\text{vs}3} = \text{indirect}_1 - \text{indirect}_3
+    ```
 
-    $$CI_{1\text{vs}12} = \text{indirect}_{1} - \text{indirect}_{12}$$
+    ``` math
+    CI_{1\text{vs}12} = \text{indirect}_1 - \text{indirect}_{12}
+    ```
 
-    $$CI_{1\text{vs}13} = \text{indirect}_{1} - \text{indirect}_{13}$$
+    ``` math
+    CI_{1\text{vs}13} = \text{indirect}_1 - \text{indirect}_{13}
+    ```
 
-    $$CI_{2\text{vs}3} = \text{indirect}_{2} - \text{indirect}_{3}$$
+    ``` math
+    CI_{2\text{vs}3} = \text{indirect}_2 - \text{indirect}_3
+    ```
 
-    $$CI_{2\text{vs}12} = \text{indirect}_{2} - \text{indirect}_{12}$$
+    ``` math
+    CI_{2\text{vs}12} = \text{indirect}_2 - \text{indirect}_{12}
+    ```
 
-    $$CI_{2\text{vs}13} = \text{indirect}_{2} - \text{indirect}_{13}$$
+    ``` math
+    CI_{2\text{vs}13} = \text{indirect}_2 - \text{indirect}_{13}
+    ```
 
-    $$CI_{3\text{vs}12} = \text{indirect}_{3} - \text{indirect}_{12}$$
+    ``` math
+    CI_{3\text{vs}12} = \text{indirect}_3 - \text{indirect}_{12}
+    ```
 
-    $$CI_{3\text{vs}13} = \text{indirect}_{3} - \text{indirect}_{13}$$
+    ``` math
+    CI_{3\text{vs}13} = \text{indirect}_3 - \text{indirect}_{13}
+    ```
 
-    $$CI_{12\text{vs}13} = \text{indirect}_{12} - \text{indirect}_{13}$$
+    ``` math
+    CI_{12\text{vs}13} = \text{indirect}_{12} - \text{indirect}_{13}
+    ```
 
 ------------------------------------------------------------------------
 
@@ -110,43 +164,67 @@ $$CI_{\text{path}_{1}\text{vs}\text{path}_{2}} = \text{indirect}_{\text{path}_{1
 
 ### Definitions
 
-1.  **C2-Measurement Coefficient ($X1_{b,i}$):**
-    $$X1_{b,i} = b_{i} + d_{i}$$
+1.  **C2-Measurement Coefficient ($`X1_{b,i}`$):**
+    ``` math
+    X1_{b,i} = b_i + d_i
+    ```
 
-2.  **C1-Measurement Coefficient ($X0_{b,i}$):**
-    $$X0_{b,i} = X1_{b,i} - d_{i}$$
+2.  **C1-Measurement Coefficient ($`X0_{b,i}`$):**
+    ``` math
+    X0_{b,i} = X1_{b,i} - d_i
+    ```
 
-### 5.1 Example: Three Mediators ($M_{1},M_{2},M_{3}$)
+### 5.1 Example: Three Mediators ($`M_1, M_2, M_3`$)
 
-1.  **Mediator $M_{1}$:**
+1.  **Mediator $`M_1`$:**
 
-    $$X1_{b,1} = b_{1} + d_{1}$$
+    ``` math
+    X1_{b,1} = b_1 + d_1
+    ```
 
-    $$X0_{b,1} = X1_{b,1} - d_{1}$$
+    ``` math
+    X0_{b,1} = X1_{b,1} - d_1
+    ```
 
-2.  **Mediator $M_{2}$:**
+2.  **Mediator $`M_2`$:**
 
-    $$X1_{b,2} = b_{2} + d_{2}$$
+    ``` math
+    X1_{b,2} = b_2 + d_2
+    ```
 
-    $$X0_{b,2} = X1_{b,2} - d_{2}$$
+    ``` math
+    X0_{b,2} = X1_{b,2} - d_2
+    ```
 
-3.  **Mediator $M_{3}$:**
+3.  **Mediator $`M_3`$:**
 
-    $$X1_{b,3} = b_{3} + d_{3}$$
+    ``` math
+    X1_{b,3} = b_3 + d_3
+    ```
 
-    $$X0_{b,3} = X1_{b,3} - d_{3}$$
+    ``` math
+    X0_{b,3} = X1_{b,3} - d_3
+    ```
 
-4.  **Chained Path ($\left. M_{1}\rightarrow M_{2} \right.$):**
+4.  **Chained Path ($`M_1 \to M_2`$):**
 
-    $$X1_{b,12} = b_{12} + d_{12}$$
+    ``` math
+    X1_{b,12} = b_{12} + d_{12}
+    ```
 
-    $$X0_{b,12} = X1_{b,12} - d_{12}$$
+    ``` math
+    X0_{b,12} = X1_{b,12} - d_{12}
+    ```
 
-5.  **Chained Path ($\left. M_{1}\rightarrow M_{3} \right.$):**
+5.  **Chained Path ($`M_1 \to M_3`$):**
 
-    $$X1_{b,13} = b_{13} + d_{13}$$
+    ``` math
+    X1_{b,13} = b_{13} + d_{13}
+    ```
 
-    $$X0_{b,13} = X1_{b,13} - d_{13}$$
+    ``` math
+    X0_{b,13} = X1_{b,13} - d_{13}
+    ```
 
 ------------------------------------------------------------------------
 
@@ -154,21 +232,49 @@ $$CI_{\text{path}_{1}\text{vs}\text{path}_{2}} = \text{indirect}_{\text{path}_{1
 
 This section summarizes all equations used in the model:
 
-$$Y_{\text{diff}} = cp + b_{1}M_{1\text{diff}} + \sum\limits_{i = 2}^{N + 1}\left( b_{i}M_{i\text{diff}} + d_{i}M_{i\text{avg}} \right) + d_{1}M_{1\text{avg}} + e$$
+``` math
+   Y_{\text{diff}} = cp + b_1 M_{1\text{diff}} + \sum_{i=2}^{N+1} \left( b_i M_{i\text{diff}} + d_i M_{i\text{avg}} \right) + d_1 M_{1\text{avg}} + e
+   
+```
 
-$$M_{1\text{diff}} = a_{1} + \epsilon_{1}$$
+``` math
+   M_{1\text{diff}} = a_1 + \epsilon_1
+   
+```
 
-$$M_{i\text{diff}} = a_{i} + b_{1i}M_{1\text{diff}} + d_{1i}M_{1\text{avg}} + \epsilon_{i}$$
+``` math
+   M_{i\text{diff}} = a_i + b_{1i} M_{1\text{diff}} + d_{1i} M_{1\text{avg}} + \epsilon_i
+   
+```
 
-$$\text{indirect}_{1} = a_{1} \cdot b_{1}$$
+``` math
+   \text{indirect}_1 = a_1 \cdot b_1
+   
+```
 
-$$\text{indirect}_{i} = a_{i} \cdot b_{i}$$
+``` math
+   \text{indirect}_i = a_i \cdot b_i
+   
+```
 
-$$\text{indirect}_{1i} = a_{1} \cdot b_{1i} \cdot b_{i}$$
+``` math
+   \text{indirect}_{1i} = a_1 \cdot b_{1i} \cdot b_i
+   
+```
 
-$$CI_{\text{path}_{1}\text{vs}\text{path}_{2}} = \text{indirect}_{\text{path}_{1}} - \text{indirect}_{\text{path}_{2}}$$$$X1_{b,i} = b_{i} + d_{i}$$
+``` math
+   CI_{\text{path}_1\text{vs}\text{path}_2} = \text{indirect}_{\text{path}_1} - \text{indirect}_{\text{path}_2}
+   
+```
+``` math
+   X1_{b,i} = b_i + d_i
+   
+```
 
-$$X0_{b,i} = X1_{b,i} - d_{i}$$
+``` math
+   X0_{b,i} = X1_{b,i} - d_i
+   
+```
 
 ------------------------------------------------------------------------
 

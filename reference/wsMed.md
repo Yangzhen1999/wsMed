@@ -21,7 +21,7 @@ wsMed(
   W = NULL,
   W_type = NULL,
   MP = NULL,
-  form = c("P", "CN", "CP", "PC"),
+  form = c("P", "CN", "CP", "PC", "UD"),
   Na = c("DE", "FIML", "MI"),
   alpha = 0.05,
   mi_args = list(),
@@ -34,7 +34,8 @@ wsMed(
   MCmethod = NULL,
   seed = 123,
   standardized = FALSE,
-  verbose = FALSE
+  verbose = FALSE,
+  paths = NULL
 )
 ```
 
@@ -80,7 +81,8 @@ wsMed(
 
 - form:
 
-  Model type: `"P"`, `"CN"`, `"CP"`, or `"PC"`.
+  Model type: `"P"`, `"CN"`, `"CP"`, `"PC"`, or `"UD"`. Use `"UD"` to
+  specify a user-defined mediation model.
 
 - Na:
 
@@ -152,6 +154,14 @@ wsMed(
 
   Logical; print progress messages.
 
+- paths:
+
+  A character vector defining directed paths when `form = "UD"`. Paths
+  are specified using mediator labels `M1`, `M2`, and so on, with `Y`
+  denoting the outcome. For example,
+  `c("M1 -> M3", "M3 -> Y", "M2 -> Y")`. Must be `NULL` for the
+  predefined model forms.
+
 ## Value
 
 An object of class `"wsMed"` with elements:
@@ -177,6 +187,10 @@ An object of class `"wsMed"` with elements:
 
   Analysis settings.
 
+- paths:
+
+  The user-defined paths when `form = "UD"`; otherwise `NULL`.
+
 - input_vars:
 
   Names of all user-supplied variables.
@@ -192,6 +206,8 @@ Model structures:
 - `"CP"`: chained then parallel
 
 - `"PC"`: parallel then chained
+
+- `"UD"`: user-defined mediation model
 
 Missing-data strategies:
 

@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>GenerateModelP • wsMed</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="GenerateModelP">
 </head>
 <body>
@@ -34,13 +34,14 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials">
-<li><a class="dropdown-item" href="../articles/WsMed.html">Introduction to wsMed</a></li>
+<li><a class="dropdown-item" href="../articles/WsMed.html">Using wsMed: A step-by-step tutorial</a></li>
     <li><a class="dropdown-item" href="../articles/printGM.html">Using printGM() to Generate SEM Models</a></li>
     <li><a class="dropdown-item" href="../articles/GenerateModelP.html">Parallel Mediation (P)</a></li>
     <li><a class="dropdown-item" href="../articles/GenerateModelCN.html">Chained Mediation (CN)</a></li>
     <li><a class="dropdown-item" href="../articles/GenerateModelCP.html">Combined Parallel and Chained (CP)</a></li>
     <li><a class="dropdown-item" href="../articles/GenerateModelPC.html">Parallel + Chained (PC)</a></li>
     <li><a class="dropdown-item" href="../articles/MEMORE_vs_wsMed.html">Comparison: MEMORE 3.0 vs wsMed</a></li>
+    <li><a class="dropdown-item" href="../articles/GenerateModelCustom.html">User-defined mediation models</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -63,7 +64,7 @@
       <h1>GenerateModelP</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/HEAD/vignettes/GenerateModelP.Rmd" class="external-link"><code>vignettes/GenerateModelP.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/custom-model/vignettes/GenerateModelP.Rmd" class="external-link"><code>vignettes/GenerateModelP.Rmd</code></a></small>
       <div class="d-none name"><code>GenerateModelP.Rmd</code></div>
     </div>
 
@@ -83,11 +84,11 @@ mathematical principles and the structure of the generated model.
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>Y</mi><mtext mathvariant="normal">diff</mtext></msub><annotation encoding="application/x-tex">Y_{\text{diff}}</annotation></semantics></math><a class="anchor" aria-label="anchor" href="#difference-model-for-y_textdiff"></a>
 </h3>
 <p>Taking the difference between the two conditions:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Y</mi><mtext mathvariant="normal">diff</mtext></msub><mo>=</mo><msub><mi>Y</mi><mn>2</mn></msub><mo>−</mo><msub><mi>Y</mi><mn>1</mn></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>b</mi><mn>20</mn></msub><mo>−</mo><msub><mi>b</mi><mn>10</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msub><mi>b</mi><mrow><mi>i</mi><mn>2</mn></mrow></msub><msub><mi>M</mi><mrow><mi>i</mi><mn>2</mn></mrow></msub><mo>−</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msub><mi>b</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub><msub><mi>M</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub><mo>+</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>e</mi><mn>2</mn></msub><mo>−</mo><msub><mi>e</mi><mn>1</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Y</mi><mtext mathvariant="normal">diff</mtext></msub><mo>=</mo><msub><mi>Y</mi><mn>2</mn></msub><mo>−</mo><msub><mi>Y</mi><mn>1</mn></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>b</mi><mn>20</mn></msub><mo>−</mo><msub><mi>b</mi><mn>10</mn></msub><mo stretchy="false" form="postfix">)</mo><mo>+</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msub><mi>b</mi><mrow><mi>i</mi><mn>2</mn></mrow></msub><msub><mi>M</mi><mrow><mi>i</mi><mn>2</mn></mrow></msub><mo>−</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msub><mi>b</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub><msub><mi>M</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub><mo>+</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>e</mi><mn>2</mn></msub><mo>−</mo><msub><mi>e</mi><mn>1</mn></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">
 Y_{\text{diff}} = Y_2 - Y_1 = (b_{20} - b_{10}) + \sum_{i=1}^N b_{i2} M_{i2} - \sum_{i=1}^N b_{i1} M_{i1} + (e_2 - e_1)
 </annotation></semantics></math></p>
 <p>Define: -
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><msub><mi>b</mi><mn>0</mn></msub><mo>=</mo><msub><mi>b</mi><mn>20</mn></msub><mo>−</mo><msub><mi>b</mi><mn>10</mn></msub></mrow><annotation encoding="application/x-tex">\Delta b_0 = b_{20} - b_{10}</annotation></semantics></math>:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><msub><mi>b</mi><mn>0</mn></msub><mo>=</mo><msub><mi>b</mi><mn>20</mn></msub><mo>−</mo><msub><mi>b</mi><mn>10</mn></msub></mrow><annotation encoding="application/x-tex">\Delta b_0 = b_{20} - b_{10}</annotation></semantics></math>:
 Difference in intercepts. -
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>e</mi><mo>=</mo><msub><mi>e</mi><mn>2</mn></msub><mo>−</mo><msub><mi>e</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">e = e_2 - e_1</annotation></semantics></math>:
 Difference in residuals.</p>
@@ -109,7 +110,7 @@ M_{\text{avg},i} = \frac{M_{i1} + M_{i2}}{2}
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>M</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>M</mi><mrow><mtext mathvariant="normal">avg</mtext><mo>,</mo><mi>i</mi></mrow></msub><mo>−</mo><mfrac><msub><mi>M</mi><mrow><mtext mathvariant="normal">diff</mtext><mo>,</mo><mi>i</mi></mrow></msub><mn>2</mn></mfrac></mrow><annotation encoding="application/x-tex">M_{i1} = M_{\text{avg},i} - \frac{M_{\text{diff},i}}{2}</annotation></semantics></math>
 into the equation:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Y</mi><mtext mathvariant="normal">diff</mtext></msub><mo>=</mo><mi>Δ</mi><msub><mi>b</mi><mn>0</mn></msub><mo>+</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><msub><mi>b</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>b</mi><mrow><mi>i</mi><mn>2</mn></mrow></msub></mrow><mn>2</mn></mfrac><mo>⋅</mo><msub><mi>M</mi><mrow><mtext mathvariant="normal">diff</mtext><mo>,</mo><mi>i</mi></mrow></msub><mo>+</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>b</mi><mrow><mi>i</mi><mn>2</mn></mrow></msub><mo>−</mo><msub><mi>b</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>⋅</mo><msub><mi>M</mi><mrow><mtext mathvariant="normal">avg</mtext><mo>,</mo><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>e</mi></mrow><annotation encoding="application/x-tex">
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Y</mi><mtext mathvariant="normal">diff</mtext></msub><mo>=</mo><mi mathvariant="normal">Δ</mi><msub><mi>b</mi><mn>0</mn></msub><mo>+</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><msub><mi>b</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>b</mi><mrow><mi>i</mi><mn>2</mn></mrow></msub></mrow><mn>2</mn></mfrac><mo>⋅</mo><msub><mi>M</mi><mrow><mtext mathvariant="normal">diff</mtext><mo>,</mo><mi>i</mi></mrow></msub><mo>+</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>b</mi><mrow><mi>i</mi><mn>2</mn></mrow></msub><mo>−</mo><msub><mi>b</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>⋅</mo><msub><mi>M</mi><mrow><mtext mathvariant="normal">avg</mtext><mo>,</mo><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>e</mi></mrow><annotation encoding="application/x-tex">
 Y_{\text{diff}} = \Delta b_0 + \sum_{i=1}^N \left( \frac{b_{i1} + b_{i2}}{2} \cdot M_{\text{diff},i} + (b_{i2} - b_{i1}) \cdot M_{\text{avg},i} \right) + e
 </annotation></semantics></math></p>
 <p>Define: -
@@ -122,7 +123,7 @@ Difference in the effect of the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>-th
 mediator.</p>
 <p>The final equation becomes:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Y</mi><mtext mathvariant="normal">diff</mtext></msub><mo>=</mo><mi>Δ</mi><msub><mi>b</mi><mn>0</mn></msub><mo>+</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>b</mi><mi>i</mi></msub><msub><mi>M</mi><mrow><mtext mathvariant="normal">diff</mtext><mo>,</mo><mi>i</mi></mrow></msub><mo>+</mo><msub><mi>d</mi><mi>i</mi></msub><msub><mi>M</mi><mrow><mtext mathvariant="normal">avg</mtext><mo>,</mo><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>e</mi></mrow><annotation encoding="application/x-tex">
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Y</mi><mtext mathvariant="normal">diff</mtext></msub><mo>=</mo><mi mathvariant="normal">Δ</mi><msub><mi>b</mi><mn>0</mn></msub><mo>+</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>b</mi><mi>i</mi></msub><msub><mi>M</mi><mrow><mtext mathvariant="normal">diff</mtext><mo>,</mo><mi>i</mi></mrow></msub><mo>+</mo><msub><mi>d</mi><mi>i</mi></msub><msub><mi>M</mi><mrow><mtext mathvariant="normal">avg</mtext><mo>,</mo><mi>i</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>e</mi></mrow><annotation encoding="application/x-tex">
 Y_{\text{diff}} = \Delta b_0 + \sum_{i=1}^N \left( b_i M_{\text{diff},i} + d_i M_{\text{avg},i} \right) + e
 </annotation></semantics></math></p>
 <hr>
@@ -284,7 +285,7 @@ and
 <h3 id="difference-model-with-two-mediators">5.1 Difference Model with Two Mediators<a class="anchor" aria-label="anchor" href="#difference-model-with-two-mediators"></a>
 </h3>
 <p>From the difference model:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Y</mi><mtext mathvariant="normal">diff</mtext></msub><mo>=</mo><mi>Δ</mi><msub><mi>b</mi><mn>0</mn></msub><mo>+</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><msub><mi>b</mi><mn>11</mn></msub><mo>+</mo><msub><mi>b</mi><mn>21</mn></msub></mrow><mn>2</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><msub><mi>M</mi><mtext mathvariant="normal">diff</mtext></msub><mo>+</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>b</mi><mn>21</mn></msub><mo>−</mo><msub><mi>b</mi><mn>11</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><msub><mi>M</mi><mtext mathvariant="normal">avg</mtext></msub><mo>+</mo><mi>e</mi></mrow><annotation encoding="application/x-tex">
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Y</mi><mtext mathvariant="normal">diff</mtext></msub><mo>=</mo><mi mathvariant="normal">Δ</mi><msub><mi>b</mi><mn>0</mn></msub><mo>+</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><msub><mi>b</mi><mn>11</mn></msub><mo>+</mo><msub><mi>b</mi><mn>21</mn></msub></mrow><mn>2</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><msub><mi>M</mi><mtext mathvariant="normal">diff</mtext></msub><mo>+</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>b</mi><mn>21</mn></msub><mo>−</mo><msub><mi>b</mi><mn>11</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><msub><mi>M</mi><mtext mathvariant="normal">avg</mtext></msub><mo>+</mo><mi>e</mi></mrow><annotation encoding="application/x-tex">
 Y_{\text{diff}} = \Delta b_0 + \left(\frac{b_{11} + b_{21}}{2}\right) M_{\text{diff}} + \left(b_{21} - b_{11}\right) M_{\text{avg}} + e
 </annotation></semantics></math></p>
 <p>Define: -
@@ -307,7 +308,7 @@ X1_{b,i} = b + d
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>b</mi><annotation encoding="application/x-tex">b</annotation></semantics></math>
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><mfrac><mrow><msub><mi>b</mi><mn>11</mn></msub><mo>+</mo><msub><mi>b</mi><mn>21</mn></msub></mrow><mn>2</mn></mfrac><mo>+</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>b</mi><mn>21</mn></msub><mo>−</mo><msub><mi>b</mi><mn>11</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>b</mi><mn>21</mn></msub></mrow><annotation encoding="application/x-tex">
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><mfrac><mrow><msub><mi>b</mi><mn>11</mn></msub><mo>+</mo><msub><mi>b</mi><mn>21</mn></msub></mrow><mn>2</mn></mfrac><mo>+</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>b</mi><mn>21</mn></msub><mo>−</mo><msub><mi>b</mi><mn>11</mn></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>b</mi><mn>21</mn></msub></mrow><annotation encoding="application/x-tex">
 X1_{b,i} = \frac{b_{11} + b_{21}}{2} + (b_{21} - b_{11}) = b_{21}
 </annotation></semantics></math></p>
 <p>Thus,
@@ -330,7 +331,7 @@ X0_{b,i} = X1_{b,i} - d
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><msub><mi>b</mi><mn>21</mn></msub></mrow><annotation encoding="application/x-tex">X1_{b,i} = b_{21}</annotation></semantics></math>
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo>=</mo><msub><mi>b</mi><mn>21</mn></msub><mo>−</mo><msub><mi>b</mi><mn>11</mn></msub></mrow><annotation encoding="application/x-tex">d = b_{21} - b_{11}</annotation></semantics></math>:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>0</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><msub><mi>b</mi><mn>21</mn></msub><mo>−</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>b</mi><mn>21</mn></msub><mo>−</mo><msub><mi>b</mi><mn>11</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>b</mi><mn>11</mn></msub></mrow><annotation encoding="application/x-tex">
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>0</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><msub><mi>b</mi><mn>21</mn></msub><mo>−</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>b</mi><mn>21</mn></msub><mo>−</mo><msub><mi>b</mi><mn>11</mn></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>b</mi><mn>11</mn></msub></mrow><annotation encoding="application/x-tex">
 X0_{b,i} = b_{21} - (b_{21} - b_{11}) = b_{11}
 </annotation></semantics></math></p>
 <p>Thus,
@@ -409,7 +410,7 @@ quantify the effects in specific conditions.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

@@ -12,6 +12,7 @@ You can install the development version of wsMed from
 [GitHub](https://github.com/) with:
 
 ``` r
+
 # install.packages("pak")
 pak::pak("Yangzhen1999/wsMed")
 ```
@@ -20,6 +21,7 @@ Alternatively, if you prefer using devtools, you can install wsMed as
 follows:
 
 ``` r
+
 # install.packages("devtools")
 devtools::install_github("Yangzhen1999/wsMed")
 ```
@@ -29,6 +31,7 @@ devtools::install_github("Yangzhen1999/wsMed")
 This is a basic example which shows you how to solve a common problem:
 
 ``` r
+
 library(wsMed)
 
 # Load example data

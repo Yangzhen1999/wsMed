@@ -10,11 +10,11 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/Yangzhen1999/wsMed/blob/master/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/Yangzhen1999/wsMed/blob/feature/custom-model/DESCRIPTION)
 
 Yang W, Cheung S (2025). *wsMed: Within-Subject Mediation Analysis Using
 Structural Equation Modeling*.
-[doi:10.32614/CRAN.package.wsMed](https://doi.org/10.32614/CRAN.package.wsMed),
+[doi:10.32614/CRAN.package.wsMed](https://doi.org/10.32614/CRAN.package.wsMed).
 R package version 1.0.2, <https://CRAN.R-project.org/package=wsMed>.
 
     @Manual{,

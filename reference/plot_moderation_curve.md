@@ -1,35 +1,7 @@
 # Plot moderation curves with Johnson-Neyman highlights
 
-`plot_moderation_curve()` visualises how an indirect effect
-(`theta_curve`) or a path coefficient (`path_curve`) varies along a
-continuous moderator *W*.
-
-The routine
-
-- extracts the requested record (`path_name`) from `result$moderation`,
-  preferring `theta_curve` when it is available in both curves;
-
-- draws the conditional effect (`Estimate`) against the raw moderator
-  grid (`W_raw`);
-
-- overlays the Monte-Carlo confidence band (`CI.LL`, `CI.UL`) and finds
-  every Johnson–Neyman segment whose 95 % CI excludes zero
-  (`CI.LL * CI.UL > 0`);
-
-- shades these significant regions and annotates each with its start /
-  end percentiles (for example, `"sig 12.5%-38.3%"`).
-
-Visual elements
-
-- **Red ribbon** – overall 95 % confidence band (`ns_fill`);
-
-- **Green ribbon** – significant Johnson–Neyman intervals (`sig_fill`);
-
-- **Solid line** – point estimate;
-
-- **Dashed h-line** – zero reference;
-
-- **Dashed v-lines** – J–N bounds.
+\`plot_moderation_curve()\` plots how a conditional indirect effect or
+path coefficient changes across values of a continuous moderator.
 
 ## Usage
 
@@ -52,36 +24,87 @@ plot_moderation_curve(
 
 - result:
 
-  A [`wsMed()`](https://yangzhen1999.github.io/wsMed/reference/wsMed.md)
-  result that contains a `$moderation` element.
+  A result object returned by \`wsMed()\` containing a \`moderation\`
+  component.
 
 - path_name:
 
-  Exact name of the path to plot (e.g. `"indirect_1_2"` or `"b_1_2"`).
-  When the name exists in both curves, `theta_curve` is used.
+  A single character string giving the exact name of the conditional
+  effect to plot, such as \`"indirect_1_2"\` or \`"b_1_2"\`. When the
+  name occurs in both \`theta_curve\` and \`path_curve\`,
+  \`theta_curve\` is used.
 
 - title:
 
-  Optional plot title (default
-  `sprintf("Effect Curve: (%s)", path_name)`).
+  An optional character string giving the plot title. If \`NULL\`, a
+  title is automatically constructed from \`path_name\`.
 
-- x_label, y_label:
+- x_label:
 
-  Axis labels. Defaults are `"Moderator (W)"` and `"Estimate"`.
+  A character string giving the horizontal-axis label. The default is
+  \`"Moderator (W)"\`.
 
-- ns_fill, sig_fill:
+- y_label:
 
-  Fill colours for the confidence band and the significant regions.
+  A character string giving the vertical-axis label. The default is
+  \`"Estimate"\`.
 
-- alpha_ci, alpha_sig:
+- ns_fill:
 
-  Alpha values for the two ribbons.
+  A colour specification for the complete confidence band.
+
+- sig_fill:
+
+  A colour specification for the highlighted significant regions.
+
+- alpha_ci:
+
+  A numeric value between zero and one controlling the transparency of
+  the complete confidence band.
+
+- alpha_sig:
+
+  A numeric value between zero and one controlling the transparency of
+  the highlighted significant regions.
 
 - base_size:
 
-  Base font size passed to
-  [`ggplot2::theme_minimal()`](https://ggplot2.tidyverse.org/reference/ggtheme.html).
+  A positive numeric value specifying the base font size passed to
+  \`ggplot2::theme_minimal()\`.
 
 ## Value
 
-A `ggplot` object (add layers or save with `ggsave()`).
+A \`ggplot\` object. Additional ggplot2 layers can be added to the
+returned object, and the plot can be saved using \`ggplot2::ggsave()\`.
+
+## Details
+
+The function searches the moderation results for the effect specified by
+\`path_name\`. It first searches \`result\$moderation\$theta_curve\`,
+which contains conditional indirect effects, and then
+\`result\$moderation\$path_curve\`, which contains conditional path
+coefficients. If the same name appears in both components,
+\`theta_curve\` is used.
+
+The selected records are ordered by the raw moderator values in
+\`W_raw\`. The function then plots the conditional estimates in
+\`Estimate\` and the confidence band defined by \`CI.LL\` and \`CI.UL\`.
+
+A moderator value is treated as statistically significant when the lower
+and upper confidence limits have the same sign. Equivalently, the
+product of \`CI.LL\` and \`CI.UL\` must be greater than zero.
+Consecutive significant moderator values are combined into intervals and
+highlighted as Johnson-Neyman regions.
+
+The red ribbon shows the complete confidence band, whereas the green
+ribbon highlights regions in which the confidence interval excludes
+zero. The solid line represents the conditional point estimate. The
+horizontal dashed line marks zero, and the vertical dashed lines mark
+the boundaries of the highlighted regions. Each highlighted region is
+annotated with the percentile range of the moderator values that it
+covers.
+
+The interval boundaries are identified from the moderator grid stored in
+the moderation results. They should therefore be interpreted as
+grid-based approximations to the Johnson-Neyman boundaries. A denser
+moderator grid produces more precise boundary locations.
