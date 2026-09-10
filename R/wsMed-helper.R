@@ -277,7 +277,7 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
                         alpha     = 0.05,
                         fixed.x   = FALSE,
                         verbose   = TRUE,
-                        run_mc    = TRUE) {
+                        run_mc    = TRUE, seed = NULL) {
   # 0) 解析缺失处理方式
   Na <- match.arg(Na)
   miss_opt <- if (Na == "DE") "listwise" else "fiml"
@@ -296,7 +296,7 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
   mc_out <- NULL
   if (run_mc) {
     if (verbose) message("  -- Monte-Carlo draws...")
-    mc_out <- semmcci::MC(lav = fit, R = R, alpha = alpha)
+    mc_out <- semmcci::MC(lav = fit, R = R, alpha = alpha, seed = seed)
   } else {
     if (verbose) message("  -- Monte-Carlo skipped (ci_method = 'bootstrap')")
   }
@@ -317,7 +317,7 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
                              MP          = NULL,
                              W_type      = c("categorical", "continuous", "none"),  ## ***
                              alpha       = 0.05,
-                             verbose     = FALSE) {
+                             verbose     = FALSE, point_estimates = NULL) {
 
   ## ---- 0. W & W_type 预处理 --------------------------------------------- ##
   # * 若没有 W，则强制 W_type = "none"
@@ -347,7 +347,7 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
   ## ---- B. 无调节（basic contrasts） --------------------------------------
   if (W_type == "none") {                                               ## ***
     dbg(". W_type = 'none' -> basic contrasts", verbose = verbose)
-    basic <- calc_basic_contrasts(theta_draws, ci_level = 1 - alpha)
+    basic <- calc_basic_contrasts(theta_draws, ci_level = 1 - alpha, point_estimates = point_estimates)
 
     return(list(
       type         = "none",
@@ -364,7 +364,8 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
       mc_result     = theta_draws,          ## 可直接传矩阵版本
       prepared_data = data,
       MP            = MP,
-      ci_level      = 1 - alpha
+      ci_level      = 1 - alpha,
+      point_estimates = point_estimates
     )
 
     return(list(
@@ -385,7 +386,8 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
     data        = data,
     MP          = MP,
     W_raw_name  = W[1],
-    ci_level    = 1 - alpha
+    ci_level    = 1 - alpha,
+    point_estimates = point_estimates
   )
 
   cont_out$type <- "continuous"

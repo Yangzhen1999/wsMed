@@ -12,7 +12,8 @@
   alpha = 0.05,
   fixed.x = FALSE,
   verbose = TRUE,
-  run_mc = TRUE
+  run_mc = TRUE,
+  seed = NULL
 )
 }
 \description{

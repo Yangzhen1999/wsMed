@@ -8,6 +8,21 @@
 - Corrected the `ci_method` documentation to include `"both"` and the existing
   `"mc"` default, including when `NULL` is supplied.
 
+## Unreleased: phase 1 standardization repairs
+
+- Standardized MC and bootstrap parameter tables now share component-based
+  interaction scaling and preserve 0/1 dummy coding, difference-score intercepts,
+  and scaled residual covariances. Invalid joint draws are counted and reported.
+- Conditional effects use fitted plug-in estimates, all mediation paths, and all
+  fitted moderator main effects. Continuous probes are evaluated exactly;
+  direct-path moderation and contrast signs are corrected.
+- MI forwards `fixed.x` to every fit and evaluates nonlinear effects after pooling
+  primitive coefficients. The MC seed is now forwarded.
+- Extended these repairs to sparse and reverse-order user-defined models (`UD`),
+  preserving the existing `paths` interface and case-insensitive choices.
+- Printing handles `ci_method = "both"` and identifies conditional outputs as
+  unstandardized. Standardized conditional curves remain outside this change.
+
 ## wsMed 1.0.2 (2025-12-06)
 ## wsMed 1.0.1 (2025-09-25)
 ## wsMed 1.0.0 (2025-09-19)

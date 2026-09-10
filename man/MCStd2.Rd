@@ -7,27 +7,29 @@
 MCStd2(mc, alpha = c(0.001, 0.01, 0.05))
 }
 \arguments{
-\item{mc}{A Monte Carlo result object of class \code{semmcci}, typically from \code{MC()} or \code{MCMI()}.}
+\item{mc}{A Monte Carlo result object of class `semmcci`, typically from `MC()` or `MCMI()`.}
 
-\item{alpha}{A numeric vector of significance levels (default: \code{c(0.001, 0.01, 0.05)}).}
+\item{alpha}{A numeric vector of significance levels (default: `c(0.001, 0.01, 0.05)`).}
 }
 \value{
 A data frame containing:
 \describe{
-\item{Parameter}{Parameter name}
-\item{Estimate}{Standardized point estimate}
-\item{SE}{Standard deviation of standardized samples}
-\item{R}{Number of Monte Carlo replications}
-\item{CI columns}{Multiple confidence intervals based on \code{alpha}}
+  \item{Parameter}{Parameter name}
+  \item{Estimate}{Standardized point estimate}
+  \item{SE}{Standard deviation of standardized samples}
+  \item{R}{Number of valid joint Monte Carlo replications}
+  \item{CI columns}{Multiple confidence intervals based on `alpha`}
 }
 }
 \description{
 Computes standardized estimates, standard errors, and confidence intervals
-based on Monte Carlo samples from a \code{semmcci} object. This function fully standardizes
+based on Monte Carlo samples from a `semmcci` object. This function fully standardizes
 both point estimates and sampling distributions (including intercepts).
 }
 \details{
-The function standardizes the sampling distribution using \code{StdLav2()} on each Monte Carlo draw,
+The function standardizes the sampling distribution using `StdLav2()` on each Monte Carlo draw,
 then summarizes the distribution into SEs and quantile-based confidence intervals.
+Invalid draws are excluded jointly and reported in the standardization_diagnostics
+attribute (requested, valid, invalid, indices and reasons).
 }
 \keyword{internal}

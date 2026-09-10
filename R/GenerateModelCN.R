@@ -112,7 +112,7 @@ GenerateModelCN <- function(prepared_data, MP = character(0)) {
     if (paste0("d", i) %in% MP)
       y_rhs <- c(y_rhs, add_mod_terms(paste0("^int_M", i, "avg_"), paste0("dw", i)))
   }
-  if ("cp" %in% MP && length(Wvars))
+  if (length(Wvars))
     y_rhs <- c(y_rhs, paste0("cpw_", Wvars, "*", Wvars))
   if (length(Wvars))
     y_rhs <- c(y_rhs, Wvars)  # 添加主效应 W
@@ -123,7 +123,7 @@ GenerateModelCN <- function(prepared_data, MP = character(0)) {
   regM <- character(nM)
   for (i in seq_len(nM)) {
     rhs <- c(paste0("a", i, "*1"))
-    if (paste0("a", i) %in% MP && length(Wvars))
+    if (length(Wvars))
       rhs <- c(rhs, paste0("aw", i, "_", Wvars, "*", Wvars))
 
     if (i > 1)

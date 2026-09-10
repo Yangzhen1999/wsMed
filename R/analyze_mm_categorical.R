@@ -34,14 +34,19 @@ analyze_mm_categorical <- function(mc_result, prepared_data,
                                    MP       = NULL,
                                    ci_level = 0.95,
                                    digits   = 8,
-                                   debug    = FALSE) {
+                                   debug    = FALSE,
+                                   point_estimates = NULL) {
 
   # ---- local message helper --------------------------------------------
   msg <- function(fmt, ...) if (debug) message(sprintf(fmt, ...))
 
   # ---- 0. Helper aliases ------------------------------------------------
   make_ci_names      <- .cat_make_ci_names
-  summarize_vec      <- .cat_summarize_vec
+  summarize_vec <- function(v) {
+    out <- .cat_summarize_vec(v[-1], ci_level, digits)
+    out$Estimate <- round(v[1], digits)
+    out
+  }
   add_sig            <- .cat_add_sig
   pack_df            <- .cat_pack_df
   get_indirect_paths <- .cat_get_indirect_paths
@@ -60,7 +65,7 @@ analyze_mm_categorical <- function(mc_result, prepared_data,
   }
 
   # ---- 1. Validate & basic objects -------------------------------------
-  theta <- as.matrix(mc_result)
+  theta <- .mm_evaluation_rows(mc_result, point_estimates)
   if (nrow(theta) == 0L) stop("Sampling matrix is empty.")
 
   Winfo <- attr(prepared_data, "W_info")
@@ -74,9 +79,7 @@ analyze_mm_categorical <- function(mc_result, prepared_data,
   # ---- 2. Parse paths ---------------------------------------------------
   pars_all  <- colnames(theta)
   paths_all <- get_indirect_paths(pars_all)
-  paths     <- if (length(MP))
-    Filter(function(p) any(p$coefs %in% MP), paths_all)
-  else paths_all
+  paths <- paths_all
 
   msg("indirect paths (all / filtered): %d / %d",
       length(paths_all), length(paths))
@@ -311,13 +314,13 @@ analyze_mm_categorical <- function(mc_result, prepared_data,
 #' @noRd
 .cat_apply_mod <- function(theta, prepared_data, base, group, MP, grp_var) {
   base_vec <- theta[, base, drop = TRUE]
-  if (length(MP) && base %in% MP) {
+  {
     prefix <- .cat_get_mod_prefix(base)
     mods   <- grep(paste0("^", prefix, "_W\\d+$"),
                    colnames(theta), value = TRUE)
     for (m in mods) {
       dm   <- sub(".*_(W\\d+)$", "\\1", m)  # e.g., W1
-      wval <- unique(prepared_data[[dm]][prepared_data[[grp_var]] == group])
+      wval <- unique(prepared_data[[dm]][!is.na(prepared_data[[grp_var]]) & prepared_data[[grp_var]] == group])
       stopifnot(length(wval) == 1)
       base_vec <- base_vec + theta[, m] * wval
     }

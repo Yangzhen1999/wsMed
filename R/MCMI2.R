@@ -31,6 +31,8 @@
 #' @param estimator A character string specifying the estimator for SEM fitting. Default is `"ML"` (Maximum Likelihood).
 #' @param se A character string specifying the type of standard errors to compute. Default is `"standard"`.
 #' @param missing A character string specifying the method for handling missing data in SEM fitting. Default is `"listwise"`.
+#' @param fixed.x Whether exogenous covariates are treated as fixed in every
+#'   imputation. Defaults to FALSE, consistently with wsMed().
 #'
 #' @return An object of class `semmcci` containing:
 #' - `call`: The matched function call.
@@ -77,7 +79,8 @@ MCMI2 <- function(sem_model,
                  seed = NULL,
                  estimator = "ML",
                  se = "standard",
-                 missing = "listwise") {
+                 missing = "listwise",
+                 fixed.x = FALSE) {
   stopifnot(
     is.character(sem_model),
     is.list(imputations) && all(sapply(imputations, is.data.frame))
@@ -89,7 +92,8 @@ MCMI2 <- function(sem_model,
       data = data,
       estimator = estimator,
       se = se,
-      missing = missing
+      missing = missing,
+      fixed.x = fixed.x
     )
   })
 
@@ -122,12 +126,9 @@ MCMI2 <- function(sem_model,
 
   thetahat <- ThetaHatWrapper(
     object = fits[[1]],
-    est = colMeans(
-      do.call(
-        what = "rbind",
-        args = lapply(fits, function(fit) fit@ParTable$est)
-      )
-    )
+    est = lavaan::lav_model_get_parameters(
+      lavaan::lav_model_set_parameters(fits[[1]]@Model, x = location),
+      type = "user", extra = TRUE)
   )
 
   thetahatstar <- MCDefWrapper(
@@ -142,6 +143,7 @@ MCMI2 <- function(sem_model,
     call = match.call(),
     args = list(
       lav = lav,
+      fixed.x = fixed.x,
       sem_model = sem_model,
       imputations = imputations,
       R = R,

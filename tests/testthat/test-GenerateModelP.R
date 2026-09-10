@@ -66,9 +66,9 @@ test_that("T3a: Continuous W with MP = b1", {
 
   # 如果 cp 不被调节则主效应保留，否则不应出现
   if (!"cp" %in% c("b1")) {
-    expect_true(grepl("\\+ W1", y_line))
+    expect_true(grepl("cpw_W1*W1", y_line, fixed = TRUE))
   } else {
-    expect_false(grepl("\\+ W1", y_line))
+    expect_true(grepl("cpw_W1*W1", y_line, fixed = TRUE))
   }
 
   # 如果 a1 未被调节，主效应应存在
@@ -97,6 +97,6 @@ test_that("T3c: Binary W with MP = a1", {
   expect_match(out, "M1diff ~ a1\\*1 \\+ aw1_W1\\*W1")
 
   y_line <- strsplit(out, "\n")[[1]][1]
-  expect_true(grepl("\\+ W1", y_line))  # W1 为主效应在 Ydiff 中
+  expect_true(grepl("cpw_W1*W1", y_line, fixed = TRUE))  # W1 为主效应在 Ydiff 中
 })
 

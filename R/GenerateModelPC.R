@@ -78,102 +78,6 @@ GenerateModelPC <- function(prepared_data, MP = character(0)) {
   chain_md <- grep("^M1diff$", colnames(prepared_data), value = TRUE)
   chain_ma <- grep("^M1avg$",  colnames(prepared_data), value = TRUE)
   all_md   <- sort(grep("^M\\d+diff$", colnames(prepared_data), value = TRUE))
-  all_ma   <- sort(grep("^M\\d+avg$",  colnames(prepared_data), value = TRUE))
-  par_md   <- setdiff(all_md, chain_md)
-  par_ma   <- setdiff(all_ma, chain_ma)
-  n_par    <- length(par_md)
-
-  between <- grep("^Cb\\d+(_\\d+)?$", colnames(prepared_data), value = TRUE)
-  within  <- grep("^Cw\\d+(diff|avg)$", colnames(prepared_data), value = TRUE)
-  controls<- c(between, within)
-  ctrl_rhs<- if (length(controls)) paste(controls, collapse = " + ") else NULL
-
-  Wvars <- grep("^W\\d+$", colnames(prepared_data), value = TRUE)
-  ints  <- grep("^int_", colnames(prepared_data), value = TRUE)
-
-  add_int <- function(pat_stub, coef_stub) {
-    hits <- grep(pat_stub, ints, value = TRUE)
-    if (!length(hits)) return(NULL)
-    wtag <- sub("^.*_(W\\d+)$", "\\1", hits)
-    paste0(coef_stub, "_", wtag, "*", hits)
-  }
-
-  ## ---------- Ydiff ----------
-  y_rhs <- c("cp*1", paste0("b1*", chain_md), paste0("d1*", chain_ma),
-             paste0("b", 2:(n_par+1), "*", par_md),
-             paste0("d", 2:(n_par+1), "*", par_ma))
-  if ("cp" %in% MP && length(Wvars))
-    y_rhs <- c(y_rhs, paste0("cpw_", Wvars, "*", Wvars))
-  if ("b1" %in% MP)
-    y_rhs <- c(y_rhs, add_int(paste0("^int_", chain_md, "_"), "bw1"))
-  if ("d1" %in% MP)
-    y_rhs <- c(y_rhs, add_int(paste0("^int_", chain_ma, "_"), "dw1"))
-  for (i in seq_len(n_par)) {
-    idx <- i + 1
-    if (paste0("b", idx) %in% MP)
-      y_rhs <- c(y_rhs, add_int(paste0("^int_", par_md[i], "_"), paste0("bw", idx)))
-    if (paste0("d", idx) %in% MP)
-      y_rhs <- c(y_rhs, add_int(paste0("^int_", par_ma[i], "_"), paste0("dw", idx)))
-  }
-  if (!is.null(ctrl_rhs)) y_rhs <- c(y_rhs, ctrl_rhs)
-  regY <- paste("Ydiff ~", paste(y_rhs, collapse = " + "))
-
-  ## ---------- 链首 parallel mediators ----------
-  regM_par <- sapply(seq_along(par_md), function(i){
-    idx <- i + 1
-    rhs <- c(paste0("a", idx, "*1"))
-    if (paste0("a", idx) %in% MP && length(Wvars))
-      rhs <- c(rhs, paste0("aw", idx, "_", Wvars, "*", Wvars))
-    if (!is.null(ctrl_rhs)) rhs <- c(rhs, ctrl_rhs)
-    paste(par_md[i], "~", paste(rhs, collapse = " + "))
-  })
-
-  ## ---------- M1diff （链尾）----------
-  rhs_chain <- c("a1*1")
-  if ("a1" %in% MP && length(Wvars))
-    rhs_chain <- c(rhs_chain, paste0("aw1_", Wvars, "*", Wvars))
-  for (i in seq_along(par_md)) {
-    idx <- i + 1
-    rhs_chain <- c(rhs_chain,
-                   paste0("b_", idx, "_1*", par_md[i]),
-                   paste0("d_", idx, "_1*", par_ma[i]))
-    if (paste0("b_", idx, "_1") %in% MP)
-      rhs_chain <- c(rhs_chain, add_int(paste0("^int_", par_md[i], "_"),
-                                        paste0("bw_", idx, "_1")))
-    if (paste0("d_", idx, "_1") %in% MP)
-      rhs_chain <- c(rhs_chain, add_int(paste0("^int_", par_ma[i], "_"),
-                                        paste0("dw_", idx, "_1")))
-  }
-  if (!is.null(ctrl_rhs)) rhs_chain <- c(rhs_chain, ctrl_rhs)
-  regM_chain <- paste(chain_md, "~", paste(rhs_chain, collapse = " + "))
-
-  ## ---------- 间接效应 ----------
-  ind_lines <- c("indirect_1 := a1 * b1")
-  ind_names <- "indirect_1"
-  for (i in seq_along(par_md)) {
-    idx <- i + 1
-    ind_lines <- c(ind_lines,
-                   paste0("indirect_", idx, " := a", idx, " * b", idx),
-                   paste0("indirect_", idx, "_1 := a", idx, " * b_", idx, "_1 * b1"))
-    ind_names <- c(ind_names,
-                   paste0("indirect_", idx),
-                   paste0("indirect_", idx, "_1"))
-  }
-  tot_ind <- paste("total_indirect :=", paste(ind_names, collapse = " + "))
-  tot_eff <- "total_effect := cp + total_indirect"
-
-  ## ---------- 汇总 ----------
-  paste(c(regY, regM_par, regM_chain, ind_lines, tot_ind, tot_eff),
-        collapse = "\n")
-}
-
-
-GenerateModelPC <- function(prepared_data, MP = character(0)) {
-
-  ## ---------- 变量 ----------
-  chain_md <- grep("^M1diff$", colnames(prepared_data), value = TRUE)
-  chain_ma <- grep("^M1avg$",  colnames(prepared_data), value = TRUE)
-  all_md   <- sort(grep("^M\\d+diff$", colnames(prepared_data), value = TRUE))
   all_ma   <- sort(grep("^M\\d+avg$", colnames(prepared_data), value = TRUE))
   par_md   <- setdiff(all_md, chain_md)
   par_ma   <- setdiff(all_ma, chain_ma)
@@ -201,7 +105,7 @@ GenerateModelPC <- function(prepared_data, MP = character(0)) {
   if ("cp" %in% MP && length(Wvars)) {
     y_rhs <- c(y_rhs, paste0("cpw_", Wvars, "*", Wvars))
   } else if (!("cp" %in% MP) && length(Wvars)) {
-    y_rhs <- c(y_rhs, Wvars)
+    y_rhs <- c(y_rhs, paste0("cpw_", Wvars, "*", Wvars))
   }
   if ("b1" %in% MP)
     y_rhs <- c(y_rhs, add_int(paste0("^int_", chain_md, "_"), "bw1"))
@@ -224,7 +128,7 @@ GenerateModelPC <- function(prepared_data, MP = character(0)) {
     if (paste0("a", idx) %in% MP && length(Wvars)) {
       rhs <- c(rhs, paste0("aw", idx, "_", Wvars, "*", Wvars))
     } else if (length(Wvars)) {
-      rhs <- c(rhs, Wvars)
+      rhs <- c(rhs, paste0("aw", idx, "_", Wvars, "*", Wvars))
     }
     if (!is.null(ctrl_rhs)) rhs <- c(rhs, ctrl_rhs)
     paste(par_md[i], "~", paste(rhs, collapse = " + "))
@@ -235,7 +139,7 @@ GenerateModelPC <- function(prepared_data, MP = character(0)) {
   if ("a1" %in% MP && length(Wvars)) {
     rhs_chain <- c(rhs_chain, paste0("aw1_", Wvars, "*", Wvars))
   } else if (length(Wvars)) {
-    rhs_chain <- c(rhs_chain, Wvars)
+    rhs_chain <- c(rhs_chain, paste0("aw1_", Wvars, "*", Wvars))
   }
   for (i in seq_along(par_md)) {
     idx <- i + 1

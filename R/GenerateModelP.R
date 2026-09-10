@@ -104,7 +104,7 @@ GenerateModelP <- function(prepared_data,
   if ("cp" %in% MP && length(W_vars))
     y_terms <- c(y_terms, paste0("cpw_", W_vars, "*", W_vars))
   else if (length(W_vars))
-    y_terms <- c(y_terms, W_vars)
+    y_terms <- c(y_terms, paste0("cpw_", W_vars, "*", W_vars))
 
   if (length(control_vars))
     y_terms <- c(y_terms, control_vars)
@@ -117,7 +117,7 @@ GenerateModelP <- function(prepared_data,
     if (paste0("a", i) %in% MP && length(W_vars)) {
       rhs <- c(rhs, paste0("aw", i, "_", W_vars, "*", W_vars))
     } else if (length(W_vars)) {
-      rhs <- c(rhs, W_vars)
+      rhs <- c(rhs, paste0("aw", i, "_", W_vars, "*", W_vars))
     }
     if (length(control_vars))
       rhs <- c(rhs, control_vars)

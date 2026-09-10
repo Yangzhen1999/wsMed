@@ -12,7 +12,8 @@ analyze_mm_continuous(
   ci_level = 0.95,
   W_values = NULL,
   n_curve = 120,
-  digits = 8
+  digits = 8,
+  point_estimates = NULL
 )
 }
 \arguments{
@@ -22,13 +23,15 @@ analyze_mm_continuous(
 variable. This is typically the first component returned by
 `PrepareData()`.}
 
+\item{MP}{Requested focal paths; all fitted W main effects enter conditional effects.}
+
 \item{W_raw_name}{A character string giving the name of the moderator
 variable in `data`. The default is `"W"`.}
 
 \item{ci_level}{A numeric value between zero and one specifying the
 two-sided confidence level. The default is `0.95`.}
 
-\item{W_values}{An optional numeric vector containing three raw moderator
+\item{W_values}{An optional numeric vector containing at least two distinct raw moderator
 values at which to evaluate the conditional effects. If `NULL`, the
 moderator mean and values one standard deviation below and above the mean
 are used.}
@@ -37,7 +40,10 @@ are used.}
 used to construct each effect curve. The default is `120`.}
 
 \item{digits}{A non-negative integer specifying the number of decimal places
-used to round the reported results. The default is `3`.}
+used to round the reported results. The default is `8`.}
+
+\item{point_estimates}{Named plug-in parameter estimates. If omitted, the
+means of primitive coefficient draws are used.}
 }
 \value{
 A named list with the following components:

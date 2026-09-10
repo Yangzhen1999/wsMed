@@ -52,7 +52,9 @@ wsMed(
 \item{W_type}{Character; \code{"continuous"} or \code{"categorical"}.}
 
 \item{MP}{Character vector identifying which regression paths are moderated
-(for example, \code{"a1"}, \code{"b_1_2"}, \code{"cp"}).}
+(for example, \code{"a1"}, \code{"b_1_2"}, \code{"cp"}). Main effects of
+W already included in each regression are always used when computing
+conditional intercepts, whether or not a/cp is explicitly listed in MP.}
 
 \item{form}{Model type: \code{"P"}, \code{"CN"}, \code{"CP"},
 \code{"PC"}, or \code{"UD"}. Use \code{"UD"} to specify a
@@ -91,7 +93,9 @@ Values are case-insensitive. The default (also used for \code{NULL}) is
 \item{MCmethod}{If \code{Na = "FIML"} and \code{ci_method = "mc"},
 choose \code{"mc"} (default) or \code{"bootSD"}.}
 
-\item{standardized}{Logical; if \code{TRUE}, return standardized effects. Default \code{FALSE}.}
+\item{standardized}{Logical; if \code{TRUE}, return standardized parameter
+tables (including defined effects at the reference moderator value).
+Conditional effect tables and curves remain unstandardized. Default FALSE.}
 
 \item{verbose}{Logical; print progress messages.}
 
@@ -145,6 +149,21 @@ Confidence-interval engines:
 }
 For \code{Na = "FIML"}, you may choose \code{MCmethod = "mc"} (default) or
 \code{"bootSD"} to add a finite-sample SD correction.
+
+Standardization divides differences by their marginal model-implied SDs,
+without recentering them. Dummy variables retain 0/1 units; interaction
+terms use the product of their component scale factors, not the interaction
+column SD. MC and bootstrap draws are transformed jointly with their scales.
+Standardized bootstrap intervals use type-7 quantiles; bc and bca.simple
+apply bias correction with zero acceleration. P-values use inversion of
+that distribution and require at least 1000 valid replicates.
+
+Conditional tables use percentile intervals and fixed numerical probes.
+With fixed.x=TRUE, scale transformations condition on the fitted external
+moments rather than adding sampling uncertainty for those moments.
+In MI, probes/centering references use the first completed data set;
+fixed.x=TRUE also conditions on its external moments in the pooled transform.
+No new population-relative probing or imputation method is implemented here.
 
 Workflow: (1) preprocess -> (2) generate SEM syntax -> (3) fit
 -> (4) compute confidence intervals -> (5) optional: standardize estimates.

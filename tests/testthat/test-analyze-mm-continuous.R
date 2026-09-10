@@ -50,7 +50,7 @@ test_that("analyze_mm_continuous works on wsMed output (continuous W)", {
 
   # 至少要覆盖 MP 中的每个基础系数
   expect_true(all(
-    unique(cont_out$mod_coeff$BaseCoef) %in% MP_vec
+    MP_vec %in% unique(cont_out$mod_coeff$BaseCoef)
   ))
 
   # ③ beta_coef 有三行 × 每条路径

@@ -367,7 +367,7 @@ test_that("Continuous moderator terms are added to the correct equations", {
   m2_line <- get_regression_line(model, "M2diff")
   y_line  <- get_regression_line(model, "Ydiff")
 
-  expect_match(m1_line, "\\+ W1")
+  expect_match(m1_line, "aw1_W1*W1", fixed = TRUE)
 
   expect_match(m2_line, "aw2_W1\\*W1")
   expect_match(m2_line, "bw_1_2_W1\\*int_M1diff_W1")

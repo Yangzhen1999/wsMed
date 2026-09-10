@@ -18,6 +18,9 @@
 #'   labels follow the existing wsMed convention:
 #'   `a1`, `b1`, `d1`, `b_1_2`, `d_1_2`, and `cp`.
 #'
+#' Main effects of W are always labeled and used for conditional intercepts,
+#' including when a/cp is not explicitly listed in MP.
+#'
 #' @return A character string containing lavaan model syntax.
 #'
 #' @examples
@@ -500,7 +503,7 @@ GenerateModelCustom <- function(prepared_data,
           )
         )
       } else {
-        rhs <- c(rhs, W_vars)
+        rhs <- c(rhs, paste0("aw", mediator_id, "_", W_vars, "*", W_vars))
       }
     }
 
@@ -583,7 +586,7 @@ GenerateModelCustom <- function(prepared_data,
         paste0("cpw_", W_vars, "*", W_vars)
       )
     } else {
-      y_rhs <- c(y_rhs, W_vars)
+      y_rhs <- c(y_rhs, paste0("cpw_", W_vars, "*", W_vars))
     }
   }
 

@@ -17,7 +17,7 @@
 #' * A primary \eqn{b} path is any coefficient named `b1`, `b_1_2`, …
 #'   Its matching \eqn{d} path (`d1`, `d_1_2`, …) is paired automatically.
 #'
-#' Each contrast is summarised with its Monte-Carlo mean, SD, and a symmetric
+#' Each contrast is summarised with its plug-in estimate, sampling SD, and a symmetric
 #' \eqn{100(1-\alpha)} % confidence interval.  Helper functions
 #' `mc_summary_pct()` and `fix_pct_names()` ensure that the final CI columns are
 #' named, for example, `2.5%CI.Lo` and `97.5%CI.Up`.
@@ -25,6 +25,7 @@
 #' @param mc_result A Monte-Carlo result of class `"semmcci"`
 #'                  (returned by [MCMI2()]).
 #' @param ci_level  Confidence level for the CI (default `0.95`).
+#' @param point_estimates Named fitted parameter estimates, including defined effects.
 #' @param digits    Decimal places to keep (default `3`).
 #'
 #' @return A list with up to two data frames:
@@ -39,8 +40,14 @@
 
 
 
-calc_basic_contrasts <- function(mc_result, ci_level=.95, digits=3){
-  th_star <- mc_result
+calc_basic_contrasts <- function(mc_result, ci_level=.95, digits=3, point_estimates = NULL){
+  th_star <- .mm_evaluation_rows(mc_result, point_estimates)
+  summary_draws <- mc_summary_pct
+  mc_summary_pct <- function(x, label, ci_level, digits) {
+    out <- summary_draws(x[-1], label, ci_level, digits)
+    out$Estimate <- round(x[1], digits)
+    out
+  }
   ## 所有 indirect_* 两两差
   ind_cols <- grep("^indirect_",colnames(th_star),value=TRUE)
   ie_diff <- list()
