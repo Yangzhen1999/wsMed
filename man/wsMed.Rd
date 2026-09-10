@@ -56,9 +56,10 @@ wsMed(
 
 \item{form}{Model type: \code{"P"}, \code{"CN"}, \code{"CP"},
 \code{"PC"}, or \code{"UD"}. Use \code{"UD"} to specify a
-user-defined mediation model.}
+user-defined mediation model. Values are case-insensitive.}
 
-\item{Na}{Missing-data method: \code{"DE"}, \code{"FIML"}, or \code{"MI"}.}
+\item{Na}{Missing-data method: \code{"DE"}, \code{"FIML"}, or \code{"MI"}.
+Values are case-insensitive.}
 
 \item{alpha}{Numeric vector in (0, 1); two-sided significance levels.}
 
@@ -83,9 +84,9 @@ or \code{"bca.simple"}.}
 
 \item{fixed.x}{Logical; passed to \pkg{lavaan}.}
 
-\item{ci_method}{CI engine: \code{"bootstrap"} or \code{"mc"}.
-If \code{NULL} (default) the choice is \code{"bootstrap"} for \code{Na = "DE"}
-and \code{"mc"} otherwise.}
+\item{ci_method}{CI engine: \code{"mc"}, \code{"bootstrap"}, or \code{"both"}.
+Values are case-insensitive. The default (also used for \code{NULL}) is
+\code{"mc"}. With \code{Na = "MI"}, only \code{"mc"} is supported.}
 
 \item{MCmethod}{If \code{Na = "FIML"} and \code{ci_method = "mc"},
 choose \code{"mc"} (default) or \code{"bootSD"}.}

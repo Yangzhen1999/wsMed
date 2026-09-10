@@ -81,6 +81,7 @@ validate_wsMed_inputs <- function(data,
   }
 
   ## ---- 3. form & Na -------------------------------------------------------
+  if (is.character(form)) form <- toupper(form)
   form <- match.arg(
     form,
     c("P", "CN", "CP", "PC", "UD")
@@ -116,6 +117,7 @@ validate_wsMed_inputs <- function(data,
     )
   }
 
+  if (is.character(Na)) Na <- toupper(Na)
   Na   <- match.arg(Na,   c("DE", "FIML", "MI"))
 
   ## ---- 4. scalar integer parameters --------------------------------------
@@ -139,6 +141,7 @@ validate_wsMed_inputs <- function(data,
            FIML = "mc",
            MI   = "mc")
   } else {
+    if (is.character(ci_method)) ci_method <- tolower(ci_method)
     match.arg(ci_method, allowed_methods)
   }
 

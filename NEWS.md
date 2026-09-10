@@ -1,4 +1,13 @@
 # Package News
+
+## Development version
+
+- `wsMed()` now accepts case-insensitive values for `form`, `Na`, and
+  `ci_method`. Existing defaults, unambiguous abbreviations, and validation
+  rules are preserved; returned settings retain their canonical spelling.
+- Corrected the `ci_method` documentation to include `"both"` and the existing
+  `"mc"` default, including when `NULL` is supplied.
+
 ## wsMed 1.0.2 (2025-12-06)
 ## wsMed 1.0.1 (2025-09-25)
 ## wsMed 1.0.0 (2025-09-19)

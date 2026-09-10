@@ -39,7 +39,7 @@
 #' @param Y_C1,Y_C2 Character scalars for the outcome under each condition.
 #' @param form Model type: \code{"P"}, \code{"CN"}, \code{"CP"},
 #'   \code{"PC"}, or \code{"UD"}. Use \code{"UD"} to specify a
-#'   user-defined mediation model.
+#'   user-defined mediation model. Values are case-insensitive.
 #' @param paths A character vector defining directed paths when
 #'   \code{form = "UD"}. Paths are specified using mediator labels
 #'   \code{M1}, \code{M2}, and so on, with \code{Y} denoting the outcome.
@@ -48,9 +48,10 @@
 #' @param standardized Logical; if \code{TRUE}, return standardized effects. Default \code{FALSE}.
 #'
 #' @param Na Missing-data method: \code{"DE"}, \code{"FIML"}, or \code{"MI"}.
-#' @param ci_method CI engine: \code{"bootstrap"} or \code{"mc"}.
-#'   If \code{NULL} (default) the choice is \code{"bootstrap"} for \code{Na = "DE"}
-#'   and \code{"mc"} otherwise.
+#'   Values are case-insensitive.
+#' @param ci_method CI engine: \code{"mc"}, \code{"bootstrap"}, or \code{"both"}.
+#'   Values are case-insensitive. The default (also used for \code{NULL}) is
+#'   \code{"mc"}. With \code{Na = "MI"}, only \code{"mc"} is supported.
 #' @param MCmethod If \code{Na = "FIML"} and \code{ci_method = "mc"},
 #'   choose \code{"mc"} (default) or \code{"bootSD"}.
 #'
@@ -137,6 +138,11 @@ wsMed <- function(data,
                   paths = NULL) {
 
   ## ── 0  输入验证 ──────────────────────────────────────────────────────
+  # Normalize character choices only; retain match.arg() defaults, partial
+  # matching and rejection of non-character or ambiguous inputs.
+  if (is.character(ci_method)) ci_method <- tolower(ci_method)
+  if (is.character(form)) form <- toupper(form)
+  if (is.character(Na)) Na <- toupper(Na)
   ci_method <- match.arg(ci_method)
   form      <- match.arg(form)
   Na        <- match.arg(Na)
