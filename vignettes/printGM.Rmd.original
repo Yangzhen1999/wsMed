@@ -9,8 +9,8 @@ vignette: >
 
 ## Demonstration of `printGM()`
 
-### Using `printGM()` with `WsMed()`
-The `WsMed()` function returns a list containing `sem_model`. `printGM()` can automatically extract and format the model equations.
+### Using `printGM()` with `wsMed()`
+The `wsMed()` function returns a list containing `sem_model`. `printGM()` can automatically extract and format the model equations.
 
 ```{r, message=FALSE, warning=FALSE}
 library(wsMed)
@@ -22,9 +22,9 @@ result1 <- wsMed(
   Y_C2 = "D2",
   form = "P",
   Na = "DE",
-  standardized = TRUE,
-  bootstrap = 1000,
-  iseed = 123
+  standardized = FALSE,
+  ci_method = "mc", R = 1000,
+  seed = 123
 )
 printGM(result1)
 ```
@@ -41,10 +41,10 @@ data(example_data)
 # Prepare data
 prepared_data <- PrepareData(
   data = example_data,
-  M_C1 = c("A1", "B1"),
-  M_C2 = c("A2", "B2"),
-  Y_C1 = "C1",
-  Y_C2 = "C2"
+  M_C1 = c("A1", "B1", "C1"),
+  M_C2 = c("A2", "B2", "C2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2"
 )
 
 # Generate Model
@@ -53,3 +53,9 @@ sem_model <- GenerateModelPC(prepared_data)
 # print Model equations
 printGM(sem_model)
 ```
+
+`printGM()` displays the unstandardized model equations; requesting
+standardized estimates does not rewrite the SEM syntax. For standardized
+conditional estimates and plots, use `moderation_std` and
+`plot_moderation_curve(..., standardized = TRUE)`, as shown in
+[Standardized moderated mediation](StandardizedModeratedMediation.html).

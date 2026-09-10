@@ -1,0 +1,157 @@
+---
+title: "Plotting mediation effects and contrasts"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Plotting mediation effects and contrasts}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+library(wsMed)
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", cache = FALSE,
+                     fig.width = 8, fig.height = 5)
+```
+
+The four plotting functions return editable `ggplot` objects and retain the
+plotted estimates and interval limits in `p$data`. Set `standardized = TRUE`
+to use the standardized results already requested during fitting. With
+`ci_method = "both"`, use `engine = "mc"` or `engine = "boot"` consistently.
+For a single engine, the stored engine is used automatically.
+
+## Reproducible two-condition data
+
+```{r simulation}
+set.seed(918)
+n <- 350
+w <- rnorm(n, 3, 2)
+avg1 <- rnorm(n); avg2 <- rnorm(n)
+dm1 <- 2 + .8*w + rnorm(n)
+dm2 <- 1 + .4*w + .3*dm1 + rnorm(n)
+dy <- .5 + .6*w + .5*dm1 + .7*dm2 + .2*dm1*w + .3*avg1 + rnorm(n)
+y1 <- rnorm(n)
+dat <- data.frame(M11=avg1-dm1/2, M12=avg1+dm1/2,
+                  M21=avg2-dm2/2, M22=avg2+dm2/2,
+                  Y1=y1, Y2=y1+dy, W=w)
+dat$Group <- cut(w, c(-Inf,2,4,Inf), labels=c("A","B","C"))
+fit_args <- list(data=dat, M_C1=c("M11","M21"), M_C2=c("M12","M22"),
+                 Y_C1="Y1", Y_C2="Y2", form="P", Na="DE", ci_method="mc",
+                 R=2000, seed=2026, standardized=TRUE, verbose=FALSE)
+plain <- do.call(wsMed, fit_args)
+continuous <- do.call(wsMed, c(fit_args,
+  list(W="W", W_type="continuous", MP=c("b1","d1"))))
+categorical <- do.call(wsMed, c(fit_args,
+  list(W="Group", W_type="categorical", MP=c("b1","d1"))))
+```
+
+These separate fits illustrate each plotting interface; changing W from
+continuous to grouped changes the fitted model and is not a transformation
+of the original conditional estimates.
+
+## Forest plots
+
+`plot_effects()` displays complete indirect effects, their total, the direct
+effect (`cp`) and the total effect. Choose rows and their display order with
+`paths`; use a named `labels` vector for readable descriptions.
+
+```{r forest}
+forest <- plot_effects(plain, standardized=TRUE,
+  paths=c("indirect_1", "indirect_2", "total_indirect", "cp", "total_effect"),
+  labels=c(indirect_1="Via M1", indirect_2="Via M2",
+           total_indirect="Total indirect", cp="Direct", total_effect="Total"))
+forest
+```
+
+With a moderator, this forest shows effects at the model reference value
+(centered continuous W = 0, or the reference category). It does not average
+conditional effects across W. To display different W levels, use the next plot.
+
+## Conditional effects by group or selected level
+
+```{r categorical-effects}
+group_plot <- plot_conditional_effects(categorical, standardized=TRUE,
+  paths=c("indirect_1","indirect_2"),
+  labels=c(indirect_1="Via M1",indirect_2="Via M2"), ncol=2)
+group_plot
+```
+
+Each point and interval belongs to a fitted group. There are no interpolating
+lines between categories. `levels` can select and reorder group labels.
+Choose `type = "paths"` for available path coefficients or `type = "overall"`
+for total indirect and total effects. All panels share their effect axis.
+
+The same function can display the stored reference levels of a continuous W:
+
+```{r continuous-levels}
+plot_conditional_effects(continuous, paths="indirect_effect_1",
+  levels=c("-1 SD","0 SD","+1 SD"), standardized=TRUE,
+  labels=c(indirect_effect_1="Via M1"))
+```
+
+The axis includes raw W values. `indirect_1` and `indirect_effect_1` are accepted
+as aliases when selecting an available indirect effect; the underlying result
+tables keep their existing identifiers.
+
+## Differences need their own intervals
+
+One effect having an interval that excludes zero and another having an
+interval that includes zero does not establish a difference between them.
+`plot_contrasts()` displays the difference and its own interval instead.
+
+```{r categorical-contrasts}
+contrast_plot <- plot_contrasts(categorical, standardized=TRUE,
+  paths=c("indirect_1","indirect_2"),
+  labels=c(indirect_1="Via M1",indirect_2="Via M2"), ncol=2)
+contrast_plot
+```
+
+For example, `B - A` means the conditional effect in B minus that in A.
+With a continuous moderator, the same function compares stored low, mean
+and high moderator levels. `contrasts` selects exact labels from the result
+table (also visible in `contrast_plot$data$Contrast`). Conditional contrasts
+use the already-computed joint-draw contrast intervals, not differences
+between endpoints of separate intervals.
+
+Without a moderator, the plot compares indirect paths with one another:
+
+```{r path-contrasts}
+plot_contrasts(plain, standardized=TRUE)
+```
+
+Here the helper uses stored joint draws and fitted/pooled point estimates.
+Standardized contrasts are computed with each draw's own endpoint scales
+before forming percentile intervals. No model is refitted. A moderator fit
+currently supports contrasts within each effect across groups/levels, not
+arbitrary contrasts between different indirect paths at a fixed W.
+For continuous moderators, `type = "overall"` is unavailable unless an
+overall contrast table is present; specific indirect and path contrasts
+remain available.
+
+## Conditional curves and their highlighted ranges
+
+```{r curve}
+plot_moderation_curve(continuous, "total_indirect", standardized=TRUE)
+```
+
+The band uses the fitted confidence level. Shading denotes stored grid values
+whose pointwise interval excludes zero. Labels give raw W bounds, not sample
+percentiles. Boundaries are grid approximations; they are not exact
+Johnson--Neyman boundaries or simultaneous confidence regions. An adjacent
+change from a negative to a positive interval breaks a highlighted range.
+
+## Inspect and export
+
+```{r inspect}
+forest$data[, c("Path","Estimate","CI.LL","CI.UL")]
+attr(forest, "wsmed_plot")
+```
+
+```{r export, eval=FALSE}
+ggplot2::ggsave("mediation-effects.pdf", forest, width=8, height=5)
+ggplot2::ggsave("group-effects.png", group_plot, width=8, height=5, dpi=300)
+```
+
+All conditional intervals are percentile intervals; bootstrap parameter
+forest plots use the stored bootstrap interval type. The common marginal
+scale, fixed raw W probes and joint uncertainty are described in
+[Standardized moderated mediation](StandardizedModeratedMediation.html).

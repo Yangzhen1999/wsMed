@@ -1,0 +1,250 @@
+---
+title: "Standardized moderated mediation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Standardized moderated mediation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+library(wsMed)
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", cache = FALSE,
+                     fig.width = 7, fig.height = 5)
+```
+
+## What is standardized?
+
+For a two-condition design, define $D M=M_2-M_1$ and $D Y=Y_2-Y_1$.
+`PrepareData()` centers the mediator average component, but does not center
+these differences. Standardization divides a difference by its marginal
+model-implied SD, preserving its mean condition effect.
+
+Write $s_M=SD(D M)$ and $s_Y=SD(D Y)$. Without moderation,
+
+$$
+a^*=a/s_M,\qquad b^*=b s_M/s_Y,\qquad c'^*=c'/s_Y,
+\qquad IE^*=ab/s_Y.
+$$
+
+The condition contrast retains its original unit. In a serial chain, the
+intermediate mediator SDs cancel. Thus every complete indirect effect, its
+contrast with another complete indirect effect, the total indirect effect
+and the total condition effect use the outcome-difference SD.
+
+These are **marginal** SDs implied by the fitted model, not residual SDs,
+group-specific SDs or SDs conditional on a selected moderator value. The same
+endpoint scales apply at every moderator value within a fit.
+
+## Continuous moderators: two different quantities
+
+For a centered moderator $w_c=w-\bar w$, suppose the conditional paths are
+$a(w_c)=a+a_w w_c$ and $b(w_c)=b+b_w w_c$. Then
+
+$$
+IE^*(w_c)=\frac{(a+a_w w_c)(b+b_w w_c)}{s_Y},
+\qquad b^*(w_c)=(b+b_w w_c)\frac{s_M}{s_Y}.
+$$
+
+The standardized interaction coefficient is instead
+
+$$
+b_w^*=b_w\frac{s_M s_W}{s_Y},\qquad
+a_w^*=a_w\frac{s_W}{s_M}.
+$$
+
+`moderation_std$mod_coeff` reports interaction coefficients per SD of a
+continuous moderator. Conditional tables and curves evaluate effects at
+fixed numerical moderator values in the **original units**. To recover a
+conditional slope from fully standardized coefficients, use
+$b^*(w_c)=b^*+b_w^*(w_c/s_W)$. The scale of an interaction is the product of
+its component scale factors, not the SD of the observed product column.
+
+## Fit a reproducible example
+
+The following simulated data have a moderator with a nonzero mean and an SD
+different from one. The mediator averages and differences are generated
+separately to make the two-condition structure explicit.
+
+```{r simulate}
+set.seed(918)
+n <- 350
+w <- rnorm(n, 3, 2)
+avg1 <- rnorm(n)
+avg2 <- rnorm(n)
+dm1 <- 2 + 0.8 * w + rnorm(n)
+dm2 <- 1 + 0.4 * w + 0.3 * dm1 + rnorm(n)
+dy <- 0.5 + 0.6 * w + 0.5 * dm1 + 0.7 * dm2 +
+      0.2 * dm1 * w + 0.3 * avg1 + rnorm(n)
+y1 <- rnorm(n)
+dat <- data.frame(M11 = avg1 - dm1/2, M12 = avg1 + dm1/2,
+                  M21 = avg2 - dm2/2, M22 = avg2 + dm2/2,
+                  Y1 = y1, Y2 = y1 + dy, W = w)
+```
+
+```{r fit-continuous}
+result <- wsMed(
+  data = dat, M_C1 = c("M11", "M21"), M_C2 = c("M12", "M22"),
+  Y_C1 = "Y1", Y_C2 = "Y2", form = "P",
+  W = "W", W_type = "continuous", MP = c("b1", "d1"),
+  Na = "DE", ci_method = "mc", R = 2000, seed = 2026,
+  fixed.x = FALSE, standardized = TRUE, verbose = FALSE
+)
+head(result$moderation_std$beta_coef)
+result$moderation_std$conditional_overall
+result$moderation_std$mod_coeff
+```
+
+`MP` requests interactions and focal paths. Moderator main effects already
+included in the fitted regressions also enter conditional intercepts, even
+when `a1` or `cp` is absent from `MP`. The total indirect effect includes both
+mediator paths in this example, not just the path with a requested interaction.
+
+The original `result$moderation` remains available. Without a moderator,
+`standardized = TRUE` supplies parameter tables such as `result$mc$std_mc`,
+but there is no conditional moderation table.
+
+```{r plot-continuous}
+plot_moderation_curve(result, "total_indirect", standardized = TRUE)
+```
+
+The horizontal axis retains raw moderator units. Shading marks stored grid
+values whose pointwise confidence interval excludes zero; boundary labels
+report raw W values. These are grid approximations, not exact analytical
+Johnson--Neyman boundaries or simultaneous confidence regions.
+
+### A check of the point estimates
+
+For this complete-data MC fit, the standardized overall effects must equal
+the raw effects divided by the fitted marginal outcome SD:
+
+```{r check-endpoint-scale}
+sy <- sqrt(lavaan::fitted(result$mc$fit)$cov["Ydiff", "Ydiff"])
+stopifnot(isTRUE(all.equal(
+  result$moderation_std$conditional_overall$Estimate,
+  result$moderation$conditional_overall$Estimate / sy,
+  tolerance = 1e-7
+)))
+stopifnot(identical(result$moderation_std$theta_curve$W_raw,
+                    result$moderation$theta_curve$W_raw))
+```
+
+This identity concerns point estimates. It does **not** justify dividing raw
+confidence limits by the fitted SD.
+
+## Categorical moderators
+
+Categorical moderators retain their 0/1 dummy coding. There is no SD-of-dummy
+multiplier, and all groups share the same marginal endpoint scales.
+The factor levels below make the reference category explicit.
+
+```{r categorical}
+dat$Group <- cut(dat$W, c(-Inf, 2, 4, Inf), labels = c("A", "B", "C"))
+levels(dat$Group)
+group_result <- wsMed(
+  data = dat, M_C1 = c("M11", "M21"), M_C2 = c("M12", "M22"),
+  Y_C1 = "Y1", Y_C2 = "Y2", form = "P",
+  W = "Group", W_type = "categorical", MP = c("b1", "d1"),
+  Na = "DE", ci_method = "mc", R = 2000, seed = 2026,
+  fixed.x = FALSE, standardized = TRUE, verbose = FALSE
+)
+group_result$moderation_std$conditional_IE
+group_result$moderation_std$IE_contrasts
+group_result$moderation_std$conditional_overall
+```
+
+Use these group tables for categorical moderators. The continuous-moderator
+curve example above should not be interpreted as interpolating between groups.
+
+```{r check-group-scale, include=FALSE}
+group_sy <- sqrt(lavaan::fitted(group_result$mc$fit)$cov["Ydiff", "Ydiff"])
+stopifnot(isTRUE(all.equal(group_result$moderation_std$conditional_IE$Estimate,
+  group_result$moderation$conditional_IE$Estimate / group_sy, tolerance = 1e-7)))
+```
+
+## Convert a fitted result without refitting
+
+`standardize_moderation()` uses the joint MC or bootstrap draws stored in a
+`wsMed` object with a moderator. It returns the standardized moderation list:
+
+```{r post-fit}
+converted <- standardize_moderation(result)
+stopifnot(isTRUE(all.equal(converted, result$moderation_std)))
+result$moderation_std <- converted
+attr(converted, "standardization")
+```
+
+A result without the required stored draws cannot be converted by this helper.
+
+## Confidence intervals, bootstrap and both engines
+
+Each valid joint draw supplies both regression coefficients and model-implied
+SDs. Transform the effect using those draw-specific SDs, then summarize the
+transformed draws. For continuous moderators, the selected raw values (for
+example the reference mean and mean plus/minus one reference SD) remain fixed
+across draws. If standardized coefficients are used, evaluate them at
+$w_c/s_W^{(r)}$ in draw $r$, not at one fixed standardized moderator value.
+
+Point estimates evaluate the effect at the fitted parameters, or at pooled
+primitive parameters for MI. They are not averages of nonlinear draw effects.
+Invalid joint draws are excluded with diagnostics; inspect the
+`standardization` attribute for their counts, indices and reasons.
+
+All **conditional** tables use percentile intervals, for both MC and
+bootstrap. `boot_ci_type` controls parameter-table intervals; it does not
+change conditional intervals. In standardized parameter tables, `"bc"` and
+`"bca.simple"` use bias correction with zero acceleration, not a full
+acceleration-adjusted BCa calculation. Standardized bootstrap p-values require
+at least 1000 valid replicates; that is not a minimum for conditional intervals.
+
+The following longer bootstrap example is not run during vignette rebuilding:
+
+```{r both-engines, eval=FALSE}
+both_result <- wsMed(
+  data = dat, M_C1 = c("M11", "M21"), M_C2 = c("M12", "M22"),
+  Y_C1 = "Y1", Y_C2 = "Y2", form = "P",
+  W = "W", W_type = "continuous", MP = c("b1", "d1"),
+  Na = "DE", ci_method = "both", R = 5000, bootstrap = 2000,
+  seed = 2026, iseed = 2026, boot_ci_type = "perc",
+  standardized = TRUE
+)
+both_result$moderation_std$mc$conditional_overall
+both_result$moderation_std$boot$conditional_overall
+plot_moderation_curve(both_result, "total_indirect",
+                      standardized = TRUE, engine = "boot")
+```
+
+For a single engine (`"mc"` or `"bootstrap"`), tables are directly inside
+`moderation_std`. For `"both"`, they are nested under `$mc` and `$boot`;
+the plotting `engine` argument selects between them.
+
+## Missing data and reporting
+
+FIML and MI use the same effect definition. With `fixed.x = FALSE`, estimated
+external moments participate in the joint transformation. With
+`fixed.x = TRUE`, transformations condition on fitted external moments.
+MI supports MC inference and evaluates effects at pooled primitive parameters;
+its probing and centering reference is the first completed dataset.
+With MI and `fixed.x = TRUE`, external moments from that reference are held
+fixed. This does not introduce population-relative moderator probing or a
+new imputation procedure.
+
+Report the condition difference direction, model and moderated paths,
+moderator coding/reference and raw probe values, marginal SD definition,
+missing-data method, `fixed.x`, inference engine, number of valid draws and
+interval type. Distinguish standardized interaction coefficients per SD of W
+from conditional indirect effects at particular raw W values.
+
+For serial and sparse models, see the
+[custom-model tutorial](GenerateModelCustom.html). Their complete indirect
+effects follow the same endpoint scaling rule.
+
+
+## More plots for reporting
+
+Use `plot_effects()` for an effect forest, `plot_conditional_effects()` for
+group or reference-level point intervals, and `plot_contrasts()` for effect
+differences with their own confidence intervals. All three support
+`standardized` and the MC/bootstrap `engine` selection. See
+[Plotting mediation effects and contrasts](PlottingEffects.html) for executed
+examples, selection of paths and labels, and export to PDF or PNG.

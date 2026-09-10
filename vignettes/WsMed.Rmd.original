@@ -330,8 +330,8 @@ result_fiml <- wsMed(
 )
 ```
 
-For FIML with Monte Carlo intervals, `MCmethod` can be set to `"mc"` or
-`"bootSD"`.
+For FIML with Monte Carlo intervals, use the default `MCmethod = "mc"`.
+The current fitting pipeline does not activate a separate `"bootSD"` correction.
 
 Multiple imputation is requested with `Na = "MI"`. Its controls are supplied
 through `mi_args`:
@@ -379,6 +379,16 @@ result_standardized <- wsMed(
 )
 ```
 
+Standardization uses marginal model-implied SDs of the difference and
+average components; differences are not recentered. A full indirect effect
+is divided by the outcome-difference SD, including in serial models.
+With a moderator, `standardized = TRUE` also adds `moderation_std` while
+preserving raw conditional results in `moderation`. The parameter table
+alone does not describe effects at all moderator values.
+
+See [Standardized moderated mediation](StandardizedModeratedMediation.html)
+for the scale definitions, executable examples and inference conventions.
+
 ## Step 4: Add optional model components
 
 Moderators and covariates are added to the same `wsMed()` call. They do not
@@ -408,6 +418,7 @@ result_moderated <- wsMed(
   Na = "DE",
   ci_method = "mc",
   R = 5000,
+  standardized = TRUE,
   seed = 123
 )
 ```
@@ -532,7 +543,7 @@ The first example fits a parallel mediation model using multiple
 imputation and Monte Carlo confidence intervals. Standardized results are
 also requested so that all principal output sections are illustrated.
 
-```{r result-example-no-moderator, cache=TRUE}
+```{r result-example-no-moderator, cache=FALSE}
 result4_mi <- wsMed(
   data = example_data_missing,
   M_C1 = c("A1", "B1"),
@@ -742,7 +753,7 @@ The second example fits a chained--parallel model and adds `D3` as a
 continuous moderator. The paths listed in `MP` are allowed to vary with
 the moderator.
 
-```{r result-example-continuous-moderator, cache=TRUE}
+```{r result-example-continuous-moderator, cache=FALSE}
 result5 <- wsMed(
   data = example_data_missing,
   M_C1 = c("A1", "B1", "C1"),
@@ -756,6 +767,7 @@ result5 <- wsMed(
   Na = "DE",
   ci_method = "mc",
   R = 5000,
+  standardized = TRUE,
   seed = 123
 )
 
@@ -768,7 +780,7 @@ important additions are:
 | Additional output | What it contains |
 |:------------------|:-----------------|
 | Moderator in `VARIABLES` | The observed variable mapped to the internal moderator label, such as `W1`. |
-| `Moderated Coefficients` | Interaction terms for the paths named in `MP`. |
+| `Moderated Coefficients` | Moderator coefficients, including already-fitted moderator main effects. |
 | `Conditional Indirect Effects` | Indirect effects evaluated at selected moderator values. |
 | `Indirect Effect Contrasts` | Differences between conditional indirect effects at those values. |
 | `Moderated Path Coefficients` | The selected path coefficients evaluated at each moderator value. |
@@ -777,13 +789,14 @@ important additions are:
 
 #### Moderated coefficients
 
-The `Moderated Coefficients` table reports the interaction term associated
-with each path in `MP`. The `BaseCoef` column links the interaction to the
+The `Moderated Coefficients` table reports requested interactions and
+already-fitted moderator main effects used in conditional intercepts. The `BaseCoef` column links the interaction to the
 original path. For example, a row whose base coefficient is `a1` indicates
 whether the condition-to-`M1` path changes with `D3`.
 
-The interaction estimate describes the expected change in the base path
-for a one-unit increase in the moderator. Its confidence interval evaluates
+In the unstandardized table, the interaction estimate describes the expected
+change in the base path for a one-unit increase in the moderator. In the
+standardized `mod_coeff` table, it is per SD of the continuous moderator. Its confidence interval evaluates
 whether that change differs from zero. This table should be consulted
 before interpreting the pattern of conditional path coefficients.
 
@@ -949,3 +962,47 @@ missing-data, moderated, and covariate-adjusted analyses. Only the arguments
 needed for the intended analysis have to be added or changed. The returned
 object can be read through `print()`, connected to the generated model with
 `printGM()`, and accessed directly for further analysis or reporting.
+
+
+## Reading standardized conditional results
+
+The moderated example above provides both scales:
+
+```{r standardized-conditional-tables}
+head(result5$moderation_std$beta_coef)
+result5$moderation_std$conditional_overall
+attr(result5$moderation_std, "standardization")
+```
+
+Continuous interaction coefficients in `mod_coeff` are per SD of the
+moderator. Conditional effects and curves are evaluated at fixed numerical
+values in the original moderator units, using a common marginal endpoint
+scale. These are different reporting quantities. Existing moderator main
+effects enter conditional intercepts whether or not `a`/`cp` is listed in
+`MP`; totals include all model-implied indirect paths.
+
+```{r standardized-conditional-plot, fig.width=7, fig.height=5}
+plot_moderation_curve(result5, "total_indirect", standardized = TRUE)
+```
+
+Conditional intervals are percentile intervals from jointly transformed
+draws, including uncertainty in the SDs when those moments are estimated.
+Do not divide raw interval limits by a single fitted SD. Point estimates
+evaluate the effect at fitted (or pooled primitive) parameters, rather than
+averaging the nonlinear effect over draws. Report the raw moderator probes,
+the marginal scale definition, `fixed.x`, and the interval engine.
+
+For `ci_method = "both"`, extract `moderation_std$mc` or
+`moderation_std$boot`; choose `engine = "mc"` or `engine = "boot"` in the
+plotting call. The [dedicated tutorial](StandardizedModeratedMediation.html)
+also covers categorical moderators, post-fit conversion, FIML and MI.
+
+
+## More plots for reporting
+
+Use `plot_effects()` for an effect forest, `plot_conditional_effects()` for
+group or reference-level point intervals, and `plot_contrasts()` for effect
+differences with their own confidence intervals. All three support
+`standardized` and the MC/bootstrap `engine` selection. See
+[Plotting mediation effects and contrasts](PlottingEffects.html) for executed
+examples, selection of paths and labels, and export to PDF or PNG.

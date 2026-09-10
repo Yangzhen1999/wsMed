@@ -299,3 +299,33 @@ To fit a user-defined model:
 This workflow retains the existing difference-and-level parameterization in
 `wsMed` while allowing users to specify mediation structures beyond the four
 predefined model forms.
+
+
+## Standardized moderated custom models
+
+The same endpoint scaling applies to a sparse user-defined model. Only
+paths present in `paths` can be requested in `MP`. For the model above,
+`b_1_3` and `b3` exist, whereas `b1` does not.
+
+```{r custom-standardized-moderation}
+set.seed(321)
+example_custom$W <- rnorm(nrow(example_custom))
+custom_moderated <- wsMed(
+  data = example_custom,
+  M_C1 = c("A1", "B1", "C1"), M_C2 = c("A2", "B2", "C2"),
+  Y_C1 = "D1", Y_C2 = "D2", form = "UD",
+  paths = c("M1 -> M3", "M3 -> Y", "M2 -> Y"),
+  W = "W", W_type = "continuous", MP = c("b_1_3", "b3"),
+  Na = "DE", ci_method = "mc", R = 2000, seed = 321,
+  standardized = TRUE, verbose = FALSE
+)
+head(custom_moderated$moderation_std$beta_coef)
+custom_moderated$moderation_std$conditional_overall
+```
+
+The total indirect effect includes every complete path in this model,
+including paths without a requested interaction. Moderator main effects
+already fitted in the mediator and outcome regressions enter conditional
+intercepts even though `a` and `cp` were not requested in `MP`.
+See [Standardized moderated mediation](StandardizedModeratedMediation.html)
+for raw-unit probing, categorical coding and uncertainty in the scale factors.
