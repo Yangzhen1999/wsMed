@@ -52,3 +52,5 @@ importFrom(utils,head)
 importFrom(utils,modifyList)
 importFrom(utils,str)
 importFrom(utils,tail)
+
+export(standardize_moderation)

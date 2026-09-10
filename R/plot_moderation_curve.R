@@ -56,6 +56,8 @@
 #' @param base_size A positive numeric value specifying the base font size
 #'   passed to `ggplot2::theme_minimal()`.
 #'
+#' @param standardized Use standardized conditional results. Default FALSE.
+#' @param engine For ci_method="both", select "mc" (default) or "boot".
 #' @return A `ggplot` object. Additional ggplot2 layers can be added to the
 #'   returned object, and the plot can be saved using `ggplot2::ggsave()`.
 #'
@@ -72,11 +74,16 @@ plot_moderation_curve <- function(result, path_name,
                                   sig_fill  = "#C7E9C0",
                                   alpha_ci  = 0.35,
                                   alpha_sig = 0.35,
-                                  base_size = 14) {
+                                  base_size = 14,
+                                  standardized = FALSE, engine = c("mc", "boot")) {
   stopifnot(requireNamespace("ggplot2"), requireNamespace("dplyr"))
 
   `%||%` <- function(a, b) if (!is.null(a)) a else b
-  mod <- result$moderation
+  mod <- if (standardized) result$moderation_std else result$moderation
+  if (is.null(mod)) stop("Requested conditional results are unavailable. Use standardized=TRUE in wsMed().")
+  if (identical(result$ci_method, "both")) mod <- mod[[match.arg(engine)]]
+  if (standardized && missing(y_label)) y_label <- "Standardized effect"
+  if (standardized && missing(x_label)) x_label <- "Moderator (W, raw units)"
 
   ## locate the curve ------------------------------------------------------
   if (!is.null(mod$theta_curve) && path_name %in% mod$theta_curve$Path) {

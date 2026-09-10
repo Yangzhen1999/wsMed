@@ -62,7 +62,8 @@
 #'   Must be \code{NULL} for the predefined model forms.
 #' @param standardized Logical; if \code{TRUE}, return standardized parameter
 #'   tables (including defined effects at the reference moderator value).
-#'   Conditional effect tables and curves remain unstandardized. Default FALSE.
+#'   Raw conditional results remain in moderation; standardized conditional
+#'   tables and curves are added in moderation_std. Default FALSE.
 #'
 #' @param Na Missing-data method: \code{"DE"}, \code{"FIML"}, or \code{"MI"}.
 #'   Values are case-insensitive.
@@ -110,7 +111,9 @@
 #'   \item{sem_model}{Generated \pkg{lavaan} syntax.}
 #'   \item{mc}{List with Monte Carlo draws, bootstrap tables (if any),
 #'     and the fitted model.}
-#'   \item{moderation}{Conditional or moderated effect tables.}
+#'   \item{moderation}{Raw conditional or moderated effect tables.}
+#'   \item{moderation_std}{Standardized conditional tables and curves when
+#'     standardized=TRUE and a moderator is supplied.}
 #'   \item{form,Na,alpha}{Analysis settings.}
 #'   \item{paths}{The user-defined paths when \code{form = "UD"};
 #'     otherwise \code{NULL}.}
@@ -399,7 +402,7 @@ wsMed <- function(data,
     Y_C1 = Y_C1, Y_C2 = Y_C2,
     C_C1 = C_C1, C_C2 = C_C2,
     C    = C,    C_type = C_type,
-    W    = W,    W_type = W_type
+    W    = W,    W_type = W_type, MP = MP
   )
 
 
@@ -420,6 +423,7 @@ wsMed <- function(data,
   )
 
   class(out) <- "wsMed"
+  if (standardized && length(W)) out$moderation_std <- standardize_moderation(out)
 
   .v(
     "Analysis completed successfully.",

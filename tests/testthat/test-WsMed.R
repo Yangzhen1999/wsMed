@@ -15,7 +15,7 @@ example_dataN <- suppressWarnings(
     expect_s3_class(obj, "wsMed")
 
     expect_setequal(
-      names(obj),
+      setdiff(names(obj), "moderation_std"),
       c(
         "Na",
         "alpha",

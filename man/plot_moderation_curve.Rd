@@ -14,7 +14,9 @@ plot_moderation_curve(
   sig_fill = "#C7E9C0",
   alpha_ci = 0.35,
   alpha_sig = 0.35,
-  base_size = 14
+  base_size = 14,
+  standardized = FALSE,
+  engine = c("mc", "boot")
 )
 }
 \arguments{
@@ -48,6 +50,10 @@ transparency of the highlighted significant regions.}
 
 \item{base_size}{A positive numeric value specifying the base font size
 passed to `ggplot2::theme_minimal()`.}
+
+\item{standardized}{Use standardized conditional results. Default FALSE.}
+
+\item{engine}{For ci_method="both", select "mc" (default) or "boot".}
 }
 \value{
 A `ggplot` object. Additional ggplot2 layers can be added to the

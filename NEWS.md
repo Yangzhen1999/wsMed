@@ -2,6 +2,11 @@
 
 ## Development version
 
+- Added standardized conditional effects, contrasts and curves for continuous
+  and categorical moderators through `moderation_std` and `standardize_moderation()`.
+- Added standardized curve selection and MC/bootstrap selection in plotting.
+  Probe values remain fixed in raw W units; scales vary jointly with each draw.
+
 - `wsMed()` now accepts case-insensitive values for `form`, `Na`, and
   `ci_method`. Existing defaults, unambiguous abbreviations, and validation
   rules are preserved; returned settings retain their canonical spelling.

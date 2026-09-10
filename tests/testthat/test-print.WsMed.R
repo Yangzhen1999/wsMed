@@ -16,7 +16,7 @@ expect_wsMed_structure <- function(obj) {
   expect_s3_class(obj, "wsMed")
 
   expect_setequal(
-    names(obj),
+    setdiff(names(obj), "moderation_std"),
     c(
       "Na",
       "alpha",

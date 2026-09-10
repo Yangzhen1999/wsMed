@@ -95,7 +95,8 @@ choose \code{"mc"} (default) or \code{"bootSD"}.}
 
 \item{standardized}{Logical; if \code{TRUE}, return standardized parameter
 tables (including defined effects at the reference moderator value).
-Conditional effect tables and curves remain unstandardized. Default FALSE.}
+Raw conditional results remain in moderation; standardized conditional
+tables and curves are added in moderation_std. Default FALSE.}
 
 \item{verbose}{Logical; print progress messages.}
 
@@ -112,7 +113,9 @@ An object of class \code{"wsMed"} with elements:
   \item{sem_model}{Generated \pkg{lavaan} syntax.}
   \item{mc}{List with Monte Carlo draws, bootstrap tables (if any),
     and the fitted model.}
-  \item{moderation}{Conditional or moderated effect tables.}
+  \item{moderation}{Raw conditional or moderated effect tables.}
+  \item{moderation_std}{Standardized conditional tables and curves when
+    standardized=TRUE and a moderator is supplied.}
   \item{form,Na,alpha}{Analysis settings.}
   \item{paths}{The user-defined paths when \code{form = "UD"};
     otherwise \code{NULL}.}
