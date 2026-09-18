@@ -13,7 +13,7 @@ evaluate_definitions_unstd_v2(theta_star, definitions)
 }
 \value{
 A data frame with R rows (simulations) and p + d columns
-(p = number of free parameters, d = number of defined parameters).
+  (p = number of free parameters, d = number of defined parameters).
 }
 \description{
 Evaluates user-defined parameter expressions from Monte Carlo samples

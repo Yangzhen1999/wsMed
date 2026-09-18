@@ -17,28 +17,26 @@ parameter estimates for one imputed dataset.}
 
 \item{k}{An integer specifying the number of parameters in the SEM model.}
 
-\item{adj}{A logical value indicating whether to apply an adjustment for finite samples. Default is \code{TRUE}.}
+\item{adj}{A logical value indicating whether to apply an adjustment for finite samples. Default is `TRUE`.}
 }
 \value{
 A list containing the pooled estimates and covariance matrix:
-\itemize{
-\item \code{est}: A numeric vector of pooled parameter estimates.
-\item \code{total}: A numeric matrix representing the pooled covariance matrix.
-}
+- `est`: A numeric vector of pooled parameter estimates.
+- `total`: A numeric matrix representing the pooled covariance matrix.
 }
 \description{
-A wrapper function for the internal \code{.MICombine()} function from the \code{semmcci} package.
+A wrapper function for the internal `.MICombine()` function from the `semmcci` package.
 This function pools parameter estimates and covariance matrices from multiple imputed datasets
 using Rubin's rules.
 }
 \details{
-This wrapper provides an abstraction over the internal \code{.MICombine()} function from the \code{semmcci} package,
+This wrapper provides an abstraction over the internal `.MICombine()` function from the `semmcci` package,
 allowing it to be used within your package without directly exposing the internal function.
 It is primarily designed for use within workflows that involve multiple imputation and structural
 equation modeling (SEM). Rubin's rules are applied to compute pooled parameter estimates and their
 covariance matrices.
 }
 \seealso{
-\code{\link[=RunMCMIAnalysis]{RunMCMIAnalysis()}}
+[RunMCMIAnalysis()]
 }
 \keyword{internal}

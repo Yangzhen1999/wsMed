@@ -28,9 +28,9 @@ pipelines when working with multiply imputed data.
 \details{
 The function performs the following steps:
 \itemize{
-\item Extracts all imputed datasets from the original \code{mids} object.
-\item Applies \code{PrepareData()} to each imputed dataset using the specified within-subject mediator and outcome variables.
-\item Combines all processed datasets into a long format and reconstructs a new \code{mids} object via \code{mice::as.mids()}.
+  \item Extracts all imputed datasets from the original \code{mids} object.
+  \item Applies \code{PrepareData()} to each imputed dataset using the specified within-subject mediator and outcome variables.
+  \item Combines all processed datasets into a long format and reconstructs a new \code{mids} object via \code{mice::as.mids()}.
 }
 This enables subsequent analyses to operate on a version of the multiply imputed data where difference scores and averages
 have already been computed.

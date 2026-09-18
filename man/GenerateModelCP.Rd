@@ -7,21 +7,20 @@
 GenerateModelCP(prepared_data, MP = character(0))
 }
 \arguments{
-\item{prepared_data}{A data frame returned by \code{\link[=PrepareData]{PrepareData()}}, containing the processed
+\item{prepared_data}{A data frame returned by [PrepareData()], containing the processed
 within-subject mediator and outcome variables. The data frame must include columns for
-difference scores (\code{Mdiff}) and average scores (\code{Mavg}) of mediators, as well as the
-outcome difference score (\code{Ydiff}).}
+difference scores (`Mdiff`) and average scores (`Mavg`) of mediators, as well as the
+outcome difference score (`Ydiff`).}
 
 \item{MP}{A character vector specifying which paths are moderated by variable(s) W.
-Acceptable values include:
-- \code{"a2"}, \code{"a3"}, ...: moderation on the a paths of parallel mediators (W → Mdiff).
-- \code{"b2"}, \code{"b3"}, ...: moderation on the b paths of parallel mediators (Mdiff × W → Ydiff).
-- \code{"b_1_2"}, \code{"b_1_3"}, ...: moderation on the paths from the chain mediator to parallel mediators.
-- \code{"d_1_2"}, \code{"d_1_3"}, ...: moderation on the paths from the chain mediator’s Mavg to parallel mediators.
-- \code{"cp"}: moderation on the direct effect from X to Y (i.e., W → Ydiff).
+          Acceptable values include:
+          - \code{"a2"}, \code{"a3"}, ...: moderation on the a paths of parallel mediators (W → Mdiff).
+          - \code{"b2"}, \code{"b3"}, ...: moderation on the b paths of parallel mediators (Mdiff × W → Ydiff).
+          - \code{"b_1_2"}, \code{"b_1_3"}, ...: moderation on the paths from the chain mediator to parallel mediators.
+          - \code{"d_1_2"}, \code{"d_1_3"}, ...: moderation on the paths from the chain mediator’s Mavg to parallel mediators.
+          - \code{"cp"}: moderation on the direct effect from X to Y (i.e., W → Ydiff).
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{      Each entry triggers inclusion of W’s main effect or interaction terms (e.g., \code{int_Mdiff_W}).
-}\if{html}{\out{</div>}}}
+          Each entry triggers inclusion of W’s main effect or interaction terms (e.g., \code{int_Mdiff_W}).}
 }
 \value{
 A character string representing the SEM model syntax for the specified combined parallel and chained mediation analysis.
@@ -36,19 +35,24 @@ total effects, contrasts between indirect effects, and coefficients in different
 This function is used to construct SEM models that combine parallel and chained mediation analysis.
 It automatically parses variable names from the prepared dataset and dynamically creates
 the necessary model syntax, including:
-\itemize{
-\item \strong{Outcome regression}: Defines the relationship between the difference scores of
-the outcome (\code{Ydiff}), the chained mediator (\code{M1diff}), and the parallel mediators (\code{M2diff}, \code{M3diff}, etc.).
-\item \strong{Mediator regressions}: Defines the sequential regression models for the chained mediator and each parallel mediator.
-\item \strong{Indirect effects}: Computes the indirect effects for both chained and parallel mediation paths,
+
+- **Outcome regression**: Defines the relationship between the difference scores of
+the outcome (`Ydiff`), the chained mediator (`M1diff`), and the parallel mediators (`M2diff`, `M3diff`, etc.).
+
+- **Mediator regressions**: Defines the sequential regression models for the chained mediator and each parallel mediator.
+
+- **Indirect effects**: Computes the indirect effects for both chained and parallel mediation paths,
 including multi-step indirect effects involving both chained and parallel mediators.
-\item \strong{Total indirect effect}: Calculates the sum of all indirect effects from chained and parallel mediation paths.
-\item \strong{Total effect}: Combines the direct effect (\code{cp}) and the total indirect effect.
-\item \strong{Contrasts of indirect effects}: Optionally calculates the pairwise contrasts between
+
+- **Total indirect effect**: Calculates the sum of all indirect effects from chained and parallel mediation paths.
+
+- **Total effect**: Combines the direct effect (`cp`) and the total indirect effect.
+
+- **Contrasts of indirect effects**: Optionally calculates the pairwise contrasts between
 the indirect effects for different mediation paths.
-\item \strong{Coefficients in different 'X' conditions}: Calculates path coefficients in different \code{X}
-conditions to observe the moderation effect of \code{X}.
-}
+
+- **Coefficients in different 'X' conditions**: Calculates path coefficients in different `X`
+conditions to observe the moderation effect of `X`.
 
 This model is suitable for designs where mediators include both a sequential chain (chained mediation)
 and independent parallel mediators.
@@ -71,5 +75,5 @@ cat(sem_model)
 
 }
 \seealso{
-\code{\link[=PrepareData]{PrepareData()}}, \code{\link[=wsMed]{wsMed()}}, \code{\link[=GenerateModelP]{GenerateModelP()}}, \code{\link[=GenerateModelCN]{GenerateModelCN()}}
+[PrepareData()], [wsMed()], [GenerateModelP()], [GenerateModelCN()]
 }

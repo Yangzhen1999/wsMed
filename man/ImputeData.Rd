@@ -27,7 +27,7 @@ ImputeData(
 A list of \code{m} imputed data frames.
 }
 \description{
-The \code{ImputeData} function performs multiple imputation on a data frame with missing values using the \code{mice} package. It handles missing data by creating multiple imputed datasets based on a specified imputation method and returns a list of completed data frames.
+The `ImputeData` function performs multiple imputation on a data frame with missing values using the \code{mice} package. It handles missing data by creating multiple imputed datasets based on a specified imputation method and returns a list of completed data frames.
 }
 \details{
 This function replaces specified missing value placeholders (e.g., \code{-999}) with \code{NA}, and then applies the multiple imputation by chained equations (MICE) procedure to generate multiple imputed datasets. It supports flexible imputation methods and allows for specifying a custom predictor matrix.

@@ -7,7 +7,7 @@
 fix_ci_names(df, ci = 0.95)
 }
 \description{
-Converts columns like \code{CI[LL]} / \code{CI[UL]} or \code{CI.LL} / \code{CI.UL} to the
-standard produced by \code{.make_ci_names()}.
+Converts columns like `CI[LL]` / `CI[UL]` or `CI.LL` / `CI.UL` to the
+standard produced by `.make_ci_names()`.
 }
 \keyword{internal}

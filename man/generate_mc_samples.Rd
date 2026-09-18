@@ -7,9 +7,9 @@
 generate_mc_samples(fit, resolved_map, R = 20000, seed = NULL)
 }
 \arguments{
-\item{fit}{A fitted \code{lavaan} model.}
+\item{fit}{A fitted `lavaan` model.}
 
-\item{resolved_map}{A dependency map from \code{\link[=resolve_all_dependencies]{resolve_all_dependencies()}}.}
+\item{resolved_map}{A dependency map from [resolve_all_dependencies()].}
 
 \item{R}{Integer. Number of Monte Carlo samples to generate.}
 

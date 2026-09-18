@@ -7,18 +7,16 @@
 extract_all_parameters(fit)
 }
 \arguments{
-\item{fit}{A \code{lavaan} model object.}
+\item{fit}{A `lavaan` model object.}
 }
 \value{
 A list with:
-\itemize{
-\item \code{free}: Names of free parameters.
-\item \code{defined}: Names of defined parameters.
-\item \code{definition_map}: A list mapping defined parameters to their dependencies.
-}
+- `free`: Names of free parameters.
+- `defined`: Names of defined parameters.
+- `definition_map`: A list mapping defined parameters to their dependencies.
 }
 \description{
-Extracts free and defined parameters from a fitted \code{lavaan} model,
+Extracts free and defined parameters from a fitted `lavaan` model,
 and builds a dependency map of user-defined parameters.
 }
 \keyword{internal}

@@ -21,25 +21,23 @@ ThetaHatStarWrapper(
 \item{location}{Numeric vector. The mean (or location) of the parameter estimates.}
 
 \item{decomposition}{Character. Decomposition method for the covariance matrix.
-Options: \code{"chol"} (Cholesky), \code{"eigen"} (eigenvalue decomposition), \code{"svd"} (singular value decomposition). Default is \code{"eigen"}.}
+Options: `"chol"` (Cholesky), `"eigen"` (eigenvalue decomposition), `"svd"` (singular value decomposition). Default is `"eigen"`.}
 
-\item{pd}{Logical. Ensure positive definiteness of the covariance matrix. Default is \code{TRUE}.}
+\item{pd}{Logical. Ensure positive definiteness of the covariance matrix. Default is `TRUE`.}
 
-\item{tol}{Numeric. Tolerance for positive definiteness checks. Default is \code{1e-06}.}
+\item{tol}{Numeric. Tolerance for positive definiteness checks. Default is `1e-06`.}
 }
 \value{
 A list containing:
-\itemize{
-\item \code{thetahatstar}: A matrix of simulated parameter estimates with dimensions \verb{R x length(location)}.
-\item \code{decomposition}: The decomposition method used.
-}
+- `thetahatstar`: A matrix of simulated parameter estimates with dimensions `R x length(location)`.
+- `decomposition`: The decomposition method used.
 }
 \description{
 Generates Monte Carlo samples for parameter estimates using a covariance matrix
-and a location vector. This function is a wrapper for the internal \code{.ThetaHatStar()}
-function from the \code{semmcci} package.
+and a location vector. This function is a wrapper for the internal `.ThetaHatStar()`
+function from the `semmcci` package.
 }
 \seealso{
-\code{\link[=MCMI2]{MCMI2()}}, \code{\link[=RunMCMIAnalysis]{RunMCMIAnalysis()}}
+[MCMI2()], [RunMCMIAnalysis()]
 }
 \keyword{internal}

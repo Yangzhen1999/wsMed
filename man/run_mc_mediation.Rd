@@ -15,7 +15,7 @@ run_mc_mediation(
 )
 }
 \arguments{
-\item{fit}{A fitted \code{lavaan} model.}
+\item{fit}{A fitted `lavaan` model.}
 
 \item{data}{The dataset used for the fitted model.}
 

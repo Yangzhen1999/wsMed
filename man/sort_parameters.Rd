@@ -13,15 +13,15 @@ sort_parameters(df)
 A reordered version of the same data frame, with rows sorted according to
 a predefined logical structure:
 \enumerate{
-\item a-paths (e.g., a1, a2, ...)
-\item b-paths (e.g., b1, b2, ...)
-\item d-paths (e.g., d1, d2, ...)
-\item indirect effects (e.g., ind1, ind2, ...)
-\item direct effect
-\item total indirect
-\item total effect
-\item contrasts (e.g., ind1-ind2, ind2-ind3)
-\item X-condition path terms (e.g., X1_b1, X0_b1, ...)
+  \item a-paths (e.g., a1, a2, ...)
+  \item b-paths (e.g., b1, b2, ...)
+  \item d-paths (e.g., d1, d2, ...)
+  \item indirect effects (e.g., ind1, ind2, ...)
+  \item direct effect
+  \item total indirect
+  \item total effect
+  \item contrasts (e.g., ind1-ind2, ind2-ind3)
+  \item X-condition path terms (e.g., X1_b1, X0_b1, ...)
 }
 }
 \description{

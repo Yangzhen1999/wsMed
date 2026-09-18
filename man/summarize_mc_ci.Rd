@@ -11,16 +11,16 @@ summarize_mc_ci(mc_result, alpha = 0.05)
 represents one Monte Carlo replication of that parameter's estimate.}
 
 \item{alpha}{Numeric. Significance level used to compute the (1 - alpha) confidence interval.
-Default is 0.05 for a 95\% confidence interval.}
+Default is 0.05 for a 95 percent confidence interval.}
 }
 \value{
 A data frame with one row per parameter and the following columns:
 \describe{
-\item{Parameter}{The name of the parameter.}
-\item{Estimate}{The average estimate across all Monte Carlo replications.}
-\item{SE}{The standard deviation of the estimates (standard error).}
-\item{CI_lower}{The lower bound of the confidence interval.}
-\item{CI_upper}{The upper bound of the confidence interval.}
+  \item{Parameter}{The name of the parameter.}
+  \item{Estimate}{The average estimate across all Monte Carlo replications.}
+  \item{SE}{The standard deviation of the estimates (standard error).}
+  \item{CI_lower}{The lower bound of the confidence interval.}
+  \item{CI_upper}{The upper bound of the confidence interval.}
 }
 }
 \description{

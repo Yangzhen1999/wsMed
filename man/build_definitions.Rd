@@ -7,7 +7,7 @@
 build_definitions(fit)
 }
 \arguments{
-\item{fit}{A \code{lavaan} model object.}
+\item{fit}{A `lavaan` model object.}
 }
 \value{
 A named list of parameter definitions.

@@ -18,13 +18,11 @@ Invisibly returns the input \code{wsMed} object for further use.
 }
 \description{
 Provides a comprehensive summary of results from a \code{wsMed} object, including:
-\itemize{
-\item Input and computed variables with sample size.
-\item Model fit indices, regression paths, and variance estimates.
-\item Total, direct, and indirect effects with pairwise contrasts.
-\item Moderation effects and Monte Carlo confidence intervals for raw and standardized estimates (if applicable).
-\item Diagnostic notes for bootstrapping, imputation, and analysis parameters.
-}
+- Input and computed variables with sample size.
+- Model fit indices, regression paths, and variance estimates.
+- Total, direct, and indirect effects with pairwise contrasts.
+- Moderation effects and Monte Carlo confidence intervals for raw and standardized estimates (if applicable).
+- Diagnostic notes for bootstrapping, imputation, and analysis parameters.
 
 The output is formatted for clarity, ensuring an intuitive presentation of mediation analysis results,
 including dynamic confidence intervals, moderation keys, and C1-C2 coefficients.
@@ -32,38 +30,29 @@ including dynamic confidence intervals, moderation keys, and C1-C2 coefficients.
 \details{
 This function is specifically designed to display results from the within-subject mediation
 analysis conducted using the \code{wsMed} function. Key features include:
-\itemize{
-\item \strong{Variables}:
-\itemize{
-\item Shows input variables (M_C1, M_C2, Y_C1, Y_C2) and computed variables like Ydiff, Mdiff, and Mavg.
-\item Reports the sample size used in the analysis.
-}
-\item \strong{Model Fit Indices}:
-\itemize{
-\item Displays SEM fit indices (e.g., Chi-square, CFI, TLI, RMSEA, SRMR) to assess model quality.
-}
-\item \strong{Regression Paths and Variance Estimates}:
-\itemize{
-\item Summarizes path coefficients, intercepts, variances, and confidence intervals.
-}
-\item \strong{Effects}:
-\itemize{
-\item Reports total, direct, and indirect effects with their significance.
-\item Highlights pairwise contrasts between indirect effects for mediation paths.
-}
-\item \strong{Moderation Effects}:
-\itemize{
-\item Provides moderation results for identified variables with corresponding coefficients and paths.
-}
-\item \strong{Monte Carlo Confidence Intervals}:
-\itemize{
-\item Includes results for raw and standardized estimates obtained using methods such as MI or FIML.
-}
-\item \strong{Diagnostics}:
-\itemize{
-\item Summarizes analysis parameters like bootstrapping, imputation settings, Monte Carlo iterations, and random seeds.
-}
-}
+
+- **Variables**:
+  - Shows input variables (M_C1, M_C2, Y_C1, Y_C2) and computed variables like Ydiff, Mdiff, and Mavg.
+  - Reports the sample size used in the analysis.
+
+- **Model Fit Indices**:
+  - Displays SEM fit indices (e.g., Chi-square, CFI, TLI, RMSEA, SRMR) to assess model quality.
+
+- **Regression Paths and Variance Estimates**:
+  - Summarizes path coefficients, intercepts, variances, and confidence intervals.
+
+- **Effects**:
+  - Reports total, direct, and indirect effects with their significance.
+  - Highlights pairwise contrasts between indirect effects for mediation paths.
+
+- **Moderation Effects**:
+  - Provides moderation results for identified variables with corresponding coefficients and paths.
+
+- **Monte Carlo Confidence Intervals**:
+  - Includes results for raw and standardized estimates obtained using methods such as MI or FIML.
+
+- **Diagnostics**:
+  - Summarizes analysis parameters like bootstrapping, imputation settings, Monte Carlo iterations, and random seeds.
 }
 \examples{
 

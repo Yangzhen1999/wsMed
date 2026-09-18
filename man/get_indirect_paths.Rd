@@ -12,8 +12,8 @@ get_indirect_paths(col_names)
 }
 \value{
 A list of path descriptors; each element is itself a list with
-components \code{path_name}, \code{coefs}, and \code{mediators}.
-If no valid path exists, an empty list is returned.
+  components \code{path_name}, \code{coefs}, and \code{mediators}.
+  If no valid path exists, an empty list is returned.
 }
 \description{
 Infers every unique mediation chain that can be constructed from a set of
@@ -21,23 +21,23 @@ coefficient names following the WsMed naming convention
 (e.g., \code{a1}, \code{b_1_3}, \code{d_2_1}, \code{b3}).
 The function returns a list; each element describes one indirect effect:
 \itemize{
-\item \code{path_name}  – canonical name, e.g.\ \code{"indirect_effect_1_3"}\cr
-(mediators are concatenated in the encountered order);
-\item \code{coefs}      – vector of coefficient names that define the path;
-\item \code{mediators}  – readable label such as \code{"M1 M3"}.
+  \item \code{path_name}  – canonical name, e.g.\ \code{"indirect_effect_1_3"}\cr
+        (mediators are concatenated in the encountered order);
+  \item \code{coefs}      – vector of coefficient names that define the path;
+  \item \code{mediators}  – readable label such as \code{"M1 M3"}.
 }
 }
 \details{
 Internally the function:
 \enumerate{
-\item identifies all \code{a}, \code{b}, and \code{d} coefficients
-available in \code{col_names};
-\item constructs a directed graph from \code{X → Mi}, \code{Mi → Y},
+  \item identifies all \code{a}, \code{b}, and \code{d} coefficients
+        available in \code{col_names};
+  \item constructs a directed graph from \code{X → Mi}, \code{Mi → Y},
         and \code{Mi → Mj} edges;
-\item runs a depth-first search from the exposure (\emph{X}) to the
-outcome (\emph{Y});
-\item converts every node sequence (X → … → Y) into the corresponding
-coefficient sequence.
+  \item runs a depth-first search from the exposure (\emph{X}) to the
+        outcome (\emph{Y});
+  \item converts every node sequence (X → … → Y) into the corresponding
+        coefficient sequence.
 }
 Duplicate paths (identical mediator ordering) are removed.
 }

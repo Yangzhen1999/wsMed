@@ -7,21 +7,20 @@
 GenerateModelP(prepared_data, MP = character(0))
 }
 \arguments{
-\item{prepared_data}{A data frame returned by \code{\link[=PrepareData]{PrepareData()}}, containing the processed
+\item{prepared_data}{A data frame returned by [PrepareData()], containing the processed
 within-subject mediator and outcome variables. The data frame must include columns for
-difference scores (\code{Mdiff}) and average scores (\code{Mavg}) of mediators, as well as the
-outcome difference score (\code{Ydiff}).}
+difference scores (`Mdiff`) and average scores (`Mavg`) of mediators, as well as the
+outcome difference score (`Ydiff`).}
 
 \item{MP}{A character vector specifying which paths are moderated by variable(s) W.
-Valid values include:
-- \code{"a1"}, \code{"a2"}, ...: moderation on the a paths (W → Mdiff).
-- \code{"b1"}, \code{"b2"}, ...: moderation on the b paths (Mdiff × W → Ydiff).
-- \code{"d1"}, \code{"d2"}, ...: moderation on the d paths (Mavg × W → Ydiff).
-- \code{"cp"}: moderation on the direct effect from X to Y (i.e., W → Ydiff).
+          Valid values include:
+          - \code{"a1"}, \code{"a2"}, ...: moderation on the a paths (W → Mdiff).
+          - \code{"b1"}, \code{"b2"}, ...: moderation on the b paths (Mdiff × W → Ydiff).
+          - \code{"d1"}, \code{"d2"}, ...: moderation on the d paths (Mavg × W → Ydiff).
+          - \code{"cp"}: moderation on the direct effect from X to Y (i.e., W → Ydiff).
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{      This argument controls which interaction terms (e.g., \code{int_Mdiff_W}, \code{int_Mavg_W}) are
-      added to the corresponding regression equations.
-}\if{html}{\out{</div>}}}
+          This argument controls which interaction terms (e.g., \code{int_Mdiff_W}, \code{int_Mavg_W}) are
+          added to the corresponding regression equations.}
 }
 \value{
 A character string representing the SEM model syntax for the specified parallel mediation analysis.
@@ -36,19 +35,24 @@ contrasts between indirect effect, and .
 This function is used to construct SEM models for parallel mediation analysis.
 It automatically parses variable names from the prepared dataset and dynamically creates
 the necessary model syntax, including:
-\itemize{
-\item \strong{Outcome regression}: Defines the relationship between the difference scores of
-the outcome (\code{Ydiff}) and the mediators (\code{Mdiff}) as well as their average scores (\code{Mavg}).
-\item \strong{Mediator regressions}: Defines the intercept models for each mediator's difference score.
-\item \strong{Indirect effects}: Computes the indirect effects for each mediator using the
-product of path coefficients (e.g., \code{a * b}).
-\item \strong{Total indirect effect}: Calculates the sum of all indirect effects.
-\item \strong{Total effect}: Combines the direct effect (\code{cp}) and the total indirect effect.
-\item \strong{Contrasts of indirect effects}: Optionally calculates the pairwise contrasts between
+
+- **Outcome regression**: Defines the relationship between the difference scores of
+the outcome (`Ydiff`) and the mediators (`Mdiff`) as well as their average scores (`Mavg`).
+
+- **Mediator regressions**: Defines the intercept models for each mediator's difference score.
+
+- **Indirect effects**: Computes the indirect effects for each mediator using the
+product of path coefficients (e.g., `a * b`).
+
+- **Total indirect effect**: Calculates the sum of all indirect effects.
+
+- **Total effect**: Combines the direct effect (`cp`) and the total indirect effect.
+
+- **Contrasts of indirect effects**: Optionally calculates the pairwise contrasts between
 the indirect effects when multiple mediators are present.
-\item \strong{coefficients in different 'X' conditions}: Calculates path coefficients in different X conditions
+
+- **coefficients in different 'X' conditions**: Calculates path coefficients in different X conditions
 to observe the moderation effect of ‘X'.
-}
 
 This model is suitable for parallel mediation designs where multiple mediators act independently.
 }
@@ -67,5 +71,5 @@ sem_model <- GenerateModelP(prepared_data)
 cat(sem_model)
 }
 \seealso{
-\code{\link[=PrepareData]{PrepareData()}}, \code{\link[=wsMed]{wsMed()}}, \code{\link[=GenerateModelCN]{GenerateModelCN()}}
+[PrepareData()], [wsMed()], [GenerateModelCN()]
 }
