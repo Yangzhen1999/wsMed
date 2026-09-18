@@ -29,8 +29,8 @@ Average Relative Increase in Variance
 }
 \details{
 The average relative increase in variance
-is given by
-\deqn{
+  is given by
+  \deqn{
     \mathrm{ARIV}
     =
     \left( 1 + M^{-1} \right)

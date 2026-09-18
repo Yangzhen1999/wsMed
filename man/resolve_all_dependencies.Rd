@@ -7,7 +7,7 @@
 resolve_all_dependencies(def_map)
 }
 \arguments{
-\item{def_map}{A definition map produced by \code{\link[=extract_all_parameters]{extract_all_parameters()}}.}
+\item{def_map}{A definition map produced by [extract_all_parameters()].}
 }
 \value{
 A list mapping each defined parameter to its dependent free parameters.

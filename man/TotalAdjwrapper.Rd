@@ -19,8 +19,8 @@ Adjusted Total Sampling Covariance Matrix
 }
 \details{
 The adjusted total sampling covariance matrix
-is given by
-\deqn{
+  is given by
+  \deqn{
     \tilde{\mathbf{V}}_{\mathrm{total}}
     =
     \left( 1 + \mathrm{ARIV} \right)

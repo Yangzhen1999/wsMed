@@ -66,11 +66,11 @@ in the returned data?}
 \value{
 A list containing:
 \describe{
-\item{\code{processed_data_list}}{A list of \code{m} data frames,
-each representing an imputed and processed dataset ready for
-within-subject mediation analysis.}
-\item{\code{imputation_summary}}{A summary of the imputation process,
-including diagnostics and convergence information.}
+  \item{\code{processed_data_list}}{A list of \code{m} data frames,
+    each representing an imputed and processed dataset ready for
+    within-subject mediation analysis.}
+  \item{\code{imputation_summary}}{A summary of the imputation process,
+    including diagnostics and convergence information.}
 }
 }
 \description{
@@ -82,16 +82,17 @@ and provides diagnostics for the imputation process.
 \details{
 This function is designed to preprocess datasets with missing values
 for mediation analysis. It performs the following steps:
-\itemize{
-\item Multiple imputation: Uses specified imputation methods
-(for example, predictive mean matching) to generate
-\code{m} imputed datasets.
-\item Data preparation: Applies \code{\link{PrepareData}} to each of the
-\code{m} imputed datasets to calculate difference scores
-and centered averages for mediators and the outcome variable.
-\item Imputation diagnostics: Provides summary diagnostics for the imputation
-process, including information about missing data patterns and convergence.
-}
+
+- Multiple imputation: Uses specified imputation methods
+  (for example, predictive mean matching) to generate
+  \code{m} imputed datasets.
+
+- Data preparation: Applies \code{\link{PrepareData}} to each of the
+  \code{m} imputed datasets to calculate difference scores
+  and centered averages for mediators and the outcome variable.
+
+- Imputation diagnostics: Provides summary diagnostics for the imputation
+  process, including information about missing data patterns and convergence.
 
 This function integrates imputation and data preparation, ensuring that
 the resulting datasets are ready for subsequent mediation analysis.

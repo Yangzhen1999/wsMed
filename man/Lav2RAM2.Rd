@@ -7,15 +7,15 @@
 Lav2RAM2(lav_mod)
 }
 \arguments{
-\item{lav_mod}{A named list of lavaan matrices including \code{lambda}, \code{beta}, \code{theta}, \code{psi}, and \code{alpha}.}
+\item{lav_mod}{A named list of lavaan matrices including `lambda`, `beta`, `theta`, `psi`, and `alpha`.}
 }
 \value{
 A list with components:
 \describe{
-\item{A}{Asymmetric path matrix (including factor loadings and structural paths)}
-\item{S}{Symmetric path matrix (variances and covariances)}
-\item{F}{Filter matrix mapping latent and observed variables}
-\item{M}{Row vector of intercepts/means}
+  \item{A}{Asymmetric path matrix (including factor loadings and structural paths)}
+  \item{S}{Symmetric path matrix (variances and covariances)}
+  \item{F}{Filter matrix mapping latent and observed variables}
+  \item{M}{Row vector of intercepts/means}
 }
 }
 \description{

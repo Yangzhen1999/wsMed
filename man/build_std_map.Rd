@@ -7,7 +7,7 @@
 build_std_map(fit)
 }
 \arguments{
-\item{fit}{A fitted \code{lavaan} model.}
+\item{fit}{A fitted `lavaan` model.}
 }
 \value{
 A named list: intercepts (std_map).

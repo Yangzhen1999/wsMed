@@ -7,7 +7,7 @@
 TestPositiveDefinitewrapper(eigen, tol = 1e-06)
 }
 \arguments{
-\item{eigen}{output of the \code{\link[=eigen]{eigen()}} function.}
+\item{eigen}{output of the [eigen()] function.}
 
 \item{tol}{Numeric.
 Tolerance.}
@@ -16,9 +16,9 @@ Tolerance.}
 Logical.
 }
 \description{
-Returns \code{TRUE} if input
+Returns `TRUE` if input
 is a positive definite matrix,
-and \code{FALSE} otherwise.
+and `FALSE` otherwise.
 }
 \details{
 A
@@ -29,6 +29,6 @@ is positive definite
 if all of its eigenvalues are positive.
 }
 \references{
-\href{https://en.wikipedia.org/wiki/Definite_matrix}{Wikipedia: Definite matrix}
+[Wikipedia: Definite matrix](https://en.wikipedia.org/wiki/Definite_matrix)
 }
 \keyword{internal}

@@ -19,7 +19,7 @@ A character vector of variable names whose standard deviations are needed to sta
 \description{
 Extracts variable names from a fitted SEM model and a definition map that are required
 for computing standardized estimates in Monte Carlo simulations.
-Specifically, it identifies intercept terms (e.g., \code{~1}) involved in user-defined parameters
-such as indirect effects (e.g., \code{indirect := a * b}) that require standard deviations for standardization.
+Specifically, it identifies intercept terms (e.g., `~1`) involved in user-defined parameters
+such as indirect effects (e.g., `indirect := a * b`) that require standard deviations for standardization.
 }
 \keyword{internal}

@@ -7,7 +7,7 @@
 get_all_variables_from_path_map(path_std_map)
 }
 \arguments{
-\item{path_std_map}{A named list returned by \code{\link[=build_path_std_map]{build_path_std_map()}}.}
+\item{path_std_map}{A named list returned by [build_path_std_map()].}
 }
 \value{
 A character vector of variable names.

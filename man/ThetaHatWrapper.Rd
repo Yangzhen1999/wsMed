@@ -7,7 +7,7 @@
 ThetaHatWrapper(object, est = NULL)
 }
 \arguments{
-\item{object}{A fitted \code{lavaan} SEM model object.}
+\item{object}{A fitted `lavaan` SEM model object.}
 
 \item{est}{A numeric vector of pooled parameter estimates, typically obtained from multiple imputations
 or Monte Carlo simulations.}
@@ -16,7 +16,7 @@ or Monte Carlo simulations.}
 A numeric vector of updated parameter estimates.
 }
 \description{
-A wrapper for the internal \code{.ThetaHat()} function from the \code{semmcci} package.
+A wrapper for the internal `.ThetaHat()` function from the `semmcci` package.
 This function computes updated parameter estimates for structural equation models (SEM)
 using pooled estimates from multiple imputations or Monte Carlo simulations.
 }
@@ -30,6 +30,6 @@ NULL
 
 }
 \seealso{
-\code{\link[=MCMI2]{MCMI2()}}, \code{\link[=RunMCMIAnalysis]{RunMCMIAnalysis()}}
+[MCMI2()], [RunMCMIAnalysis()]
 }
 \keyword{internal}

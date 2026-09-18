@@ -50,53 +50,42 @@ Same coding as \code{C_type}. Ignored when \code{W = NULL}.}
 \value{
 A data frame containing at minimum:
 \itemize{
-\item \code{Ydiff}
-\item \code{Mi_diff}, \code{Mi_avg} for each mediator
-\item centered or dummy-coded \code{Cb*}, \code{Cw*diff}, \code{Cw*avg}
-\item centered or dummy-coded \code{W*} and all \code{int_*} interaction terms
+  \item \code{Ydiff}
+  \item \code{Mi_diff}, \code{Mi_avg} for each mediator
+  \item centered or dummy-coded \code{Cb*}, \code{Cw*diff}, \code{Cw*avg}
+  \item centered or dummy-coded \code{W*} and all \code{int_*} interaction terms
 }
 plus the attributes \code{"W_info"} and \code{"C_info"} described above.
 }
 \description{
-\code{PrepareData()} transforms raw pre/post data into the set of variables
-required by the \strong{WsMed} workflow.
-It handles \emph{mediators}, \emph{outcome}, \emph{within-subject controls}, \emph{between-subject
-controls}, \emph{moderators}, and all necessary \strong{interaction terms}, while
+`PrepareData()` transforms raw pre/post data into the set of variables
+required by the **WsMed** workflow.
+It handles *mediators*, *outcome*, *within-subject controls*, *between-subject
+controls*, *moderators*, and all necessary **interaction terms**, while
 automatically centering / dummy-coding variables as needed.
 }
 \details{
 The function performs the following steps:
-\enumerate{
-\item Outcome difference: \code{Ydiff = Y_C2 - Y_C1}.
-\item Mediator variables for each pair \code{(M_C1[i], M_C2[i])}:
-\itemize{
-\item \code{Mi_diff = M_C2 - M_C1}
-\item \code{Mi_avg} is the mean-centered average of the two occasions.
-}
-\item Between-subject controls \code{C}:
-\itemize{
-\item Continuous variables are grand-mean centered (\code{Cb1}, \code{Cb2}, ...).
-\item Categorical variables (binary or multi-level) are expanded into \code{k - 1}
-dummy variables (\code{Cb1_1}, \code{Cb2_1}, \code{Cb2_2}, ...), using the
-first level as the reference.
-}
-\item Within-subject controls \code{Cw}: difference and centered-average versions
-(\code{Cw1diff}, \code{Cw1avg}, ...).
-\item Moderators \code{W} (one or more):
-\itemize{
-\item Continuous variables are grand-mean centered (\code{W1}, \code{W2}, ...).
-\item Categorical variables are dummy-coded in the same way as \code{C}.
-}
-\item Interaction terms between each moderator column and each mediator column:
-\itemize{
-\item \code{int_<Mi_diff>_<Wj>}, \code{int_<Mi_avg>_<Wj>}.
-}
-\item Two attributes are added to the returned data:
-\itemize{
-\item \code{"W_info"}: raw names, dummy names, level mapping
-\item \code{"C_info"}: same structure for between-subject controls.
-}
-}
+
+1. Outcome difference: \code{Ydiff = Y_C2 - Y_C1}.
+2. Mediator variables for each pair \code{(M_C1[i], M_C2[i])}:
+   - \code{Mi_diff = M_C2 - M_C1}
+   - \code{Mi_avg} is the mean-centered average of the two occasions.
+3. Between-subject controls \code{C}:
+   - Continuous variables are grand-mean centered (\code{Cb1}, \code{Cb2}, ...).
+   - Categorical variables (binary or multi-level) are expanded into \code{k - 1}
+     dummy variables (\code{Cb1_1}, \code{Cb2_1}, \code{Cb2_2}, ...), using the
+     first level as the reference.
+4. Within-subject controls \code{Cw}: difference and centered-average versions
+   (\code{Cw1diff}, \code{Cw1avg}, ...).
+5. Moderators \code{W} (one or more):
+   - Continuous variables are grand-mean centered (\code{W1}, \code{W2}, ...).
+   - Categorical variables are dummy-coded in the same way as \code{C}.
+6. Interaction terms between each moderator column and each mediator column:
+   - \code{int_<Mi_diff>_<Wj>}, \code{int_<Mi_avg>_<Wj>}.
+7. Two attributes are added to the returned data:
+   - \code{"W_info"}: raw names, dummy names, level mapping
+   - \code{"C_info"}: same structure for between-subject controls.
 
 Row counts are preserved even if input factors contain NA values
 (model.matrix is called with \code{na.action = na.pass}).

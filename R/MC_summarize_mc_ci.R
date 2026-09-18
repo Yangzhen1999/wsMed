@@ -6,7 +6,7 @@
 #' @param mc_result A data frame where each column corresponds to a parameter, and each row
 #' represents one Monte Carlo replication of that parameter's estimate.
 #' @param alpha Numeric. Significance level used to compute the (1 - alpha) confidence interval.
-#' Default is 0.05 for a 95% confidence interval.
+#' Default is 0.05 for a 95 percent confidence interval.
 #'
 #' @return A data frame with one row per parameter and the following columns:
 #' \describe{

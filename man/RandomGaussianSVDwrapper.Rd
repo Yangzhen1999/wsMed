@@ -9,12 +9,12 @@ RandomGaussianSVDwrapper(Z, svd)
 }
 \arguments{
 \item{Z}{Numeric matrix.
-\code{n} by \code{k} matrix of independent random variates
+`n` by `k` matrix of independent random variates
 from the standard univariate normal distribution
 \eqn{\mathbf{Z}}.}
 
 \item{svd}{Object.
-Result of \code{\link[=svd]{svd()}}.}
+Result of [svd()].}
 }
 \value{
 Numeric matrix.

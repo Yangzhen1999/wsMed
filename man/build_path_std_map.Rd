@@ -7,7 +7,7 @@
 build_path_std_map(fit)
 }
 \arguments{
-\item{fit}{A fitted \code{lavaan} model.}
+\item{fit}{A fitted `lavaan` model.}
 }
 \value{
 A named list: slopes (path_std_map).

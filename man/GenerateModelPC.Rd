@@ -7,23 +7,22 @@
 GenerateModelPC(prepared_data, MP = character(0))
 }
 \arguments{
-\item{prepared_data}{A data frame returned by \code{\link[=PrepareData]{PrepareData()}}, containing the processed
+\item{prepared_data}{A data frame returned by [PrepareData()], containing the processed
 within-subject mediator and outcome variables. The data frame must include columns for
-difference scores (\code{Mdiff}) and average scores (\code{Mavg}) of mediators, as well as the
-outcome difference score (\code{Ydiff}).}
+difference scores (`Mdiff`) and average scores (`Mavg`) of mediators, as well as the
+outcome difference score (`Ydiff`).}
 
 \item{MP}{A character vector specifying which paths are moderated by variable(s) W.
-Acceptable values include:
-- \code{"a2"}, \code{"a3"}, ...: moderation on the a paths (W → Mdiff).
-- \code{"b2"}, \code{"b3"}, ...: moderation on the b paths (Mdiff × W → Ydiff).
-- \code{"b_2_1"}, \code{"b_3_1"}, ...: moderation on the cross-paths from parallel mediators to the chain mediator (e.g., M2 → M1).
-- \code{"d_2_1"}, \code{"d_3_1"}, ...: moderation on the paths from parallel mediators’ centered means to M1.
-- \code{"cp"}: moderation on the direct effect of X on Y (i.e., W → Ydiff).
+          Acceptable values include:
+          - \code{"a2"}, \code{"a3"}, ...: moderation on the a paths (W → Mdiff).
+          - \code{"b2"}, \code{"b3"}, ...: moderation on the b paths (Mdiff × W → Ydiff).
+          - \code{"b_2_1"}, \code{"b_3_1"}, ...: moderation on the cross-paths from parallel mediators to the chain mediator (e.g., M2 → M1).
+          - \code{"d_2_1"}, \code{"d_3_1"}, ...: moderation on the paths from parallel mediators’ centered means to M1.
+          - \code{"cp"}: moderation on the direct effect of X on Y (i.e., W → Ydiff).
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{      This argument controls which interaction terms (e.g., \code{int_Mdiff_W}, \code{int_Mavg_W}) are included
-      in the regression equations. Variable names are automatically matched using the naming convention
-      \code{"int_<predictor>_W<index>"}.
-}\if{html}{\out{</div>}}}
+          This argument controls which interaction terms (e.g., \code{int_Mdiff_W}, \code{int_Mavg_W}) are included
+          in the regression equations. Variable names are automatically matched using the naming convention
+          \code{"int_<predictor>_W<index>"}.}
 }
 \value{
 A character string representing the SEM model syntax for the specified parallel and chained mediation analysis.
@@ -31,31 +30,34 @@ A character string representing the SEM model syntax for the specified parallel 
 \description{
 Dynamically generates a structural equation modeling (SEM) syntax for
 mediation analysis that integrates both parallel and chained mediators. Unlike the
-Combined Parallel and Chained mediation model (\code{GenerateModelCP}), this function assumes
+Combined Parallel and Chained mediation model (`GenerateModelCP`), this function assumes
 that the chained mediator receives inputs from the parallel mediators and directly influences
 the outcome variable, emphasizing a downstream role for the chained mediator.
 }
 \details{
 This function is designed to build SEM models that integrate parallel and chained mediation structures.
 It automatically identifies variable names from the prepared dataset and generates the necessary model syntax, including:
-\itemize{
-\item \strong{Outcome regression}: Defines the relationship between the difference scores of the outcome (\code{Ydiff}),
-the chained mediator (\code{M1diff}), and the parallel mediators (\code{M2diff}, \code{M3diff}, etc.).
-\item \strong{Mediator regressions}: Constructs separate regression models for the parallel mediators and the chained mediator.
+
+- **Outcome regression**: Defines the relationship between the difference scores of the outcome (`Ydiff`),
+the chained mediator (`M1diff`), and the parallel mediators (`M2diff`, `M3diff`, etc.).
+
+- **Mediator regressions**: Constructs separate regression models for the parallel mediators and the chained mediator.
 The chained mediator incorporates predictors from all parallel mediators.
-\item \strong{Indirect effects}: Computes indirect effects for:
-\itemize{
-\item Parallel mediators (\code{M2diff}, \code{M3diff}, etc.) directly influencing the outcome.
-\item The chained mediator (\code{M1diff}) directly influencing the outcome.
-\item Combined paths where parallel mediators influence the chained mediator, which in turn influences the outcome.
-}
-\item \strong{Total indirect effect}: Summarizes all indirect effects from parallel and chained mediation paths.
-\item \strong{Total effect}: Combines the direct effect (\code{cp}) and the total indirect effect.
-\item \strong{Contrasts of indirect effects}: Optionally computes pairwise contrasts between indirect effects
+
+- **Indirect effects**: Computes indirect effects for:
+  - Parallel mediators (`M2diff`, `M3diff`, etc.) directly influencing the outcome.
+  - The chained mediator (`M1diff`) directly influencing the outcome.
+  - Combined paths where parallel mediators influence the chained mediator, which in turn influences the outcome.
+
+- **Total indirect effect**: Summarizes all indirect effects from parallel and chained mediation paths.
+
+- **Total effect**: Combines the direct effect (`cp`) and the total indirect effect.
+
+- **Contrasts of indirect effects**: Optionally computes pairwise contrasts between indirect effects
 for different mediation paths.
-\item \strong{Coefficients in different 'X' conditions}: Computes path coefficients under different \code{X} conditions
+
+- **Coefficients in different 'X' conditions**: Computes path coefficients under different `X` conditions
 to analyze moderation effects.
-}
 
 This model is suitable for designs where mediators include both independent parallel paths and
 sequential chained paths, providing a comprehensive mediation analysis framework.
@@ -78,5 +80,5 @@ cat(sem_model)
 
 }
 \seealso{
-\code{\link[=PrepareData]{PrepareData()}}, \code{\link[=wsMed]{wsMed()}}, \code{\link[=GenerateModelP]{GenerateModelP()}}, \code{\link[=GenerateModelCN]{GenerateModelCN()}}
+[PrepareData()], [wsMed()], [GenerateModelP()], [GenerateModelCN()]
 }

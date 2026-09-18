@@ -7,7 +7,7 @@
 MCDefWrapper(object, thetahat, thetahatstar_orig)
 }
 \arguments{
-\item{object}{A fitted \code{lavaan} SEM model object.}
+\item{object}{A fitted `lavaan` SEM model object.}
 
 \item{thetahat}{A numeric vector of parameter estimates.}
 
@@ -18,7 +18,7 @@ represent parameters.}
 A matrix of computed defined parameters for each Monte Carlo sample.
 }
 \description{
-A wrapper for the internal \code{.MCDef()} function from the \code{semmcci} package.
+A wrapper for the internal `.MCDef()` function from the `semmcci` package.
 This function processes Monte Carlo samples to compute defined parameters for structural
 equation modeling (SEM).
 }
@@ -29,6 +29,6 @@ based on the model syntax. It is particularly useful for examining derived quant
 analyses using Monte Carlo methods.
 }
 \seealso{
-\code{\link[=MCMI2]{MCMI2()}}, \code{\link[=RunMCMIAnalysis]{RunMCMIAnalysis()}}
+[MCMI2()], [RunMCMIAnalysis()]
 }
 \keyword{internal}
