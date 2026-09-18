@@ -1,7 +1,7 @@
 # Monte Carlo Summary for Standardized Estimates
 
 Computes standardized estimates, standard errors, and confidence
-intervals based on Monte Carlo samples from a `semmcci` object. This
+intervals based on Monte Carlo samples from a \`semmcci\` object. This
 function fully standardizes both point estimates and sampling
 distributions (including intercepts).
 
@@ -15,13 +15,13 @@ MCStd2(mc, alpha = c(0.001, 0.01, 0.05))
 
 - mc:
 
-  A Monte Carlo result object of class `semmcci`, typically from `MC()`
-  or `MCMI()`.
+  A Monte Carlo result object of class \`semmcci\`, typically from
+  \`MC()\` or \`MCMI()\`.
 
 - alpha:
 
-  A numeric vector of significance levels (default:
-  `c(0.001, 0.01, 0.05)`).
+  A numeric vector of significance levels (default: \`c(0.001, 0.01,
+  0.05)\`).
 
 ## Value
 
@@ -41,15 +41,16 @@ A data frame containing:
 
 - R:
 
-  Number of Monte Carlo replications
+  Number of valid joint Monte Carlo replications
 
 - CI columns:
 
-  Multiple confidence intervals based on `alpha`
+  Multiple confidence intervals based on \`alpha\`
 
 ## Details
 
-The function standardizes the sampling distribution using
-[`StdLav2()`](https://yangzhen1999.github.io/wsMed/reference/StdLav2.md)
+The function standardizes the sampling distribution using \`StdLav2()\`
 on each Monte Carlo draw, then summarizes the distribution into SEs and
-quantile-based confidence intervals.
+quantile-based confidence intervals. Invalid draws are excluded jointly
+and reported in the standardization_diagnostics attribute (requested,
+valid, invalid, indices and reasons).

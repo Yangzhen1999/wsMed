@@ -39,9 +39,17 @@ Functions to handle missing data with multiple imputation
 - [`PrepareData()`](https://yangzhen1999.github.io/wsMed/reference/PrepareData.md)
   : Prepare Data for Two-Condition Within-Subject Mediation (WsMed)
 
-## Plotting Conditional Indirect Effects
+## Standardization and Conditional Effects
 
-Functions for visualizing conditional indirect effect curves
+Standardize conditional results and visualize effect curves
 
+- [`standardize_moderation()`](https://yangzhen1999.github.io/wsMed/reference/standardize_moderation.md)
+  : Standardize conditional mediation results using existing joint draws
 - [`plot_moderation_curve()`](https://yangzhen1999.github.io/wsMed/reference/plot_moderation_curve.md)
-  : Plot moderation curves with Johnson-Neyman highlights
+  : Plot conditional effects across a continuous moderator
+- [`plot_effects()`](https://yangzhen1999.github.io/wsMed/reference/plot_effects.md)
+  : Forest plot of mediation effects
+- [`plot_conditional_effects()`](https://yangzhen1999.github.io/wsMed/reference/plot_conditional_effects.md)
+  : Plot conditional effects at moderator levels
+- [`plot_contrasts()`](https://yangzhen1999.github.io/wsMed/reference/plot_contrasts.md)
+  : Plot differences between mediation effects

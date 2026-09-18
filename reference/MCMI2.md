@@ -19,7 +19,8 @@ MCMI2(
   seed = NULL,
   estimator = "ML",
   se = "standard",
-  missing = "listwise"
+  missing = "listwise",
+  fixed.x = FALSE
 )
 ```
 
@@ -37,77 +38,76 @@ MCMI2(
 - R:
 
   An integer specifying the number of Monte Carlo samples. Default is
-  `20000L`.
+  \`20000L\`.
 
 - alpha:
 
   A numeric vector specifying significance levels for the confidence
-  intervals. Default is `c(0.001, 0.01, 0.05)`.
+  intervals. Default is \`c(0.001, 0.01, 0.05)\`.
 
 - decomposition:
 
   A character string specifying the decomposition method for the
-  covariance matrix. Default is `"eigen"`. Options include `"chol"`,
-  `"eigen"`, or `"svd"`.
+  covariance matrix. Default is \`"eigen"\`. Options include \`"chol"\`,
+  \`"eigen"\`, or \`"svd"\`.
 
 - pd:
 
   A logical value indicating whether to ensure positive definiteness of
-  the covariance matrix. Default is `TRUE`.
+  the covariance matrix. Default is \`TRUE\`.
 
 - tol:
 
   A numeric value specifying the tolerance for positive definiteness
-  checks. Default is `1e-06`.
+  checks. Default is \`1e-06\`.
 
 - seed:
 
   An optional integer specifying the random seed for reproducibility.
-  Default is `NULL`.
+  Default is \`NULL\`.
 
 - estimator:
 
   A character string specifying the estimator for SEM fitting. Default
-  is `"ML"` (Maximum Likelihood).
+  is \`"ML"\` (Maximum Likelihood).
 
 - se:
 
   A character string specifying the type of standard errors to compute.
-  Default is `"standard"`.
+  Default is \`"standard"\`.
 
 - missing:
 
   A character string specifying the method for handling missing data in
-  SEM fitting. Default is `"listwise"`.
+  SEM fitting. Default is \`"listwise"\`.
+
+- fixed.x:
+
+  Whether exogenous covariates are treated as fixed in every imputation.
+  Defaults to FALSE, consistently with wsMed().
 
 ## Value
 
-An object of class `semmcci` containing:
-
-- `call`: The matched function call.
-
-- `args`: A list of input arguments.
-
-- `thetahat`: The pooled parameter estimates.
-
-- `thetahatstar`: Monte Carlo samples for parameter estimates.
-
-- `fun`: The name of the function (`"MCMI2"`).
+An object of class \`semmcci\` containing: - \`call\`: The matched
+function call. - \`args\`: A list of input arguments. - \`thetahat\`:
+The pooled parameter estimates. - \`thetahatstar\`: Monte Carlo samples
+for parameter estimates. - \`fun\`: The name of the function
+(\`"MCMI2"\`).
 
 ## Details
 
 This function is designed for SEM models that require multiple
 imputation to handle missing data. It performs the following steps:
 
-- **SEM Fitting**: Fits the specified SEM model to each imputed dataset
-  using [`lavaan::sem()`](https://rdrr.io/pkg/lavaan/man/sem.html).
+\- \*\*SEM Fitting\*\*: Fits the specified SEM model to each imputed
+dataset using \[lavaan::sem()\].
 
-- **Pooling Results**: Combines parameter estimates and covariance
-  matrices across imputations using Rubin's rules.
+\- \*\*Pooling Results\*\*: Combines parameter estimates and covariance
+matrices across imputations using Rubin's rules.
 
-- **Monte Carlo Sampling**: Generates Monte Carlo samples based on the
-  pooled estimates and covariance matrices, and calculates confidence
-  intervals for model parameters.
+\- \*\*Monte Carlo Sampling\*\*: Generates Monte Carlo samples based on
+the pooled estimates and covariance matrices, and calculates confidence
+intervals for model parameters.
 
 This function supports custom estimators, handling of missing data, and
 precision adjustments for Monte Carlo sampling. It is particularly
@@ -116,9 +116,7 @@ are addressed using multiple imputation.
 
 ## See also
 
-[`lavaan::sem()`](https://rdrr.io/pkg/lavaan/man/sem.html),
-[`semmcci::MC()`](https://github.com/jeksterslab/semmcci/reference/MC.html),
-[`semmcci::MCStd()`](https://github.com/jeksterslab/semmcci/reference/MCStd.html)
+\[lavaan::sem()\], \[semmcci::MC()\], \[semmcci::MCStd()\]
 
 ## Examples
 

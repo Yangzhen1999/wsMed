@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,6 +20,8 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials"><li><a class="dropdown-item" href="../articles/WsMed.html">Using wsMed: A step-by-step tutorial</a></li>
+    <li><a class="dropdown-item" href="../articles/PlottingEffects.html">Plotting effects and contrasts</a></li>
+    <li><a class="dropdown-item" href="../articles/StandardizedModeratedMediation.html">Standardized moderated mediation</a></li>
     <li><a class="dropdown-item" href="../articles/printGM.html">Using printGM() to Generate SEM Models</a></li>
     <li><a class="dropdown-item" href="../articles/GenerateModelP.html">Parallel Mediation (P)</a></li>
     <li><a class="dropdown-item" href="../articles/GenerateModelCN.html">Chained Mediation (CN)</a></li>
@@ -39,7 +41,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Create moderation output for wsMed</h1>
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/custom-model/R/wsMed-helper.R" class="external-link"><code>R/wsMed-helper.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/master/R/wsMed-helper.R" class="external-link"><code>R/wsMed-helper.R</code></a></small>
       <div class="d-none name"><code>dot-make_moderation.Rd</code></div>
     </div>
 
@@ -56,7 +58,8 @@
 <span>  MP <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  W_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"categorical"</span>, <span class="st">"continuous"</span>, <span class="st">"none"</span><span class="op">)</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
-<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  point_estimates <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 

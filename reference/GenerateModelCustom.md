@@ -30,6 +30,9 @@ GenerateModelCustom(prepared_data, paths, MP = character(0))
   follow the existing wsMed convention: \`a1\`, \`b1\`, \`d1\`,
   \`b_1_2\`, \`d_1_2\`, and \`cp\`.
 
+  Main effects of W are always labeled and used for conditional
+  intercepts, including when a/cp is not explicitly listed in MP.
+
 ## Value
 
 A character string containing lavaan model syntax.

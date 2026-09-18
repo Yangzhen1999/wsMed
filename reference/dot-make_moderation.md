@@ -12,6 +12,7 @@ Create moderation output for wsMed
   MP = NULL,
   W_type = c("categorical", "continuous", "none"),
   alpha = 0.05,
-  verbose = FALSE
+  verbose = FALSE,
+  point_estimates = NULL
 )
 ```

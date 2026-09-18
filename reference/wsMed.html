@@ -13,7 +13,7 @@ Monte Carlo confidence intervals."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,6 +26,8 @@ Monte Carlo confidence intervals."></head><body>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials"><li><a class="dropdown-item" href="../articles/WsMed.html">Using wsMed: A step-by-step tutorial</a></li>
+    <li><a class="dropdown-item" href="../articles/PlottingEffects.html">Plotting effects and contrasts</a></li>
+    <li><a class="dropdown-item" href="../articles/StandardizedModeratedMediation.html">Standardized moderated mediation</a></li>
     <li><a class="dropdown-item" href="../articles/printGM.html">Using printGM() to Generate SEM Models</a></li>
     <li><a class="dropdown-item" href="../articles/GenerateModelP.html">Parallel Mediation (P)</a></li>
     <li><a class="dropdown-item" href="../articles/GenerateModelCN.html">Chained Mediation (CN)</a></li>
@@ -45,7 +47,7 @@ Monte Carlo confidence intervals."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Within-Subject Mediation Analysis (Two-Condition)</h1>
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/custom-model/R/WSMed.R" class="external-link"><code>R/WSMed.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/master/R/WSMed.R" class="external-link"><code>R/WSMed.R</code></a></small>
       <div class="d-none name"><code>wsMed.Rd</code></div>
     </div>
 
@@ -127,17 +129,20 @@ Monte Carlo confidence intervals.</p>
 
 <dt id="arg-mp">MP<a class="anchor" aria-label="anchor" href="#arg-mp"></a></dt>
 <dd><p>Character vector identifying which regression paths are moderated
-(for example, <code>"a1"</code>, <code>"b_1_2"</code>, <code>"cp"</code>).</p></dd>
+(for example, <code>"a1"</code>, <code>"b_1_2"</code>, <code>"cp"</code>). Main effects of
+W already included in each regression are always used when computing
+conditional intercepts, whether or not a/cp is explicitly listed in MP.</p></dd>
 
 
 <dt id="arg-form">form<a class="anchor" aria-label="anchor" href="#arg-form"></a></dt>
 <dd><p>Model type: <code>"P"</code>, <code>"CN"</code>, <code>"CP"</code>,
 <code>"PC"</code>, or <code>"UD"</code>. Use <code>"UD"</code> to specify a
-user-defined mediation model.</p></dd>
+user-defined mediation model. Values are case-insensitive.</p></dd>
 
 
 <dt id="arg-na">Na<a class="anchor" aria-label="anchor" href="#arg-na"></a></dt>
-<dd><p>Missing-data method: <code>"DE"</code>, <code>"FIML"</code>, or <code>"MI"</code>.</p></dd>
+<dd><p>Missing-data method: <code>"DE"</code>, <code>"FIML"</code>, or <code>"MI"</code>.
+Values are case-insensitive.</p></dd>
 
 
 <dt id="arg-alpha">alpha<a class="anchor" aria-label="anchor" href="#arg-alpha"></a></dt>
@@ -187,9 +192,9 @@ or <code>"bca.simple"</code>.</p></dd>
 
 
 <dt id="arg-ci-method">ci_method<a class="anchor" aria-label="anchor" href="#arg-ci-method"></a></dt>
-<dd><p>CI engine: <code>"bootstrap"</code> or <code>"mc"</code>.
-If <code>NULL</code> (default) the choice is <code>"bootstrap"</code> for <code>Na = "DE"</code>
-and <code>"mc"</code> otherwise.</p></dd>
+<dd><p>CI engine: <code>"mc"</code>, <code>"bootstrap"</code>, or <code>"both"</code>.
+Values are case-insensitive. The default (also used for <code>NULL</code>) is
+<code>"mc"</code>. With <code>Na = "MI"</code>, only <code>"mc"</code> is supported.</p></dd>
 
 
 <dt id="arg-mcmethod">MCmethod<a class="anchor" aria-label="anchor" href="#arg-mcmethod"></a></dt>
@@ -198,7 +203,10 @@ choose <code>"mc"</code> (default) or <code>"bootSD"</code>.</p></dd>
 
 
 <dt id="arg-standardized">standardized<a class="anchor" aria-label="anchor" href="#arg-standardized"></a></dt>
-<dd><p>Logical; if <code>TRUE</code>, return standardized effects. Default <code>FALSE</code>.</p></dd>
+<dd><p>Logical; if <code>TRUE</code>, return standardized parameter
+tables (including defined effects at the reference moderator value).
+Raw conditional results remain in moderation; standardized conditional
+tables and curves are added in moderation_std. Default FALSE.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
@@ -226,7 +234,11 @@ Must be <code>NULL</code> for the predefined model forms.</p></dd>
     and the fitted model.</p></dd>
 
   <dt>moderation</dt>
-<dd><p>Conditional or moderated effect tables.</p></dd>
+<dd><p>Raw conditional or moderated effect tables.</p></dd>
+
+  <dt>moderation_std</dt>
+<dd><p>Standardized conditional tables and curves when
+    standardized=TRUE and a moderator is supplied.</p></dd>
 
   <dt>form,Na,alpha</dt>
 <dd><p>Analysis settings.</p></dd>
@@ -254,6 +266,19 @@ Must be <code>NULL</code> for the predefined model forms.</p></dd>
 <li><p>Monte Carlo: draws via <span class="pkg">semmcci</span> (all <code>Na</code> options)</p></li>
 </ul><p>For <code>Na = "FIML"</code>, you may choose <code>MCmethod = "mc"</code> (default) or
 <code>"bootSD"</code> to add a finite-sample SD correction.</p>
+<p>Standardization divides differences by their marginal model-implied SDs,
+without recentering them. Dummy variables retain 0/1 units; interaction
+terms use the product of their component scale factors, not the interaction
+column SD. MC and bootstrap draws are transformed jointly with their scales.
+Standardized bootstrap intervals use type-7 quantiles; bc and bca.simple
+apply bias correction with zero acceleration. P-values use inversion of
+that distribution and require at least 1000 valid replicates.</p>
+<p>Conditional tables use percentile intervals and fixed numerical probes.
+With fixed.x=TRUE, scale transformations condition on the fitted external
+moments rather than adding sampling uncertainty for those moments.
+In MI, probes/centering references use the first completed data set;
+fixed.x=TRUE also conditions on its external moments in the pooled transform.
+No new population-relative probing or imputation method is implemented here.</p>
 <p>Workflow: (1) preprocess -&gt; (2) generate SEM syntax -&gt; (3) fit
 -&gt; (4) compute confidence intervals -&gt; (5) optional: standardize estimates.</p>
     </div>
@@ -309,7 +334,7 @@ Must be <code>NULL</code> for the predefined model forms.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |:--------------|--------:|-----:|---------:|----------:|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |Total effect   |    0.015| 0.016|    -0.017|      0.047|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |Direct effect  |    0.016| 0.016|    -0.016|      0.048|</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |Total indirect |   -0.001| 0.004|    -0.010|      0.008|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Total indirect |   -0.001| 0.004|    -0.009|      0.008|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Indirect effects:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -334,7 +359,7 @@ Must be <code>NULL</code> for the predefined model forms.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |Coefficient | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |:-----------|--------:|-----:|---------:|----------:|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |d1          |   -0.062| 0.091|    -0.238|      0.115|</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |d2          |   -0.073| 0.083|    -0.236|      0.092|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |d2          |   -0.073| 0.083|    -0.238|      0.089|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> *************** MODERATION KEY (d-paths) ***************</span>
@@ -344,6 +369,9 @@ Must be <code>NULL</code> for the predefined model forms.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |:-----------|:--------------|:---------------|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |d1          |M1avg -&gt; Ydiff |M1diff -&gt; Ydiff |</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |d2          |M2avg -&gt; Ydiff |M2diff -&gt; Ydiff |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> UNSTANDARDIZED CONDITIONAL EFFECTS (mc)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Percentile intervals; moderator probes and centering references are held fixed.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> *************** CONTRAST INDIRECT EFFECTS (No Moderator) ***************</span>
@@ -359,10 +387,10 @@ Must be <code>NULL</code> for the predefined model forms.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |Coeff | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |:-----|--------:|-----:|---------:|----------:|</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |X1_b1 |    0.006| 0.102|    -0.190|      0.205|</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |X0_b1 |    0.068| 0.102|    -0.135|      0.266|</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |X1_b2 |    0.077| 0.099|    -0.114|      0.272|</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |X0_b2 |    0.150| 0.099|    -0.045|      0.344|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |X1_b1 |    0.005| 0.102|    -0.196|      0.205|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |X0_b1 |    0.067| 0.102|    -0.129|      0.267|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |X1_b2 |    0.076| 0.099|    -0.119|      0.271|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |X0_b2 |    0.149| 0.099|    -0.041|      0.345|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> *************** REGRESSION PATHS (MC) ***************</span>
@@ -373,7 +401,7 @@ Must be <code>NULL</code> for the predefined model forms.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |Ydiff ~ M1diff |b1    |    0.036| 0.091|    -0.141|      0.215|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |Ydiff ~ M1avg  |d1    |   -0.062| 0.091|    -0.238|      0.115|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |Ydiff ~ M2diff |b2    |    0.112| 0.090|    -0.061|      0.291|</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |Ydiff ~ M2avg  |d2    |   -0.073| 0.083|    -0.236|      0.092|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Ydiff ~ M2avg  |d2    |   -0.073| 0.083|    -0.238|      0.089|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> *************** INTERCEPTS (MC) ***************</span>
@@ -382,10 +410,10 @@ Must be <code>NULL</code> for the predefined model forms.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |Intercept |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |:---------|:-----|--------:|-----:|---------:|----------:|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |Ydiff~1   |cp    |    0.016| 0.016|    -0.016|      0.048|</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |M1diff~1  |a1    |    0.027| 0.018|    -0.008|      0.062|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |M1diff~1  |a1    |    0.027| 0.018|    -0.007|      0.062|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |M2diff~1  |a2    |   -0.014| 0.018|    -0.049|      0.020|</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |M1avg~1   |      |   -0.000| 0.018|    -0.036|      0.037|</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |M2avg~1   |      |    0.000| 0.020|    -0.039|      0.039|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |M1avg~1   |      |   -0.000| 0.018|    -0.035|      0.036|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |M2avg~1   |      |    0.000| 0.020|    -0.040|      0.040|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> *************** VARIANCES (MC) ***************</span>
@@ -393,7 +421,7 @@ Must be <code>NULL</code> for the predefined model forms.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |Variance       |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |:--------------|:-----|--------:|-----:|---------:|----------:|</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |Ydiff~~Ydiff   |      |    0.026| 0.004|     0.018|      0.033|</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |Ydiff~~Ydiff   |      |    0.026| 0.004|     0.019|      0.033|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |M1diff~~M1diff |      |    0.031| 0.004|     0.022|      0.039|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |M2diff~~M2diff |      |    0.032| 0.005|     0.023|      0.041|</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |M1avg~~M1avg   |      |    0.034| 0.005|     0.024|      0.043|</span>

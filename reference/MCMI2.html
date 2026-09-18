@@ -11,7 +11,7 @@ pools the results, and generates confidence intervals through Monte Carlo sampli
 
     <a class="navbar-brand me-2" href="../index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,6 +24,8 @@ pools the results, and generates confidence intervals through Monte Carlo sampli
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials"><li><a class="dropdown-item" href="../articles/WsMed.html">Using wsMed: A step-by-step tutorial</a></li>
+    <li><a class="dropdown-item" href="../articles/PlottingEffects.html">Plotting effects and contrasts</a></li>
+    <li><a class="dropdown-item" href="../articles/StandardizedModeratedMediation.html">Standardized moderated mediation</a></li>
     <li><a class="dropdown-item" href="../articles/printGM.html">Using printGM() to Generate SEM Models</a></li>
     <li><a class="dropdown-item" href="../articles/GenerateModelP.html">Parallel Mediation (P)</a></li>
     <li><a class="dropdown-item" href="../articles/GenerateModelCN.html">Chained Mediation (CN)</a></li>
@@ -43,7 +45,7 @@ pools the results, and generates confidence intervals through Monte Carlo sampli
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Monte Carlo Confidence Intervals for Multiple Imputation SEM Models</h1>
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/custom-model/R/MCMI2.R" class="external-link"><code>R/MCMI2.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/master/R/MCMI2.R" class="external-link"><code>R/MCMI2.R</code></a></small>
       <div class="d-none name"><code>MCMI2.Rd</code></div>
     </div>
 
@@ -66,7 +68,8 @@ pools the results, and generates confidence intervals through Monte Carlo sampli
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  estimator <span class="op">=</span> <span class="st">"ML"</span>,</span>
 <span>  se <span class="op">=</span> <span class="st">"standard"</span>,</span>
-<span>  missing <span class="op">=</span> <span class="st">"listwise"</span></span>
+<span>  missing <span class="op">=</span> <span class="st">"listwise"</span>,</span>
+<span>  fixed.x <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -83,65 +86,72 @@ pools the results, and generates confidence intervals through Monte Carlo sampli
 
 
 <dt id="arg-r">R<a class="anchor" aria-label="anchor" href="#arg-r"></a></dt>
-<dd><p>An integer specifying the number of Monte Carlo samples. Default is <code>20000L</code>.</p></dd>
+<dd><p>An integer specifying the number of Monte Carlo samples. Default is `20000L`.</p></dd>
 
 
 <dt id="arg-alpha">alpha<a class="anchor" aria-label="anchor" href="#arg-alpha"></a></dt>
-<dd><p>A numeric vector specifying significance levels for the confidence intervals. Default is <code>c(0.001, 0.01, 0.05)</code>.</p></dd>
+<dd><p>A numeric vector specifying significance levels for the confidence intervals. Default is `c(0.001, 0.01, 0.05)`.</p></dd>
 
 
 <dt id="arg-decomposition">decomposition<a class="anchor" aria-label="anchor" href="#arg-decomposition"></a></dt>
 <dd><p>A character string specifying the decomposition method for the covariance matrix.
-Default is <code>"eigen"</code>. Options include <code>"chol"</code>, <code>"eigen"</code>, or <code>"svd"</code>.</p></dd>
+Default is `"eigen"`. Options include `"chol"`, `"eigen"`, or `"svd"`.</p></dd>
 
 
 <dt id="arg-pd">pd<a class="anchor" aria-label="anchor" href="#arg-pd"></a></dt>
-<dd><p>A logical value indicating whether to ensure positive definiteness of the covariance matrix. Default is <code>TRUE</code>.</p></dd>
+<dd><p>A logical value indicating whether to ensure positive definiteness of the covariance matrix. Default is `TRUE`.</p></dd>
 
 
 <dt id="arg-tol">tol<a class="anchor" aria-label="anchor" href="#arg-tol"></a></dt>
-<dd><p>A numeric value specifying the tolerance for positive definiteness checks. Default is <code>1e-06</code>.</p></dd>
+<dd><p>A numeric value specifying the tolerance for positive definiteness checks. Default is `1e-06`.</p></dd>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
-<dd><p>An optional integer specifying the random seed for reproducibility. Default is <code>NULL</code>.</p></dd>
+<dd><p>An optional integer specifying the random seed for reproducibility. Default is `NULL`.</p></dd>
 
 
 <dt id="arg-estimator">estimator<a class="anchor" aria-label="anchor" href="#arg-estimator"></a></dt>
-<dd><p>A character string specifying the estimator for SEM fitting. Default is <code>"ML"</code> (Maximum Likelihood).</p></dd>
+<dd><p>A character string specifying the estimator for SEM fitting. Default is `"ML"` (Maximum Likelihood).</p></dd>
 
 
 <dt id="arg-se">se<a class="anchor" aria-label="anchor" href="#arg-se"></a></dt>
-<dd><p>A character string specifying the type of standard errors to compute. Default is <code>"standard"</code>.</p></dd>
+<dd><p>A character string specifying the type of standard errors to compute. Default is `"standard"`.</p></dd>
 
 
 <dt id="arg-missing">missing<a class="anchor" aria-label="anchor" href="#arg-missing"></a></dt>
-<dd><p>A character string specifying the method for handling missing data in SEM fitting. Default is <code>"listwise"</code>.</p></dd>
+<dd><p>A character string specifying the method for handling missing data in SEM fitting. Default is `"listwise"`.</p></dd>
+
+
+<dt id="arg-fixed-x">fixed.x<a class="anchor" aria-label="anchor" href="#arg-fixed-x"></a></dt>
+<dd><p>Whether exogenous covariates are treated as fixed in every
+imputation. Defaults to FALSE, consistently with wsMed().</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An object of class <code>semmcci</code> containing:</p><ul><li><p><code>call</code>: The matched function call.</p></li>
-<li><p><code>args</code>: A list of input arguments.</p></li>
-<li><p><code>thetahat</code>: The pooled parameter estimates.</p></li>
-<li><p><code>thetahatstar</code>: Monte Carlo samples for parameter estimates.</p></li>
-<li><p><code>fun</code>: The name of the function (<code>"MCMI2"</code>).</p></li>
-</ul></div>
+    <p>An object of class `semmcci` containing:
+- `call`: The matched function call.
+- `args`: A list of input arguments.
+- `thetahat`: The pooled parameter estimates.
+- `thetahatstar`: Monte Carlo samples for parameter estimates.
+- `fun`: The name of the function (`"MCMI2"`).</p>
+    </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>This function is designed for SEM models that require multiple imputation to handle missing data.
-It performs the following steps:</p><ul><li><p><strong>SEM Fitting</strong>: Fits the specified SEM model to each imputed dataset using <code><a href="https://rdrr.io/pkg/lavaan/man/sem.html" class="external-link">lavaan::sem()</a></code>.</p></li>
-<li><p><strong>Pooling Results</strong>: Combines parameter estimates and covariance matrices across imputations
-using Rubin's rules.</p></li>
-<li><p><strong>Monte Carlo Sampling</strong>: Generates Monte Carlo samples based on the pooled estimates and covariance matrices,
-and calculates confidence intervals for model parameters.</p></li>
-</ul><p>This function supports custom estimators, handling of missing data, and precision adjustments for
+It performs the following steps:</p>
+<p>- **SEM Fitting**: Fits the specified SEM model to each imputed dataset using [lavaan::sem()].</p>
+<p>- **Pooling Results**: Combines parameter estimates and covariance matrices across imputations
+using Rubin's rules.</p>
+<p>- **Monte Carlo Sampling**: Generates Monte Carlo samples based on the pooled estimates and covariance matrices,
+and calculates confidence intervals for model parameters.</p>
+<p>This function supports custom estimators, handling of missing data, and precision adjustments for
 Monte Carlo sampling. It is particularly useful for mediation analysis or complex SEM models
 where missing data are addressed using multiple imputation.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="https://rdrr.io/pkg/lavaan/man/sem.html" class="external-link">lavaan::sem()</a></code>, <code><a href="https://github.com/jeksterslab/semmcci/reference/MC.html" class="external-link">semmcci::MC()</a></code>, <code><a href="https://github.com/jeksterslab/semmcci/reference/MCStd.html" class="external-link">semmcci::MCStd()</a></code></p></div>
+    <div class="dont-index"><p>[lavaan::sem()], [semmcci::MC()], [semmcci::MCStd()]</p></div>
     </div>
 
     <div class="section level2">

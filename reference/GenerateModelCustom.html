@@ -15,7 +15,7 @@ indirect effects."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,6 +28,8 @@ indirect effects."></head><body>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials"><li><a class="dropdown-item" href="../articles/WsMed.html">Using wsMed: A step-by-step tutorial</a></li>
+    <li><a class="dropdown-item" href="../articles/PlottingEffects.html">Plotting effects and contrasts</a></li>
+    <li><a class="dropdown-item" href="../articles/StandardizedModeratedMediation.html">Standardized moderated mediation</a></li>
     <li><a class="dropdown-item" href="../articles/printGM.html">Using printGM() to Generate SEM Models</a></li>
     <li><a class="dropdown-item" href="../articles/GenerateModelP.html">Parallel Mediation (P)</a></li>
     <li><a class="dropdown-item" href="../articles/GenerateModelCN.html">Chained Mediation (CN)</a></li>
@@ -47,7 +49,7 @@ indirect effects."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Generate a User-Defined Within-Subject Mediation Model</h1>
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/custom-model/R/GenerateModelCustom.R" class="external-link"><code>R/GenerateModelCustom.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/master/R/GenerateModelCustom.R" class="external-link"><code>R/GenerateModelCustom.R</code></a></small>
       <div class="d-none name"><code>GenerateModelCustom.Rd</code></div>
     </div>
 
@@ -81,8 +83,10 @@ and from mediators to the outcome. For example:
 
 <dt id="arg-mp">MP<a class="anchor" aria-label="anchor" href="#arg-mp"></a></dt>
 <dd><p>A character vector identifying moderated paths. Supported
-labels follow the existing wsMed convention:
-`a1`, `b1`, `d1`, `b_1_2`, `d_1_2`, and `cp`.</p></dd>
+  labels follow the existing wsMed convention:
+  `a1`, `b1`, `d1`, `b_1_2`, `d_1_2`, and `cp`.</p>
+<p>Main effects of W are always labeled and used for conditional intercepts,
+including when a/cp is not explicitly listed in MP.</p></dd>
 
 </dl></div>
     <div class="section level2">

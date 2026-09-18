@@ -77,16 +77,19 @@ wsMed(
 - MP:
 
   Character vector identifying which regression paths are moderated (for
-  example, `"a1"`, `"b_1_2"`, `"cp"`).
+  example, `"a1"`, `"b_1_2"`, `"cp"`). Main effects of W already
+  included in each regression are always used when computing conditional
+  intercepts, whether or not a/cp is explicitly listed in MP.
 
 - form:
 
   Model type: `"P"`, `"CN"`, `"CP"`, `"PC"`, or `"UD"`. Use `"UD"` to
-  specify a user-defined mediation model.
+  specify a user-defined mediation model. Values are case-insensitive.
 
 - Na:
 
-  Missing-data method: `"DE"`, `"FIML"`, or `"MI"`.
+  Missing-data method: `"DE"`, `"FIML"`, or `"MI"`. Values are
+  case-insensitive.
 
 - alpha:
 
@@ -138,8 +141,9 @@ wsMed(
 
 - ci_method:
 
-  CI engine: `"bootstrap"` or `"mc"`. If `NULL` (default) the choice is
-  `"bootstrap"` for `Na = "DE"` and `"mc"` otherwise.
+  CI engine: `"mc"`, `"bootstrap"`, or `"both"`. Values are
+  case-insensitive. The default (also used for `NULL`) is `"mc"`. With
+  `Na = "MI"`, only `"mc"` is supported.
 
 - MCmethod:
 
@@ -148,7 +152,10 @@ wsMed(
 
 - standardized:
 
-  Logical; if `TRUE`, return standardized effects. Default `FALSE`.
+  Logical; if `TRUE`, return standardized parameter tables (including
+  defined effects at the reference moderator value). Raw conditional
+  results remain in moderation; standardized conditional tables and
+  curves are added in moderation_std. Default FALSE.
 
 - verbose:
 
@@ -181,7 +188,12 @@ An object of class `"wsMed"` with elements:
 
 - moderation:
 
-  Conditional or moderated effect tables.
+  Raw conditional or moderated effect tables.
+
+- moderation_std:
+
+  Standardized conditional tables and curves when standardized=TRUE and
+  a moderator is supplied.
 
 - form,Na,alpha:
 
@@ -225,6 +237,23 @@ Confidence-interval engines:
 
 For `Na = "FIML"`, you may choose `MCmethod = "mc"` (default) or
 `"bootSD"` to add a finite-sample SD correction.
+
+Standardization divides differences by their marginal model-implied SDs,
+without recentering them. Dummy variables retain 0/1 units; interaction
+terms use the product of their component scale factors, not the
+interaction column SD. MC and bootstrap draws are transformed jointly
+with their scales. Standardized bootstrap intervals use type-7
+quantiles; bc and bca.simple apply bias correction with zero
+acceleration. P-values use inversion of that distribution and require at
+least 1000 valid replicates.
+
+Conditional tables use percentile intervals and fixed numerical probes.
+With fixed.x=TRUE, scale transformations condition on the fitted
+external moments rather than adding sampling uncertainty for those
+moments. In MI, probes/centering references use the first completed data
+set; fixed.x=TRUE also conditions on its external moments in the pooled
+transform. No new population-relative probing or imputation method is
+implemented here.
 
 Workflow: (1) preprocess -\> (2) generate SEM syntax -\> (3) fit -\> (4)
 compute confidence intervals -\> (5) optional: standardize estimates.
@@ -281,7 +310,7 @@ print(result)
 #> |:--------------|--------:|-----:|---------:|----------:|
 #> |Total effect   |    0.015| 0.016|    -0.017|      0.047|
 #> |Direct effect  |    0.016| 0.016|    -0.016|      0.048|
-#> |Total indirect |   -0.001| 0.004|    -0.010|      0.008|
+#> |Total indirect |   -0.001| 0.004|    -0.009|      0.008|
 #> 
 #> Indirect effects:
 #> 
@@ -306,7 +335,7 @@ print(result)
 #> |Coefficient | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
 #> |:-----------|--------:|-----:|---------:|----------:|
 #> |d1          |   -0.062| 0.091|    -0.238|      0.115|
-#> |d2          |   -0.073| 0.083|    -0.236|      0.092|
+#> |d2          |   -0.073| 0.083|    -0.238|      0.089|
 #> 
 #> 
 #> *************** MODERATION KEY (d-paths) ***************
@@ -316,6 +345,9 @@ print(result)
 #> |:-----------|:--------------|:---------------|
 #> |d1          |M1avg -> Ydiff |M1diff -> Ydiff |
 #> |d2          |M2avg -> Ydiff |M2diff -> Ydiff |
+#> 
+#> UNSTANDARDIZED CONDITIONAL EFFECTS (mc)
+#> Percentile intervals; moderator probes and centering references are held fixed.
 #> 
 #> 
 #> *************** CONTRAST INDIRECT EFFECTS (No Moderator) ***************
@@ -331,10 +363,10 @@ print(result)
 #> 
 #> |Coeff | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
 #> |:-----|--------:|-----:|---------:|----------:|
-#> |X1_b1 |    0.006| 0.102|    -0.190|      0.205|
-#> |X0_b1 |    0.068| 0.102|    -0.135|      0.266|
-#> |X1_b2 |    0.077| 0.099|    -0.114|      0.272|
-#> |X0_b2 |    0.150| 0.099|    -0.045|      0.344|
+#> |X1_b1 |    0.005| 0.102|    -0.196|      0.205|
+#> |X0_b1 |    0.067| 0.102|    -0.129|      0.267|
+#> |X1_b2 |    0.076| 0.099|    -0.119|      0.271|
+#> |X0_b2 |    0.149| 0.099|    -0.041|      0.345|
 #> 
 #> 
 #> *************** REGRESSION PATHS (MC) ***************
@@ -345,7 +377,7 @@ print(result)
 #> |Ydiff ~ M1diff |b1    |    0.036| 0.091|    -0.141|      0.215|
 #> |Ydiff ~ M1avg  |d1    |   -0.062| 0.091|    -0.238|      0.115|
 #> |Ydiff ~ M2diff |b2    |    0.112| 0.090|    -0.061|      0.291|
-#> |Ydiff ~ M2avg  |d2    |   -0.073| 0.083|    -0.236|      0.092|
+#> |Ydiff ~ M2avg  |d2    |   -0.073| 0.083|    -0.238|      0.089|
 #> 
 #> 
 #> *************** INTERCEPTS (MC) ***************
@@ -354,10 +386,10 @@ print(result)
 #> |Intercept |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
 #> |:---------|:-----|--------:|-----:|---------:|----------:|
 #> |Ydiff~1   |cp    |    0.016| 0.016|    -0.016|      0.048|
-#> |M1diff~1  |a1    |    0.027| 0.018|    -0.008|      0.062|
+#> |M1diff~1  |a1    |    0.027| 0.018|    -0.007|      0.062|
 #> |M2diff~1  |a2    |   -0.014| 0.018|    -0.049|      0.020|
-#> |M1avg~1   |      |   -0.000| 0.018|    -0.036|      0.037|
-#> |M2avg~1   |      |    0.000| 0.020|    -0.039|      0.039|
+#> |M1avg~1   |      |   -0.000| 0.018|    -0.035|      0.036|
+#> |M2avg~1   |      |    0.000| 0.020|    -0.040|      0.040|
 #> 
 #> 
 #> *************** VARIANCES (MC) ***************
@@ -365,7 +397,7 @@ print(result)
 #> 
 #> |Variance       |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
 #> |:--------------|:-----|--------:|-----:|---------:|----------:|
-#> |Ydiff~~Ydiff   |      |    0.026| 0.004|     0.018|      0.033|
+#> |Ydiff~~Ydiff   |      |    0.026| 0.004|     0.019|      0.033|
 #> |M1diff~~M1diff |      |    0.031| 0.004|     0.022|      0.039|
 #> |M2diff~~M2diff |      |    0.032| 0.005|     0.023|      0.041|
 #> |M1avg~~M1avg   |      |    0.034| 0.005|     0.024|      0.043|

@@ -1,6 +1,6 @@
 # Monte Carlo SEM with Multiple Imputation (WsMed Workflow)
 
-`RunMCMIAnalysis()` is a helper that:
+\`RunMCMIAnalysis()\` is a helper that:
 
 1.  imputes missing data via
     [`PrepareMissingData`](https://yangzhen1999.github.io/wsMed/reference/PrepareMissingData.md);
@@ -40,7 +40,8 @@ RunMCMIAnalysis(
   alpha = c(0.001, 0.01, 0.05),
   decomposition = "eigen",
   pd = TRUE,
-  tol = 1e-06
+  tol = 1e-06,
+  fixed.x = FALSE
 )
 ```
 
@@ -128,6 +129,10 @@ RunMCMIAnalysis(
 - tol:
 
   Numeric tolerance for PD checks. Default `1e-6`.
+
+- fixed.x:
+
+  Whether to treat exogenous covariates as fixed in every imputation.
 
 ## Value
 

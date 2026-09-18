@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,6 +20,8 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials"><li><a class="dropdown-item" href="../articles/WsMed.html">Using wsMed: A step-by-step tutorial</a></li>
+    <li><a class="dropdown-item" href="../articles/PlottingEffects.html">Plotting effects and contrasts</a></li>
+    <li><a class="dropdown-item" href="../articles/StandardizedModeratedMediation.html">Standardized moderated mediation</a></li>
     <li><a class="dropdown-item" href="../articles/printGM.html">Using printGM() to Generate SEM Models</a></li>
     <li><a class="dropdown-item" href="../articles/GenerateModelP.html">Parallel Mediation (P)</a></li>
     <li><a class="dropdown-item" href="../articles/GenerateModelCN.html">Chained Mediation (CN)</a></li>
@@ -153,9 +155,9 @@
         </dt>
         <dd>Prepare Data for Two-Condition Within-Subject Mediation (WsMed)</dd>
       </dl></div><div class="section level2">
-      <h2 id="plotting-conditional-indirect-effects">Plotting Conditional Indirect Effects<a class="anchor" aria-label="anchor" href="#plotting-conditional-indirect-effects"></a></h2>
+      <h2 id="standardization-and-conditional-effects">Standardization and Conditional Effects<a class="anchor" aria-label="anchor" href="#standardization-and-conditional-effects"></a></h2>
 
-      <div class="section-desc"><p>Functions for visualizing conditional indirect effect curves</p></div>
+      <div class="section-desc"><p>Standardize conditional results and visualize effect curves</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -164,10 +166,38 @@
 
       <dl><dt>
 
+          <code><a href="standardize_moderation.html">standardize_moderation()</a></code>
+
+        </dt>
+        <dd>Standardize conditional mediation results using existing joint draws</dd>
+
+        <dt>
+
           <code><a href="plot_moderation_curve.html">plot_moderation_curve()</a></code>
 
         </dt>
-        <dd>Plot moderation curves with Johnson-Neyman highlights</dd>
+        <dd>Plot conditional effects across a continuous moderator</dd>
+
+        <dt>
+
+          <code><a href="plot_effects.html">plot_effects()</a></code>
+
+        </dt>
+        <dd>Forest plot of mediation effects</dd>
+
+        <dt>
+
+          <code><a href="plot_conditional_effects.html">plot_conditional_effects()</a></code>
+
+        </dt>
+        <dd>Plot conditional effects at moderator levels</dd>
+
+        <dt>
+
+          <code><a href="plot_contrasts.html">plot_contrasts()</a></code>
+
+        </dt>
+        <dd>Plot differences between mediation effects</dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
