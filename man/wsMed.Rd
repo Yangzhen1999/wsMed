@@ -17,7 +17,7 @@ wsMed(
   W = NULL,
   W_type = NULL,
   MP = NULL,
-  form = c("P", "CN", "CP", "PC"),
+  form = c("P", "CN", "CP", "PC", "UD"),
   Na = c("DE", "FIML", "MI"),
   alpha = 0.05,
   mi_args = list(),
@@ -30,7 +30,8 @@ wsMed(
   MCmethod = NULL,
   seed = 123,
   standardized = FALSE,
-  verbose = FALSE
+  verbose = FALSE,
+  paths = NULL
 )
 }
 \arguments{
@@ -51,22 +52,27 @@ wsMed(
 \item{W_type}{Character; \code{"continuous"} or \code{"categorical"}.}
 
 \item{MP}{Character vector identifying which regression paths are moderated
-(for example, \code{"a1"}, \code{"b_1_2"}, \code{"cp"}).}
+(for example, \code{"a1"}, \code{"b_1_2"}, \code{"cp"}). Main effects of
+W already included in each regression are always used when computing
+conditional intercepts, whether or not a/cp is explicitly listed in MP.}
 
-\item{form}{Model type: \code{"P"}, \code{"CN"}, \code{"CP"}, or \code{"PC"}.}
+\item{form}{Model type: \code{"P"}, \code{"CN"}, \code{"CP"},
+\code{"PC"}, or \code{"UD"}. Use \code{"UD"} to specify a
+user-defined mediation model. Values are case-insensitive.}
 
-\item{Na}{Missing-data method: \code{"DE"}, \code{"FIML"}, or \code{"MI"}.}
+\item{Na}{Missing-data method: \code{"DE"}, \code{"FIML"}, or \code{"MI"}.
+Values are case-insensitive.}
 
 \item{alpha}{Numeric vector in (0, 1); two-sided significance levels.}
 
 \item{mi_args}{List of MI-specific controls:
 \describe{
-\item{\code{m}}{Number of imputations. Default 5.}
-\item{\code{method_num}}{Imputation method for \code{mice()}.}
-\item{\code{decomposition}}{Covariance-decomposition method
-(\code{"eigen"}, \code{"chol"}, \code{"svd"}).}
-\item{\code{pd}}{Logical; positive-definiteness check.}
-\item{\code{tol}}{Tolerance for the positive-definiteness check.}
+  \item{\code{m}}{Number of imputations. Default 5.}
+  \item{\code{method_num}}{Imputation method for \code{mice()}.}
+  \item{\code{decomposition}}{Covariance-decomposition method
+    (\code{"eigen"}, \code{"chol"}, \code{"svd"}).}
+  \item{\code{pd}}{Logical; positive-definiteness check.}
+  \item{\code{tol}}{Tolerance for the positive-definiteness check.}
 }}
 
 \item{R}{Integer; number of Monte Carlo draws. Default \code{20000L}.}
@@ -80,26 +86,40 @@ or \code{"bca.simple"}.}
 
 \item{fixed.x}{Logical; passed to \pkg{lavaan}.}
 
-\item{ci_method}{CI engine: \code{"bootstrap"} or \code{"mc"}.
-If \code{NULL} (default) the choice is \code{"bootstrap"} for \code{Na = "DE"}
-and \code{"mc"} otherwise.}
+\item{ci_method}{CI engine: \code{"mc"}, \code{"bootstrap"}, or \code{"both"}.
+Values are case-insensitive. The default (also used for \code{NULL}) is
+\code{"mc"}. With \code{Na = "MI"}, only \code{"mc"} is supported.}
 
 \item{MCmethod}{If \code{Na = "FIML"} and \code{ci_method = "mc"},
 choose \code{"mc"} (default) or \code{"bootSD"}.}
 
-\item{standardized}{Logical; if \code{TRUE}, return standardized effects. Default \code{FALSE}.}
+\item{standardized}{Logical; if \code{TRUE}, return standardized parameter
+tables (including defined effects at the reference moderator value).
+Raw conditional results remain in moderation; standardized conditional
+tables and curves are added in moderation_std. Default FALSE.}
 
 \item{verbose}{Logical; print progress messages.}
+
+\item{paths}{A character vector defining directed paths when
+\code{form = "UD"}. Paths are specified using mediator labels
+\code{M1}, \code{M2}, and so on, with \code{Y} denoting the outcome.
+For example, \code{c("M1 -> M3", "M3 -> Y", "M2 -> Y")}.
+Must be \code{NULL} for the predefined model forms.}
 }
 \value{
 An object of class \code{"wsMed"} with elements:
 \describe{
-\item{data}{Preprocessed data frame.}
-\item{sem_model}{Generated \pkg{lavaan} syntax.}
-\item{mc}{List with Monte Carlo draws, bootstrap tables (if any), and the fitted model.}
-\item{moderation}{Conditional or moderated effect tables.}
-\item{form,Na,alpha}{Analysis settings.}
-\item{input_vars}{Names of all user-supplied variables.}
+  \item{data}{Preprocessed data frame.}
+  \item{sem_model}{Generated \pkg{lavaan} syntax.}
+  \item{mc}{List with Monte Carlo draws, bootstrap tables (if any),
+    and the fitted model.}
+  \item{moderation}{Raw conditional or moderated effect tables.}
+  \item{moderation_std}{Standardized conditional tables and curves when
+    standardized=TRUE and a moderator is supplied.}
+  \item{form,Na,alpha}{Analysis settings.}
+  \item{paths}{The user-defined paths when \code{form = "UD"};
+    otherwise \code{NULL}.}
+  \item{input_vars}{Names of all user-supplied variables.}
 }
 }
 \description{
@@ -111,26 +131,42 @@ Monte Carlo confidence intervals.
 \details{
 Model structures:
 \itemize{
-\item \code{"P"}: parallel mediation
-\item \code{"CN"}: chained (serial) mediation
-\item \code{"CP"}: chained then parallel
-\item \code{"PC"}: parallel then chained
+  \item \code{"P"}: parallel mediation
+  \item \code{"CN"}: chained (serial) mediation
+  \item \code{"CP"}: chained then parallel
+  \item \code{"PC"}: parallel then chained
+  \item \code{"UD"}: user-defined mediation model
 }
 
 Missing-data strategies:
 \itemize{
-\item \code{"DE"}: list-wise deletion
-\item \code{"FIML"}: full-information maximum likelihood
-\item \code{"MI"}: multiple imputation via \pkg{mice}
+  \item \code{"DE"}: list-wise deletion
+  \item \code{"FIML"}: full-information maximum likelihood
+  \item \code{"MI"}: multiple imputation via \pkg{mice}
 }
 
 Confidence-interval engines:
 \itemize{
-\item Bootstrap: percentile, BC, or BCa (DE and FIML only)
-\item Monte Carlo: draws via \pkg{semmcci} (all \code{Na} options)
+  \item Bootstrap: percentile, BC, or BCa (DE and FIML only)
+  \item Monte Carlo: draws via \pkg{semmcci} (all \code{Na} options)
 }
 For \code{Na = "FIML"}, you may choose \code{MCmethod = "mc"} (default) or
 \code{"bootSD"} to add a finite-sample SD correction.
+
+Standardization divides differences by their marginal model-implied SDs,
+without recentering them. Dummy variables retain 0/1 units; interaction
+terms use the product of their component scale factors, not the interaction
+column SD. MC and bootstrap draws are transformed jointly with their scales.
+Standardized bootstrap intervals use type-7 quantiles; bc and bca.simple
+apply bias correction with zero acceleration. P-values use inversion of
+that distribution and require at least 1000 valid replicates.
+
+Conditional tables use percentile intervals and fixed numerical probes.
+With fixed.x=TRUE, scale transformations condition on the fitted external
+moments rather than adding sampling uncertainty for those moments.
+In MI, probes/centering references use the first completed data set;
+fixed.x=TRUE also conditions on its external moments in the pooled transform.
+No new population-relative probing or imputation method is implemented here.
 
 Workflow: (1) preprocess -> (2) generate SEM syntax -> (3) fit
 -> (4) compute confidence intervals -> (5) optional: standardize estimates.

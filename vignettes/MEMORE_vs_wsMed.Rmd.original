@@ -9,6 +9,17 @@ vignette: >
 
 # introduction
 
+The MEMORE reports below are stored reference output, not rerun by this
+vignette. Compare estimates only after matching difference direction, model
+structure, missing-data handling and interval settings. Standardized results
+require matching the SD definition as well: wsMed uses marginal model-implied
+difference-component SDs. Matching raw estimates does not imply matching
+standardized estimates or confidence intervals.
+
+For moderation, see [Standardized moderated mediation](StandardizedModeratedMediation.html).
+This vignette does not establish agreement between the programs for moderated
+standardized effects.
+
 This document presents a comparison between the **MEMORE 3.0 (SPSS Plugin)** and **wsMed (R Package)** outputs.
 
 ## parallel mediation
@@ -37,6 +48,7 @@ result1 <- wsMed(
   Y_C2 = "D2", # C2 is outcome variable in condition 2
   form = "P", # Parallel mediation
   standardized = TRUE,
+  Na = "DE", ci_method = "mc", R = 5000, seed = 123
 )
 print(result1,digits=4)
 printGM(result1)
@@ -63,8 +75,9 @@ result2 <- wsMed(
   M_C2 = c("A2","B2"), # A2/B2 is A/B mediator variable in condition 2
   Y_C1 = "C1", # C1 is outcome variable in condition 1
   Y_C2 = "C2", # C2 is outcome variable in condition 2
-  form = "CN", # Parallel mediation
+  form = "CN", # Serial mediation
   standardized = TRUE,
+  Na = "DE", ci_method = "mc", R = 5000, seed = 123
 )
 print(result2,digits=4)
 printGM(result2)

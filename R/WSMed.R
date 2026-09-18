@@ -13,6 +13,7 @@
 #'   \item \code{"CN"}: chained (serial) mediation
 #'   \item \code{"CP"}: chained then parallel
 #'   \item \code{"PC"}: parallel then chained
+#'   \item \code{"UD"}: user-defined mediation model
 #' }
 #'
 #' Missing-data strategies:
@@ -30,19 +31,45 @@
 #' For \code{Na = "FIML"}, you may choose \code{MCmethod = "mc"} (default) or
 #' \code{"bootSD"} to add a finite-sample SD correction.
 #'
+#' Standardization divides differences by their marginal model-implied SDs,
+#' without recentering them. Dummy variables retain 0/1 units; interaction
+#' terms use the product of their component scale factors, not the interaction
+#' column SD. MC and bootstrap draws are transformed jointly with their scales.
+#' Standardized bootstrap intervals use type-7 quantiles; bc and bca.simple
+#' apply bias correction with zero acceleration. P-values use inversion of
+#' that distribution and require at least 1000 valid replicates.
+#'
+#' Conditional tables use percentile intervals and fixed numerical probes.
+#' With fixed.x=TRUE, scale transformations condition on the fitted external
+#' moments rather than adding sampling uncertainty for those moments.
+#' In MI, probes/centering references use the first completed data set;
+#' fixed.x=TRUE also conditions on its external moments in the pooled transform.
+#' No new population-relative probing or imputation method is implemented here.
+#'
 #' Workflow: (1) preprocess -> (2) generate SEM syntax -> (3) fit
 #' -> (4) compute confidence intervals -> (5) optional: standardize estimates.
 #'
 #' @param data A \link[base:data.frame]{data.frame} containing the raw scores.
 #' @param M_C1,M_C2 Character vectors of mediator names under condition 1 and 2.
 #' @param Y_C1,Y_C2 Character scalars for the outcome under each condition.
-#' @param form Model type: \code{"P"}, \code{"CN"}, \code{"CP"}, or \code{"PC"}.
-#' @param standardized Logical; if \code{TRUE}, return standardized effects. Default \code{FALSE}.
+#' @param form Model type: \code{"P"}, \code{"CN"}, \code{"CP"},
+#'   \code{"PC"}, or \code{"UD"}. Use \code{"UD"} to specify a
+#'   user-defined mediation model. Values are case-insensitive.
+#' @param paths A character vector defining directed paths when
+#'   \code{form = "UD"}. Paths are specified using mediator labels
+#'   \code{M1}, \code{M2}, and so on, with \code{Y} denoting the outcome.
+#'   For example, \code{c("M1 -> M3", "M3 -> Y", "M2 -> Y")}.
+#'   Must be \code{NULL} for the predefined model forms.
+#' @param standardized Logical; if \code{TRUE}, return standardized parameter
+#'   tables (including defined effects at the reference moderator value).
+#'   Raw conditional results remain in moderation; standardized conditional
+#'   tables and curves are added in moderation_std. Default FALSE.
 #'
 #' @param Na Missing-data method: \code{"DE"}, \code{"FIML"}, or \code{"MI"}.
-#' @param ci_method CI engine: \code{"bootstrap"} or \code{"mc"}.
-#'   If \code{NULL} (default) the choice is \code{"bootstrap"} for \code{Na = "DE"}
-#'   and \code{"mc"} otherwise.
+#'   Values are case-insensitive.
+#' @param ci_method CI engine: \code{"mc"}, \code{"bootstrap"}, or \code{"both"}.
+#'   Values are case-insensitive. The default (also used for \code{NULL}) is
+#'   \code{"mc"}. With \code{Na = "MI"}, only \code{"mc"} is supported.
 #' @param MCmethod If \code{Na = "FIML"} and \code{ci_method = "mc"},
 #'   choose \code{"mc"} (default) or \code{"bootSD"}.
 #'
@@ -62,7 +89,9 @@
 #' @param W Character vector of moderators. Default \code{NULL}.
 #' @param W_type Character; \code{"continuous"} or \code{"categorical"}.
 #' @param MP Character vector identifying which regression paths are moderated
-#'   (for example, \code{"a1"}, \code{"b_1_2"}, \code{"cp"}).
+#'   (for example, \code{"a1"}, \code{"b_1_2"}, \code{"cp"}). Main effects of
+#'   W already included in each regression are always used when computing
+#'   conditional intercepts, whether or not a/cp is explicitly listed in MP.
 #'
 #' @param mi_args List of MI-specific controls:
 #' \describe{
@@ -80,9 +109,14 @@
 #' \describe{
 #'   \item{data}{Preprocessed data frame.}
 #'   \item{sem_model}{Generated \pkg{lavaan} syntax.}
-#'   \item{mc}{List with Monte Carlo draws, bootstrap tables (if any), and the fitted model.}
-#'   \item{moderation}{Conditional or moderated effect tables.}
+#'   \item{mc}{List with Monte Carlo draws, bootstrap tables (if any),
+#'     and the fitted model.}
+#'   \item{moderation}{Raw conditional or moderated effect tables.}
+#'   \item{moderation_std}{Standardized conditional tables and curves when
+#'     standardized=TRUE and a moderator is supplied.}
 #'   \item{form,Na,alpha}{Analysis settings.}
+#'   \item{paths}{The user-defined paths when \code{form = "UD"};
+#'     otherwise \code{NULL}.}
 #'   \item{input_vars}{Names of all user-supplied variables.}
 #' }
 #'
@@ -107,7 +141,7 @@ wsMed <- function(data,
                   C     = NULL, C_type = NULL,
                   W     = NULL, W_type = NULL,
                   MP    = NULL,
-                  form  = c("P", "CN", "CP", "PC"),
+                  form = c("P", "CN", "CP", "PC", "UD"),
                   Na    = c("DE", "FIML", "MI"),
                   alpha = .05,
                   mi_args = list(),
@@ -122,9 +156,15 @@ wsMed <- function(data,
                   MCmethod     = NULL,
                   seed         = 123,
                   standardized = FALSE,
-                  verbose      = FALSE) {
+                  verbose      = FALSE,
+                  paths = NULL) {
 
   ## ── 0  输入验证 ──────────────────────────────────────────────────────
+  # Normalize character choices only; retain match.arg() defaults, partial
+  # matching and rejection of non-character or ambiguous inputs.
+  if (is.character(ci_method)) ci_method <- tolower(ci_method)
+  if (is.character(form)) form <- toupper(form)
+  if (is.character(Na)) Na <- toupper(Na)
   ci_method <- match.arg(ci_method)
   form      <- match.arg(form)
   Na        <- match.arg(Na)
@@ -137,6 +177,7 @@ wsMed <- function(data,
     W         = W,     W_type = W_type,
     MP        = MP,
     form      = form,
+    paths     = paths,
     Na        = Na,
     R         = R,
     bootstrap = bootstrap,
@@ -173,14 +214,30 @@ wsMed <- function(data,
 
   ## ── 2  构建 SEM 语法 ────────────────────────────────────────────────
   .v(sprintf("Building SEM syntax (%s) ...", form), verbose = verbose)
-  sem_model <- switch(form,
-                      P  = GenerateModelP (prep, MP),
-                      CN = GenerateModelCN(prep, MP),
-                      CP = GenerateModelCP(prep, MP),
-                      PC = GenerateModelPC(prep, MP)
+  sem_model <- switch(
+    form,
+    P = GenerateModelP(
+      prepared_data = prep,
+      MP = MP
+    ),
+    CN = GenerateModelCN(
+      prepared_data = prep,
+      MP = MP
+    ),
+    CP = GenerateModelCP(
+      prepared_data = prep,
+      MP = MP
+    ),
+    PC = GenerateModelPC(
+      prepared_data = prep,
+      MP = MP
+    ),
+    UD = GenerateModelCustom(
+      prepared_data = prep,
+      paths = paths,
+      MP = MP
+    )
   )
-
-
   ## ── 3  拟合 + 抽样（按 Na & ci_method 分流） ──────────────────────
   .v(sprintf("Na = %s  |  ci_method = %s", Na, ci_method), verbose = verbose)
 
@@ -212,7 +269,8 @@ wsMed <- function(data,
       alpha        = alpha,
       decomposition = mi_args$decomposition,
       pd            = mi_args$pd,
-      tol           = mi_args$tol
+      tol           = mi_args$tol,
+      fixed.x       = fixed.x
     )
 
     mc$result <- mi_out$mc_result
@@ -233,6 +291,7 @@ wsMed <- function(data,
       alpha   = alpha,
       fixed.x = fixed.x,
       verbose = verbose,
+      seed    = seed,
       run_mc  = need_mc              # ← 关键开关
     )
 
@@ -249,7 +308,7 @@ wsMed <- function(data,
         R                = bootstrap,
         iseed            = iseed,
         do_bootstrapping = TRUE,
-        ncpus            = parallel::detectCores(1L),
+        ncpus            = min(2L, bootstrap),
         parallel         = "snow")
 
       theta_boot <- slot(fit_u, "external")$sbt_boot_ustd
@@ -270,7 +329,7 @@ wsMed <- function(data,
 
       mc$theta_boot <- theta_boot
       mc$bootstrap  <- param_boot
-      assign("fit_u", fit_u, inherits = TRUE)   # 供后面标准化块使用
+
     }
   }
 
@@ -282,9 +341,15 @@ wsMed <- function(data,
 
 
   ## ── 5  调节分析 (路由 CI 来源) ─────────────────────────────────
+  roles <- .wsmed_roles(prep)
+  mc$fit@external$wsmed_roles <- roles
+  if (!is.null(mc$result)) mc$result$args$lav@external$wsmed_roles <- roles
+  if (!is.null(fit_u)) fit_u@external$wsmed_roles <- roles
+  point_estimates <- if (!is.null(mc$result)) mc$result$thetahat$est else ThetaHatWrapper(mc$fit)$est
   make_mod <- function(theta_mat) {
     .make_moderation(
       mc_res  = theta_mat,
+      point_estimates = point_estimates,
       data    = prep,
       W       = W,
       MP      = MP,
@@ -321,15 +386,9 @@ wsMed <- function(data,
                                 choices = c("perc", "bc", "bca.simple"))
 
       mc$std_boot <- tryCatch(
-        semboottools::standardizedSolution_boot(
-          object             = fit_u,
-          level              = 1 - alpha,
-          type               = "std.all",
-          boot_ci_type       = boot_ci_type,
-          save_boot_est_std  = TRUE,
-          boot_pvalue        = TRUE),
+        .wsmed_std_boot(fit_u, alpha, boot_ci_type),
         error = function(e) {
-          warning("standardizedSolution_boot failed: ", e$message)
+          warning("wsMed bootstrap standardization failed: ", e$message)
           NULL
         }
       )
@@ -343,7 +402,7 @@ wsMed <- function(data,
     Y_C1 = Y_C1, Y_C2 = Y_C2,
     C_C1 = C_C1, C_C2 = C_C2,
     C    = C,    C_type = C_type,
-    W    = W,    W_type = W_type
+    W    = W,    W_type = W_type, MP = MP
   )
 
 
@@ -359,9 +418,18 @@ wsMed <- function(data,
     form       = form,
     ci_method  = ci_method,
     input_vars = input_vars,
-    fit_u  = fit_u
+    fit_u  = fit_u,
+    paths = paths
   )
+
   class(out) <- "wsMed"
+  if (standardized && length(W)) out$moderation_std <- standardize_moderation(out)
+
+  .v(
+    "Analysis completed successfully.",
+    verbose = verbose
+  )
+
   out
 }
 

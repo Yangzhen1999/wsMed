@@ -4,47 +4,52 @@
 \alias{calc_basic_contrasts}
 \title{Basic Contrasts for Indirect Effects and Pre/Post Path Coefficients}
 \usage{
-calc_basic_contrasts(mc_result, ci_level = 0.95, digits = 3)
+calc_basic_contrasts(
+  mc_result,
+  ci_level = 0.95,
+  digits = 3,
+  point_estimates = NULL
+)
 }
 \arguments{
-\item{mc_result}{A Monte-Carlo result of class \code{"semmcci"}
-(returned by \code{\link[=MCMI2]{MCMI2()}}).}
+\item{mc_result}{A Monte-Carlo result of class `"semmcci"`
+(returned by [MCMI2()]).}
 
-\item{ci_level}{Confidence level for the CI (default \code{0.95}).}
+\item{ci_level}{Confidence level for the CI (default `0.95`).}
 
-\item{digits}{Decimal places to keep (default \code{3}).}
+\item{digits}{Decimal places to keep (default `3`).}
+
+\item{point_estimates}{Named fitted parameter estimates, including defined effects.}
 }
 \value{
 A list with up to two data frames:
 \describe{
-\item{IE_contrasts}{Pairwise contrasts of indirect effects, or \code{NULL} if
-fewer than two are present.}
-\item{Xcoef}{Rows \verb{X1_b*} and \verb{X0_b*} for every detected \eqn{b} path,
-or \code{NULL} if no \eqn{b} path is found.}
+  \item{IE_contrasts}{Pairwise contrasts of indirect effects, or `NULL` if
+        fewer than two are present.}
+  \item{Xcoef}{Rows `X1_b*` and `X0_b*` for every detected \eqn{b} path,
+        or `NULL` if no \eqn{b} path is found.}
 }
 }
 \description{
-\code{calc_basic_contrasts()} extracts two convenient sets of contrasts from a
-Monte-Carlo SEM result (\code{semmcci} object):
+`calc_basic_contrasts()` extracts two convenient sets of contrasts from a
+Monte-Carlo SEM result (`semmcci` object):
 \enumerate{
-\item All pairwise differences between indirect effects
-(\verb{indirect_*} columns);
-\item Pre-test (\eqn{X_0}) and post-test (\eqn{X_1}) coefficients for every
-primary \eqn{b} path, obtained with
-\eqn{X_1 = (2b + d)/2}, \eqn{X_0 = X_1 - d}.
+  \item All pairwise differences between indirect effects
+        (`indirect_*` columns);
+  \item Pre-test (\eqn{X_0}) and post-test (\eqn{X_1}) coefficients for every
+        primary \eqn{b} path, obtained with
+        \eqn{X_1 = (2b + d)/2}, \eqn{X_0 = X_1 - d}.
 }
 }
 \details{
-\itemize{
-\item Indirect-effect columns are detected by the regular expression
-\verb{^indirect_}.
-\item A primary \eqn{b} path is any coefficient named \code{b1}, \code{b_1_2}, …
-Its matching \eqn{d} path (\code{d1}, \code{d_1_2}, …) is paired automatically.
-}
+* Indirect-effect columns are detected by the regular expression
+  `^indirect_`.
+* A primary \eqn{b} path is any coefficient named `b1`, `b_1_2`, …
+  Its matching \eqn{d} path (`d1`, `d_1_2`, …) is paired automatically.
 
-Each contrast is summarised with its Monte-Carlo mean, SD, and a symmetric
-\eqn{100(1-\alpha)} \% confidence interval.  Helper functions
-\code{mc_summary_pct()} and \code{fix_pct_names()} ensure that the final CI columns are
-named, for example, \verb{2.5\%CI.Lo} and \verb{97.5\%CI.Up}.
+Each contrast is summarised with its plug-in estimate, sampling SD, and a symmetric
+\eqn{100(1-\alpha)} % confidence interval.  Helper functions
+`mc_summary_pct()` and `fix_pct_names()` ensure that the final CI columns are
+named, for example, `2.5%CI.Lo` and `97.5%CI.Up`.
 }
 \keyword{internal}

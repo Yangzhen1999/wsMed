@@ -15,6 +15,12 @@
 
 StdLav2 <- function(est, object) {
   lav_model <- object@Model
+  # Accept either the free vector or a complete parameter-table vector.
+  if (length(est) == length(object@ParTable$free)) {
+    free <- object@ParTable$free
+    est <- est[match(seq_len(lav_model@nx.free), free)]
+  }
+  if (length(est) != lav_model@nx.free) stop("Incorrect parameter vector length.")
 
   # Set parameters: apply current est vector to model
   lav_model_new <- lavaan::lav_model_set_parameters(
@@ -50,7 +56,7 @@ StdLav2 <- function(est, object) {
   ram_list <- lapply(glist_new, Lav2RAM2)  # Your new version
 
   # 2. Standardize RAM (A, S, M)
-  ram_std_list <- lapply(ram_list, StdRAM2)
+  ram_std_list <- lapply(ram_list, StdRAM2, roles = object@external$wsmed_roles)
 
   # 3. Convert standardized RAM back to lavaan-style matrix list
   glist_std <- mapply(

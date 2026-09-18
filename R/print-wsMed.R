@@ -105,36 +105,59 @@ print.wsMed <- function(x, digits = 3, ...){
   if (!is.null(x$param_boot))
     .print_d_key(x$data, x$mc$result, x$param_boot)
 
+  mods <- if (identical(x$ci_method, "both")) x$moderation else
+    stats::setNames(list(x$moderation), x$ci_method)
+  for (engine in names(mods)) {
+    mod <- mods[[engine]]
+    cat("\nUNSTANDARDIZED CONDITIONAL EFFECTS (", engine, ")\n", sep = "")
+    cat("Percentile intervals; moderator probes and centering references are held fixed.\n")
   ## 4 调节--------------------------------
   ## ---------- (1) basic contrasts ----------
-  if (!is.null(x$moderation) && x$moderation$type == "none") {
-    if (!is.null(x$moderation$IE_contrasts)) {
+  if (isTRUE(mod$type == "none")) {
+    if (!is.null(mod$IE_contrasts)) {
       cat("\n")
       cat("\n*************** CONTRAST INDIRECT EFFECTS (No Moderator) ***************\n")
-      tbl <- x$moderation$IE_contrasts        # ① 取出原表
+      tbl <- mod$IE_contrasts        # ① 取出原表
       names(tbl) <- clean_ci_names(names(tbl))
       if ("Contrast" %in% names(tbl))         # ② 对齐，别动别的列
         tbl$Contrast <- align_minus(tbl$Contrast)
       .print_tbl(tbl, digits)
     }
 
-    if (!is.null(x$moderation$Xcoef)) {
+    if (!is.null(mod$Xcoef)) {
       cat("\n")
       cat("\n*************** C1-C2 COEFFICIENTS (No Moderator) ***************\n")
-      .print_tbl(x$moderation$Xcoef, digits)
+      .print_tbl(mod$Xcoef, digits)
     }
 
   }
 
 
-  if (!is.null(x$moderation)) {
-    if (x$moderation$type == "categorical") {
-      .print_moderation_categorical(x$moderation, digits)
-    } else if (x$moderation$type == "continuous") {
-      .print_moderation_continuous(x$moderation, digits)
+  if (!is.null(mod$type)) {
+    if (mod$type == "categorical") {
+      .print_moderation_categorical(mod, digits)
+    } else if (mod$type == "continuous") {
+      .print_moderation_continuous(mod, digits)
     }
   }
 
+
+  }
+
+  if (!is.null(x$moderation_std)) {
+    stdmods <- if (identical(x$ci_method, "both")) x$moderation_std else
+      stats::setNames(list(x$moderation_std), x$ci_method)
+    for (engine in names(stdmods)) {
+      mod <- stdmods[[engine]]
+      cat("\nSTANDARDIZED CONDITIONAL EFFECTS (", engine, ")\n", sep = "")
+      cat("Marginal endpoint scales; fixed raw W probes; percentile intervals.\n")
+      cat("Moderation coefficients: per SD of continuous W; categorical contrasts keep 0/1 units.\n")
+      if (isTRUE(attr(mod, "standardization")$fixed.x))
+        cat("External moments held fixed (fixed.x=TRUE).\n")
+      if (identical(mod$type, "continuous")) .print_moderation_continuous(mod, digits)
+      if (identical(mod$type, "categorical")) .print_moderation_categorical(mod, digits)
+    }
+  }
 
   ## ---------- 回归 / 方差 / 截距 ----------
   .print_mc_RIV(x$mc$result, x$mc$fit, x$alpha, digits)

@@ -4,6 +4,7 @@
 #' using the implied covariance matrix. Intercepts are also standardized.
 #'
 #' @param ram_est A RAM object list with matrices `A`, `S`, `F`, and `M` as returned by `Lav2RAM2()`.
+#' @param roles Internal list of dummy variable names and interaction components.
 #'
 #' @return A list of standardized RAM matrices:
 #' \describe{
@@ -17,7 +18,7 @@
 #' extracts standard deviations, and performs standardization via \eqn{D^{-1}} scaling.
 #' @keywords internal
 
-StdRAM2 <- function(ram_est) {
+StdRAM2 <- function(ram_est, roles = NULL) {
   a_mat <- ram_est$A
   s_mat <- ram_est$S
   iden <- diag(nrow(a_mat))
@@ -25,9 +26,28 @@ StdRAM2 <- function(ram_est) {
 
   # implied covariance matrix: Sigma = B * S * B'
   sigma <- b_inv %*% s_mat %*% t(b_inv)
+  if (any(!is.finite(sigma)) || any(!is.finite(s_mat)))
+    stop("Non-finite covariance matrix.")
+  if (min(eigen(s_mat, symmetric = TRUE, only.values = TRUE)$values) <
+      -1e-10 * max(1, max(abs(s_mat))))
+    stop("Non-positive-semidefinite residual/exogenous covariance matrix.")
+  tryCatch(chol(sigma), error = function(e)
+    stop("Non-positive-definite implied covariance matrix."))
 
-  # standard deviation inverse matrix: D^{-1}
-  sdinv <- diag(1 / sqrt(diag(sigma)))
+  # Marginal implied SDs; dummy contrasts retain their original units.
+  variances <- diag(sigma)
+  if (any(!is.finite(variances)) || any(variances <= 0))
+    stop("Non-positive or non-finite implied variance.")
+  sd_vec <- sqrt(variances)
+  names(sd_vec) <- colnames(a_mat)
+  for (nm in intersect(roles$dummy, names(sd_vec))) sd_vec[nm] <- 1
+  for (nm in intersect(names(roles$products), names(sd_vec))) {
+    components <- roles$products[[nm]]
+    if (!all(components %in% names(sd_vec)))
+      stop("Missing interaction component in standardization: ", nm)
+    sd_vec[nm] <- prod(sd_vec[components])
+  }
+  sdinv <- diag(1 / sd_vec)
 
   # standardize A and S
   a_matz <- sdinv %*% a_mat %*% solve(sdinv)
@@ -35,7 +55,6 @@ StdRAM2 <- function(ram_est) {
 
   # standardize M
   m_vec <- as.numeric(ram_est$M)         # intercept vector
-  sd_vec <- sqrt(diag(sigma))            # SD of each variable
   m_std <- m_vec / sd_vec                # element-wise division
   m_matz <- matrix(m_std, nrow = 1)      # back to 1-row matrix
   colnames(m_matz) <- colnames(a_mat)

@@ -1,11 +1,11 @@
 #' @title Convert Standardized RAM Back to Lavaan Matrices
 #'
 #' @description Converts a standardized RAM object back to lavaan-style matrix structure.
-#' Optionally ensures correlations for `theta` and `psi` matrices.
+#' Preserves residual covariances on their transformed scales.
 #'
 #' @param ram A RAM list containing standardized matrices (`A`, `S`, `F`, and `M`).
 #' @param lav_mod A lavaan-style matrix list (e.g., GLIST) to be updated.
-#' @param standardized Logical. If TRUE, forces symmetric matrices to correlation form (cov2cor).
+#' @param standardized Retained for compatibility; RAM covariances are already rescaled.
 #'
 #' @return A modified lavaan-style matrix list with updated `lambda`, `beta`, `theta`, `psi`, and `alpha`.
 #'
@@ -42,11 +42,7 @@ RAM2Lav2 <- function(ram, lav_mod, standardized = FALSE) {
     lav_mod$theta[,] <- 0
     theta_names <- rownames(lav_mod$theta)
     lav_mod$theta[theta_names, theta_names] <- s_mat[theta_names, theta_names, drop = FALSE]
-    if (standardized) {
-      tmp <- diag(lav_mod$theta)
-      lav_mod$theta <- stats::cov2cor(lav_mod$theta)
-      diag(lav_mod$theta) <- tmp
-    }
+
     if (exists("lambda1")) {
       lav_mod$theta[lambda1, lambda1] <- 0
     }
@@ -56,11 +52,7 @@ RAM2Lav2 <- function(ram, lav_mod, standardized = FALSE) {
     lav_mod$psi[,] <- 0
     psi_names <- rownames(lav_mod$psi)
     lav_mod$psi[psi_names, psi_names] <- s_mat[psi_names, psi_names, drop = FALSE]
-    if (standardized) {
-      tmp <- diag(lav_mod$psi)
-      lav_mod$psi <- stats::cov2cor(lav_mod$psi)
-      diag(lav_mod$psi) <- tmp
-    }
+
   }
 
   # 不处理 nu，仅处理 alpha

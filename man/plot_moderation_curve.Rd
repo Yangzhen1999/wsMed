@@ -2,67 +2,64 @@
 % Please edit documentation in R/plot_moderation_curve.R
 \name{plot_moderation_curve}
 \alias{plot_moderation_curve}
-\title{Plot moderation curves with Johnson-Neyman highlights}
+\title{Plot conditional effects across a continuous moderator}
 \usage{
 plot_moderation_curve(
   result,
   path_name,
   title = NULL,
-  x_label = "Moderator (W)",
+  x_label = "Moderator (W, raw units)",
   y_label = "Estimate",
   ns_fill = "#FEE0D2",
   sig_fill = "#C7E9C0",
   alpha_ci = 0.35,
   alpha_sig = 0.35,
-  base_size = 14
+  base_size = 14,
+  standardized = FALSE,
+  engine = c("mc", "boot")
 )
 }
 \arguments{
-\item{result}{A \code{wsMed()} result that contains a \verb{$moderation} element.}
+\item{result}{A result returned by \code{\link[=wsMed]{wsMed()}} with a continuous moderator.}
 
-\item{path_name}{Exact name of the path to plot (e.g. \code{"indirect_1_2"} or
-\code{"b_1_2"}).  When the name exists in both curves, \code{theta_curve} is used.}
+\item{path_name}{One stored effect identifier, such as
+\code{"indirect_effect_1_2"}, \code{"total_indirect"} or \code{"b_1_2"}.
+\code{"indirect_1_2"} is also accepted as an alias.}
 
-\item{title}{Optional plot title (default
-\code{sprintf("Effect Curve: (\%s)", path_name)}).}
+\item{title}{Optional plot title.}
 
-\item{x_label, y_label}{Axis labels.  Defaults are \code{"Moderator (W)"} and
-\code{"Estimate"}.}
+\item{x_label, y_label}{Axis labels. The default x axis uses raw W units.}
 
-\item{ns_fill, sig_fill}{Fill colours for the confidence band and the
-significant regions.}
+\item{ns_fill}{Colour of the complete confidence band.}
 
-\item{alpha_ci, alpha_sig}{Alpha values for the two ribbons.}
+\item{sig_fill}{Colour of the regions whose pointwise CI excludes zero.}
 
-\item{base_size}{Base font size passed to \code{ggplot2::theme_minimal()}.}
+\item{alpha_ci, alpha_sig}{Opacity of the band and highlighted regions.}
+
+\item{base_size}{Base font size.}
+
+\item{standardized}{Use the stored standardized conditional results.}
+
+\item{engine}{For \code{ci_method = "both"}, select \code{"mc"} or \code{"boot"}.}
 }
 \value{
-A \code{ggplot} object (add layers or save with \code{ggsave()}).
+A ggplot object. Its \code{data} contains the selected curve;
+the \code{wsmed_regions} attribute contains raw-unit grid interval endpoints.
+The \code{wsmed_plot} attribute records engine, scale and confidence level.
 }
 \description{
-\code{plot_moderation_curve()} visualises how an indirect effect
-(\code{theta_curve}) or a path coefficient (\code{path_curve}) varies along a
-continuous moderator \emph{W}.
-
-The routine
-\itemize{
-\item extracts the requested record (\code{path_name}) from \code{result$moderation},
-preferring \code{theta_curve} when it is available in both curves;
-\item draws the conditional effect (\code{Estimate}) against the raw moderator grid
-(\code{W_raw});
-\item overlays the Monte-Carlo confidence band (\code{CI.LL}, \code{CI.UL}) and finds every
-Johnson–Neyman segment whose 95 \% CI excludes zero
-(\code{CI.LL * CI.UL > 0});
-\item shades these significant regions and annotates each with its start /
-end percentiles (for example, \code{"sig 12.5\%-38.3\%"}).
+Plot a conditional indirect effect, total effect or path coefficient with
+its pointwise confidence band. Highlight stored grid values whose interval
+excludes zero. Boundary labels use raw moderator units, not sample percentiles.
 }
-
-Visual elements
-\itemize{
-\item \strong{Red ribbon}   – overall 95 \% confidence band (\code{ns_fill});
-\item \strong{Green ribbon} – significant Johnson–Neyman intervals (\code{sig_fill});
-\item \strong{Solid line}   – point estimate;
-\item \strong{Dashed h-line} – zero reference;
-\item \strong{Dashed v-lines} – J–N bounds.
+\details{
+Highlighted intervals are approximate ranges on the stored grid,
+not exact Johnson--Neyman boundaries or simultaneous confidence regions.
+A label \verb{[a, b]} reports the first and last qualifying grid values. An
+isolated qualifying point is marked by a vertical line. Missing confidence
+limits break a highlighted range. The displayed confidence level follows
+\code{result$alpha}; no fixed p-value threshold is implied.
 }
+\seealso{
+\code{\link[=plot_effects]{plot_effects()}}, \code{\link[=plot_conditional_effects]{plot_conditional_effects()}}, \code{\link[=plot_contrasts]{plot_contrasts()}}
 }

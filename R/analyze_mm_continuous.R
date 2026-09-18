@@ -1,70 +1,87 @@
-#' @title Conditional Indirect Effects with a Continuous Moderator
+#' @title Summarise Effects with a Continuous Moderator
 #'
 #' @description
-#' Summarises Monte-Carlo draws from a \code{semmcci} object when the
-#' moderator \emph{W} is \strong{continuous}.
-#' The function outputs:
-#' \enumerate{
-#'   \item \bold{mod_coeff}   – table of every moderated path coefficient
-#'         (\code{aw}, \code{bw}, \code{dw}, \code{cpw}) with its base
-#'         counterpart and 95 % CI;
-#'   \item \bold{beta_coef}   – indirect effect at three reference points
-#'         of \emph{W} (–1 SD, mean, +1 SD);
-#'   \item \bold{path_HML}    – likewise, the moderated primary paths
-#'         (\code{a}, \code{b}, …) at the three W levels;
-#'   \item \bold{theta_curve} – full curve of the indirect effect over a
-#'         user-defined grid of centred \emph{W};
-#'   \item \bold{path_curve}  – full curve for every moderated base path.
-#' }
-#' Significance stars (\code{"*"}) are added where the CI excludes 0.
+#' `analyze_mm_continuous()` summarises Monte Carlo draws from a `semmcci`
+#' object when the moderator `W` is continuous. It reports moderated path
+#' coefficients, conditional indirect effects, conditional path coefficients,
+#' and effect curves across values of the moderator.
 #'
-#' @param mc_result A \code{semmcci} object returned by \code{MCMI2()}.
-#' @param data A processed data frame (first element of
-#'   \code{PrepareData()} output) that contains the raw moderator column.
-#' @param W_raw_name Name of the moderator column in \code{data}.
-#'   Default \code{"W"}.
-#' @param ci_level Two-sided confidence level (default \code{0.95}).
-#' @param W_values Numeric vector of raw \emph{W} values at which to
-#'   evaluate “Low / Mid / High” effects.
-#'   If \code{NULL} (default) the vector \eqn{mean(W) ± 1\,SD} is used.
-#' @param n_curve Integer, number of points used to draw the continuous
-#'   effect curve (default \code{120}).
-#' @param digits Integer, decimal places for rounding (default \code{3}).
+#' @details
+#' The function first summarises the coefficients associated with moderated
+#' paths, including interaction terms such as `aw`, `bw`, `dw`, and `cpw`,
+#' together with their corresponding base coefficients and confidence
+#' intervals.
 #'
-#' @return A named list with components:
+#' It then evaluates conditional indirect effects and moderated path
+#' coefficients at three reference values of the moderator. By default, these
+#' values are the moderator mean and one standard deviation below and above
+#' the mean. Alternative reference values can be supplied through `W_values`.
+#'
+#' Finally, the function evaluates the conditional indirect effects and
+#' moderated path coefficients over a moderator grid. These results can be
+#' used to plot effect curves or identify regions in which the confidence
+#' interval excludes zero.
+#'
+#' An asterisk is added to an effect when its confidence interval excludes
+#' zero.
+#' @param MP Requested focal paths; all fitted W main effects enter conditional effects.
+#' @param point_estimates Named plug-in parameter estimates. If omitted, the
+#'   means of primitive coefficient draws are used.
+#'
+#' @param mc_result A `semmcci` object returned by `MCMI2()`.
+#' @param data A processed data frame containing the original moderator
+#'   variable. This is typically the first component returned by
+#'   `PrepareData()`.
+#' @param W_raw_name A character string giving the name of the moderator
+#'   variable in `data`. The default is `"W"`.
+#' @param ci_level A numeric value between zero and one specifying the
+#'   two-sided confidence level. The default is `0.95`.
+#' @param W_values An optional numeric vector containing at least two distinct raw moderator
+#'   values at which to evaluate the conditional effects. If `NULL`, the
+#'   moderator mean and values one standard deviation below and above the mean
+#'   are used.
+#' @param n_curve A positive integer specifying the number of moderator values
+#'   used to construct each effect curve. The default is `120`.
+#' @param digits A non-negative integer specifying the number of decimal places
+#'   used to round the reported results. The default is `8`.
+#'
+#' @return A named list with the following components:
 #' \describe{
-#'   \item{\code{mod_coeff}}{Moderated path coefficients (\code{aw},
-#'         \code{bw}, …).}
-#'   \item{\code{beta_coef}}{Indirect effect at –1 SD / 0 SD / +1 SD.}
-#'   \item{\code{path_HML}}{Moderated base paths at the three W levels.}
-#'   \item{\code{theta_curve}}{Data frame of the indirect effect curve.}
-#'   \item{\code{path_curve}}{Data frame of each moderated base-path
-#'         curve.}
+#'   \item{\code{mod_coeff}}{
+#'     A data frame summarising the moderated path coefficients, their
+#'     corresponding base coefficients, and confidence intervals.
+#'   }
+#'   \item{\code{beta_coef}}{
+#'     A data frame containing the conditional indirect effects at the three
+#'     reference values of the moderator.
+#'   }
+#'   \item{\code{path_HML}}{
+#'     A data frame containing the conditional moderated path coefficients at
+#'     the three reference values of the moderator.
+#'   }
+#'   \item{\code{theta_curve}}{
+#'     A data frame containing the conditional indirect effects evaluated over
+#'     the moderator grid.
+#'   }
+#'   \item{\code{path_curve}}{
+#'     A data frame containing the conditional path coefficients evaluated over
+#'     the moderator grid.
+#'   }
 #' }
 #'
-#' @importFrom utils  tail modifyList
-#' @importFrom stats  model.matrix
 #' @importFrom methods slot
-#' @importFrom stats complete.cases
-#' @importFrom utils head
-
+#' @importFrom stats complete.cases model.matrix
+#' @importFrom utils head modifyList tail
+#'
 #' @keywords internal
-
-# -----------------------------------------------------------------------------
-# analyze_mm_continuous.R ── Monte‑Carlo summary for continuous moderation -----
-# -----------------------------------------------------------------------------
-# Public (internal‑only) engine that aggregates MC draws when the moderator W
-# is *continuous*. Low‑level helpers live in cont_helpers.R (.cont_*).
-# The function signature and returned list are identical to the original
-# implementation so that existing tests keep working.
-
 
 analyze_mm_continuous <- function(mc_result, data, MP,
                                   W_raw_name = "W",
                                   ci_level   = 0.95,
                                   W_values   = NULL,
                                   n_curve    = 120,
-                                  digits     = 8) {
+                                  digits     = 8,
+                                  point_estimates = NULL) {
 
   if (!W_raw_name %in% names(data))
     stop("Moderator column `", W_raw_name, "` not found in `data`.")
@@ -72,14 +89,25 @@ analyze_mm_continuous <- function(mc_result, data, MP,
   if (!(is.character(MP) && length(MP) > 0))
     stop("`MP` must be a non-empty character vector of coefficient names.")
 
-  th   <- mc_result
+  th <- .mm_evaluation_rows(mc_result, point_estimates)
+  summarize_draws <- mc_summary_se
+  mc_summary_se <- function(x, ci_level, digits) {
+    out <- summarize_draws(x[-1], ci_level, digits)
+    out["Estimate"] <- round(x[1], digits)
+    out
+  }
   Wraw <- data[[W_raw_name]]
-  muW  <- mean(Wraw);  sdW <- sd(Wraw)
-  if (is.null(W_values)) W_values <- muW + c(-1, 0, 1) * sdW
-  Level_lbl <- c("-1 SD", "0 SD", "+1 SD")
+  muW <- mean(Wraw, na.rm = TRUE); sdW <- sd(Wraw, na.rm = TRUE)
+  center <- muW
+  if ("W1" %in% names(data)) center <- mean(Wraw - data$W1, na.rm = TRUE)
+  default_probes <- is.null(W_values)
+  if (default_probes) W_values <- muW + c(-1, 0, 1) * sdW
+  if (length(W_values) < 2L || any(!is.finite(W_values)) || anyDuplicated(W_values))
+    stop("W_values must contain at least two distinct finite probe values.")
+  Level_lbl <- if (default_probes) c("-1 SD", "0 SD", "+1 SD") else paste0("W=", W_values)
   probs     <- c((1 - ci_level) / 2, (1 + ci_level) / 2)
   extend <- 0.5
-  Wc_seq <- seq(min(Wraw) - extend*sdW, max(Wraw) + extend*sdW, length.out = n_curve) - muW
+  Wc_seq <- seq(min(Wraw, na.rm = TRUE) - extend*sdW, max(Wraw, na.rm = TRUE) + extend*sdW, length.out = n_curve) - center
 
   ## ---------- 1. 所有调节项 ----------
   mod_cols <- grep("^(aw|bw|dw|cpw)", colnames(th), value = TRUE)
@@ -106,18 +134,7 @@ analyze_mm_continuous <- function(mc_result, data, MP,
 
   ## ---------- 3. 识别包含 MP 的所有路径 ----------
   paths_all <- get_indirect_paths(colnames(th))
-  paths <- Filter(\(p) any(p$coefs %in% MP), paths_all)
-
-  if (!length(paths)) {
-    warning("No indirect paths include any of: ", paste(MP, collapse = ", "))
-    return(list(
-      mod_coeff   = mod_coeff,
-      beta_coef   = NULL,
-      path_HML    = NULL,
-      theta_curve = NULL,
-      path_curve  = NULL
-    ))
-  }
+  paths <- paths_all
 
   ## ---------- 4. 分析路径 ----------
   beta_tbl <- list(); theta_curve <- list()
@@ -126,7 +143,7 @@ analyze_mm_continuous <- function(mc_result, data, MP,
   for (pth in paths) {
     coef_list <- lapply(pth$coefs, function(cn) {
       base  <- th[, cn]
-      wcols <- grep(paste0("^", sub("^([abd])", "\\1w", cn), "(_|$)"),
+      wcols <- grep(paste0("^", .cat_get_mod_prefix(cn), "(_|$)"),
                     colnames(th), value = TRUE)
       wcols <- wcols[!grepl("_W[2-9]\\d*$", wcols)]
       wsum  <- if (length(wcols)) rowSums(th[, wcols, drop = FALSE]) else 0
@@ -134,7 +151,7 @@ analyze_mm_continuous <- function(mc_result, data, MP,
     })
 
     for (k in seq_along(W_values)) {
-      wc <- W_values[k] - muW
+      wc <- W_values[k] - center
       samp <- Reduce(`*`, lapply(coef_list, \(z) z$base + z$w * wc))
       beta_tbl[[length(beta_tbl) + 1]] <- data.frame(
         Path      = pth$path_name,
@@ -147,14 +164,14 @@ analyze_mm_continuous <- function(mc_result, data, MP,
     }
 
     th_mat <- sapply(Wc_seq, \(wc) Reduce(`*`, lapply(coef_list, \(z) z$base + z$w * wc)))
-    ci <- t(apply(th_mat, 2, quantile, probs = probs, na.rm = TRUE))
+    ci <- t(apply(th_mat[-1, , drop = FALSE], 2, quantile, probs = probs, na.rm = TRUE))
     theta_curve[[length(theta_curve) + 1]] <- data.frame(
       Path       = pth$path_name,
       Mediators  = pth$mediators,
       W_center   = Wc_seq,
-      W_raw      = Wc_seq + muW,
-      Estimate   = apply(th_mat, 2, mean),
-      SE         = apply(th_mat, 2, sd),
+      W_raw      = Wc_seq + center,
+      Estimate   = th_mat[1, ],
+      SE         = apply(th_mat[-1, , drop = FALSE], 2, sd),
       CI.LL      = ci[, 1],
       CI.UL      = ci[, 2],
       row.names  = NULL
@@ -177,30 +194,30 @@ analyze_mm_continuous <- function(mc_result, data, MP,
 
   # indirect: 对每条路径求乘积，再对路径求和
   ind_mat <- sapply(Wc_seq, function(wc){
-    rowSums(sapply(paths, function(pth){
+    Reduce(`+`, lapply(paths, function(pth){
       Reduce(`*`, lapply(pth$coefs, function(cn){
         base  <- th[, cn]
-        wcols <- grep(paste0("^", sub("^([abd])", "\\1w", cn), "(_|$)"),
+        wcols <- grep(paste0("^", .cat_get_mod_prefix(cn), "(_|$)"),
                       colnames(th), value = TRUE)
         wcols <- wcols[!grepl("_W[2-9]\\d*$", wcols)]
         wsum  <- if (length(wcols)) rowSums(th[, wcols, drop = FALSE]) else 0
         base + wsum * wc
       }))
-    }))
+    }), init = rep(0, nrow(th)))
   })
 
   tot_mat <- direct_mat + ind_mat   # total effect
 
   ## (C) 把整条曲线写入 theta_curve ---------------------------
   make_curve_df <- function(mat, label){
-    ci <- t(apply(mat, 2, quantile, probs = probs))
+    ci <- t(apply(mat[-1, , drop = FALSE], 2, quantile, probs = probs))
     data.frame(
       Path      = label,
       Mediators = label,
       W_center  = Wc_seq,
-      W_raw     = Wc_seq + muW,
-      Estimate  = colMeans(mat),
-      SE        = apply(mat, 2, sd),
+      W_raw     = Wc_seq + center,
+      Estimate  = mat[1, ],
+      SE        = apply(mat[-1, , drop = FALSE], 2, sd),
       CI.LL     = ci[, 1],
       CI.UL     = ci[, 2],
       row.names = NULL
@@ -214,9 +231,14 @@ analyze_mm_continuous <- function(mc_result, data, MP,
   overall_tbl <- list()
 
   for (k in seq_along(W_values)) {
-    wc <- W_values[k] - muW
-    ind_sample <- ind_mat[, which.min(abs(Wc_seq - wc))]
-    tot_sample <- tot_mat[, which.min(abs(Wc_seq - wc))]
+    wc <- W_values[k] - center
+    ind_sample <- Reduce(`+`, lapply(paths, function(pth) {
+      Reduce(`*`, lapply(pth$coefs, function(cn) {
+        wcols <- grep(paste0("^", .cat_get_mod_prefix(cn), "_W1$"), colnames(th), value = TRUE)
+        th[, cn] + rowSums(th[, wcols, drop = FALSE]) * wc
+      }))
+    }), init = rep(0, nrow(th)))
+    tot_sample <- ind_sample + cp_base + cpw_sum * wc
 
     overall_tbl[[length(overall_tbl)+1]] <-
       data.frame(Effect = "total_indirect",
@@ -249,14 +271,14 @@ analyze_mm_continuous <- function(mc_result, data, MP,
   moderated_base <- intersect(moderated_base, colnames(th))
 
   for (bc in moderated_base) {
-    wcols <- grep(paste0("^", sub("^([abd])", "\\1w", bc), "(_|$)"),
+    wcols <- grep(paste0("^", .cat_get_mod_prefix(bc), "(_|$)"),
                   colnames(th), value = TRUE)
     wcols <- wcols[!grepl("_W[2-9]\\d*$", wcols)]
     base <- th[, bc]
     wsum <- rowSums(th[, wcols, drop = FALSE])
 
     for (k in seq_along(W_values)) {
-      wc <- W_values[k] - muW
+      wc <- W_values[k] - center
       samp <- base + wsum * wc
       path_HML[[length(path_HML) + 1]] <- data.frame(
         Path     = bc,
@@ -268,13 +290,13 @@ analyze_mm_continuous <- function(mc_result, data, MP,
     }
 
     mat <- sapply(Wc_seq, \(wc) base + wsum * wc)
-    ci <- t(apply(mat, 2, quantile, probs = probs, na.rm = TRUE))
+    ci <- t(apply(mat[-1, , drop = FALSE], 2, quantile, probs = probs, na.rm = TRUE))
     path_curve[[length(path_curve) + 1]] <- data.frame(
       Path      = bc,
       W_center  = Wc_seq,
-      W_raw     = Wc_seq + muW,
-      Estimate  = apply(mat, 2, mean),
-      SE        = apply(mat, 2, sd),
+      W_raw     = Wc_seq + center,
+      Estimate  = mat[1, ],
+      SE        = apply(mat[-1, , drop = FALSE], 2, sd),
       CI.LL     = ci[, 1],
       CI.UL     = ci[, 2],
       row.names = NULL
@@ -305,22 +327,22 @@ analyze_mm_continuous <- function(mc_result, data, MP,
 
     IE_contrasts <- do.call(rbind, lapply(1:nrow(IE_contrast_raw), function(i) {
       pth <- paths[[which(sapply(paths, \(x) x$path_name == IE_contrast_raw$Path[i]))]]
-      lvl_hi <- IE_contrast_raw$Contrast[i] |> strsplit(" - ") |> unlist() |> tail(1)
-      lvl_lo <- IE_contrast_raw$Contrast[i] |> strsplit(" - ") |> unlist() |> head(1)
+      lvl_hi <- IE_contrast_raw$Contrast[i] |> strsplit(" - ") |> unlist() |> head(1)
+      lvl_lo <- IE_contrast_raw$Contrast[i] |> strsplit(" - ") |> unlist() |> tail(1)
 
-      wc_hi <- W_values[match(lvl_hi, Level_lbl)] - muW
-      wc_lo <- W_values[match(lvl_lo, Level_lbl)] - muW
+      wc_hi <- W_values[match(lvl_hi, Level_lbl)] - center
+      wc_lo <- W_values[match(lvl_lo, Level_lbl)] - center
 
       samp_hi <- Reduce(`*`, lapply(pth$coefs, \(cn){
         base <- th[, cn]
-        wcols <- grep(paste0("^", sub("^([abd])", "\\1w", cn), "(_|$)"), colnames(th), value=TRUE)
+        wcols <- grep(paste0("^", .cat_get_mod_prefix(cn), "(_|$)"), colnames(th), value=TRUE)
         wsum <- if (length(wcols)) rowSums(th[, wcols, drop=FALSE]) else 0
         base + wsum * wc_hi
       }))
 
       samp_lo <- Reduce(`*`, lapply(pth$coefs, \(cn){
         base <- th[, cn]
-        wcols <- grep(paste0("^", sub("^([abd])", "\\1w", cn), "(_|$)"), colnames(th), value=TRUE)
+        wcols <- grep(paste0("^", .cat_get_mod_prefix(cn), "(_|$)"), colnames(th), value=TRUE)
         wsum <- if (length(wcols)) rowSums(th[, wcols, drop=FALSE]) else 0
         base + wsum * wc_lo
       }))
@@ -341,13 +363,13 @@ analyze_mm_continuous <- function(mc_result, data, MP,
     path_contrasts <- do.call(rbind, lapply(1:nrow(path_contrast_raw), function(i) {
       bc <- path_contrast_raw$Path[i]
 
-      lvl_hi <- path_contrast_raw$Contrast[i] |> strsplit(" - ") |> unlist() |> tail(1)
-      lvl_lo <- path_contrast_raw$Contrast[i] |> strsplit(" - ") |> unlist() |> head(1)
+      lvl_hi <- path_contrast_raw$Contrast[i] |> strsplit(" - ") |> unlist() |> head(1)
+      lvl_lo <- path_contrast_raw$Contrast[i] |> strsplit(" - ") |> unlist() |> tail(1)
 
-      wc_hi <- W_values[match(lvl_hi, Level_lbl)] - muW
-      wc_lo <- W_values[match(lvl_lo, Level_lbl)] - muW
+      wc_hi <- W_values[match(lvl_hi, Level_lbl)] - center
+      wc_lo <- W_values[match(lvl_lo, Level_lbl)] - center
 
-      wcols <- grep(paste0("^", sub("^([abd])", "\\1w", bc), "(_|$)"), colnames(th), value=TRUE)
+      wcols <- grep(paste0("^", .cat_get_mod_prefix(bc), "(_|$)"), colnames(th), value=TRUE)
       base <- th[, bc]
       wsum <- if (length(wcols)) rowSums(th[, wcols, drop=FALSE]) else 0
 
@@ -491,7 +513,7 @@ get_indirect_paths <- function(col_names) {
 }
 
 
-#' Make CI column names like "2.5%CI.Lo / 97.5%CI.Up"
+#' Make CI column names
 #' @keywords internal
 .make_ci_names <- function(ci) {
   lo <- paste0(round((1 - ci) / 2 * 100, 1), "%CI.Lo")
@@ -524,7 +546,7 @@ add_sig <- function(df) {
   df
 }
 
-#' Fix % characters mangled by `make.names()`
+#' Fix characters mangled by `make.names()`
 #' @keywords internal
 fix_pct_names <- function(df) {
   if (is.null(df) || !is.data.frame(df)) return(df)

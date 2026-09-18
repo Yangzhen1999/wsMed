@@ -58,6 +58,7 @@
 #' @param pd Logical, enforce positive-definite covariance (default \code{TRUE}).
 #' @param tol Numeric tolerance for PD checks. Default \code{1e-6}.
 #'
+#' @param fixed.x Whether to treat exogenous covariates as fixed in every imputation.
 #' @return A list with three elements:
 #' \describe{
 #'   \item{\code{mc_result}}{A \code{semmcci} object returned by
@@ -75,68 +76,6 @@
 #' @keywords internal
 
 
-
-RunMCMIAnalysis <- function(data_missing,
-                            m = 5,
-                            method = "pmm",
-                            seed = 123,
-                            M_C1,
-                            M_C2,
-                            Y_C1,
-                            Y_C2,
-                            C_C1 = NULL,
-                            C_C2 = NULL,
-                            C = NULL,
-                            W = NULL,  # <-- 添加对 W 的支持
-                            sem_model,
-                            Na = "MI",
-                            R = 20000L,
-                            alpha = c(0.001, 0.01, 0.05),
-                            decomposition = "eigen",
-                            pd = TRUE,
-                            tol = 1e-06) {
-
-  mi_result <- NULL
-  first_imputed_data <- NULL
-
-  if (Na == "MI") {
-    prepared_data <- PrepareMissingData(
-      data_missing = data_missing,
-      m = m,
-      method = method,
-      seed = seed,
-      M_C1 = M_C1,
-      M_C2 = M_C2,
-      Y_C1 = Y_C1,
-      Y_C2 = Y_C2,
-      C_C1 = C_C1,
-      C_C2 = C_C2,
-      C = C,
-      W = W  # <-- 传递调节变量
-    )
-
-    processed_data_list <- prepared_data$processed_data_list
-    first_imputed_data <- processed_data_list[[1]]
-
-    mi_result <- MCMI2(
-      sem_model = sem_model,
-      imputations = processed_data_list,
-      R = R,
-      alpha = alpha,
-      decomposition = decomposition,
-      pd = pd,
-      tol = tol,
-      seed = seed
-    )
-  } else {
-    stop("MI is set to FALSE. Currently, only MI = TRUE is supported.")
-  }
-
-  return(list(
-    mc_result = mi_result,
-    first_imputed_data = first_imputed_data
-  ))
-}
 
 RunMCMIAnalysis <- function(data_missing,
                             m            = 5,
@@ -157,7 +96,8 @@ RunMCMIAnalysis <- function(data_missing,
                             alpha        = c(0.001, 0.01, 0.05),
                             decomposition= "eigen",
                             pd           = TRUE,
-                            tol          = 1e-06) {
+                            tol          = 1e-06,
+                            fixed.x      = FALSE) {
 
 
   if (Na != "MI")
@@ -198,7 +138,8 @@ RunMCMIAnalysis <- function(data_missing,
     decomposition = decomposition,
     pd          = pd,
     tol         = tol,
-    seed        = seed
+    seed        = seed,
+    fixed.x     = fixed.x
   )
 
   ## ---------- 3. 返回 ----------

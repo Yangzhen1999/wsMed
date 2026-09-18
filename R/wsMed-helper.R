@@ -9,8 +9,9 @@ validate_wsMed_inputs <- function(data,
                                   C_C1 = NULL, C_C2 = NULL, C = NULL,
                                   W     = NULL, W_type = NULL,
                                   MP    = NULL,
-                                  form  = c("P","CN","CP","PC"),
-                                  Na    = c("DE","FIML","MI"),
+                                  form  = c("P", "CN", "CP", "PC", "UD"),
+                                  paths = NULL,
+                                  Na    = c("DE", "FIML", "MI"),
                                   R           = 20000L,
                                   bootstrap   = 1000L,
                                   m           = 5L,
@@ -80,7 +81,43 @@ validate_wsMed_inputs <- function(data,
   }
 
   ## ---- 3. form & Na -------------------------------------------------------
-  form <- match.arg(form, c("P", "CN", "CP", "PC"))
+  if (is.character(form)) form <- toupper(form)
+  form <- match.arg(
+    form,
+    c("P", "CN", "CP", "PC", "UD")
+  )
+
+  if (form == "UD") {
+
+    if (is.null(paths)) {
+      stop(
+        "`paths` must be supplied when `form = \"UD\"`.",
+        call. = FALSE
+      )
+    }
+
+    if (!is.character(paths) ||
+        length(paths) == 0L ||
+        anyNA(paths) ||
+        any(!nzchar(trimws(paths)))) {
+      stop(
+        paste0(
+          "`paths` must be a non-empty character vector ",
+          "when `form = \"UD\"`."
+        ),
+        call. = FALSE
+      )
+    }
+
+  } else if (!is.null(paths)) {
+
+    stop(
+      "`paths` can only be supplied when `form = \"UD\"`.",
+      call. = FALSE
+    )
+  }
+
+  if (is.character(Na)) Na <- toupper(Na)
   Na   <- match.arg(Na,   c("DE", "FIML", "MI"))
 
   ## ---- 4. scalar integer parameters --------------------------------------
@@ -104,6 +141,7 @@ validate_wsMed_inputs <- function(data,
            FIML = "mc",
            MI   = "mc")
   } else {
+    if (is.character(ci_method)) ci_method <- tolower(ci_method)
     match.arg(ci_method, allowed_methods)
   }
 
@@ -137,10 +175,27 @@ validate_wsMed_inputs <- function(data,
 
   ## ---- 9. mediator count by form -----------------------------------------
   k <- length(M_C1)
-  if (form == "CN" && k < 2)
-    stop("Form 'CN' requires at least 2 mediators.", call. = FALSE)
-  if (form %in% c("PC","CP") && k < 3)
-    stop("Forms 'PC' and 'CP' require at least 3 mediators.", call. = FALSE)
+
+  if (form == "CN" && k < 2L) {
+    stop(
+      "Form 'CN' requires at least 2 mediators.",
+      call. = FALSE
+    )
+  }
+
+  if (form %in% c("PC", "CP") && k < 3L) {
+    stop(
+      "Forms 'PC' and 'CP' require at least 3 mediators.",
+      call. = FALSE
+    )
+  }
+
+  if (form == "UD" && k < 1L) {
+    stop(
+      "Form 'UD' requires at least one mediator.",
+      call. = FALSE
+    )
+  }
 
   invisible(TRUE)
 }
@@ -196,12 +251,23 @@ assert_scalar_int <- function(x,
 #' Debug printer with indentation (internal)
 #' @keywords internal
 dbg <- function(..., .lvl = 0, verbose = TRUE) {
-  if (verbose) {
-    pref <- paste(rep(".", .lvl), collapse = "")
-    message("[DBG] ", pref, sprintf(...))
-  }
-}
 
+  debug_enabled <- isTRUE(
+    getOption("wsMed.debug", FALSE)
+  )
+
+  if (isTRUE(verbose) && debug_enabled) {
+    pref <- paste(rep(".", .lvl), collapse = "")
+
+    message(
+      "[DBG] ",
+      pref,
+      sprintf(...)
+    )
+  }
+
+  invisible(NULL)
+}
 #' Fit SEM and run Monte-Carlo draws
 #'
 #' @keywords internal
@@ -211,7 +277,7 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
                         alpha     = 0.05,
                         fixed.x   = FALSE,
                         verbose   = TRUE,
-                        run_mc    = TRUE) {
+                        run_mc    = TRUE, seed = NULL) {
   # 0) 解析缺失处理方式
   Na <- match.arg(Na)
   miss_opt <- if (Na == "DE") "listwise" else "fiml"
@@ -230,7 +296,7 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
   mc_out <- NULL
   if (run_mc) {
     if (verbose) message("  -- Monte-Carlo draws...")
-    mc_out <- semmcci::MC(lav = fit, R = R, alpha = alpha)
+    mc_out <- semmcci::MC(lav = fit, R = R, alpha = alpha, seed = seed)
   } else {
     if (verbose) message("  -- Monte-Carlo skipped (ci_method = 'bootstrap')")
   }
@@ -251,7 +317,7 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
                              MP          = NULL,
                              W_type      = c("categorical", "continuous", "none"),  ## ***
                              alpha       = 0.05,
-                             verbose     = FALSE) {
+                             verbose     = FALSE, point_estimates = NULL) {
 
   ## ---- 0. W & W_type 预处理 --------------------------------------------- ##
   # * 若没有 W，则强制 W_type = "none"
@@ -281,7 +347,7 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
   ## ---- B. 无调节（basic contrasts） --------------------------------------
   if (W_type == "none") {                                               ## ***
     dbg(". W_type = 'none' -> basic contrasts", verbose = verbose)
-    basic <- calc_basic_contrasts(theta_draws, ci_level = 1 - alpha)
+    basic <- calc_basic_contrasts(theta_draws, ci_level = 1 - alpha, point_estimates = point_estimates)
 
     return(list(
       type         = "none",
@@ -298,7 +364,8 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
       mc_result     = theta_draws,          ## 可直接传矩阵版本
       prepared_data = data,
       MP            = MP,
-      ci_level      = 1 - alpha
+      ci_level      = 1 - alpha,
+      point_estimates = point_estimates
     )
 
     return(list(
@@ -319,7 +386,8 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
     data        = data,
     MP          = MP,
     W_raw_name  = W[1],
-    ci_level    = 1 - alpha
+    ci_level    = 1 - alpha,
+    point_estimates = point_estimates
   )
 
   cont_out$type <- "continuous"
