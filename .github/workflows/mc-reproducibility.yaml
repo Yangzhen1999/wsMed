@@ -67,3 +67,4 @@ jobs:
           python .github/validation/check-study.py
           Rscript .github/validation/check-simulation.R
           Rscript .github/validation/mi-comparison/check.R
+          python .github/validation/mi-comparison/check-evidence.py

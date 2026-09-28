@@ -25,8 +25,8 @@ the eventual release archive or a later commit has been checked.
 
 ## Local development validation: 2026-09-28
 
-* Complete suite: 1669 passing expectations; zero failures, warnings or skips.
-* All 13 executable tutorial sources rebuilt successfully in an isolated output
+* Complete suite: 1699 passing expectations; zero failures, warnings or skips.
+* All 14 executable tutorial sources rebuilt successfully in an isolated output
   directory; the source archive used those regenerated tutorials.
 * Ten replication-comparison tests passed. The full manuscript analysis matched
   all 820 rows in the frozen reference-core candidate baseline.
@@ -38,6 +38,10 @@ the eventual release archive or a later commit has been checked.
   undercoverage in some default-MI moderated scenarios (minimum observed 89.5%
   for nominal 95% intervals). See .github/validation/RESULTS.md; successful
   execution and platform agreement do not certify inferential coverage.
+* External completed-data input is now validated in both public workflows.
+  Identical internal/external completions give identical pooled estimates and
+  MC draws. The model-compatible MI tutorial and four SMC-FCS pipeline checks
+  passed; the paired follow-up report records its separate statistical results.
 
 ## Changes since CRAN 1.1.0
 

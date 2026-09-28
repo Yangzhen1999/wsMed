@@ -1,5 +1,10 @@
 # Standardization screening study: 2026-09-28
 
+A [paired follow-up](mi-comparison/RESULTS.md) now compares the same incomplete
+datasets with model-compatible external imputation and complete-data controls.
+It substantially reduces bias, but coverage and numerical imputation warnings
+remain explicit limitations. The original screening results below are retained.
+
 The eight prespecified scenarios used 200 independent datasets each, five
 imputations in incomplete-data scenarios, and 2000 MC draws per analysis.
 All 1600 fits/inferences completed. Each dataset contributed three conditional

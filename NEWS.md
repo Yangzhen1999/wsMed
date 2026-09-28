@@ -8,6 +8,10 @@
 - Explain the main-effects-only default imputation limitation in moderated
   result summaries. Add a scoped SMC-FCS tutorial with an explicit predictor
   matrix and rank checks for continuous and categorical moderator formulas.
+  The tutorial stops on rejection-sampling failure warnings. A paired 3200-
+  analysis study finds substantially smaller bias with compatible imputation,
+  but does not establish universally nominal interval coverage; retain all
+  imputation warnings and both m=5/m=20 results in the validation report.
 
 - Record fitting and inference algorithm identities independently of package
   version. Reject incompatible/unversioned endogenous-product fits before new

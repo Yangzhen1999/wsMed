@@ -69,10 +69,13 @@ pred <- matrix(0, ncol(imp_data), ncol(imp_data),
   dimnames = list(names(imp_data), names(imp_data)))
 pred["m1", c("m2", "W")] <- 1
 set.seed(721)
-imp <- smcfcs::smcfcs(imp_data, smtype = "lm",
+imp <- withCallingHandlers(smcfcs::smcfcs(imp_data, smtype = "lm",
   smformula = "yd ~ I(m2-m1)*W + I((m1+m2)/2)",
   method = c("", "norm", "", ""), predictorMatrix = pred,
-  m = 5, numit = 20, rjlimit = 5000)
+  m = 5, numit = 20, rjlimit = 5000), warning = function(w) {
+    if (grepl("Rejection sampling failed", conditionMessage(w), fixed = TRUE))
+      stop("Resolve the rejection-sampling warning before analysis: increase rjlimit, rerun imputation and review diagnostics.", call. = FALSE)
+  })
 completed <- lapply(imp$impDatasets, function(x) {
   d <- dat
   d$m1 <- x$m1
@@ -85,7 +88,9 @@ completed <- lapply(imp$impDatasets, function(x) {
 Five imputations keep this tutorial short; choose the number of imputations and
 iterations for the actual missing-information fraction and required precision.
 Inspect `imp$smCoefIter` for mixing/stability and review rejection-sampling
-warnings. Twenty iterations are an example setting, not a convergence guarantee.
+warnings. The example stops on rejection-sampling failures; do not pass warned
+imputations to the fitting step without resolving the issue. Twenty iterations
+are an example setting, not a convergence guarantee.
 
 The explicit predictor matrix matters: automatic predictor discovery in smcfcs
 can miss m2 when it appears only inside `I(...)`. We specify the covariate model

@@ -9,6 +9,7 @@ on:
       - 'NAMESPACE'
       - 'DESCRIPTION'
       - '.github/replication/**'
+      - '.github/validation/**'
       - '.github/workflows/manuscript-replication.yaml'
   pull_request:
     branches: [main, master]
@@ -18,6 +19,7 @@ on:
       - 'NAMESPACE'
       - 'DESCRIPTION'
       - '.github/replication/**'
+      - '.github/validation/**'
       - '.github/workflows/manuscript-replication.yaml'
 permissions:
   contents: read
