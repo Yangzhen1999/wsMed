@@ -149,6 +149,13 @@ stopifnot(isTRUE(all.equal(coef(one_call_effects), coef(effects))),
 
 ## Categorical covariates
 
+Endogenous products have an auxiliary moment model with the necessary upstream
+residual covariances. This preserves marginal scales under reference recoding.
+With MI, marginal variances and coefficients are pooled jointly; compare the same
+completed datasets when checking coding equivalence. Earlier saved moderated
+models need refitting. See the [diagnostics tutorial](WorkflowReliability.html)
+for an executable reference-group comparison.
+
 A categorical between-subject covariate uses the same reference coding. This
 separate example adjusts for `Group` without treating it as a moderator:
 

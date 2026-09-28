@@ -186,7 +186,10 @@ across draws. If standardized coefficients are used, evaluate them at
 $w_c/s_W^{(r)}$ in draw $r$, not at one fixed standardized moderator value.
 
 Point estimates evaluate the effect at the fitted parameters, or at pooled
-primitive parameters for MI. They are not averages of nonlinear draw effects.
+primitive parameters for MI. For MI models containing endogenous products,
+  the marginal variance estimators are pooled separately and jointly with those
+  coefficients before taking square roots. They are not averages of nonlinear
+  draw effects.
 Invalid joint draws are excluded with diagnostics; inspect the
 `standardization` attribute for their counts, indices and reasons.
 
@@ -223,11 +226,26 @@ the plotting `engine` argument selects between them.
 FIML and MI use the same effect definition. With `fixed.x = FALSE`, estimated
 external moments participate in the joint transformation. With
 `fixed.x = TRUE`, transformations condition on fitted external moments.
+Products containing an endogenous mediator are modeled with auxiliary moment
+equations and covariances with their upstream mediator disturbances. This
+preserves the predictor moment structure when a reference group changes.
+`fixed.x` applies to the remaining genuine exogenous predictors; endogenous
+product moments are always estimated.
+
 MI supports MC inference and evaluates effects at pooled primitive parameters;
 its probing and centering reference is the first completed dataset.
 With MI and `fixed.x = TRUE`, external moments from that reference are held
 fixed. This does not introduce population-relative moderator probing or a
 new imputation procedure.
+
+For MI moderated models, wsMed averages each marginal variance estimate over
+completed datasets. It pools its covariance with the primitive coefficients using
+delta-method within-imputation covariances and Rubin's rules. MC samples the
+variances jointly with the coefficients, so the denominator is not treated as
+fixed. Pooling the variance itself avoids the coding dependence of evaluating a
+nonlinear marginal variance only after pooling covariance-model parameters.
+The original coefficient pooling and imputation procedure are retained.
+Refit earlier saved moderated models before using this correction.
 
 Report the condition difference direction, model and moderated paths,
 moderator coding/reference and raw probe values, marginal SD definition,

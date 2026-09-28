@@ -170,8 +170,10 @@ contrast definitions. `wsmed_reproducibility(result)` returns an analysis manife
 without participant-level data or simulation draws; use `file = "analysis.rds"`
 to save it to a new file.
 
-The current product-term SEM can imply different marginal variances after
-changing a categorical reference, so standardized effects are not guaranteed to
-be reference-invariant. Keep and report the reference coding and implied SD.
+Moderated models now account for the dependence of endogenous products on
+upstream mediator disturbances, preserving marginal scales under reference
+recoding. MI jointly pools marginal variances and coefficients and propagates
+their covariance. Refit earlier saved moderated models and regenerate inference;
+the corrected estimates and intervals can differ from version 1.1.0.
 The [diagnostics and migration tutorial](https://yangzhen1999.github.io/wsMed/articles/WorkflowReliability.html)
 explains these conventions and the transition from previous one-call results.

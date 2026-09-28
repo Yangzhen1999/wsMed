@@ -90,13 +90,40 @@ and reports its plug-in value. This is a marginal SD, not a conditional SD at ea
 moderator value. Draw-specific scales continue to vary jointly with coefficients.
 Contrasts display signed weights and their source effects/probes.
 
-Changing category reference levels preserves the raw conditional effects in the
-checked complete-data example. However, the current product-term SEM can imply
-different marginal covariances after recoding; standardized conditional effects
-are therefore not guaranteed to be reference-invariant. Keep reference coding
-fixed when reporting these effects. The report exposes the coding and implied
-SD rather than substituting a different standardizer. Resolving this model-level
-limitation requires a separate statistical specification change.
+The generated SEM now accounts for the dependence of endogenous products on
+upstream mediator disturbances. `printGM()` shows its auxiliary product moment
+equations and residual covariances separately from the mediation paths. These
+auxiliary equations parameterize means and covariances, not new causal paths.
+For the same data and model, changing a categorical reference preserves the
+marginal standardizer and conditional effects, up to fitting precision.
+
+```{r reference-invariance}
+group_model <- wsmed_model(
+  c(before = "D1", after = "D2"),
+  list(A = c(before = "A1", after = "A2")),
+  moderator = list(variable = "Group", interactions = "A -> Y"))
+group_fit <- wsmed_fit(group_model, example_data)
+recoded_data <- example_data
+recoded_data$Group <- relevel(recoded_data$Group, "low")
+recoded_fit <- wsmed_fit(group_model, recoded_data)
+probes <- list(Group = c("high", "low", "med"))
+original_effects <- wsmed_effects(group_fit, at = probes, scale = "marginal")
+recoded_effects <- wsmed_effects(recoded_fit, at = probes, scale = "marginal")
+data.frame(group = probes$Group, original = coef(original_effects),
+           recoded = coef(recoded_effects))
+stopifnot(isTRUE(all.equal(unname(coef(original_effects)),
+  unname(coef(recoded_effects)), tolerance = 1e-6)))
+```
+
+For MI moderated models, marginal variances are estimated in each completed
+dataset and pooled jointly with coefficients. Their within-imputation covariance
+uses the delta method; Rubin's rules include between-imputation uncertainty.
+MC draws retain the covariance between coefficients and standardizers.
+A coding comparison must use the same completed datasets: repeating stochastic
+imputation or finite MC sampling can itself change numerical results.
+
+Models saved before this correction must be refitted and their inference rerun.
+Re-extracting an old object's results cannot repair its fitted covariance model.
 
 ## Export a compact analysis manifest
 
