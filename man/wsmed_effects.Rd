@@ -55,4 +55,7 @@ variances with coefficients, using a delta-method within-imputation covariance
 and Rubin's rules; MC draws retain their covariance. Refit objects saved before
 this correction. Finite MC draws or new imputations need not match after recoding.
 The query interpretation records the plug-in outcome-difference SD.
+Incompatible saved fits stop before extraction. If a fit is compatible but
+its MI sampler is unversioned or outdated, rerun \code{\link[=wsmed_infer]{wsmed_infer()}} on that fit.
+Stored primitive coefficients and full legacy tables remain inspectable.
 }

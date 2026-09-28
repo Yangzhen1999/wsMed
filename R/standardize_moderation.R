@@ -14,10 +14,13 @@
 #'   parameters and the existing first-imputation probing reference. For models
 #'   with endogenous products, marginal variances are pooled jointly with
 #'   coefficients before taking square roots, retaining their sampling covariance.
+#'   Saved endogenous-product fits and MI draws require compatible algorithm
+#'   identifiers. Refit unversioned old models rather than restandardizing them.
 #' @export
 standardize_moderation <- function(object) {
   if (!inherits(object, "wsMed")) stop("object must be a wsMed result.")
   if (is.null(object$input_vars[["W"]])) stop("A moderator is required.")
+  .wsmed_check_legacy_standardization(object)
   run <- function(engine) {
     is_mc <- engine == "mc"
     fit <- if (is_mc) object$mc$result$args$lav else object$fit_u

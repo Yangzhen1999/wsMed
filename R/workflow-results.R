@@ -27,6 +27,9 @@
 #' and Rubin's rules; MC draws retain their covariance. Refit objects saved before
 #' this correction. Finite MC draws or new imputations need not match after recoding.
 #' The query interpretation records the plug-in outcome-difference SD.
+#' Incompatible saved fits stop before extraction. If a fit is compatible but
+#' its MI sampler is unversioned or outdated, rerun [wsmed_infer()] on that fit.
+#' Stored primitive coefficients and full legacy tables remain inspectable.
 #' @export
 wsmed_effects <- function(object, type = c("indirect", "total", "direct",
                            "total_indirect", "paths", "parameters"), terms = NULL,
@@ -136,10 +139,12 @@ wsmed_effects <- function(object, type = c("indirect", "total", "direct",
   }
   if (inherits(object, "wsmed_inference")) {
     if (!is.null(method) && !identical(method, object$method)) stop("Requested inference is not stored.")
+    .wsmed_check_inference(object)
     return(list(fit = object$fit, inference = object))
   }
   if (inherits(object, "wsmed_fit")) {
     if (!is.null(method)) stop("A fit contains no stored inference; call wsmed_infer().")
+    .wsmed_check_fit(object)
     return(list(fit = object, inference = NULL))
   }
   stop("Expected a wsmed_fit, wsmed_inference, or wsMed result.")

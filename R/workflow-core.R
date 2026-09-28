@@ -149,6 +149,7 @@
         as.numeric(lavaan::lavInspect(x, "nobs")), numeric(1)),
       case_indices = lapply(fits, function(x) lavaan::lavInspect(x, "case.idx"))),
     provenance = list(R = R.version.string, wsMed = utils::packageVersion("wsMed"),
+      algorithms = .wsmed_fit_algorithms(),
       lavaan = utils::packageVersion("lavaan"),
       mice = if (Na == "MI") utils::packageVersion("mice") else NULL,
       platform = R.version$platform, RNGkind = RNGkind(),
@@ -175,6 +176,7 @@
 
 .wsmed_infer_core <- function(fit, method, draws, seed, level, boot_ci_type,
                               decomposition, pd, tol, verbose = FALSE) {
+  .wsmed_check_fit(fit)
   if (!all(fit$diagnostics$converged)) stop("Inference requires converged fits.")
   bad <- which(!fit$diagnostics$admissible)
   if (length(bad)) stop("Inference requires admissible fits; review dataset(s): ",
@@ -217,6 +219,7 @@
       decomposition = if (fit$Na == "MI") mc$args$decomposition else NULL,
       pd = pd, tol = tol, RNGkind = RNGkind()),
     provenance = list(fit = fit$provenance, semmcci = utils::packageVersion("semmcci"),
+      algorithms = .wsmed_inference_algorithms(),
       semboottools = utils::packageVersion("semboottools"),
       sampler = if (method == "bootstrap") "semboottools participant bootstrap" else
         if (fit$Na == "MI") paste("pooled MI", mc$args$decomposition) else "semmcci::MC"),

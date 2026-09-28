@@ -183,6 +183,9 @@ wsmed_fit <- function(model, data, missing = c("error", "listwise", "fiml", "mi"
 #' necessarily fits resampled datasets. No new statistical engine is introduced.
 #' Seeded calls restore the caller's random state; seed = NULL consumes the
 #' current random stream and advances it normally.
+#' Fits with endogenous products must record compatible model and MI pooling
+#' algorithm identifiers. Older unversioned moderated fits require refitting
+#' from the original data; package version alone cannot identify their algorithms.
 #' @export
 wsmed_infer <- function(object, method = c("mc", "bootstrap"), draws = NULL,
                          seed = NULL, level = 0.95, interval = "perc",

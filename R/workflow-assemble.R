@@ -97,6 +97,9 @@
   )
 
   class(out) <- "wsMed"
+  out$model <- fit$model
+  out$fit <- fit
+  out$inference <- inferences
   if (standardized && length(W)) out$moderation_std <- standardize_moderation(out)
 
   .v(
@@ -104,8 +107,5 @@
     verbose = verbose
   )
 
-  out$model <- fit$model
-  out$fit <- fit
-  out$inference <- inferences
   out
 }
