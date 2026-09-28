@@ -1,0 +1,87 @@
+example,manuscript_file,line,label,manuscript_values,status
+1,illustration/example1-results.tex,28,Chi-Sq,17.122,PASS
+1,illustration/example1-results.tex,28,RMSEA,0.059,PASS
+1,illustration/example1-results.tex,29,df,12.000,PASS
+1,illustration/example1-results.tex,29,RMSEALow,0.000,PASS
+1,illustration/example1-results.tex,30,p,0.145,PASS
+1,illustration/example1-results.tex,30,RMSEAUp,0.117,PASS
+1,illustration/example1-results.tex,31,CFI,0.913,PASS
+1,illustration/example1-results.tex,31,SRMR,0.043,PASS
+1,illustration/example1-results.tex,32,TLI,0.754,PASS
+1,illustration/example1-results.tex,44,Totaleffect,-3.019; 0.387; -3.780; -2.257,PASS
+1,illustration/example1-results.tex,45,Directeffect,-2.745; 0.364; -3.449; -2.025,PASS
+1,illustration/example1-results.tex,46,Totalindirect,-0.274; 0.206; -0.737; 0.082,PASS
+1,illustration/example1-results.tex,57,ind_1,-0.003; 0.089; -0.202; 0.164,PASS
+1,illustration/example1-results.tex,58,ind_2,-0.317; 0.172; -0.718; -0.048,PASS
+1,illustration/example1-results.tex,59,ind_3,0.045; 0.087; -0.091; 0.262,PASS
+1,illustration/example1-results.tex,75,d1,-0.046; 0.045; -0.135; 0.043,PASS
+1,illustration/example1-results.tex,76,d2,0.013; 0.092; -0.167; 0.196,PASS
+1,illustration/example1-results.tex,77,d3,0.053; 0.126; -0.196; 0.299,PASS
+1,illustration/example1-results.tex,89,indirect_2-indirect_1,-0.314; 0.188; -0.735; -0.004,PASS
+1,illustration/example1-results.tex,90,indirect_3-indirect_1,0.048; 0.130; -0.174; 0.356,PASS
+1,illustration/example1-results.tex,91,indirect_3-indirect_2,0.362; 0.202; 0.042; 0.825,PASS
+1,illustration/example1-results.tex,104,X1_b1,0.088; 0.053; -0.016; 0.192,PASS
+1,illustration/example1-results.tex,105,X0_b1,0.134; 0.056; 0.025; 0.244,PASS
+1,illustration/example1-results.tex,106,X1_b2,-0.223; 0.078; -0.378; -0.067,PASS
+1,illustration/example1-results.tex,107,X0_b2,-0.236; 0.102; -0.436; -0.037,PASS
+1,illustration/example1-results.tex,108,X1_b3,0.119; 0.068; -0.015; 0.251,PASS
+1,illustration/example1-results.tex,109,X0_b3,0.066; 0.113; -0.154; 0.287,PASS
+1,illustration/example1-results.tex,124,Ydiff~M1diff,0.111; 0.050; 0.014; 0.209,PASS
+1,illustration/example1-results.tex,125,Ydiff~M1avg,-0.046; 0.045; -0.135; 0.043,PASS
+1,illustration/example1-results.tex,126,Ydiff~M2diff,-0.230; 0.078; -0.383; -0.076,PASS
+1,illustration/example1-results.tex,127,Ydiff~M2avg,0.013; 0.092; -0.167; 0.196,PASS
+1,illustration/example1-results.tex,128,Ydiff~M3diff,0.093; 0.068; -0.040; 0.227,PASS
+1,illustration/example1-results.tex,129,Ydiff~M3avg,0.053; 0.126; -0.196; 0.299,PASS
+1,illustration/example1-results.tex,141,Ydiff~1,-2.745; 0.364; -3.449; -2.025,PASS
+1,illustration/example1-results.tex,142,M1diff~1,-0.024; 0.736; -1.462; 1.421,PASS
+1,illustration/example1-results.tex,143,M2diff~1,1.379; 0.510; 0.381; 2.378,PASS
+1,illustration/example1-results.tex,144,M3diff~1,0.488; 0.680; -0.850; 1.819,PASS
+2,illustration/example2-results.tex,33,Totaleffect,-2.927; 0.370; -3.664; -2.207,PASS
+2,illustration/example2-results.tex,34,Directeffect,-2.372; 0.404; -3.162; -1.568,PASS
+2,illustration/example2-results.tex,35,Totalindirect,-0.555; 0.243; -1.066; -0.105,PASS
+2,illustration/example2-results.tex,41,ind_1,0.093; 0.107; -0.091; 0.338,PASS
+2,illustration/example2-results.tex,42,ind_2,-0.247; 0.157; -0.615; -0.019,PASS
+2,illustration/example2-results.tex,43,ind_2_1,-0.000; 0.023; -0.052; 0.044,PASS
+2,illustration/example2-results.tex,44,ind_3,-0.324; 0.218; -0.793; 0.073,PASS
+2,illustration/example2-results.tex,45,ind_3_1,-0.077; 0.057; -0.209; 0.010,PASS
+2,illustration/example2-results.tex,66,d1,-0.061; 0.041; -0.141; 0.018,PASS
+2,illustration/example2-results.tex,67,d2,0.008; 0.083; -0.151; 0.172,PASS
+2,illustration/example2-results.tex,68,d3,-0.083; 0.170; -0.419; 0.252,PASS
+2,illustration/example2-results.tex,69,d_2_1,0.012; 0.166; -0.314; 0.334,PASS
+2,illustration/example2-results.tex,70,d_3_1,-0.192; 0.304; -0.784; 0.403,PASS
+2,illustration/example2-results.tex,83,indirect_2-indirect_1,-0.340; 0.208; -0.815; -0.013,PASS
+2,illustration/example2-results.tex,84,indirect_2_1-indirect_1,-0.093; 0.114; -0.354; 0.102,PASS
+2,illustration/example2-results.tex,85,indirect_3-indirect_1,-0.416; 0.222; -0.876; -0.007,PASS
+2,illustration/example2-results.tex,86,indirect_3_1-indirect_1,-0.169; 0.146; -0.506; 0.060,PASS
+2,illustration/example2-results.tex,87,indirect_2_1-indirect_2,0.247; 0.157; 0.016; 0.617,PASS
+2,illustration/example2-results.tex,88,indirect_3-indirect_2,-0.076; 0.306; -0.673; 0.543,PASS
+2,illustration/example2-results.tex,89,indirect_3_1-indirect_2,0.171; 0.160; -0.079; 0.543,PASS
+2,illustration/example2-results.tex,90,indirect_3-indirect_2_1,-0.323; 0.220; -0.792; 0.080,PASS
+2,illustration/example2-results.tex,91,indirect_3_1-indirect_2_1,-0.076; 0.061; -0.218; 0.021,PASS
+2,illustration/example2-results.tex,92,indirect_3_1-indirect_3,0.247; 0.233; -0.192; 0.739,PASS
+2,illustration/example2-results.tex,105,cp,-0.600; 0.112; 20000.000; -0.808; -0.369,PASS
+2,illustration/example2-results.tex,106,indirect_1,0.023; 0.025; 20000.000; -0.022; 0.079,PASS
+2,illustration/example2-results.tex,107,indirect_2,-0.063; 0.037; 20000.000; -0.145; -0.005,PASS
+2,illustration/example2-results.tex,108,indirect_2_1,-0.000; 0.005; 20000.000; -0.012; 0.011,PASS
+2,illustration/example2-results.tex,109,indirect_3,-0.082; 0.053; 20000.000; -0.191; 0.018,PASS
+2,illustration/example2-results.tex,110,indirect_3_1,-0.019; 0.014; 20000.000; -0.050; 0.002,PASS
+2,illustration/example2-results.tex,111,total_indirect,-0.141; 0.058; 20000.000; -0.255; -0.026,PASS
+2,illustration/example2-results.tex,112,total_effect,-0.741; 0.105; 20000.000; -0.931; -0.518,PASS
+3,illustration/example3-results.tex,13,bw1_W1,-0.008; 0.017; -0.041; 0.025,PASS
+3,illustration/example3-results.tex,14,cpw_W1,0.344; 0.236; -0.123; 0.808,PASS
+3,illustration/example3-results.tex,15,aw1_W1,-0.996; 0.441; -1.853; -0.128,PASS
+3,illustration/example3-results.tex,31,indirect_effect_1,17.785; 0.263; 0.215; -0.028; 0.792,PASS
+3,illustration/example3-results.tex,32,indirect_effect_1,19.772; -0.000; 0.091; -0.187; 0.194,PASS
+3,illustration/example3-results.tex,33,indirect_effect_1,21.759; -0.204; 0.187; -0.647; 0.074,PASS
+3,illustration/example3-results.tex,48,indirect_effect_1,17.785; 0.066; 0.051; -0.007; 0.189,PASS
+3,illustration/example3-results.tex,49,indirect_effect_1,19.772; -0.000; 0.022; -0.045; 0.047,PASS
+3,illustration/example3-results.tex,50,indirect_effect_1,21.759; -0.051; 0.045; -0.155; 0.018,PASS
+3,illustration/example3-results.tex,67,(0SD)-(-1SD),-0.263; 0.197; -0.744; 0.015,PASS
+3,illustration/example3-results.tex,68,(+1SD)-(-1SD),-0.467; 0.333; -1.257; 0.022,PASS
+3,illustration/example3-results.tex,69,(+1SD)-(0SD),-0.204; 0.168; -0.589; 0.060,PASS
+3,illustration/example3-results.tex,113,a1,17.785; 1.976; 1.066; -0.127; 4.070,PASS
+3,illustration/example3-results.tex,114,a1,19.772; -0.003; 0.705; -1.390; 1.368,PASS
+3,illustration/example3-results.tex,115,a1,21.759; -1.983; 1.180; -4.293; 0.345,PASS
+3,illustration/example3-results.tex,116,b1,17.785; 0.133; 0.064; 0.007; 0.261,PASS
+3,illustration/example3-results.tex,117,b1,19.772; 0.118; 0.054; 0.012; 0.224,PASS
+3,illustration/example3-results.tex,118,b1,21.759; 0.103; 0.063; -0.021; 0.227,PASS

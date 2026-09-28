@@ -3,6 +3,12 @@ on:
   workflow_dispatch:
   push:
     branches: [fix/mc-reproducibility]
+    paths:
+      - 'R/**'
+      - 'tests/**'
+      - 'DESCRIPTION'
+      - 'tools/check-mc-reproducibility.R'
+      - '.github/workflows/mc-reproducibility.yaml'
   pull_request:
     branches: [master, main]
     paths:

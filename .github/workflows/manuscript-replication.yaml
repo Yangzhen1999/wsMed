@@ -1,0 +1,76 @@
+name: Manuscript replication
+on:
+  workflow_dispatch:
+  push:
+    branches: [fix/mc-reproducibility]
+    paths:
+      - '.github/replication/**'
+      - '.github/workflows/manuscript-replication.yaml'
+permissions:
+  contents: read
+
+jobs:
+  examples:
+    name: ${{ matrix.profile }} (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        profile: [reference-core, current-cran]
+        include:
+          - profile: reference-core
+            r: '4.4.3'
+          - profile: current-cran
+            r: 'release'
+    runs-on: ${{ matrix.os }}
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      WSMED_PROFILE: ${{ matrix.profile }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.r }}
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        if: matrix.profile == 'reference-core'
+        with:
+          extra-packages: |
+            local::.
+            any::jsonlite
+            lavaan@0.6-19
+            mice@3.17.0
+            haven@2.5.4
+            MASS@7.3-65
+            ggplot2@4.0.0
+            knitr@1.49
+            semmcci=local::.github/replication/software/semmcci_1.1.4.9000.tar.gz
+            semboottools=local::.github/replication/software/semboottools_0.0.0.9011.tar.gz
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        if: matrix.profile == 'current-cran'
+        with:
+          extra-packages: any::haven, any::jsonlite, local::.
+      - name: Reproduce all manuscript examples
+        run: Rscript .github/replication/run.R
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ${{ matrix.profile }}-${{ matrix.os }}
+          path: .github/replication/results/
+          if-no-files-found: warn
+  comparison:
+    needs: examples
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: replication-artifacts
+      - name: Compare environments and manuscript tables
+        run: python .github/replication/compare.py replication-artifacts replication-comparison
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: replication-comparison
+          path: replication-comparison/
