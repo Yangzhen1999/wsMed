@@ -7,7 +7,8 @@ wsMed 1.1.0 output. No paper values are silently replaced.
 
 Two profiles are compared on Windows, Linux, and macOS:
 
-- `reference-core`: R 4.4.3 and the nine key versions recorded in `run.R`.
+- `reference-core`: R 4.4.3 and the ten versions recorded in `run.R`, including
+  historical xfun 0.51 for compatibility with knitr 1.49.
   Other transitive dependencies are resolved separately and recorded. This
   is not a byte-for-byte recreation of the full historical environment.
 - `current-cran`: current R-release and currently available CRAN dependencies.

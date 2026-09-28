@@ -10,7 +10,7 @@ stopifnot(unname(tools::md5sum(file.path(inputs, "wsMed_examples.sav"))) ==
 expected <- c(wsMed = "1.1.0.9000", lavaan = "0.6-19", mice = "3.17.0",
               haven = "2.5.4", semmcci = "1.1.4.9000",
               semboottools = "0.0.0.9011", MASS = "7.3-65",
-              ggplot2 = "4.0.0", knitr = "1.49")
+              ggplot2 = "4.0.0", knitr = "1.49", xfun = "0.51")
 if (profile == "reference-core") {
   stopifnot(getRversion() == package_version("4.4.3"))
   for (p in names(expected)) {

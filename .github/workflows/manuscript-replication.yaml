@@ -45,6 +45,7 @@ jobs:
             MASS@7.3-65
             ggplot2@4.0.0
             knitr@1.49
+            xfun@0.51
             semmcci=local::.github/replication/software/semmcci_1.1.4.9000.tar.gz
             semboottools=local::.github/replication/software/semboottools_0.0.0.9011.tar.gz
       - uses: r-lib/actions/setup-r-dependencies@v2
