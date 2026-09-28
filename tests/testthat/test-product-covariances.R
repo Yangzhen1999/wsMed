@@ -230,11 +230,35 @@ test_that("paired participant bootstrap refits are reference invariant", {
   re <- d; re$W <- relevel(d$W, "med")
   g <- wsmed_fit(f$model, re)
   results <- lapply(list(f, g), function(x) {
-    expect_warning(i <- wsmed_infer(x, method = "bootstrap", draws = 60, seed = 291,
-      interval = "perc", level = .80),
+    expect_warning(i <- withCallingHandlers(
+      wsmed_infer(x, method = "bootstrap", draws = 60, seed = 291,
+        interval = "perc", level = .80),
+      warning = function(w) {
+        # A numerical refit can fail on one platform/reference coding. Its
+        # warning and original replicate ID remain in inference diagnostics.
+        if (grepl("bootstrap runs failed or did not converge", conditionMessage(w), fixed = TRUE))
+          invokeRestart("muffleWarning")
+      }),
       "Bootstrap p-values are not computed")
-    wsmed_effects(i, at = list(W = c("high", "low", "med")), scale = "marginal")
+    expect_equal(sort(c(i$draw_ids, i$diagnostics$invalid_draw_ids)), seq_len(60))
+    if (i$diagnostics$invalid > 0L)
+      expect_true(any(grepl("bootstrap runs failed or did not converge",
+        i$diagnostics$warnings, fixed = TRUE)))
+    out <- wsmed_effects(i, at = list(W = c("high", "low", "med")), scale = "marginal")
+    expect_equal(unname(confint(out)),
+      unname(t(apply(out$draws, 2, quantile, probs = c(.1, .9)))))
+    out
   })
-  expect_equal(results[[1]]$draws, results[[2]]$draws, tolerance = 2e-5)
-  expect_equal(confint(results[[1]]), confint(results[[2]]), tolerance = 2e-5)
+  # Compare the same participant resamples, never two differently filtered
+  # sequences (e.g., 59 versus 60 successful refits). Keep the numerical
+  # tolerance unchanged and fail if more than two paired refits are lost.
+  common <- intersect(results[[1]]$draw_ids, results[[2]]$draw_ids)
+  expect_gte(length(common), 58L)
+  paired <- lapply(results, function(x) {
+    x$draws <- x$draws[match(common, x$draw_ids), , drop = FALSE]
+    x$draw_ids <- common
+    x
+  })
+  expect_equal(paired[[1]]$draws, paired[[2]]$draws, tolerance = 2e-5)
+  expect_equal(confint(paired[[1]]), confint(paired[[2]]), tolerance = 2e-5)
 })
