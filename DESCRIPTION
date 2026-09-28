@@ -24,7 +24,7 @@ Depends: R (>= 4.1.0)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-Suggests: rmarkdown, devtools, testthat
+Suggests: rmarkdown, devtools, testthat, smcfcs (>= 1.8.0)
 Config/testthat/edition: 3
 Imports: knitr, lavaan, semmcci, mice, semboottools, MASS, rlang,
         dplyr, ggplot2, methods, stats, graphics, utils

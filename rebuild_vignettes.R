@@ -5,6 +5,8 @@
 # Use articles = "ModularWorkflow" to rebuild only the staged-workflow tutorial.
 # Use articles = "CategoricalPredictors" to rebuild the categorical examples.
 # Use articles = "WorkflowReliability" for diagnostics, manifests, and migration.
+# Use articles = "CompatibleImputation" for external model-aware MI; install
+# the suggested smcfcs package to execute its substantive-model example.
 # Edit executable sources as .Rmd temporarily, then restore .Rmd.original before
 # running this helper. Frozen .Rmd files are generated output, not source files.
 rebuild_vignettes <- function(root = getwd(), output_dir = file.path(root, "vignettes"),

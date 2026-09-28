@@ -180,6 +180,16 @@ do not guarantee nominal coverage; users should assess whether their imputation
 model preserves the substantive moderation structure. These findings do not
 establish the cause or cover all missing-data mechanisms.
 
+To use a model-aware external imputer, supply its completed wide datasets (or
+a `mice` mids object) with `wsmed_fit(..., missing = "mi",
+mi = list(completed = completed))`. The one-call equivalent is
+`wsMed(..., Na = "MI", mi_args = list(completed = completed))`. Both interfaces
+validate observed cells, participant order and factor levels, then use the same
+fitting, pooling and standardization engine. See the executable
+[SMC-FCS tutorial](https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/vignettes/CompatibleImputation.Rmd.original)
+for its assumptions and required predictor matrix, and the
+[paired follow-up](https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/.github/validation/mi-comparison/RESULTS.md).
+
 Interval methods retain the confidence level saved in the selected inference;
 an explicit `level` overrides it. Fit diagnostics distinguish convergence from
 post-fit admissibility and record each imputed dataset separately. Effect summaries

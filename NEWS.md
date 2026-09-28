@@ -1,5 +1,14 @@
 # wsMed 1.1.0.9000
 
+- Accept externally generated completed datasets or a mice mids object through
+  `wsmed_fit(mi = list(completed = ...))` and `wsMed(mi_args = list(completed = ...))`.
+  Validate observed cells, participant rows and factor coding; regenerate
+  transformed variables within each completion and reuse existing Rubin/MC
+  inference. Record external imputation without exporting participant data.
+- Explain the main-effects-only default imputation limitation in moderated
+  result summaries. Add a scoped SMC-FCS tutorial with an explicit predictor
+  matrix and rank checks for continuous and categorical moderator formulas.
+
 - Record fitting and inference algorithm identities independently of package
   version. Reject incompatible/unversioned endogenous-product fits before new
   inference or extraction; allow a compatible fit to regenerate old MI draws.

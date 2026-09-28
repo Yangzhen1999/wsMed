@@ -210,3 +210,10 @@ study does not isolate the cause of the observed bias and undercoverage.
 See the development repository
 [simulation report](https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/.github/validation/RESULTS.md)
 for the design, Monte Carlo uncertainty and retained results.
+
+A model-compatible external imputer can now supply its completed datasets via
+`mi = list(completed = completed)` or one-call `mi_args = list(completed = completed)`.
+This does not reimpute or change the pooling/standardization engine. See the
+[model-compatible imputation tutorial](CompatibleImputation.html) for a scoped
+SMC-FCS example and the paired follow-up study. Save external imputation settings
+and convergence diagnostics separately; they cannot be inferred from completed data.

@@ -266,3 +266,14 @@ differences with their own confidence intervals. All three support
 `standardized` and the MC/bootstrap `engine` selection. See
 [Plotting mediation effects and contrasts](PlottingEffects.html) for executed
 examples, selection of paths and labels, and export to PDF or PNG.
+
+## Imputation compatibility
+
+Correct standardization does not repair an imputation model that omits substantive
+interactions. Default raw-variable MI uses main effects. To use model-compatible
+external imputations, pass a list of completed wide datasets (or a `mice` mids
+object) through `wsmed_fit(..., missing = "mi", mi = list(completed = completed))`
+or `wsMed(..., Na = "MI", mi_args = list(completed = completed))`. The difference
+scores and products are regenerated in each completion; observed cells and factor
+levels are checked. See [the worked example](CompatibleImputation.html) for
+assumptions, an explicit SMC-FCS predictor matrix and convergence guidance.

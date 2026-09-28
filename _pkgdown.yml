@@ -32,6 +32,8 @@ navbar:
           href: articles/PlottingEffects.html
         - text: "Standardized moderated mediation"
           href: articles/StandardizedModeratedMediation.html
+        - text: "Model-compatible multiple imputation"
+          href: articles/CompatibleImputation.html
         - text: "Inspecting generated SEM syntax"
           href: articles/printGM.html
         - text: "Specifying parallel mediation models"

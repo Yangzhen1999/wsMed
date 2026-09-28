@@ -57,7 +57,7 @@ jobs:
           use-public-rspm: true
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::testthat, local::.
+          extra-packages: any::testthat, any::smcfcs, local::.
       - name: Run package regression tests
         shell: Rscript {0}
         run: testthat::test_local(".", reporter = "summary", stop_on_failure = TRUE)
@@ -66,3 +66,4 @@ jobs:
         run: |
           python .github/validation/check-study.py
           Rscript .github/validation/check-simulation.R
+          Rscript .github/validation/mi-comparison/check.R

@@ -156,3 +156,13 @@ it without drawing new samples. Primitive-parameter intervals and indirect-effec
 intervals concern different quantities: use `confint(wsmed_effects(inference))`
 for indirect effects. See [diagnostics and migration](WorkflowReliability.html)
 for dataset-level checks, reproducibility reports, and changes from wsMed 1.1.0.
+
+## Externally generated imputations
+
+For an imputation model chosen to match substantive interactions, supply
+`mi = list(completed = completed)` to `wsmed_fit()` (with `missing = "mi"`).
+`completed` can be a list of wide datasets or a `mice` mids object. The number of
+imputations is inferred; omit internal imputation method and seed controls.
+Both this interface and `wsMed(..., mi_args = list(completed = completed))` reuse
+the existing fitting, Rubin pooling and effect inference. See the
+[model-compatible imputation tutorial](CompatibleImputation.html).
