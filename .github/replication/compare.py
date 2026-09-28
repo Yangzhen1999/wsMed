@@ -56,7 +56,7 @@ expected = {f"{profile}-{os}-latest"
             for os in ("ubuntu", "windows", "macos")}
 missing = sorted(expected - set(cases))
 stages = ("imputations", "pooled_mean", "pooled_covariance", "mc_preview",
-          "parameter_tables", "conditional_tables", "standardization_diagnostics")
+          "marginal_mc_preview", "parameter_tables", "conditional_tables", "standardization_diagnostics")
 stage_comparisons, table_comparisons, changed_rows = [], [], []
 numerical_comparisons, numerical_failures = [], []
 indexed = {name: index_rows(*case_rows(case))[0] for name, case in cases.items()}

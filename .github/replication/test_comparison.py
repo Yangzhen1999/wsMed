@@ -48,7 +48,7 @@ class AuditChecks(unittest.TestCase):
                 n = int(line[8])
                 name = "example2_ud" if "(UD)" in line else "example2_pc" if n == 2 else f"example{n}"
                 fits[name] = dict.fromkeys(("imputations", "pooled_mean", "pooled_covariance",
-                    "mc_preview", "parameter_tables", "conditional_tables", "standardization_diagnostics"))
+                    "mc_preview", "marginal_mc_preview", "parameter_tables", "conditional_tables", "standardization_diagnostics"))
                 fits[name]["printed"] = []
             if line.startswith("|"):
                 fits[name]["printed"].append(line)

@@ -61,7 +61,9 @@ the first-imputation convention; they are not assigned extra sampling variance.
 MC first generates the existing primitive parameter draws. It then draws the
 variance estimators from their conditional normal distribution given those
 draws, using the pooled cross-covariance and the Schur-complement covariance.
-The latter can be singular by construction, so an eigen square root is used;
+The latter can be singular by construction, so its symmetric eigen square root
+`Q sqrt(D) Q'` is used. This removes arbitrary eigenvector signs and rotations
+from fixed-seed realizations across numerical libraries;
 only negative eigenvalues within numerical roundoff tolerance are truncated.
 Materially indefinite matrices error. Nonpositive variance draws are rejected
 through the existing joint standardization diagnostics. This retains uncertainty

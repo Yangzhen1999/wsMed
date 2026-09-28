@@ -51,7 +51,10 @@
   tolerance <- 1e-8 * max(abs(moments$total), .Machine$double.eps)
   if (min(eig$values) < -tolerance)
     stop("MI marginal-variance conditional covariance is not positive semidefinite.")
-  root <- sweep(eig$vectors, 2, sqrt(pmax(eig$values, 0)), `*`)
+  # Use the unique symmetric PSD square root Q sqrt(D) Q'. Q sqrt(D) alone
+  # produces the right covariance but changes fixed-seed draws when LAPACK
+  # flips an eigenvector sign or rotates a repeated-eigenvalue eigenspace.
+  root <- tcrossprod(sweep(eig$vectors, 2, sqrt(pmax(eig$values, 0)), `*`), eig$vectors)
   innovations <- matrix(stats::rnorm(nrow(draws) * nrow(root)), nrow(draws)) %*% t(root)
   values <- sweep(sweep(draws, 2, coefficients) %*% t(slope) + innovations,
                   2, moments$point, `+`)

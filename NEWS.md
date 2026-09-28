@@ -24,6 +24,9 @@
   dependence caused by computing nonlinear variances only after parameter pooling.
   Point estimates, standard errors, intervals and model fit can change from 1.1.0;
   refit earlier saved moderated models and regenerate their inference.
+- Use the symmetric positive-semidefinite square root for conditional MI variance
+  innovations, so fixed-seed draws are invariant to eigenvector sign choices and
+  rotations within repeated-eigenvalue eigenspaces across numerical libraries.
 - Print auxiliary product equations and residual covariances in separate printGM()
   sections. Add reference-coding, fixed.x, FIML, MI and paired-bootstrap regression
   checks, including an independent covariance-model comparison.

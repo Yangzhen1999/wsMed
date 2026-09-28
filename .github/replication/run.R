@@ -42,6 +42,7 @@ fits <- list(example1 = analysis$result1, example2_pc = analysis$result2_predefi
 snapshot <- lapply(fits, function(x) {
   a <- x$mc$result$args
   draws <- x$mc$result$thetahatstar
+  marginal <- a$lav@external$wsmed_mi_marginal
   list(
     imputations = lapply(a$imputations, function(d) lapply(d, as.numeric)),
     pooled_mean = as.list(a$pooled$est),
@@ -49,6 +50,9 @@ snapshot <- lapply(fits, function(x) {
                              values = unname(a$pooled$total)),
     mc_preview = list(names = colnames(draws),
                       values = unname(draws[seq_len(min(64, nrow(draws))), , drop = FALSE])),
+    marginal_mc_preview = if (is.null(marginal)) NULL else list(
+      point = as.list(marginal$point), names = colnames(marginal$draws),
+      values = unname(marginal$draws[seq_len(min(64, nrow(marginal$draws))), , drop = FALSE])),
     parameter_tables = x$mc$std_mc,
     conditional_tables = x$moderation,
     standardization_diagnostics = attr(x$mc$std_mc, "standardization_diagnostics"),

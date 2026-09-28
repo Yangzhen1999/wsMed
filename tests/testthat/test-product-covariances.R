@@ -224,6 +224,29 @@ test_that("serial MI pools marginal variances before standardization and samples
   expect_equal(std$draws[, 1], raw$draws[keep, 1]/sd_draws[keep], tolerance = 1e-7)
 })
 
+test_that("MI variance innovations are stable across equivalent eigenvector bases", {
+  # An arbitrarily small off-diagonal perturbation rotates the eigenvectors
+  # of an identity covariance by 45 degrees. The symmetric root stays close.
+  moments <- list(point = c(A = 2, B = 3), cross = matrix(0, 2, 2), total = diag(2))
+  perturbed <- moments
+  perturbed$total[1, 2] <- perturbed$total[2, 1] <- 1e-12
+  theta <- matrix(0, 400, 2)
+  set.seed(123)
+  a <- .wsmed_draw_marginal(moments, c(0, 0), diag(2), theta)$draws
+  set.seed(123)
+  b <- .wsmed_draw_marginal(perturbed, c(0, 0), diag(2), theta)$draws
+  expect_equal(a, b, tolerance = 1e-9)
+  set.seed(123)
+  expected <- sweep(matrix(rnorm(800), 400, 2), 2, moments$point, `+`)
+  expect_equal(unname(a), unname(expected), tolerance = 1e-12)
+  # A singular conditional covariance is valid; it must preserve the exact
+  # linear relation rather than add independent noise in its nullspace.
+  moments$total[,] <- 1
+  set.seed(123)
+  singular <- .wsmed_draw_marginal(moments, c(0, 0), diag(2), theta)$draws
+  expect_equal(singular[, 1] - 2, singular[, 2] - 3, tolerance = 1e-12)
+})
+
 test_that("paired participant bootstrap refits are reference invariant", {
   skip_on_cran()
   d <- product_data(); f <- wsmed_fit(product_model(one = TRUE), d)
