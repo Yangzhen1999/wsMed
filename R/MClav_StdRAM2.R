@@ -5,6 +5,7 @@
 #'
 #' @param ram_est A RAM object list with matrices `A`, `S`, `F`, and `M` as returned by `Lav2RAM2()`.
 #' @param roles Internal list of dummy variable names and interaction components.
+#' @param marginal_variances Optional jointly pooled MI marginal variances.
 #'
 #' @return A list of standardized RAM matrices:
 #' \describe{
@@ -18,7 +19,7 @@
 #' extracts standard deviations, and performs standardization via \eqn{D^{-1}} scaling.
 #' @keywords internal
 
-StdRAM2 <- function(ram_est, roles = NULL) {
+StdRAM2 <- function(ram_est, roles = NULL, marginal_variances = NULL) {
   a_mat <- ram_est$A
   s_mat <- ram_est$S
   iden <- diag(nrow(a_mat))
@@ -36,6 +37,12 @@ StdRAM2 <- function(ram_est, roles = NULL) {
 
   # Marginal implied SDs; dummy contrasts retain their original units.
   variances <- diag(sigma)
+  if (!is.null(marginal_variances)) {
+    if (is.null(names(marginal_variances)) ||
+        !all(names(marginal_variances) %in% names(variances)))
+      stop("Unknown MI marginal variance identities.")
+    variances[names(marginal_variances)] <- marginal_variances
+  }
   if (any(!is.finite(variances)) || any(variances <= 0))
     stop("Non-positive or non-finite implied variance.")
   sd_vec <- sqrt(variances)

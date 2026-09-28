@@ -46,7 +46,7 @@ test_that("CP model with continuous moderator and interaction terms", {
   dat <- mock_data_cp("continuous")
   mod <- GenerateModelCP(dat, MP = c("a2", "b_1_2"))
   mod_lines <- strsplit(mod, "\\n")[[1]]
-  m2_line <- mod_lines[grepl("^M2diff ~", mod_lines)]
+  m2_line <- mod_lines[grepl("^M2diff ~ ", mod_lines)]
 
   expect_match(m2_line, "aw2_W1\\*W1")
   expect_match(m2_line, "bw_1_2_W1\\*int_M1diff_W1")

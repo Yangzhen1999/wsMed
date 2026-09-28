@@ -93,7 +93,7 @@ MCMI2 <- function(sem_model,
   )
 
   fits <- lapply(imputations, function(data) {
-    lavaan::sem(
+    fit <- lavaan::sem(
       model = sem_model,
       data = data,
       estimator = estimator,
@@ -101,6 +101,8 @@ MCMI2 <- function(sem_model,
       missing = missing,
       fixed.x = fixed.x
     )
+    fit@external$wsmed_roles <- .wsmed_roles(data)
+    fit
   })
 
   pooled <- .wsmed_pool_fits(fits)

@@ -83,7 +83,7 @@ test_that("Moderated terms do not appear in unrelated regression equations", {
   dat <- mock_data_cn("continuous")
   mod <- GenerateModelCN(dat, MP = c("b_1_2", "d_1_2"))
   lines <- strsplit(mod, "\\n")[[1]]
-  m3line <- lines[grepl("^M3diff ~", lines)]
+  m3line <- lines[grepl("^M3diff ~ ", lines)]
   expect_false(grepl("b_1_2|bw_1_2", m3line))
   expect_false(grepl("d_1_2|dw_1_2", m3line))
 })
@@ -104,7 +104,7 @@ test_that("Indirect effects are correctly computed for serial paths", {
 test_that("Main effect W is not duplicated when modulation term exists", {
   dat <- mock_data_cn("continuous")
   mod <- GenerateModelCN(dat, MP = c("a2", "cp"))
-  m2line <- grep("^M2diff ~", strsplit(mod, "\\n")[[1]], value = TRUE)
+  m2line <- grep("^M2diff ~ ", strsplit(mod, "\\n")[[1]], value = TRUE)
   yline  <- grep("^Ydiff ~",  strsplit(mod, "\\n")[[1]], value = TRUE)
   expect_equal(length(grep("\\bW1\\b", m2line)), 1)
   expect_equal(length(grep("\\bW1\\b", yline)), 1)

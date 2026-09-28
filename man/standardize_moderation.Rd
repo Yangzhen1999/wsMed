@@ -25,5 +25,7 @@ coefficients in mod_coeff are reported per SD of W. Dummy variables retain
 Intervals are percentile intervals, as in the raw conditional tables.
 Metadata attributes record scales, probe conventions and draw diagnostics.
 With fixed.x=TRUE, external moments are held fixed. MI uses pooled primitive
-parameters and the existing first-imputation probing reference.
+parameters and the existing first-imputation probing reference. For models
+with endogenous products, marginal variances are pooled jointly with
+coefficients before taking square roots, retaining their sampling covariance.
 }

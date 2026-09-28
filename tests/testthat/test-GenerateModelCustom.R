@@ -98,7 +98,7 @@ get_regression_line <- function(model, outcome) {
   lines <- get_model_lines(model)
 
   grep(
-    paste0("^", outcome, "\\s*~"),
+    paste0("^", outcome, "\\s*~\\s+"),
     lines,
     value = TRUE
   )
@@ -449,8 +449,8 @@ test_that("Custom model reproduces the core parallel model structure", {
   )
 
   expect_setequal(
-    grep("^M[0-9]+diff ~", custom_lines, value = TRUE),
-    grep("^M[0-9]+diff ~", parallel_lines, value = TRUE)
+    grep("^M[0-9]+diff ~ ", custom_lines, value = TRUE),
+    grep("^M[0-9]+diff ~ ", parallel_lines, value = TRUE)
   )
 
   expect_setequal(
@@ -489,12 +489,12 @@ test_that("Custom model reproduces the core chained model structure", {
 
   expect_setequal(
     grep(
-      "^M[0-9]+diff ~",
+      "^M[0-9]+diff ~ ",
       get_model_lines(custom_model),
       value = TRUE
     ),
     grep(
-      "^M[0-9]+diff ~",
+      "^M[0-9]+diff ~ ",
       get_model_lines(chained_model),
       value = TRUE
     )

@@ -80,6 +80,7 @@
   sigma <- lavaan::lav_model_implied(model)$cov[[1]]
   index <- match("Ydiff", lavaan::lavNames(fit$backend[[1]], "ov"))
   variance <- sigma[index, index]
+  if (!is.null(fit$mi$pooled$marginal)) variance <- fit$mi$pooled$marginal$point[["Ydiff"]]
   list(conditions = fit$model$conditions,
     outcome = stats::setNames(c(v$Y_C1, v$Y_C2), fit$model$conditions),
     marginal_outcome_sd = if (is.finite(variance) && variance > 0) sqrt(variance) else NA_real_,

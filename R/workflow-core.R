@@ -38,7 +38,9 @@
   if (anyDuplicated(ids) || !all(vapply(coefs, function(x)
       identical(names(x), ids), logical(1))))
     stop("Imputation parameter identities/order differ; pooling stopped.")
-  MICombineWrapper(coefs, vcovs, M = length(fits), k = length(ids), adj = TRUE)
+  out <- MICombineWrapper(coefs, vcovs, M = length(fits), k = length(ids), adj = TRUE)
+  out$marginal <- .wsmed_pool_marginal(fits, coefs, vcovs)
+  out
 }
 
 # Record the existing transformation coordinates without changing them.
@@ -109,14 +111,18 @@
   if (Na == "MI" && any(!dataset_diagnostics$converged))
     stop("MI pooling stopped: non-converged dataset(s) ",
       paste(which(!dataset_diagnostics$converged), collapse = ", "), call. = FALSE)
-  if (Na == "MI") pooled <- .wsmed_pool_fits(fits)
+  roles <- .wsmed_roles(prep)
+  fits <- lapply(fits, function(x) { x@external$wsmed_roles <- roles; x })
+  if (Na == "MI") {
+    pooled <- .wsmed_pool_fits(fits)
+    fits[[1]]@external$wsmed_mi_marginal <- if (!is.null(pooled$marginal))
+      list(point = pooled$marginal$point) else NULL
+  }
   if (length(vars$W)) {
     maps <- attr(prep, "W_info")$dummy_map
     model$input_vars$W_type <- if (length(maps) == 1L &&
       identical(maps[[1]], "continuous")) "continuous" else "categorical"
   }
-  roles <- .wsmed_roles(prep)
-  fits <- lapply(fits, function(x) { x@external$wsmed_roles <- roles; x })
   coefficients <- if (Na == "MI") pooled$est else lavaan::coef(fits[[1]])
   covariance <- if (Na == "MI") pooled$total else lavaan::vcov(fits[[1]])
   dimnames(covariance) <- list(names(coefficients), names(coefficients))
@@ -145,7 +151,10 @@
     provenance = list(R = R.version.string, wsMed = utils::packageVersion("wsMed"),
       lavaan = utils::packageVersion("lavaan"),
       mice = if (Na == "MI") utils::packageVersion("mice") else NULL,
-      platform = R.version$platform, RNGkind = RNGkind())),
+      platform = R.version$platform, RNGkind = RNGkind(),
+      marginal_standardization = if (!is.null(pooled$marginal))
+        "MI pooled marginal variances with joint Rubin covariance" else
+        "Fitted model-implied marginal variances")),
     class = "wsmed_fit")
 }
 
@@ -154,6 +163,8 @@
   raw <- ThetaHatStarWrapper(R = R, location = fit$coefficients,
     scale = fit$covariance, decomposition = decomposition, pd = pd, tol = tol)
   lav <- fit$backend[[1]]
+  lav@external$wsmed_mi_marginal <- .wsmed_draw_marginal(fit$mi$pooled$marginal,
+    fit$coefficients, fit$covariance, raw$thetahatstar)
   structure(list(call = match.call(), args = list(lav = lav, fixed.x = fit$fixed.x,
     sem_model = fit$sem_model, imputations = fit$mi$prepared$processed_data_list,
     R = R, alpha = alpha, decomposition = raw$decomposition, pd = pd, tol = tol,

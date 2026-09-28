@@ -42,9 +42,11 @@
 #' Marginally standardized conditional effects use the common model-implied
 #' outcome-difference SD, not separate within-category SDs; factor labels and
 #' dummy indicators retain their coding. See [standardize_moderation()].
-#' With the current product-term SEM, recoding the reference can change implied
-#' marginal covariances. Standardized effects are not guaranteed to be invariant
-#' across such refits; retain and report the reference coding and marginal SD.
+#' Generated models account for the dependence of endogenous products on upstream
+#' mediator disturbances. Reference changes preserve the implied marginal scales
+#' of the same fitted model. MI pools marginal variance estimates jointly with
+#' coefficients; compare the same completed datasets when checking recoding.
+#' Refit saved models from before this covariance correction.
 #'
 #' @section Missing values:
 #' The staged default \code{missing = "error"} rejects missing analysis values.

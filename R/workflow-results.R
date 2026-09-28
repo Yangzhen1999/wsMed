@@ -21,9 +21,11 @@
 #' Scales and coefficients vary jointly across draws. Invalid standardized draws
 #' are excluded jointly and their original identities are recorded. For MI the
 #' existing first-imputation reference and per-imputation centering are retained.
-#' For product-term models, changing categorical reference coding can change
-#' the joint model's implied marginal SDs. Standardized effects are not guaranteed
-#' to be invariant to such recoding; retain and report the coding and standardizer.
+#' Endogenous products have an auxiliary moment model that retains the necessary
+#' upstream residual covariances. MI moderated models jointly pool marginal
+#' variances with coefficients, using a delta-method within-imputation covariance
+#' and Rubin's rules; MC draws retain their covariance. Refit objects saved before
+#' this correction. Finite MC draws or new imputations need not match after recoding.
 #' The query interpretation records the plug-in outcome-difference SD.
 #' @export
 wsmed_effects <- function(object, type = c("indirect", "total", "direct",
@@ -47,6 +49,8 @@ wsmed_effects <- function(object, type = c("indirect", "total", "direct",
                       invalid = 0L, invalid_draw_ids = integer())
   if (scale == "marginal") {
     lav <- fit$backend[[1]]
+    if (!is.null(inference$backend$mc))
+      lav@external$wsmed_mi_marginal <- inference$backend$mc$args$lav@external$wsmed_mi_marginal
     roles <- .wsmed_roles(fit$data)
     if (type != "parameters") roles$dummy <- union(roles$dummy,
       attr(fit$data, "W_info")$dummy_names)

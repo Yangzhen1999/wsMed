@@ -45,7 +45,10 @@
 #' moments rather than adding sampling uncertainty for those moments.
 #' In MI, probes/centering references use the first completed data set;
 #' fixed.x=TRUE also conditions on its external moments in the pooled transform.
-#' No new population-relative probing or imputation method is implemented here.
+#' In moderated MI models, marginal variances are pooled jointly with primitive
+#' coefficients, including their delta-method within-imputation and Rubin
+#' between-imputation covariance. MC propagates this joint uncertainty.
+#' Endogenous product moments are estimated even with fixed.x=TRUE.
 #'
 #' Workflow: (1) preprocess -> (2) generate SEM syntax -> (3) fit
 #' -> (4) compute confidence intervals -> (5) optional: standardize estimates.

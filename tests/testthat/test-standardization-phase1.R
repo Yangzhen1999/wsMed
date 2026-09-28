@@ -160,7 +160,12 @@ test_that("changing measurement units preserves standardized estimates", {
     d[c("m11", "m12")] <- d[c("m11", "m12")] * 3
     d[c("y1", "y2")] <- d[c("y1", "y2")] * 7
     if (type == "continuous") d$W <- d$W * 5
-    expect_equal(fit_one(d), original, tolerance = 2e-5)
+    scaled <- withCallingHandlers(fit_one(d), warning = function(w) {
+      # Deliberate unit inflation can trigger lavaan's descriptive scale warning.
+      if (grepl("factor 1000", conditionMessage(w), fixed = TRUE))
+        invokeRestart("muffleWarning")
+    })
+    expect_equal(scaled, original, tolerance = 2e-5)
   }
 })
 

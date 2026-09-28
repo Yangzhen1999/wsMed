@@ -4,12 +4,18 @@
 \alias{StdLav2}
 \title{Standardize parameter estimates in a lavaan model}
 \usage{
-StdLav2(est, object)
+StdLav2(
+  est,
+  object,
+  marginal_variances = object@external$wsmed_mi_marginal$point
+)
 }
 \arguments{
 \item{est}{A numeric vector of parameter estimates (free parameters).}
 
 \item{object}{A fitted lavaan model object (used to extract model structure).}
+
+\item{marginal_variances}{Optional jointly pooled MI marginal variances.}
 }
 \value{
 A numeric vector of fully standardized parameter estimates (including intercepts and defined parameters).

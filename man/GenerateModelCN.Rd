@@ -56,6 +56,15 @@ conditions to observe the moderation effect of \code{X}.
 This model is suitable for chained mediation designs where mediators influence each other in
 a sequential manner, forming multi-step mediation paths.
 }
+\section{Product moments}{
+
+When a moderated path starts at an endogenous mediator, auxiliary product
+moment equations and covariances with its upstream disturbances preserve the
+joint predictor moment structure under reference recoding. These equations
+are not additional mediation paths. Genuine exogenous moments follow the
+fitting function's \code{fixed.x} setting; endogenous product moments are estimated.
+}
+
 \examples{
 # Example prepared data
 prepared_data <- data.frame(

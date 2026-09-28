@@ -25,46 +25,6 @@
 #' @export
 
 printGM <- function(x, ...) {
-  # Extract sem_model only from a list containing it
-  if (is.list(x) && "sem_model" %in% names(x)) {
-    x <- x$sem_model
-  }
-
-  # Require a single model string
-  if (!is.character(x) || length(x) != 1 || is.na(x) || x == "") {
-    stop("Error in printGM(): Input must be a non-empty character string representing an SEM model.")
-  }
-
-  # Split lines and trim whitespace
-  lines <- trimws(unlist(strsplit(x, "\n")))
-
-  # Define equation categories
-  section_titles <- list(
-    "Outcome Difference Model (Ydiff)" = "^Ydiff ",
-    "Mediator Difference Model (Chained Mediator - M1diff)" = "^M1diff ",
-    "Mediator Difference Model (Parallel Mediators - M2diff, M3diff, ...)" = "^M[2-9]diff ",
-    "Indirect Effects" = "^indirect",
-    "Total Indirect Effect" = "^total_indirect",
-    "Total Effect" = "^total_effect",
-    "Contrast of Indirect Effects" = "^CI\\d+vs",
-    "C1-C2 Coefficients" = "^X[01]_b"
-  )
-
-  # Format each section by category
-  for (title in names(section_titles)) {
-    section_lines <- grep(section_titles[[title]], lines, value = TRUE, perl = TRUE)
-    if (length(section_lines) > 0) {
-      cat("\n", title, ":\n", sep = "")
-      cat(paste(section_lines, collapse = "\n"), "\n")
-    }
-  }
-
-  # Return the original model string for reuse
-  invisible(x)
-}
-
-
-printGM <- function(x, ...) {
   # Extract sem_model from a list when present
   if (is.list(x) && "sem_model" %in% names(x)) {
     x <- x$sem_model
@@ -79,14 +39,17 @@ printGM <- function(x, ...) {
   lines <- trimws(unlist(strsplit(x, "\n")))
 
   # Find regression equations
-  reg_lines <- grep("~", lines, value = TRUE)
+  reg_lines <- grep(" ~ ", lines, value = TRUE)
   y_line    <- grep("^Ydiff ~", reg_lines, value = TRUE)
-  m_lines   <- grep("^[A-Za-z0-9_]+ ~", reg_lines, value = TRUE)
+  m_lines   <- grep("^M[0-9]+diff ~ ", reg_lines, value = TRUE)
   m_lines   <- setdiff(m_lines, y_line)
 
   # Place M1diff first and other mediators second
   m1_line   <- grep("^M1diff ~", m_lines, value = TRUE)
   other_m   <- setdiff(m_lines, m1_line)
+
+  auxiliary <- grep("^int_", reg_lines, value = TRUE)
+  covariances <- grep(" ~~ ", lines, value = TRUE)
 
   # Find indirect- and total-effect definitions
   ie_lines   <- grep("^indirect", lines, value = TRUE)
@@ -106,6 +69,14 @@ printGM <- function(x, ...) {
   if (length(other_m)) {
     cat("\nMediator Difference Model (Other Mediators):\n")
     cat(paste(other_m, collapse = "\n"), "\n")
+  }
+  if (length(auxiliary)) {
+    cat("\nAuxiliary Product Moment Equations (not mediation paths):\n")
+    cat(paste(auxiliary, collapse = "\n"), "\n")
+  }
+  if (length(covariances)) {
+    cat("\nVariances and Residual Covariances:\n")
+    cat(paste(covariances, collapse = "\n"), "\n")
   }
   if (length(ie_lines)) {
     cat("\nIndirect Effects:\n")

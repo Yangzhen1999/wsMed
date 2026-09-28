@@ -33,6 +33,13 @@
 #' This model is suitable for designs where mediators include both independent parallel paths and
 #' sequential chained paths, providing a comprehensive mediation analysis framework.
 #'
+#' @section Product moments:
+#' When a moderated path starts at an endogenous mediator, auxiliary product
+#' moment equations and covariances with its upstream disturbances preserve the
+#' joint predictor moment structure under reference recoding. These equations
+#' are not additional mediation paths. Genuine exogenous moments follow the
+#' fitting function's `fixed.x` setting; endogenous product moments are estimated.
+#'
 #' @param prepared_data A data frame returned by [PrepareData()], containing the processed
 #' within-subject mediator and outcome variables. The data frame must include columns for
 #' difference scores (`Mdiff`) and average scores (`Mavg`) of mediators, as well as the
@@ -170,8 +177,9 @@ GenerateModelPC <- function(prepared_data, MP = character(0)) {
   tot_eff <- "total_effect := cp + total_indirect"
 
   # Assemble the model
-  paste(c(regY, regM_par, regM_chain, ind_lines, tot_ind, tot_eff),
+  sem_model <- paste(c(regY, regM_par, regM_chain, ind_lines, tot_ind, tot_eff),
         collapse = "\n")
+  .wsmed_product_covariances(sem_model)
 }
 
 

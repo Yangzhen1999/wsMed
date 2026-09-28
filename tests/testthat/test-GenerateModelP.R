@@ -62,7 +62,7 @@ test_that("T3a: Continuous W with MP = b1", {
   expect_match(out, "bw1_W1\\*int_M1diff_W1")
 
   y_line <- strsplit(out, "\n")[[1]][1]
-  m1_line <- grep("^M1diff ~", strsplit(out, "\n")[[1]], value = TRUE)
+  m1_line <- grep("^M1diff ~ ", strsplit(out, "\n")[[1]], value = TRUE)
 
   # Check the direct-path moderator term
   if (!"cp" %in% c("b1")) {

@@ -5,6 +5,7 @@
 #'
 #' @param est A numeric vector of parameter estimates (free parameters).
 #' @param object A fitted lavaan model object (used to extract model structure).
+#' @param marginal_variances Optional jointly pooled MI marginal variances.
 #'
 #' @return A numeric vector of fully standardized parameter estimates (including intercepts and defined parameters).
 #'
@@ -13,7 +14,8 @@
 #' with `lav_model_get_parameters()`.
 #' @keywords internal
 
-StdLav2 <- function(est, object) {
+StdLav2 <- function(est, object,
+                    marginal_variances = object@external$wsmed_mi_marginal$point) {
   lav_model <- object@Model
   # Accept either the free vector or a complete parameter-table vector.
   if (length(est) == length(object@ParTable$free)) {
@@ -56,7 +58,8 @@ StdLav2 <- function(est, object) {
   ram_list <- lapply(glist_new, Lav2RAM2)  # Your new version
 
   # 2. Standardize RAM (A, S, M)
-  ram_std_list <- lapply(ram_list, StdRAM2, roles = object@external$wsmed_roles)
+  ram_std_list <- lapply(ram_list, StdRAM2, roles = object@external$wsmed_roles,
+                        marginal_variances = marginal_variances)
 
   # 3. Convert standardized RAM back to lavaan-style matrix list
   glist_std <- mapply(

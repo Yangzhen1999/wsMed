@@ -12,10 +12,21 @@
 - Add wsmed_reproducibility() to return or save an analysis manifest without
   participant-level data or draw matrices. Add a migration/diagnostics tutorial
   and optional observed-moderator rug marks for continuous curves.
-- Document a model-level limitation identified by the new reference-coding
-  checks: the current product-term SEM can imply different marginal SDs after
-  changing the reference category. Raw conditional effects agree in the checked
-  example; reference-invariance of standardized effects is not guaranteed.
+- Correct endogenous-product covariance structures in all five model generators.
+  Auxiliary product moment equations preserve the unrestricted predictor moment
+  block and the necessary covariances with upstream mediator disturbances.
+  Categorical reference changes now preserve the model-implied marginal scale.
+  `fixed.x` applies to genuine exogenous predictors; endogenous product moments
+  are estimated. Models without endogenous products are unchanged.
+- In MI moderated models, pool marginal variance estimators jointly with primitive
+  coefficients using delta-method within-imputation covariances and Rubin's rules.
+  MC propagates this joint covariance. This removes the additional coding
+  dependence caused by computing nonlinear variances only after parameter pooling.
+  Point estimates, standard errors, intervals and model fit can change from 1.1.0;
+  refit earlier saved moderated models and regenerate their inference.
+- Print auxiliary product equations and residual covariances in separate printGM()
+  sections. Add reference-coding, fixed.x, FIML, MI and paired-bootstrap regression
+  checks, including an independent covariance-model comparison.
 
 - Plot methods now select continuous curves, categorical points, or forests
   according to the extracted effects. They support titles, axis labels, effect

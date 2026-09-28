@@ -49,8 +49,10 @@ For conditional standardization, moderator probes remain fixed in raw units.
 Scales and coefficients vary jointly across draws. Invalid standardized draws
 are excluded jointly and their original identities are recorded. For MI the
 existing first-imputation reference and per-imputation centering are retained.
-For product-term models, changing categorical reference coding can change
-the joint model's implied marginal SDs. Standardized effects are not guaranteed
-to be invariant to such recoding; retain and report the coding and standardizer.
+Endogenous products have an auxiliary moment model that retains the necessary
+upstream residual covariances. MI moderated models jointly pool marginal
+variances with coefficients, using a delta-method within-imputation covariance
+and Rubin's rules; MC draws retain their covariance. Refit objects saved before
+this correction. Finite MC draws or new imputations need not match after recoding.
 The query interpretation records the plug-in outcome-difference SD.
 }

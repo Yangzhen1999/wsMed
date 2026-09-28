@@ -31,6 +31,15 @@ from mediators to the outcome. The function automatically adds the
 corresponding difference and level components and identifies all
 indirect effects.
 }
+\section{Product moments}{
+
+When a moderated path starts at an endogenous mediator, auxiliary product
+moment equations and covariances with its upstream disturbances preserve the
+joint predictor moment structure under reference recoding. These equations
+are not additional mediation paths. Genuine exogenous moments follow the
+fitting function's \code{fixed.x} setting; endogenous product moments are estimated.
+}
+
 \examples{
 prepared_data <- data.frame(
   M1diff = rnorm(100),

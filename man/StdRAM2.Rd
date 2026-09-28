@@ -4,12 +4,14 @@
 \alias{StdRAM2}
 \title{Standardize RAM matrices}
 \usage{
-StdRAM2(ram_est, roles = NULL)
+StdRAM2(ram_est, roles = NULL, marginal_variances = NULL)
 }
 \arguments{
 \item{ram_est}{A RAM object list with matrices \code{A}, \code{S}, \code{F}, and \code{M} as returned by \code{Lav2RAM2()}.}
 
 \item{roles}{Internal list of dummy variable names and interaction components.}
+
+\item{marginal_variances}{Optional jointly pooled MI marginal variances.}
 }
 \value{
 A list of standardized RAM matrices:

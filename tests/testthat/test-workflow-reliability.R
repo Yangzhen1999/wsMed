@@ -86,8 +86,10 @@ test_that("reference recoding preserves raw effects and each standardizer matche
   original <- wsmed_effects(f, at = list(Group = groups))
   revised <- wsmed_effects(recoded, at = list(Group = groups))
   expect_equal(coef(original), coef(revised), tolerance = 1e-6)
-  # Product-term SEMs need not imply the same marginal covariance after recoding.
-  # Check the declared definition independently, without assuming invariance.
+  expect_equal(coef(wsmed_effects(f, at = list(Group = groups), scale = "marginal")),
+    coef(wsmed_effects(recoded, at = list(Group = groups), scale = "marginal")),
+    tolerance = 1e-6)
+  # Also check the endpoint definition independently of reference invariance.
   for (fit in list(f, recoded)) {
     raw <- wsmed_effects(fit, at = list(Group = groups))
     std <- wsmed_effects(fit, at = list(Group = groups), scale = "marginal")

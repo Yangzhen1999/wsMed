@@ -48,11 +48,11 @@ test_that("PC model with continuous W generates correct moderated paths", {
   expect_match(yline, "dw2_W1\\*int_M2avg_W1")
 
   # Check aw3 in the M3diff equation
-  m3line <- lines[grepl("^M3diff ~", lines)]
+  m3line <- lines[grepl("^M3diff ~ ", lines)]
   expect_match(m3line, "aw3_W1\\*W1")
 
   # Check bw_2_1 in the M1diff equation
-  m1line <- lines[grepl("^M1diff ~", lines)]
+  m1line <- lines[grepl("^M1diff ~ ", lines)]
   expect_match(m1line, "bw_2_1_W1\\*int_M2diff_W1")
 })
 

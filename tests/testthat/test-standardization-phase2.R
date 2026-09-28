@@ -87,12 +87,14 @@ test_that("MI and FIML standardization use their own point estimates and fixed.x
     out <- phase2_result(missing = na, fixed = fixed)
     std <- out$moderation_std
     expect_identical(attr(std, "standardization")$fixed.x, fixed)
-    # Recompute the pooled/fitted implied SD, not the first fit's estimated SD.
+    # MI pools the marginal variance itself; FIML uses its fitted implied SD.
     fit <- out$mc$result$args$lav; pt <- lavaan::parameterTable(fit)
     point <- out$mc$result$thetahat$est
     model <- lavaan::lav_model_set_parameters(fit@Model, x = point[match(seq_len(fit@Model@nx.free), pt$free)])
     yi <- match("Ydiff", rownames(lavaan::fitted(fit)$cov))
     sy <- sqrt(lavaan::lav_model_implied(model)$cov[[1]][yi, yi])
+    if (na == "MI") sy <- sqrt(mean(vapply(out$fit$backend, function(z)
+      lavaan::fitted(z)$cov["Ydiff", "Ydiff"], numeric(1))))
     expect_equal(std$conditional_overall$Estimate, out$moderation$conditional_overall$Estimate / sy, tolerance = 1e-7)
   }
 })
