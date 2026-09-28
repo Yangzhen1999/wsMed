@@ -64,14 +64,30 @@ class AuditChecks(unittest.TestCase):
             for os in ("ubuntu", "windows", "macos"):
                 self.cases[f"{profile}-{os}-latest"] = dict(
                     environment=dict(profile=profile, warnings=[]), fits=copy.deepcopy(fits))
+        self.baseline = dict(schema_version=1, source_commit="test-fixture", status="test",
+            profiles={p: copy.deepcopy(self.cases[f"{p}-macos-latest"])
+                      for p in ("reference-core", "current-cran")})
 
     def run_audit(self):
+        baseline = self.folder / "baseline.json"
+        baseline.write_text(json.dumps(self.baseline), encoding="utf-8")
         for name, case in self.cases.items():
             p = self.folder / "inputs" / name
             p.mkdir(parents=True)
             (p / "snapshot.json").write_text(json.dumps(case), encoding="utf-8")
         return subprocess.run([sys.executable, str(ROOT / "compare.py"),
-            str(self.folder / "inputs"), str(self.folder / "output")], capture_output=True, text=True)
+            str(self.folder / "inputs"), str(self.folder / "output"), "--baseline", str(baseline)],
+            capture_output=True, text=True)
+
+    def test_shared_regression_on_every_platform_fails_the_frozen_baseline(self):
+        for case in self.cases.values():
+            rows = case["fits"]["example3"]["printed_precise"]
+            i = next(i for i, r in enumerate(rows) if "int_M1diff_W1~M1avg" in r)
+            rows[i] = rows[i].replace("0.038", "0.138")
+        self.assertNotEqual(self.run_audit().returncode, 0)
+        summary = json.loads((self.folder / "output" / "summary.json").read_text())
+        self.assertFalse(summary["same_profile_numerical_failures"])
+        self.assertEqual(summary["candidate_baseline"]["failed_rows"], 6)
 
     def test_added_auxiliary_rows_preserve_all_manuscript_mappings(self):
         result = self.run_audit()
@@ -89,6 +105,10 @@ class AuditChecks(unittest.TestCase):
         self.assertNotEqual(self.run_audit().returncode, 0)
 
     def test_display_boundary_is_reported_without_false_failure(self):
+        for case in self.baseline["profiles"].values():
+            fit = case["fits"]["example3"]
+            i = next(i for i, r in enumerate(fit["printed_precise"]) if "int_M1diff_W1~M1avg" in r)
+            fit["printed_precise"][i] = fit["printed_precise"][i].replace("0.038", "0.038499999")
         for case in self.cases.values():
             fit = case["fits"]["example3"]
             i = next(i for i, r in enumerate(fit["printed"]) if "int_M1diff_W1~M1avg" in r)

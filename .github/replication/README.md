@@ -1,5 +1,8 @@
 # Manuscript replication audit
 
+The workflow runs on relevant main/master pushes and pull requests as well as
+the development branches. It validates the actual package being checked out.
+
 Runs the four fitted models in manuscript Examples 1-3, including the PC and
 UD versions of Example 2, and generates the three Example 3 plots. The current
 branch's wsMed is installed; this is a candidate revision, not the released
@@ -43,6 +46,22 @@ within-profile label/structure differences fail. Between-profile and original-
 paper differences are reported without automatically declaring the changed
 numerical method wrong. Comparison tests inject missing rows, genuine numerical
 changes, and display-only differences to verify these checks.
+
+## Frozen candidate baseline
+
+`candidate-baseline.json` freezes both profiles from the fully passing commit
+`670ace191570316830c2da0db6482c44375437f7`, including source run, environment and
+snapshot hashes. Every current ten-decimal table is compared with this baseline
+using the same numerical tolerance. A change shared by all platforms therefore
+still fails. Baseline mismatches and historical manuscript differences have
+separate CSV reports; the original submission fixtures are never overwritten.
+
+This is a reviewed **package candidate** baseline, not a claim that the manuscript
+already contains those values. Once the manuscript is updated, verify its exact
+displayed values against this candidate. Update the baseline only after explicit
+review of numerical changes, with a new source commit/run and explanation;
+normal checks never regenerate it. Tests inject a shared regression across all
+six environments and require this independent comparison to fail.
 
 ## Data attribution
 

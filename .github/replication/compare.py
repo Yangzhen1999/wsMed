@@ -12,6 +12,11 @@ inputs = Path(__file__).resolve().parent
 source, output = map(Path, sys.argv[1:3])
 output.mkdir(parents=True, exist_ok=True)
 partial = "--allow-partial" in sys.argv
+baseline_path = (Path(sys.argv[sys.argv.index("--baseline") + 1])
+                 if "--baseline" in sys.argv else inputs / "candidate-baseline.json")
+baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
+if baseline.get("schema_version") != 1:
+    raise RuntimeError("Unsupported candidate baseline schema")
 
 
 def compact(x):
@@ -67,6 +72,18 @@ precise = {name: index_rows(*case_rows(case, "printed_precise"))[0]
 for name, rows in precise.items():
     if rows.keys() != indexed[name].keys():
         raise RuntimeError(f"Normal and precise table identities differ: {name}")
+
+baseline_comparisons, baseline_failures = [], []
+for name, rows in precise.items():
+    profile = cases[name]["environment"]["profile"]
+    reference = index_rows(*case_rows(baseline["profiles"][profile], "printed_precise"))[0]
+    failed = [key for key in sorted(rows.keys() | reference.keys())
+              if key not in rows or key not in reference or
+              not numerically_equal(rows[key], reference[key])]
+    baseline_comparisons.append(dict(environment=name, profile=profile,
+        reference_rows=len(reference), current_rows=len(rows), mismatched_rows=len(failed)))
+    baseline_failures.extend(dict(environment=name, row=str(key),
+        baseline_row=reference.get(key), current_row=rows.get(key)) for key in failed)
 
 
 for left, right in itertools.combinations(sorted(cases), 2):
@@ -172,7 +189,11 @@ write_csv("manuscript-comparisons.csv", paper_rows)
 write_csv("local-candidate-comparisons.csv", local_rows)
 write_csv("numerical-comparisons.csv", numerical_comparisons)
 write_csv("numerical-failures.csv", numerical_failures)
+write_csv("candidate-baseline-comparisons.csv", baseline_comparisons)
+write_csv("candidate-baseline-failures.csv", baseline_failures)
 summary = dict(completed_environments=sorted(cases), missing_environments=missing,
+    candidate_baseline=dict(source_commit=baseline["source_commit"], status=baseline["status"],
+        comparisons=baseline_comparisons, failed_rows=len(baseline_failures)),
     missing_precision=missing_precision,
     numerical_tolerance=dict(absolute=ABS_TOL, relative=REL_TOL, printed_digits=10),
     manuscript_rows_mapped=len(mapping),
@@ -184,5 +205,5 @@ summary = dict(completed_environments=sorted(cases), missing_environments=missin
     warnings={k: v["environment"]["warnings"] for k, v in cases.items()})
 (output / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
 print(json.dumps(summary, indent=2))
-if (missing and not partial) or missing_precision or summary["same_profile_numerical_failures"]:
-    raise SystemExit("Replication comparison detected missing runs/precision or cross-platform numerical differences.")
+if (missing and not partial) or missing_precision or baseline_failures or summary["same_profile_numerical_failures"]:
+    raise SystemExit("Replication comparison detected missing runs/precision, cross-platform or candidate-baseline differences.")
