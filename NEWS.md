@@ -1,5 +1,15 @@
 # Package News
 
+## wsMed 1.1.0.9000
+
+- Stabilize the MI Monte Carlo eigen sampler using the principal symmetric
+  covariance square root. Equivalent eigenvector signs and repeated-eigenvalue
+  bases no longer change draws beyond numerical precision. The target normal
+  distribution and pooled point estimates are unchanged, but fixed-seed draws,
+  Monte Carlo standard errors, and interval endpoints differ from wsMed 1.1.0.
+  This change does not alter the non-MI sampler delegated to semmcci, and does
+  not guarantee identical results across different fitted inputs or dependencies.
+
 ## wsMed 1.1.0
 
 ### New features

@@ -17,14 +17,13 @@
 #' @noRd
 RandomGaussianEigenwrapper <- function(Z,
                                  eigen) {
-  return(
-    Z %*% (
-      t(eigen$vectors) * sqrt(
-        pmax(
-          eigen$values,
-          0
-        )
-      )
-    )
+  # The principal symmetric square root is invariant to eigenvector signs
+  # and rotations within eigenspaces with repeated eigenvalues. Multiplying
+  # Z by Q sqrt(D) alone would expose fixed-seed draws to those choices.
+  # Preserve the existing treatment of small negative eigenvalues as zero.
+  root <- tcrossprod(
+    sweep(eigen$vectors, 2L, sqrt(pmax(eigen$values, 0)), `*`),
+    eigen$vectors
   )
+  Z %*% root
 }

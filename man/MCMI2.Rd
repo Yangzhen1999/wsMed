@@ -74,6 +74,13 @@ and calculates confidence intervals for model parameters.
 This function supports custom estimators, handling of missing data, and precision adjustments for
 Monte Carlo sampling. It is particularly useful for mediation analysis or complex SEM models
 where missing data are addressed using multiple imputation.
+
+With \code{decomposition = "eigen"}, Monte Carlo sampling uses the
+principal symmetric covariance square root. Equivalent eigenvector signs
+and repeated-eigenvalue bases therefore produce the same draws up to numerical
+precision. Fixed-seed draws differ from wsMed 1.1.0; the target distribution
+and pooled point estimates are unchanged. Reproducing the complete analysis
+also requires matching data, imputation settings, and software dependencies.
 }
 \examples{
 # Example SEM model

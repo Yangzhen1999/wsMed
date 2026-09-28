@@ -70,7 +70,9 @@ Values are case-insensitive.}
   \item{\code{m}}{Number of imputations. Default 5.}
   \item{\code{method_num}}{Imputation method for \code{mice()}.}
   \item{\code{decomposition}}{Covariance-decomposition method
-    (\code{"eigen"}, \code{"chol"}, \code{"svd"}).}
+    (\code{"eigen"}, \code{"chol"}, \code{"svd"}). The default
+    \code{"eigen"} uses the principal symmetric covariance square root;
+    fixed-seed MI draws differ from wsMed 1.1.0.}
   \item{\code{pd}}{Logical; positive-definiteness check.}
   \item{\code{tol}}{Tolerance for the positive-definiteness check.}
 }}

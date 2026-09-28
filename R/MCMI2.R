@@ -69,6 +69,12 @@
 #' @import semmcci
 #' @export
 
+#' @details With \code{decomposition = "eigen"}, Monte Carlo sampling uses the
+#' principal symmetric covariance square root. Equivalent eigenvector signs
+#' and repeated-eigenvalue bases therefore produce the same draws up to numerical
+#' precision. Fixed-seed draws differ from wsMed 1.1.0; the target distribution
+#' and pooled point estimates are unchanged. Reproducing the complete analysis
+#' also requires matching data, imputation settings, and software dependencies.
 MCMI2 <- function(sem_model,
                  imputations,
                  R = 20000L,

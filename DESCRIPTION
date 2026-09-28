@@ -1,7 +1,7 @@
 Package: wsMed
 Title: Within-Subject Mediation Analysis Using Structural Equation
         Modeling
-Version: 1.1.0
+Version: 1.1.0.9000
 Authors@R: 
     c(person(given = "Wendie",
              family ="Yang",
@@ -32,6 +32,4 @@ LazyData: true
 URL: https://yangzhen1999.github.io/wsMed/
 BugReports: https://github.com/Yangzhen1999/wsMed/issues
 NeedsCompilation: no
-Author: Wendie Yang [aut, cre] (ORCID: <https://orcid.org/0009-0000-8388-6481>),
-  Shu Fai Cheung [aut] (ORCID: <https://orcid.org/0000-0002-9871-9448>)
 Maintainer: Wendie Yang <1581075494q@gmail.com>
