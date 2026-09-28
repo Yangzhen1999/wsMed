@@ -1,5 +1,17 @@
 # wsMed 1.1.0.9000
 
+- Record fitting and inference algorithm identities independently of package
+  version. Reject incompatible/unversioned endogenous-product fits before new
+  inference or extraction; allow a compatible fit to regenerate old MI draws.
+  Historical stored coefficients and full tables remain inspectable.
+- Run replication and Monte Carlo checks on main/master pushes and relevant
+  pull requests. Compare candidate results against a frozen, provenance-bearing
+  numerical baseline in addition to cross-platform comparisons.
+- Add a reproducible standardization simulation study with analytical population
+  targets, Monte Carlo uncertainty and explicit analysis/draw failure accounting.
+  The screening study identifies undercoverage in some default-MI interaction
+  scenarios; document this limitation rather than claiming universal coverage.
+
 - Keep the selected inference level in every confint method unless explicitly
   overridden. Explain the percentile effect-query convention separately from
   stored bootstrap parameter-table intervals; correct bca.simple labeling to

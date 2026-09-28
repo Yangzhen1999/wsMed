@@ -1,0 +1,22 @@
+{
+  "base_commit": "670ace191570316830c2da0db6482c44375437f7",
+  "changes_in_study_checkout": "algorithm metadata and compatibility checks; statistical engines unchanged",
+  "date": "2026-09-28",
+  "repetitions_per_scenario": 200,
+  "mc_draws_per_fit": 2000,
+  "imputations": 5,
+  "files": {
+    "standardization-summary.csv": "280655f288cfd2c5cc333b749fb77e1e0665f1e999d5a9d088d7acddfd0021bf",
+    "standardization-replicates.csv": "25ad834982a9add5ab51da6609236af3f1424d5f1a09c29b1ba0ed6f7a99b526"
+  },
+  "attempted_fits": 1600,
+  "analysis_failures": 0,
+  "warnings": [
+    "1 of 2000 standardized draws were invalid; see diagnostics.",
+    "43 of 2000 standardized draws were invalid; see diagnostics.",
+    "6 of 2000 standardized draws were invalid; see diagnostics."
+  ],
+  "executed_simulation_script_sha256": "f8683d1406c1809c7dabea65dfa828a54f53959de43589d7794e67618af76135",
+  "summary_update": "Wilson intervals added after simulation; DGP, fits, draws and per-attempt results unchanged. Summaries recomputed by summarize-simulation.R.",
+  "current_simulation_script_sha256": "cf06d61839913581d2cff65144539631293795c8e075ab3137438a9a2084d095"
+}

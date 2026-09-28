@@ -13,19 +13,27 @@ along with an example demonstration.
 
 ## Installation
 
-You can install the development version of wsMed from [GitHub](https://github.com/) with:
+Install the published CRAN package with `install.packages("wsMed")`.
+The staged workflow and revised standardization described below are currently
+on the `feature/modular-api` development branch. Install that branch explicitly:
   
   ``` r
 # install.packages("pak")
-pak::pak("Yangzhen1999/wsMed")
+pak::pak("Yangzhen1999/wsMed@feature/modular-api")
 ```
 
 Alternatively, if you prefer using devtools, you can install wsMed as follows:
   
   ``` r
 # install.packages("devtools")
-devtools::install_github("Yangzhen1999/wsMed")
+devtools::install_github("Yangzhen1999/wsMed", ref = "feature/modular-api")
 ```
+
+The development package currently reports `1.1.0.9000`. For a reproducible
+analysis, pin an audited commit with `ref = "<full commit SHA>"` and save the
+analysis manifest. Installing the default GitHub branch does not necessarily
+install these development features. Use the same package build to regenerate
+both numerical tables and figures.
 
 ## Example
 
@@ -75,6 +83,8 @@ effects <- wsmed_effects(inference)
 confint(effects, level = .90)
 plot(effects)
 ```
+
+
 
 `wsMed()` remains the one-call interface and uses the same engines. Its existing
 fields remain available alongside `model`, `fit`, and `inference`. Default
@@ -161,6 +171,14 @@ continuous. See `help("wsmed_categorical")` and the
 for reference coding, conditional effects, group contrasts, and missing data.
 
 ## Diagnostics and reproducibility
+
+The development branch includes a reproducible
+[standardization simulation study](https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/.github/validation/RESULTS.md).
+In its interaction-model scenarios, default MI showed undercoverage for some
+conditional effects. Cross-platform reproducibility and software-test success
+do not guarantee nominal coverage; users should assess whether their imputation
+model preserves the substantive moderation structure. These findings do not
+establish the cause or cover all missing-data mechanisms.
 
 Interval methods retain the confidence level saved in the selected inference;
 an explicit `level` overrides it. Fit diagnostics distinguish convergence from

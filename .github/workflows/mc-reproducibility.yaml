@@ -2,17 +2,23 @@ name: Monte Carlo reproducibility
 on:
   workflow_dispatch:
   push:
-    branches: [fix/mc-reproducibility, feature/modular-api]
+    branches: [main, master, fix/mc-reproducibility, feature/modular-api]
     paths:
       - 'R/**'
       - 'tests/**'
+      - 'NAMESPACE'
       - 'DESCRIPTION'
+      - '.github/validation/**'
       - 'tools/check-mc-reproducibility.R'
       - '.github/workflows/mc-reproducibility.yaml'
   pull_request:
     branches: [master, main]
     paths:
-      - 'R/RandomGaussian*'
+      - 'R/**'
+      - 'tests/**'
+      - 'NAMESPACE'
+      - 'DESCRIPTION'
+      - '.github/validation/**'
       - 'tools/check-mc-reproducibility.R'
       - '.github/workflows/mc-reproducibility.yaml'
 
@@ -55,3 +61,8 @@ jobs:
       - name: Run package regression tests
         shell: Rscript {0}
         run: testthat::test_local(".", reporter = "summary", stop_on_failure = TRUE)
+      - name: Validate simulation design and analysis pipeline
+        if: runner.os == 'Linux'
+        run: |
+          python .github/validation/check-study.py
+          Rscript .github/validation/check-simulation.R
