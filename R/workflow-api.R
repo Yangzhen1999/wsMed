@@ -101,7 +101,10 @@ wsmed_model <- function(outcome, mediators, conditions = names(outcome),
 #' @param model A `wsmed_model` object.
 #' @param data A wide data frame with one row per participant.
 #' @param missing Missing-data strategy: error, listwise, fiml, or mi.
-#' @param mi MI controls: m, method, seed. Imputation and inference seeds are separate.
+#' @param mi MI controls: m, method, seed, or completed. Supply `completed` as a
+#' list of at least two completed wide data frames or a `mice` mids object to
+#' use externally generated imputations. m is then inferred (or must match).
+#' Omit method and seed with completed data. Inference has its own seed.
 #' @param fixed.x Whether exogenous moments are fixed in the SEM.
 #' @param verbose Show progress messages.
 #' @return A `wsmed_fit` containing all fits and pooled estimates for MI.
@@ -111,6 +114,14 @@ wsmed_model <- function(outcome, mediators, conditions = names(outcome),
 #' See [wsmed_categorical] for reference coding, numeric 0/1 predictors, and
 #' restrictions on missing categorical predictors. `mi$method` specifies the
 #' method for numeric variables; factors use logistic or multinomial regression.
+#' Default imputation uses main effects and need not preserve substantive-model
+#' interactions. For moderated models, consider model-compatible external
+#' imputation (e.g., SMC-FCS) and pass its completed datasets. Supplied datasets
+#' must preserve participant order, row names, observed values and factor levels,
+#' and complete all analysis variables. Difference scores and products are
+#' rebuilt separately in every dataset, then the same Rubin/MC engine is used.
+#' Validation does not establish imputation-model compatibility. Save the external
+#' imputer's settings, convergence diagnostics and software versions separately.
 #' Diagnostics include dataset-level convergence/admissibility, covariance checks,
 #' case counts, warnings, and fitted category counts. Complete-case matrix rank
 #' is descriptive, not an identification test for FIML. Counts below five receive
@@ -126,7 +137,9 @@ wsmed_fit <- function(model, data, missing = c("error", "listwise", "fiml", "mi"
   if (!is.data.frame(data) || !nrow(data) || anyDuplicated(names(data)))
     stop("data must be a nonempty data frame with unique column names.")
   if (!is.list(mi) || length(mi) && (is.null(names(mi)) || anyDuplicated(names(mi)) ||
-      any(!names(mi) %in% c("m", "method", "seed")))) stop("Unknown MI control.")
+      any(!names(mi) %in% c("m", "method", "seed", "completed")))) stop("Unknown MI control.")
+  if (!is.null(mi$completed) && missing != "mi")
+    stop("completed imputations require missing = 'mi'.")
   v <- model$input_vars
   cols <- unlist(v[c("M_C1", "M_C2", "Y_C1", "Y_C2", "C_C1", "C_C2", "C", "W")], use.names = FALSE)
   if (!all(cols %in% names(data))) stop("Missing columns: ", paste(setdiff(cols, names(data)), collapse = ", "))
@@ -153,14 +166,23 @@ wsmed_fit <- function(model, data, missing = c("error", "listwise", "fiml", "mi"
       is.factor(x) && anyNA(x), logical(1))))
     stop("FIML with missing categorical predictors is unsupported; consider MI.")
   model$input_vars <- v
+  if (!is.null(mi$completed)) {
+    if (missing != "mi") stop("completed imputations require missing = 'mi'.")
+    if (!is.null(mi$method) || !is.null(mi$seed))
+      stop("method and seed control internal imputation; omit them with completed datasets.")
+    mi$completed <- .wsmed_completed(mi$completed, data, unique(cols), mi$m)
+    mi$m <- length(mi$completed)
+  }
   ctrl <- utils::modifyList(list(m = 5L, method = "pmm", seed = NULL), mi)
   assert_scalar_int(ctrl$m, "m", lower = 2L)
   assert_scalar_int(ctrl$seed, "seed", lower = 0L, allow_null = TRUE)
   if (!is.logical(fixed.x) || length(fixed.x) != 1L || is.na(fixed.x)) stop("fixed.x must be TRUE or FALSE.")
   Na <- switch(missing, error = "DE", listwise = "DE", fiml = "FIML", mi = "MI")
   fit <- .wsmed_preserve_rng(.wsmed_fit_core(model, data, Na,
-    list(m = ctrl$m, method_num = ctrl$method, seed = ctrl$seed), fixed.x, verbose),
-    preserve = Na != "MI" || !is.null(ctrl$seed))
+    list(m = ctrl$m, method_num = ctrl$method, seed = ctrl$seed,
+      completed = ctrl$completed,
+      engine = if (!is.null(ctrl$completed)) "external" else "mice"), fixed.x, verbose),
+    preserve = Na != "MI" || !is.null(ctrl$seed) || !is.null(ctrl$completed))
   fit$call <- match.call()
   fit
 }

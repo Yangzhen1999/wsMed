@@ -20,7 +20,10 @@ wsmed_fit(
 
 \item{missing}{Missing-data strategy: error, listwise, fiml, or mi.}
 
-\item{mi}{MI controls: m, method, seed. Imputation and inference seeds are separate.}
+\item{mi}{MI controls: m, method, seed, or completed. Supply \code{completed} as a
+list of at least two completed wide data frames or a \code{mice} mids object to
+use externally generated imputations. m is then inferred (or must match).
+Omit method and seed with completed data. Inference has its own seed.}
 
 \item{fixed.x}{Whether exogenous moments are fixed in the SEM.}
 
@@ -39,6 +42,14 @@ Factor outcome, mediator, and within-subject covariate columns are unsupported.
 See \link{wsmed_categorical} for reference coding, numeric 0/1 predictors, and
 restrictions on missing categorical predictors. \code{mi$method} specifies the
 method for numeric variables; factors use logistic or multinomial regression.
+Default imputation uses main effects and need not preserve substantive-model
+interactions. For moderated models, consider model-compatible external
+imputation (e.g., SMC-FCS) and pass its completed datasets. Supplied datasets
+must preserve participant order, row names, observed values and factor levels,
+and complete all analysis variables. Difference scores and products are
+rebuilt separately in every dataset, then the same Rubin/MC engine is used.
+Validation does not establish imputation-model compatibility. Save the external
+imputer's settings, convergence diagnostics and software versions separately.
 Diagnostics include dataset-level convergence/admissibility, covariance checks,
 case counts, warnings, and fitted category counts. Complete-case matrix rank
 is descriptive, not an identification test for FIML. Counts below five receive

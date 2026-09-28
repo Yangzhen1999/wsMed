@@ -105,6 +105,11 @@
 #' \describe{
 #'   \item{\code{m}}{Number of imputations. Default 5.}
 #'   \item{\code{method_num}}{Imputation method for \code{mice()}.}
+#'   \item{\code{completed}}{Optional list of completed wide data frames or a
+#'     \code{mice} mids object. Observed values, rows and factor levels must be
+#'     preserved. The number of imputations is inferred; supplied m must match.
+#'     Omit method_num. With external imputations, seed still controls MC only.
+#'     See \code{\link{wsmed_fit}} for model-compatible imputation guidance.}
 #'   \item{\code{decomposition}}{Covariance-decomposition method
 #'     (\code{"eigen"}, \code{"chol"}, \code{"svd"}). The default
 #'     \code{"eigen"} uses the principal symmetric covariance square root;
@@ -184,6 +189,16 @@ wsMed <- function(data,
   ci_method <- match.arg(ci_method)
   form      <- match.arg(form)
   Na        <- match.arg(Na)
+
+  if (!is.null(mi_args$completed)) {
+    if (Na != "MI") stop("completed imputations require Na = 'MI'.")
+    if (!is.null(mi_args$method_num))
+      stop("method_num controls internal imputation; omit it with completed datasets.")
+    cols <- unique(c(M_C1, M_C2, Y_C1, Y_C2, C_C1, C_C2, C, W))
+    mi_args$completed <- .wsmed_completed(mi_args$completed, data, cols, mi_args$m)
+    mi_args$m <- length(mi_args$completed)
+    mi_args$engine <- "external"
+  }
 
   validate_wsMed_inputs(
     data      = data,

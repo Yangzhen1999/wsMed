@@ -94,7 +94,9 @@
   fits <- withCallingHandlers({
     if (Na == "MI") {
       if (mi_args$m < 2L) stop("MI pooling requires at least two imputations.")
-      invisible(utils::capture.output(imputation <- do.call(PrepareMissingData,
+      if (!is.null(mi_args$completed)) {
+        imputation <- .wsmed_prepare_completed(data, mi_args$completed, prep_args)
+      } else invisible(utils::capture.output(imputation <- do.call(PrepareMissingData,
         c(list(data_missing = data, m = mi_args$m, method_num = mi_args$method_num,
                seed = mi_args$seed), prep_args,
           list(keep_W_raw = TRUE, keep_C_raw = TRUE)))))
@@ -128,17 +130,23 @@
   dimnames(covariance) <- list(names(coefficients), names(coefficients))
   converged <- vapply(fits, function(x) isTRUE(lavaan::lavInspect(x, "converged")), logical(1))
   references <- if (Na == "MI") lapply(seq_along(fits), function(j)
-    .wsmed_reference_data(model, mice::complete(imputation$mids, j),
+    .wsmed_reference_data(model, if (!is.null(imputation$completed_data))
+      imputation$completed_data[[j]] else mice::complete(imputation$mids, j),
                           imputation$processed_data_list[[j]])) else
     list(.wsmed_reference_data(model, data, prep))
   category_counts <- do.call(rbind, lapply(seq_along(fits), function(j)
     .wsmed_category_counts(if (Na == "MI") completed[[j]] else prep,
       references[[j]], lavaan::lavInspect(fits[[j]], "case.idx"), j)))
+  mi_controls <- mi_args[setdiff(names(mi_args), "completed")]
+  if (!is.null(mi_args$completed)) {
+    mi_controls <- list(engine = "external", m = length(fits))
+  }
   structure(list(schema_version = 1L, model = model, data = prep, raw_data = data,
     sem_model = syntax, Na = Na, fixed.x = fixed.x,
     coefficients = coefficients, covariance = covariance,
     point = .wsmed_point(fits[[1]], coefficients), backend = fits,
-    mi = list(prepared = imputation, pooled = pooled, controls = mi_args),
+    mi = list(prepared = imputation, pooled = pooled,
+      controls = mi_controls),
     reference = list(policy = model$reference_policy,
       moderator = attr(prep, "W_info"), covariates = attr(prep, "C_info"),
       by_dataset = references, reporting_dataset = 1L),

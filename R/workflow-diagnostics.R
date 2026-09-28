@@ -86,7 +86,13 @@
     marginal_outcome_sd = if (is.finite(variance) && variance > 0) sqrt(variance) else NA_real_,
     moderator = fit$reference$by_dataset[[1]]$moderator,
     covariates = fit$reference$by_dataset[[1]]$between_covariates,
-    missing = fit$Na, reference_policy = fit$reference$policy)
+    missing = fit$Na, reference_policy = fit$reference$policy,
+    imputation_note = if (identical(fit$Na, "MI")) {
+      if (identical(fit$mi$controls$engine, "external"))
+        "External imputations: compatibility and convergence require the imputer's own checks."
+      else if (length(v$W) && any(grepl("^[bd]", v$MP)))
+        "Default MI uses main effects only; interactions may require model-compatible external imputations."
+    } else NULL)
 }
 
 .wsmed_print_interpretation <- function(description, scale = "raw", type = NULL) {
@@ -102,6 +108,7 @@
     cat("Covariate:", cov$variable, "; reference category =", cov$levels[1], "\n")
   if (identical(description$missing, "MI"))
     cat("MI: per-imputation centering; first-imputation reporting reference.\n")
+  if (!is.null(description$imputation_note)) cat(description$imputation_note, "\n")
   if (scale == "marginal") {
     if (length(type) && type %in% c("indirect", "direct", "total", "total_indirect")) {
       cat("Standardization: effect / marginal model-implied SD(",

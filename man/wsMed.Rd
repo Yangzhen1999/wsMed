@@ -69,6 +69,11 @@ Values are case-insensitive.}
 \describe{
 \item{\code{m}}{Number of imputations. Default 5.}
 \item{\code{method_num}}{Imputation method for \code{mice()}.}
+\item{\code{completed}}{Optional list of completed wide data frames or a
+\code{mice} mids object. Observed values, rows and factor levels must be
+preserved. The number of imputations is inferred; supplied m must match.
+Omit method_num. With external imputations, seed still controls MC only.
+See \code{\link{wsmed_fit}} for model-compatible imputation guidance.}
 \item{\code{decomposition}}{Covariance-decomposition method
 (\code{"eigen"}, \code{"chol"}, \code{"svd"}). The default
 \code{"eigen"} uses the principal symmetric covariance square root;
