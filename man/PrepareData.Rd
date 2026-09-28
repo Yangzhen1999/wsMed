@@ -2,7 +2,7 @@
 % Please edit documentation in R/PrepareData.R
 \name{PrepareData}
 \alias{PrepareData}
-\title{Prepare Data for Two-Condition Within-Subject Mediation (WsMed)}
+\title{Prepare data for two-condition mediation}
 \usage{
 PrepareData(
   data,
@@ -37,7 +37,7 @@ PrepareData(
 Each element is one of \code{"continuous"}, \code{"categorical"}, or \code{"auto"}
 (default). Ignored when \code{C = NULL}.}
 
-\item{W}{Optional character vector: moderator names (one or more).}
+\item{W}{Optional character scalar: one moderator column name.}
 
 \item{W_type}{Optional vector of the same length as \code{W}.
 Same coding as \code{C_type}. Ignored when \code{W = NULL}.}
@@ -59,7 +59,7 @@ plus the attributes \code{"W_info"} and \code{"C_info"} described above.
 }
 \description{
 \code{PrepareData()} transforms raw pre/post data into the set of variables
-required by the \strong{WsMed} workflow.
+required by the \strong{wsMed} workflow.
 It handles \emph{mediators}, \emph{outcome}, \emph{within-subject controls}, \emph{between-subject
 controls}, \emph{moderators}, and all necessary \strong{interaction terms}, while
 automatically centering / dummy-coding variables as needed.
@@ -82,7 +82,7 @@ first level as the reference.
 }
 \item Within-subject controls \code{Cw}: difference and centered-average versions
 (\code{Cw1diff}, \code{Cw1avg}, ...).
-\item Moderators \code{W} (one or more):
+\item Moderator \code{W} (at most one):
 \itemize{
 \item Continuous variables are grand-mean centered (\code{W1}, \code{W2}, ...).
 \item Categorical variables are dummy-coded in the same way as \code{C}.
@@ -125,5 +125,5 @@ head(prep)
 }
 \seealso{
 \code{\link{PrepareMissingData}}, \code{\link{GenerateModelP}},
-\code{\link{wsMed}}
+\code{\link{wsMed}}, \code{\link{wsmed_categorical}}
 }

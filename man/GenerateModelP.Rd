@@ -2,7 +2,7 @@
 % Please edit documentation in R/GenerateModelP.R
 \name{GenerateModelP}
 \alias{GenerateModelP}
-\title{Generate Parallel Mediation Model}
+\title{Generate a parallel mediation model}
 \usage{
 GenerateModelP(prepared_data, MP = character(0))
 }

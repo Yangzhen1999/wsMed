@@ -15,7 +15,7 @@ example_dataN <- suppressWarnings(
     expect_s3_class(obj, "wsMed")
 
     expect_setequal(
-      setdiff(names(obj), "moderation_std"),
+      setdiff(names(obj), c("moderation_std", "model", "fit", "inference")),
       c(
         "Na",
         "alpha",
@@ -100,7 +100,7 @@ test_that("wsMed input validation catches all invalid scenarios", {
 
     ## ── integer parameters ────────────────────────────────────────────────
     expect_error(call_ws(R = -5), "R must be >= 1")
-    expect_error(call_ws(R = 3.5), "whole number")   # 非整数仍匹配原文本
+    expect_error(call_ws(R = 3.5), "whole number")   # Noninteger counts retain the original validation message
     expect_error(call_ws(bootstrap = 3.2),    "whole number")
 
     ## ── form / Na / ci_method combo ───────────────────────────────────────
@@ -127,7 +127,7 @@ test_that("wsMed handles continuous moderation (CP form)", {
   mod  <- res5$moderation
   expect_equal(mod$type, "continuous")
   expect_true(is.data.frame(mod$conditional_overall))
-  # 三水平 × 两条(total) = 6 行
+  # Three levels times two overall effects give six rows
   expect_equal(nrow(mod$conditional_overall), 6)
 })
 
@@ -159,15 +159,15 @@ test_that("wsMed handles categorical moderation with covariates", {
 
 
 test_that("wsMed handles missing data with standardized effects (MI)", {
-  skip_on_cran()                       # MICE + lavaan 稍慢
+  skip_on_cran()                       # The mice and lavaan test takes longer to run
   set.seed(987)
 
-  # ── 1. 造一个含缺失数据集 (10%) ──────────────────────────────
+  # Create a dataset with ten percent missing values
   dat_mis <- suppressWarnings(
     mice::ampute(example_data, prop = 0.10)$amp
   )
 
-  # ── 2. 调 wsMed() — MI + standardized ─────────────────────
+  # Use wsMed with multiple imputation and standardization
   res_mi <- wsMed(
     data = example_dataN,
     M_C1 = c("A1","B1"),  M_C2 = c("A2","B2"),
@@ -180,15 +180,15 @@ test_that("wsMed handles missing data with standardized effects (MI)", {
     verbose = FALSE
   )
 
-  # ── 3. 结构断言 ─────────────────────────────────────────────
+  # Assert the output structure
   expect_wsMed_structure(res_mi)
   expect_equal(res_mi$Na, "MI")
 
-  # mc$std 应已填充
+  # Standardized Monte Carlo results are populated
   expect_true(!is.null(res_mi$mc$std))
   expect_s3_class(res_mi$mc$std, "data.frame")
 
-  # moderation 无调节 → type = "none"
+  # Without moderation, the moderator type is none
   expect_equal(res_mi$moderation$type, "none")
 })
 

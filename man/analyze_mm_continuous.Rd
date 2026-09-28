@@ -2,7 +2,7 @@
 % Please edit documentation in R/analyze_mm_continuous.R
 \name{analyze_mm_continuous}
 \alias{analyze_mm_continuous}
-\title{Summarise Effects with a Continuous Moderator}
+\title{Summarize effects with a continuous moderator}
 \usage{
 analyze_mm_continuous(
   mc_result,
@@ -17,30 +17,30 @@ analyze_mm_continuous(
 )
 }
 \arguments{
-\item{mc_result}{A `semmcci` object returned by `MCMI2()`.}
+\item{mc_result}{A \code{semmcci} object returned by \code{MCMI2()}.}
 
 \item{data}{A processed data frame containing the original moderator
 variable. This is typically the first component returned by
-`PrepareData()`.}
+\code{PrepareData()}.}
 
 \item{MP}{Requested focal paths; all fitted W main effects enter conditional effects.}
 
 \item{W_raw_name}{A character string giving the name of the moderator
-variable in `data`. The default is `"W"`.}
+variable in \code{data}. The default is \code{"W"}.}
 
 \item{ci_level}{A numeric value between zero and one specifying the
-two-sided confidence level. The default is `0.95`.}
+two-sided confidence level. The default is \code{0.95}.}
 
 \item{W_values}{An optional numeric vector containing at least two distinct raw moderator
-values at which to evaluate the conditional effects. If `NULL`, the
+values at which to evaluate the conditional effects. If \code{NULL}, the
 moderator mean and values one standard deviation below and above the mean
 are used.}
 
 \item{n_curve}{A positive integer specifying the number of moderator values
-used to construct each effect curve. The default is `120`.}
+used to construct each effect curve. The default is \code{120}.}
 
 \item{digits}{A non-negative integer specifying the number of decimal places
-used to round the reported results. The default is `8`.}
+used to round the reported results. The default is \code{8}.}
 
 \item{point_estimates}{Named plug-in parameter estimates. If omitted, the
 means of primitive coefficient draws are used.}
@@ -48,44 +48,44 @@ means of primitive coefficient draws are used.}
 \value{
 A named list with the following components:
 \describe{
-  \item{\code{mod_coeff}}{
-    A data frame summarising the moderated path coefficients, their
-    corresponding base coefficients, and confidence intervals.
-  }
-  \item{\code{beta_coef}}{
-    A data frame containing the conditional indirect effects at the three
-    reference values of the moderator.
-  }
-  \item{\code{path_HML}}{
-    A data frame containing the conditional moderated path coefficients at
-    the three reference values of the moderator.
-  }
-  \item{\code{theta_curve}}{
-    A data frame containing the conditional indirect effects evaluated over
-    the moderator grid.
-  }
-  \item{\code{path_curve}}{
-    A data frame containing the conditional path coefficients evaluated over
-    the moderator grid.
-  }
+\item{\code{mod_coeff}}{
+A data frame summarising the moderated path coefficients, their
+corresponding base coefficients, and confidence intervals.
+}
+\item{\code{beta_coef}}{
+A data frame containing the conditional indirect effects at the three
+reference values of the moderator.
+}
+\item{\code{path_HML}}{
+A data frame containing the conditional moderated path coefficients at
+the three reference values of the moderator.
+}
+\item{\code{theta_curve}}{
+A data frame containing the conditional indirect effects evaluated over
+the moderator grid.
+}
+\item{\code{path_curve}}{
+A data frame containing the conditional path coefficients evaluated over
+the moderator grid.
+}
 }
 }
 \description{
-`analyze_mm_continuous()` summarises Monte Carlo draws from a `semmcci`
-object when the moderator `W` is continuous. It reports moderated path
+\code{analyze_mm_continuous()} summarises Monte Carlo draws from a \code{semmcci}
+object when the moderator \code{W} is continuous. It reports moderated path
 coefficients, conditional indirect effects, conditional path coefficients,
 and effect curves across values of the moderator.
 }
 \details{
 The function first summarises the coefficients associated with moderated
-paths, including interaction terms such as `aw`, `bw`, `dw`, and `cpw`,
+paths, including interaction terms such as \code{aw}, \code{bw}, \code{dw}, and \code{cpw},
 together with their corresponding base coefficients and confidence
 intervals.
 
 It then evaluates conditional indirect effects and moderated path
 coefficients at three reference values of the moderator. By default, these
 values are the moderator mean and one standard deviation below and above
-the mean. Alternative reference values can be supplied through `W_values`.
+the mean. Alternative reference values can be supplied through \code{W_values}.
 
 Finally, the function evaluates the conditional indirect effects and
 moderated path coefficients over a moderator grid. These results can be

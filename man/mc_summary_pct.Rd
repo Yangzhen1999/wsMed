@@ -2,7 +2,7 @@
 % Please edit documentation in R/calc_basic_contrasts.R
 \name{mc_summary_pct}
 \alias{mc_summary_pct}
-\title{Compute Monte Carlo Estimates, Standard Errors, and CIs (with Percent Labels)}
+\title{Compute Monte Carlo estimates, standard errors, and CIs (with percent labels)}
 \usage{
 mc_summary_pct(x, label, ci_level = 0.95, digits = 3)
 }

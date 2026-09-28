@@ -1,8 +1,8 @@
 ---
-title: "MEMORE_vs_wsMed"
+title: "Comparing wsMed and MEMORE"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{MEMORE_vs_wsMed}
+  %\VignetteIndexEntry{Comparing wsMed and MEMORE}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -50,7 +50,7 @@ result1 <- wsMed(
   standardized = TRUE,
   Na = "DE", ci_method = "mc", R = 5000, seed = 123
 )
-print(result1,digits=4)
+print(result1,digits=4, detail = "full")
 printGM(result1)
 ```
 
@@ -79,6 +79,6 @@ result2 <- wsMed(
   standardized = TRUE,
   Na = "DE", ci_method = "mc", R = 5000, seed = 123
 )
-print(result2,digits=4)
+print(result2,digits=4, detail = "full")
 printGM(result2)
 ```

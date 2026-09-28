@@ -145,14 +145,14 @@ validate_wsMed_inputs <- function(data,
     match.arg(ci_method, allowed_methods)
   }
 
-  # ── 合法性规则
-  # 1) MI 只能用 mc
+  # Validate combinations of inference and missing-data methods
+  # Multiple imputation supports Monte Carlo inference only
   if (Na == "MI" && ci_method != "mc") {
     stop("With Na = 'MI', only ci_method = 'mc' is supported.",
          call. = FALSE)
   }
 
-  # 2) DE / FIML 若涉及 bootstrap (bootstrap 或 both)，bootstrap 次数必须 > 0
+  # Bootstrap with deletion or FIML requires a positive bootstrap count
   if (Na %in% c("DE", "FIML") &&
       ci_method %in% c("bootstrap", "both") &&
       bootstrap == 0) {
@@ -210,20 +210,20 @@ assert_scalar_int <- function(x,
                               upper      = NULL,
                               allow_null = FALSE) {
 
-  # ---- 1. NULL 处理 -------------------------------------------------------
+  # Handle NULL
   if (is.null(x)) {
     if (allow_null) return(invisible(TRUE))
     stop(sprintf("%s must not be NULL.", name), call. = FALSE)
   }
 
-  # ---- 2. 标量整数检查 ----------------------------------------------------
+  # Validate a scalar integer
   ok <- is.numeric(x) && length(x) == 1L && !is.na(x) && (x == as.integer(x))
   if (!ok) {
     stop(sprintf("%s must be a single whole number (e.g., 5 or 5L).", name),
          call. = FALSE)
   }
 
-  # ---- 3. 上下界 ----------------------------------------------------------
+  # Check bounds
   if (!is.null(lower) && x < lower)
     stop(sprintf("%s must be >= %s.", name, lower), call. = FALSE)
   if (!is.null(upper) && x > upper)
@@ -240,7 +240,7 @@ assert_scalar_int <- function(x,
 #' @name null_coalesce
 #' @aliases %||%
 #' @keywords internal
-`%||%` <- function(x, y) if (is.null(x)) y else y
+`%||%` <- function(x, y) if (is.null(x)) y else x
 
 
 
@@ -278,11 +278,11 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
                         fixed.x   = FALSE,
                         verbose   = TRUE,
                         run_mc    = TRUE, seed = NULL) {
-  # 0) 解析缺失处理方式
+  # Select the missing-data method
   Na <- match.arg(Na)
   miss_opt <- if (Na == "DE") "listwise" else "fiml"
 
-  # 1) 拟合模型 --------------------------------------------------------------
+  # Fit the model
   fit <- lavaan::sem(sem_model,
                      data    = data,
                      missing = miss_opt,
@@ -292,7 +292,7 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
   if (!lavaan::lavInspect(fit, "converged"))
     warning("lavaan did not converge.")
 
-  # 2) 可选 Monte-Carlo 抽样
+  # Optional Monte Carlo draws
   mc_out <- NULL
   if (run_mc) {
     if (verbose) message("  -- Monte-Carlo draws...")
@@ -301,10 +301,10 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
     if (verbose) message("  -- Monte-Carlo skipped (ci_method = 'bootstrap')")
   }
 
-  # 3) 返回
+  # Return results
   list(
-    fit    = fit,     # lavaan 对象
-    result = mc_out   # 可能是 NULL
+    fit    = fit,     # Fitted lavaan object
+    result = mc_out   # May be NULL
   )
 }
 
@@ -319,8 +319,8 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
                              alpha       = 0.05,
                              verbose     = FALSE, point_estimates = NULL) {
 
-  ## ---- 0. W & W_type 预处理 --------------------------------------------- ##
-  # * 若没有 W，则强制 W_type = "none"
+  # Resolve W and W_type
+  # Without W, set the moderator type to none
   if (is.null(W) || length(W) == 0L) {
     W_type <- "none"                                                  ## ***
   } else {
@@ -331,7 +331,7 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
       if (is.null(W)) "<NULL>" else paste(W, collapse = ", "),
       W_type, verbose = verbose)
 
-  ## ---- A. 抽样矩阵 -------------------------------------------------------
+  # Draw matrix
   theta_draws <- if (is.matrix(mc_res) || is.data.frame(mc_res)) {
     as.matrix(mc_res)
   } else if (!is.null(mc_res$thetahatstar)) {
@@ -344,7 +344,7 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
   dbg(". theta_draws dim = %d x %d",
       nrow(theta_draws), ncol(theta_draws), verbose = verbose)
 
-  ## ---- B. 无调节（basic contrasts） --------------------------------------
+  # Basic contrasts without moderation
   if (W_type == "none") {                                               ## ***
     dbg(". W_type = 'none' -> basic contrasts", verbose = verbose)
     basic <- calc_basic_contrasts(theta_draws, ci_level = 1 - alpha, point_estimates = point_estimates)
@@ -356,12 +356,12 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
     ))
   }
 
-  ## ---- C. 分类调节 -------------------------------------------------------
+  # Categorical moderation
   if (W_type == "categorical") {
     dbg(". categorical moderation branch", verbose = verbose)
 
     cat_out <- analyze_mm_categorical(
-      mc_result     = theta_draws,          ## 可直接传矩阵版本
+      mc_result     = theta_draws,          # Accept a draw matrix directly
       prepared_data = data,
       MP            = MP,
       ci_level      = 1 - alpha,
@@ -378,7 +378,7 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
     ))
   }
 
-  ## ---- D. 连续调节 -------------------------------------------------------
+  # Continuous moderation
   dbg(". continuous moderation branch", verbose = verbose)
 
   cont_out <- analyze_mm_continuous(
@@ -416,17 +416,17 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
   stopifnot(is.matrix(theta_boot) || is.data.frame(theta_boot),
             is.character(sem_model))
 
-  ## 1. 提取所有 “name := formula” 行 -----------------------------
+  # Extract name := formula definitions
   sem_lines  <- trimws(unlist(strsplit(sem_model, "\n")))
   def_lines  <- grep(":=", sem_lines, value = TRUE)
   if (!length(def_lines))
-    return(theta_boot)          # 模型里没定义派生量，直接返回
+    return(theta_boot)          # Return draws when no derived definitions exist
 
   parts      <- strsplit(def_lines, ":=")
   def_names  <- trimws(vapply(parts, `[`, 1, FUN.VALUE = ""))
   def_rhs    <- trimws(vapply(parts, `[`, 2, FUN.VALUE = ""))
 
-  ## 2. 只保留以 prefix 开头、且在矩阵中还缺失的间接效应 ------
+  # Select missing indirect effects with the requested prefix
   sel        <- startsWith(def_names, prefix) &
     !(def_names %in% colnames(theta_boot))
   if (!any(sel))
@@ -435,13 +435,13 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
   def_names  <- def_names[ sel ]
   def_rhs    <- def_rhs  [ sel ]
 
-  ## 3. 逐个公式计算并追加
-  df_boot <- as.data.frame(theta_boot)     # 方便 with() 评估
+  # Evaluate and append definitions
+  df_boot <- as.data.frame(theta_boot)     # Use a data frame for evaluation with with()
   for (i in seq_along(def_names)) {
     nm  <- def_names[i]
     rhs <- def_rhs[i]
 
-    ## 检查公式里用到的列是否存在
+    # Check that all required columns exist
     vars_in_rhs <- all.vars(parse(text = rhs))
     miss_cols   <- setdiff(vars_in_rhs, names(df_boot))
     if (length(miss_cols)) {
@@ -451,11 +451,11 @@ dbg <- function(..., .lvl = 0, verbose = TRUE) {
       next
     }
 
-    ## 向量化计算
+    # Vectorized evaluation
     df_boot[[nm]] <- with(df_boot, eval(parse(text = rhs)))
   }
 
-  ## 4. 保持原结构返回（matrix in, matrix out; data.frame in, data.frame out）
+  # Preserve the input matrix or data-frame class
   if (is.matrix(theta_boot)) {
     cbind(theta_boot, as.matrix(df_boot[setdiff(names(df_boot),
                                                 colnames(theta_boot))]))

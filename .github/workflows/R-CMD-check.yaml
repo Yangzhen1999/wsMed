@@ -2,9 +2,10 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, feature/modular-api]
   pull_request:
     branches: [main, master]
+  workflow_dispatch:
 
 name: R-CMD-check
 
@@ -32,6 +33,7 @@ jobs:
       _R_CHECK_DEPENDS_ONLY_VIGNETTES_: false
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      NOT_CRAN: 'true'
 
     steps:
       - uses: actions/checkout@v4
@@ -48,6 +50,13 @@ jobs:
         with:
           extra-packages: any::rcmdcheck, any::XML
           needs: check
+
+      - name: Rebuild executable tutorials
+        if: matrix.config.nosuggests != true
+        shell: Rscript {0}
+        run: |
+          source("rebuild_vignettes.R")
+          rebuild_vignettes()
 
       - uses: r-lib/actions/check-r-package@v2
         with:

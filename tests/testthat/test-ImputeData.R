@@ -1,9 +1,9 @@
 library(testthat)
 
 
-# 测试 ImputeData() 函数的结构与方法自动识别逻辑
+# Test ImputeData structure and automatic method selection
 
-# 构造含缺失的 toy 数据集
+# Toy data with missing values
 set.seed(123)
 toy <- data.frame(
   num1 = c(rnorm(10), NA, rnorm(9)),                         # numeric → pmm
@@ -15,7 +15,7 @@ toy$num1[3] <- NA
 toy$fac2[6] <- NA
 toy$fac3[7] <- NA
 
-# 测试 1：结构与返回值
+# Check output structure and return values
 test_that("ImputeData returns mids + list + summary", {
   out <- ImputeData(toy, m = 2, method = NULL)
   expect_s3_class(out$mids, "mids")
@@ -23,14 +23,14 @@ test_that("ImputeData returns mids + list + summary", {
   expect_true(is.list(out$summary))
 })
 
-# 测试 2：插补后的数据中无 NA
+# Completed datasets contain no missing values
 test_that("Imputed data contains no NA", {
   out <- ImputeData(toy, m = 2, method = NULL)
   for (d in out$imputed_data_list)
     expect_false(anyNA(d))
 })
 
-# 测试 3：method = NULL 时自动选择合适方法
+# Select methods automatically when method is NULL
 test_that("Auto method selection: pmm, logreg, polyreg", {
   out <- ImputeData(toy, m = 1, method = NULL)
   methods_used <- out$mids$method
@@ -41,14 +41,14 @@ test_that("Auto method selection: pmm, logreg, polyreg", {
   expect_equal(unname(methods_used["fac3"]), "polyreg", ignore_attr = TRUE)
 })
 
-# 测试 4：method = "pmm" 单值会广播
+# Expand a single pmm method across variables
 test_that("Single method string is broadcast", {
   out <- ImputeData(toy, m = 1, method = "pmm")
   methods_used <- out$mids$method
   expect_true(all(methods_used == "pmm"))
 })
 
-# 测试 5：method 向量长度不符时报错
+# Reject a method vector of the wrong length
 test_that("Method length mismatch triggers error", {
   expect_error(
     ImputeData(toy, m = 1, method = rep("pmm", 2)),
@@ -56,7 +56,7 @@ test_that("Method length mismatch triggers error", {
   )
 })
 
-# 测试 6：非法输入对象时报错
+# Reject invalid input types
 test_that("Non-data.frame input raises error", {
   expect_error(
     ImputeData(list(a = 1:3, b = 4:6), m = 1),
@@ -64,7 +64,7 @@ test_that("Non-data.frame input raises error", {
   )
 })
 
-# 测试 7：predictorMatrix 维度正确
+# Check predictor-matrix dimensions
 test_that("predictorMatrix is correctly generated", {
   out <- ImputeData(toy, m = 1, method = NULL)
   pm <- out$mids$predictorMatrix

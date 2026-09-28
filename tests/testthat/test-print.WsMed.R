@@ -16,7 +16,7 @@ expect_wsMed_structure <- function(obj) {
   expect_s3_class(obj, "wsMed")
 
   expect_setequal(
-    setdiff(names(obj), "moderation_std"),
+    setdiff(names(obj), c("moderation_std", "model", "fit", "inference")),
     c(
       "Na",
       "alpha",
@@ -39,7 +39,7 @@ expect_wsMed_structure <- function(obj) {
 }
 
 
-# ── helper: 生成 wsMed 对象 (快速) ------------------------------------------
+# Create a small wsMed object for printing tests
 quick_ws <- function(..., .data = example_data) {
 
   wsMed(
@@ -60,18 +60,18 @@ quick_ws <- function(..., .data = example_data) {
 # ── 1. No-moderation print smoke-test --------------------------------------
 test_that("print.wsMed works without moderator", {
   obj <- quick_ws()
-  expect_invisible( out <- capture.output(print(obj, digits = 2)) )
+  expect_invisible( out <- capture.output(print(obj, digits = 2, detail = "full")) )
   expect_true(any(grepl("VARIABLES",          out)))
   expect_true(any(grepl("MODEL FIT",          out)))
   expect_true(any(grepl("TOTAL / DIRECT",     out)))
-  # 无调节 → 不应出现 MODERATION RESULTS
+  # Do not print moderation results when there is no moderator
   expect_false(any(grepl("MODERATION RESULTS", out)))
 })
 
 # ── 2. Continuous moderation ------------------------------------------------
 test_that("print.wsMed shows continuous moderation sections", {
   obj <- quick_ws(W = "D3", W_type = "continuous", MP = "a1")
-  out <- capture.output(print(obj, digits = 2))
+  out <- capture.output(print(obj, digits = 2, detail = "full"))
   expect_true(any(grepl("MODERATION RESULTS \\(Continuous", out)))
   expect_true(any(grepl("Conditional Total Effect",         out)))
 })
@@ -81,13 +81,13 @@ test_that("print.wsMed shows categorical moderation sections", {
   skip_on_cran()
   obj <- quick_ws(W = "Group", W_type = "categorical",
                   MP = "a1")
-  out <- capture.output(print(obj, digits = 2))
+  out <- capture.output(print(obj, digits = 2, detail = "full"))
   expect_true(any(grepl("MODERATION RESULTS \\(Categorical", out)))
   expect_true(any(grepl("Conditional Indirect Effects",      out)))
 })
 
 
-# tests/testthat/test-wsMed-structure.R  （或你喜欢的文件）
+# Check the wsMed object structure
 
 test_that("wsMed handles missing data with standardized effects (FIML)", {
   set.seed(4242)
@@ -107,10 +107,10 @@ test_that("wsMed handles missing data with standardized effects (FIML)", {
     standardized = TRUE
   )
 
-  # ---- 结构与关键插槽断言 -------------------------------
+  # Assert the structure and key components
   expect_wsMed_structure(res_fiml)
   expect_equal(res_fiml$Na, "FIML")
-  expect_true(!is.null(res_fiml$mc$std))            # standardized 结果应存在
+  expect_true(!is.null(res_fiml$mc$std))            # Standardized results are present
   expect_equal(res_fiml$moderation$type, "continuous")
 })
 
@@ -159,7 +159,7 @@ test_that("print.wsMed works for a user-defined model", {
   out <- capture.output(
     print(
       obj,
-      digits = 2
+      digits = 2, detail = "full"
     )
   )
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/TransformMidsWithPrepareData.R
 \name{TransformMidsWithPrepareData}
 \alias{TransformMidsWithPrepareData}
-\title{Apply PrepareData to Imputed Datasets and Return New MIDS Object}
+\title{Apply PrepareData to imputed datasets and return new mids object}
 \usage{
 TransformMidsWithPrepareData(mids_obj, M_C1, M_C2, Y_C1, Y_C2)
 }

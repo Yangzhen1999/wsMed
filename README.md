@@ -63,6 +63,33 @@ print(result)
 
 ## Main Function Overview
 
+The development version also supports a staged workflow:
+
+```r
+model <- wsmed_model(
+  outcome = c(before = "C1", after = "C2"),
+  mediators = list(A = c(before = "A1", after = "A2")))
+fit <- wsmed_fit(model, example_data)
+inference <- wsmed_infer(fit, seed = 123)
+effects <- wsmed_effects(inference)
+confint(effects, level = .90)
+plot(effects)
+```
+
+`wsMed()` remains the one-call interface and uses the same engines. Its existing
+fields remain available alongside `model`, `fit`, and `inference`. Default
+printing is concise; `summary(result)` returns selected effects and
+`print(result, detail = "full")` displays the original full tables. See the
+"One-call and staged workflows" tutorial for MI, moderation, and joint contrasts.
+
+`plot(result)` and `plot(inference)` select forests, continuous moderator curves,
+or categorical points automatically. Use `view`, `terms`, `at`, `labels`, `title`,
+and axis labels to select and present results. `plot(fit)` shows point estimates
+without intervals; `plot(effects)` uses the exact extracted table. Plotting does
+not fit or draw samples. The plot methods use percentile intervals, while the
+named legacy helpers retain their stored interval types. See the
+[plotting tutorial](https://yangzhen1999.github.io/wsMed/articles/PlottingEffects.html).
+
 The `wsMed()` function automates the full workflow for two-condition within-subject mediation analysis.
 Its main steps are:
 
@@ -101,5 +128,50 @@ Its main steps are:
 6. **Optional: Standardization** – if `standardized = TRUE`, return standardized effects with CIs.
 
 7. **Optional: Covariates** – automatically center and include:
-   - **Between-subject covariates** (`C`): mean-centered and added to all regressions.
+   - **Between-subject covariates** (`C`): continuous measures are centered;
+     categorical predictors are dummy-coded with the first factor level as reference.
    - **Within-subject covariates** (`C_C1`, `C_C2`): difference scores and centered averages are computed and included.
+
+## Packaged data
+
+`wsmed_examples` contains the prepared empirical data for the manuscript:
+123 participants and 14 columns, with missing values retained. It loads directly
+without SPSS or an additional import package:
+
+```r
+data(wsmed_examples, package = "wsMed")
+help("wsmed_examples", package = "wsMed")
+colSums(is.na(wsmed_examples))
+```
+
+The data derive from [Sagaribay's iWeek dataset](https://doi.org/10.17632/fn9n95bsh5.1)
+under CC BY 4.0. The help page documents the selected variables, BMI preparation,
+and missingness. `example_data` is a separate simulated tutorial dataset with
+100 rows and 14 columns, including the `Group` and `W_Group` factors.
+
+## Categorical predictors
+
+Binary and multicategory between-subject covariates and one categorical
+moderator are supported. Outcomes, mediators, and within-subject covariates
+are analyzed as numeric continuous measures; categorical-response models are
+not implemented. In the staged workflow, declare categories as unordered
+factors and specify their level order. Numeric 0/1 columns otherwise remain
+continuous. See `help("wsmed_categorical")` and the
+[categorical predictor tutorial](https://yangzhen1999.github.io/wsMed/articles/CategoricalPredictors.html)
+for reference coding, conditional effects, group contrasts, and missing data.
+
+## Diagnostics and reproducibility
+
+Interval methods retain the confidence level saved in the selected inference;
+an explicit `level` overrides it. Fit diagnostics distinguish convergence from
+post-fit admissibility and record each imputed dataset separately. Effect summaries
+state the condition contrast, reference coding, marginal standardizer, and signed
+contrast definitions. `wsmed_reproducibility(result)` returns an analysis manifest
+without participant-level data or simulation draws; use `file = "analysis.rds"`
+to save it to a new file.
+
+The current product-term SEM can imply different marginal variances after
+changing a categorical reference, so standardized effects are not guaranteed to
+be reference-invariant. Keep and report the reference coding and implied SD.
+The [diagnostics and migration tutorial](https://yangzhen1999.github.io/wsMed/articles/WorkflowReliability.html)
+explains these conventions and the transition from previous one-call results.

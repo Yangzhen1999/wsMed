@@ -22,11 +22,12 @@ Description: Within-subject mediation analysis using structural equation modelin
 License: GPL (>= 3)
 Depends: R (>= 4.1.0)
 Encoding: UTF-8
-RoxygenNote: 7.3.3
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
 Suggests: rmarkdown, devtools, testthat
 Config/testthat/edition: 3
 Imports: knitr, lavaan, semmcci, mice, semboottools, MASS, rlang,
-        dplyr, ggplot2, methods, stats
+        dplyr, ggplot2, methods, stats, graphics, utils
 VignetteBuilder: knitr
 LazyData: true
 URL: https://yangzhen1999.github.io/wsMed/

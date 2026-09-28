@@ -1,4 +1,4 @@
-#' @title Build Standardization Maps
+#' @title Build standardization maps
 #'
 #' @description Constructs mapping of parameter labels to variables for standardization.
 #'
@@ -15,7 +15,7 @@ build_std_map <- function(fit) {
 }
 
 
-#' @title Build Standardization Maps PATH
+#' @title Build path-specific standardization maps
 #'
 #' @description Constructs mapping of parameter labels to variables for standardization.
 #'

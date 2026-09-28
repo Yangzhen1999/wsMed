@@ -1,8 +1,8 @@
 ---
-title: "Using wsMed: A step-by-step tutorial"
+title: "Using wsMed step by step"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Using wsMed: A step-by-step tutorial}
+  %\VignetteIndexEntry{Using wsMed step by step}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 editor_options:
@@ -77,6 +77,21 @@ needed for the next part of the analysis.
 
 ## Quick start
 
+The examples below use the artificial `example_data` dataset. The empirical
+manuscript data are also included as `wsmed_examples` (123 participants,
+14 columns). Load them without an external data file:
+
+```{r manuscript-data}
+data(wsmed_examples, package = "wsMed")
+dim(wsmed_examples)
+colSums(is.na(wsmed_examples))
+```
+
+See `help("wsmed_examples")` for variable meanings, source and license,
+preprocessing, and missingness. These data retain the manuscript's missing
+values. The [categorical predictor tutorial](CategoricalPredictors.html) uses
+the separate simulated data to illustrate factor coding and group comparisons.
+
 The following example fits a parallel mediation model with two mediators.
 It uses `example_data`, which is included in the package.
 
@@ -98,7 +113,7 @@ result <- wsMed(
   seed = 123
 )
 
-print(result)
+print(result, detail = "full")
 ```
 
 The arguments in this call answer four basic questions:
@@ -492,7 +507,7 @@ included in the mediator and outcome regressions.
 Print the fitted object to obtain the main analysis summary:
 
 ```{r print-result, eval=FALSE}
-print(result)
+print(result, detail = "full")
 ```
 
 Depending on the selected options, the printed output includes:
@@ -562,7 +577,7 @@ result4_mi <- wsMed(
   seed = 123
 )
 
-print(result4_mi)
+print(result4_mi, detail = "full")
 ```
 
 The output sections and their main purposes are:
@@ -743,7 +758,7 @@ result4_mi$mc$result     # Monte Carlo results
 result4_mi$mc$std_mc     # standardized Monte Carlo results
 ```
 
-`print(result4_mi)` is intended for reading the analysis summary, whereas
+`print(result4_mi, detail = "full")` is intended for reading the analysis summary, whereas
 the stored components are intended for inspection or downstream
 programming.
 
@@ -771,7 +786,7 @@ result5 <- wsMed(
   seed = 123
 )
 
-print(result5)
+print(result5, detail = "full")
 ```
 
 Most printed sections have the same interpretation as in Example 1. The

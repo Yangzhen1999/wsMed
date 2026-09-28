@@ -1,4 +1,4 @@
-#' @title Monte Carlo Confidence Intervals for Multiple Imputation SEM Models
+#' @title Monte Carlo confidence intervals for multiple imputation SEM models
 #'
 #' @description Computes Monte Carlo confidence intervals (MCCI) for structural equation models (SEM)
 #' fitted to multiple imputed datasets. This function integrates SEM fitting across imputed datasets,
@@ -103,67 +103,13 @@ MCMI2 <- function(sem_model,
     )
   })
 
-  coefs <- lapply(fits, lavaan::coef)
-  vcovs <- lapply(fits, lavaan::vcov)
-
-  pooled <- MICombineWrapper(
-    coefs = coefs,
-    vcovs = vcovs,
-    M = length(coefs),
-    k = length(coefs[[1]]),
-    adj = TRUE
-  )
-  scale <- pooled$total
-  location <- pooled$est
-
-  if (!is.null(seed)) {
-    set.seed(seed)
-  }
-  thetahatstar <- ThetaHatStarWrapper(
-    R = R,
-    scale = scale,
-    location = location,
-    decomposition = decomposition,
-    pd = pd,
-    tol = tol
-  )
-  thetahatstar_orig <- thetahatstar$thetahatstar
-  decomposition <- thetahatstar$decomposition
-
-  thetahat <- ThetaHatWrapper(
-    object = fits[[1]],
-    est = lavaan::lav_model_get_parameters(
-      lavaan::lav_model_set_parameters(fits[[1]]@Model, x = location),
-      type = "user", extra = TRUE)
-  )
-
-  thetahatstar <- MCDefWrapper(
-    object = fits[[1]],
-    thetahat = thetahat,
-    thetahatstar_orig = thetahatstar_orig
-  )
-
-  lav <- fits[[1]]
-
-  out <- list(
-    call = match.call(),
-    args = list(
-      lav = lav,
-      fixed.x = fixed.x,
-      sem_model = sem_model,
-      imputations = imputations,
-      R = R,
-      alpha = alpha,
-      decomposition = decomposition,
-      pd = pd,
-      tol = tol,
-      seed = seed,
-      pooled = pooled
-    ),
-    thetahat = thetahat,
-    thetahatstar = thetahatstar,
-    fun = "MCMI"
-  )
-  class(out) <- c("semmcci", class(out))
-  return(out)
+  pooled <- .wsmed_pool_fits(fits)
+  fit <- list(coefficients = pooled$est, covariance = pooled$total,
+    backend = fits, point = .wsmed_point(fits[[1]], pooled$est),
+    fixed.x = fixed.x, sem_model = sem_model,
+    mi = list(prepared = list(processed_data_list = imputations), pooled = pooled))
+  if (!is.null(seed)) set.seed(seed)
+  out <- .wsmed_mi_mc(fit, R, alpha, seed, decomposition, pd, tol)
+  out$call <- match.call()
+  out
 }

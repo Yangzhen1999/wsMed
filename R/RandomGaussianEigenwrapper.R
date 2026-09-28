@@ -1,5 +1,4 @@
-#' Generate Random Variates from the Gaussian Distribution
-#' (Eigen Decomposition)
+#' Generate Gaussian random variates using eigendecomposition
 #'
 #' @author Ivan Jacob Agaloos Pesigan
 #'

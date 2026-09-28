@@ -9,11 +9,13 @@ choice_case_args <- function() {
 # Stop after real input validation, before expensive estimation. This also
 # checks the canonical values that will control the downstream model dispatch.
 capture_choice_settings <- function(arguments = list()) {
+  validate <- wsMed:::validate_wsMed_inputs
   testthat::local_mocked_bindings(
-    PrepareData = function(...) {
-      caller <- parent.frame()
+    validate_wsMed_inputs = function(...) {
+      supplied <- list(...)
+      do.call(validate, supplied)
       stop(errorCondition("validated", class = "wsmed_validated",
-                          settings = mget(c("form", "Na", "ci_method"), caller)))
+                          settings = supplied[c("form", "Na", "ci_method")]))
     },
     .package = "wsMed"
   )

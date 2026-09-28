@@ -2,7 +2,7 @@
 % Please edit documentation in R/printGM.R
 \name{printGM}
 \alias{printGM}
-\title{Print Formatted SEM Model Syntax}
+\title{Print formatted SEM model syntax}
 \usage{
 printGM(x, ...)
 }

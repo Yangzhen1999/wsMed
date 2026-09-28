@@ -1,8 +1,8 @@
 ---
-title: "GenerateModelCN"
+title: "Specifying serial mediation models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{GenerateModelCN}
+  %\VignetteIndexEntry{Specifying serial mediation models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

@@ -1,4 +1,4 @@
-#' @title Generate Parallel and Chained Mediation Model
+#' @title Generate a parallel-serial mediation model
 #'
 #' @description Dynamically generates a structural equation modeling (SEM) syntax for
 #' mediation analysis that integrates both parallel and chained mediators. Unlike the
@@ -74,7 +74,7 @@
 
 GenerateModelPC <- function(prepared_data, MP = character(0)) {
 
-  ## ---------- 变量 ----------
+  # Identify variables
   chain_md <- grep("^M1diff$", colnames(prepared_data), value = TRUE)
   chain_ma <- grep("^M1avg$",  colnames(prepared_data), value = TRUE)
   all_md   <- sort(grep("^M\\d+diff$", colnames(prepared_data), value = TRUE))
@@ -121,7 +121,7 @@ GenerateModelPC <- function(prepared_data, MP = character(0)) {
   if (!is.null(ctrl_rhs)) y_rhs <- c(y_rhs, ctrl_rhs)
   regY <- paste("Ydiff ~", paste(y_rhs, collapse = " + "))
 
-  ## ---------- 链首 parallel mediators ----------
+  # Upstream parallel mediators
   regM_par <- sapply(seq_along(par_md), function(i){
     idx <- i + 1
     rhs <- c(paste0("a", idx, "*1"))
@@ -134,7 +134,7 @@ GenerateModelPC <- function(prepared_data, MP = character(0)) {
     paste(par_md[i], "~", paste(rhs, collapse = " + "))
   })
 
-  ## ---------- M1diff （链尾）----------
+  # Downstream mediator M1diff
   rhs_chain <- c("a1*1")
   if ("a1" %in% MP && length(Wvars)) {
     rhs_chain <- c(rhs_chain, paste0("aw1_", Wvars, "*", Wvars))
@@ -154,7 +154,7 @@ GenerateModelPC <- function(prepared_data, MP = character(0)) {
   if (!is.null(ctrl_rhs)) rhs_chain <- c(rhs_chain, ctrl_rhs)
   regM_chain <- paste(chain_md, "~", paste(rhs_chain, collapse = " + "))
 
-  ## ---------- 间接效应 ----------
+  # Indirect effects
   ind_lines <- c("indirect_1 := a1 * b1")
   ind_names <- "indirect_1"
   for (i in seq_along(par_md)) {
@@ -169,7 +169,7 @@ GenerateModelPC <- function(prepared_data, MP = character(0)) {
   tot_ind <- paste("total_indirect :=", paste(ind_names, collapse = " + "))
   tot_eff <- "total_effect := cp + total_indirect"
 
-  ## ---------- 汇总 ----------
+  # Assemble the model
   paste(c(regY, regM_par, regM_chain, ind_lines, tot_ind, tot_eff),
         collapse = "\n")
 }

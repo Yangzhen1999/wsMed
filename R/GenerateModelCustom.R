@@ -1,4 +1,4 @@
-#' Generate a User-Defined Within-Subject Mediation Model
+#' Generate a user-defined mediation model
 #'
 #' @description
 #' Generates lavaan model syntax for a user-defined within-subject

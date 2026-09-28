@@ -2,7 +2,7 @@
 % Please edit documentation in R/MC_build_std_map.R
 \name{build_std_map}
 \alias{build_std_map}
-\title{Build Standardization Maps}
+\title{Build standardization maps}
 \usage{
 build_std_map(fit)
 }

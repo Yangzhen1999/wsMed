@@ -1,4 +1,4 @@
-#' Test for a Positive Definite Matrix
+#' Test for a positive definite matrix
 #'
 #' Returns `TRUE` if input
 #' is a positive definite matrix,

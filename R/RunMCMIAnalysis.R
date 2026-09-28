@@ -1,4 +1,4 @@
-#' @title Monte Carlo SEM with Multiple Imputation (WsMed Workflow)
+#' @title Monte Carlo SEM with multiple imputation (wsMed workflow)
 #'
 #' @description
 #' `RunMCMIAnalysis()` is a helper that:
@@ -79,9 +79,9 @@
 
 RunMCMIAnalysis <- function(data_missing,
                             m            = 5,
-                            method_num   = "pmm",   # ← 对连续变量的插补方法
+                            method_num   = "pmm",   # Imputation method for continuous variables
                             seed         = 123,
-                            ## ---------- 设计变量 ----------
+                            # Design variables
                             M_C1,  M_C2,
                             Y_C1,  Y_C2,
                             C_C1 = NULL,  C_C2 = NULL,
@@ -142,7 +142,7 @@ RunMCMIAnalysis <- function(data_missing,
     fixed.x     = fixed.x
   )
 
-  ## ---------- 3. 返回 ----------
+  # Return results
   list(
     mc_result          = mi_result,
     first_imputed_data = first_imputed_data,

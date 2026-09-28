@@ -5,7 +5,7 @@ library(wsMed)
 
 data(example_data)
 
-# 统一参数 ---------------------------------------------------------
+# Shared arguments
 args_core <- list(
   data = example_data,
   M_C1 = c("A1", "A2"),
@@ -19,7 +19,7 @@ args_core <- list(
 )
 
 # -----------------------------------------------------------------
-# 测试 1：numeric W 连续型，开启中心化
+# Center a continuous numeric moderator
 # -----------------------------------------------------------------
 pd_num_cent <- do.call(PrepareData, c(args_core,
                                       list(W = "A3", W_type = "continuous", center_W = TRUE)))
@@ -30,7 +30,7 @@ test_that("Numeric W is centred and named W1", {
 })
 
 # -----------------------------------------------------------------
-# 测试 2：numeric W 关闭中心化
+# Keep a numeric moderator uncentered
 # -----------------------------------------------------------------
 pd_num_raw <- do.call(PrepareData, c(args_core,
                                      list(W = "A3", W_type = "continuous", center_W = FALSE)))
@@ -40,7 +40,7 @@ test_that("Numeric W remains un‑centred when centre_W = FALSE", {
 })
 
 # -----------------------------------------------------------------
-# 测试 3：factor W → dummy 列
+# Dummy-code a factor moderator
 # -----------------------------------------------------------------
 pd_fac <- do.call(PrepareData, c(args_core,
                                  list(W = "Group", W_type = "categorical", center_W = TRUE)))
@@ -52,7 +52,7 @@ test_that("Factor W converted to (k‑1) dummy columns", {
 })
 
 # -----------------------------------------------------------------
-# 测试 4：Ydiff / Mdiff / Mavg 正确
+# Check outcome differences, mediator differences, and centered averages
 # -----------------------------------------------------------------
 test_that("Core diff/avg columns are correct", {
   expect_equal(pd_num_cent$Ydiff, example_data$C2 - example_data$C1)
@@ -63,7 +63,7 @@ test_that("Core diff/avg columns are correct", {
 })
 
 # -----------------------------------------------------------------
-# 测试 5：一次传入两个 W 必须报错
+# Reject two moderators
 # -----------------------------------------------------------------
 test_that("Supplying more than one W triggers error", {
   expect_error(

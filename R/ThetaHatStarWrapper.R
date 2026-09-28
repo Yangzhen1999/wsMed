@@ -1,4 +1,4 @@
-#' @title Monte Carlo Sampling for Parameter Estimates
+#' @title Monte Carlo sampling for parameter estimates
 #' @md
 #'
 #' @description Generates Monte Carlo samples for parameter estimates using a covariance matrix

@@ -1,4 +1,4 @@
-#' @title Evaluate Standardized Monte Carlo Expressions
+#' @title Evaluate standardized Monte Carlo expressions
 #'
 #' @description Evaluates user-defined parameters (defined via expressions)
 #' and standardized free parameters from Monte Carlo simulated samples.
@@ -111,7 +111,7 @@ evaluate_definitions_v3 <- function(theta_star,
   return(as.data.frame(results))
 }
 
-#' @title Evaluate Unstandardized Monte Carlo Definitions
+#' @title Evaluate unstandardized Monte Carlo definitions
 #'
 #' @description Evaluates user-defined parameter expressions from Monte Carlo samples
 #' without any standardization.

@@ -1,0 +1,140 @@
+---
+title: "Diagnostics, reproducibility, and migration"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Diagnostics, reproducibility, and migration}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+library(wsMed)
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", error = FALSE,
+                     fig.width = 7, fig.height = 4)
+```
+
+## Fit once and keep the inference settings
+
+```{r fit}
+data(example_data)
+model <- wsmed_model(
+  outcome = c(before = "D1", after = "D2"),
+  mediators = list(A = c(before = "A1", after = "A2")),
+  moderator = list(variable = "D3", interactions = "A -> Y"))
+fit <- wsmed_fit(model, example_data)
+inference <- wsmed_infer(fit, draws = 1000, seed = 604, level = .90)
+```
+
+This tutorial uses 1,000 draws for speed; the default is 20,000 MC draws.
+Summary, interval extraction, and plotting keep the stored confidence level.
+An explicit `level` changes the quantiles computed from stored joint draws.
+It does not refit, reimpute, or draw new samples.
+
+```{r levels}
+effects <- wsmed_effects(inference, at = list(D3 = c(.2, .5)), scale = "marginal")
+summary(effects)
+confint(effects)                 # stored 90% level
+confint(effects, level = .95)    # explicit override
+plot(effects, view = "conditional")
+stopifnot(identical(confint(effects, level = NULL), confint(effects)))
+```
+
+`confint(inference)` extracts primitive model-parameter intervals. Use
+`confint(effects)` for the selected indirect or conditional effects. When a
+one-call result contains both MC and bootstrap inference, choose `method`
+explicitly. Each method keeps its own stored level.
+
+Effect extraction and its associated methods use percentile intervals, including
+when `wsmed_infer(..., method = "bootstrap", interval = "bc")` requested a
+bias-corrected legacy parameter table. These are different interval conventions.
+The existing `plot_effects()` helper preserves that parameter table; `plot()`
+uses the extracted percentile intervals. `bca.simple` uses bias correction with
+zero acceleration, not a full BCa acceleration estimate. See also the
+[plotting tutorial](PlottingEffects.html).
+
+## Inspect fitted datasets and inference separately
+
+```{r diagnostics}
+fit
+diagnostics <- wsmed_inspect(fit, "diagnostics")
+diagnostics$by_dataset
+wsmed_inspect(inference, "diagnostics")
+```
+
+For each dataset, the report records the cases used and excluded, optimizer
+convergence, the backend's post-fit admissibility check, finite parameter
+covariance, its smallest eigenvalue, and warning messages. These checks assess
+different properties: optimizer convergence alone does not establish an
+admissible solution or a substantively appropriate model. MI reports every
+completed dataset separately. Non-converged MI fits are not silently pooled;
+inference rejects known inadmissible fits.
+
+Complete-case matrix rank is descriptive and may be unavailable when there are
+too few complete rows; it is not a test of FIML identification. Recorded category
+counts refer to the fitted rows in each prepared dataset (completed data in MI).
+Counts below five are flagged descriptively, without treating five as a general
+validity threshold. Transformed variables with no usable variation stop fitting
+and are named in the error, for example `M1diff` for the first mediator difference.
+
+Inference diagnostics count exclusions before effect extraction. Standardized
+effect diagnostics separately count additional invalid scale draws and their
+reasons. An excluded draw's original index remains available. Do not interpret
+a low failure count as proof of good model fit or adequate simulation precision.
+
+## Interpret the effect being reported
+
+The summary states the condition order, moderator units and centering reference,
+and categorical reference groups. For marginally standardized direct and indirect
+condition effects, it identifies the model-implied SD of the outcome difference
+and reports its plug-in value. This is a marginal SD, not a conditional SD at each
+moderator value. Draw-specific scales continue to vary jointly with coefficients.
+Contrasts display signed weights and their source effects/probes.
+
+Changing category reference levels preserves the raw conditional effects in the
+checked complete-data example. However, the current product-term SEM can imply
+different marginal covariances after recoding; standardized conditional effects
+are therefore not guaranteed to be reference-invariant. Keep reference coding
+fixed when reporting these effects. The report exposes the coding and implied
+SD rather than substituting a different standardizer. Resolving this model-level
+limitation requires a separate statistical specification change.
+
+## Export a compact analysis manifest
+
+```{r manifest}
+report <- wsmed_reproducibility(effects)
+report$analysis$missing
+report$analysis$reference$policy
+report$inference$mc$controls
+report$fitting_versions
+path <- tempfile(fileext = ".rds")
+wsmed_reproducibility(effects, file = path)
+stopifnot(identical(readRDS(path), report))
+unlink(path)
+```
+
+The manifest records the resolved model, variable roles and coding, missing-data
+and inference settings, recorded versions, diagnostics, and effect/contrast query.
+It contains no participant-level data or simulation draw matrices. It is useful
+alongside the analysis script, data, and dependency records, but cannot reproduce
+the analysis by itself. Existing report files are not overwritten. Versions from
+fitting and inference remain separate from the environment used to export.
+Missing provenance in older objects is not filled using current versions.
+
+## Move from the previous one-call workflow
+
+| Previous usage or expectation | Current workflow |
+|:--|:--|
+| `wsMed(...)` performs the full analysis | Still supported; staged calls use the same engines |
+| Printing shows all tables | `print(result)` is an overview; use `print(result, detail = "full")` for legacy tables |
+| Read effects from nested fields | `wsmed_effects()` followed by `as.data.frame()` or `confint()` |
+| Change MC to bootstrap by rerunning everything | Pass an existing fit to `wsmed_infer()`; bootstrap still fits resampled datasets |
+| Inspect the generated syntax | `printGM(result)` or `wsmed_inspect(fit, "syntax")` |
+| Use the named plotting helpers | Still supported; `plot()` also accepts workflow objects |
+| Expect implicit 95% intervals everywhere | Methods keep the saved level; specify `level = .95` when intended |
+| Numeric 0/1 predictors detected automatically | The staged interface requires explicit factors for categorical interpretation |
+
+Older saved one-call objects retain the legacy fields and plotting helpers.
+They cannot acquire missing staged metadata without refitting from the original
+script and data. The new methods report this limitation rather than refitting
+automatically. MI-bootstrap and categorical outcome/mediator models remain
+outside the supported scope of this release.

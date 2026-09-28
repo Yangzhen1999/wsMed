@@ -2,21 +2,21 @@
 % Please edit documentation in R/GenerateModelCustom.R
 \name{GenerateModelCustom}
 \alias{GenerateModelCustom}
-\title{Generate a User-Defined Within-Subject Mediation Model}
+\title{Generate a user-defined mediation model}
 \usage{
 GenerateModelCustom(prepared_data, paths, MP = character(0))
 }
 \arguments{
-\item{prepared_data}{A data frame returned by [PrepareData()].
-It must contain `M1diff`, `M1avg`, ..., and `Ydiff`.}
+\item{prepared_data}{A data frame returned by \code{\link[=PrepareData]{PrepareData()}}.
+It must contain \code{M1diff}, \code{M1avg}, ..., and \code{Ydiff}.}
 
 \item{paths}{A character vector defining directed paths among mediators
 and from mediators to the outcome. For example:
-`c("M1 -> M2", "M2 -> Y")`.}
+\code{c("M1 -> M2", "M2 -> Y")}.}
 
 \item{MP}{A character vector identifying moderated paths. Supported
-  labels follow the existing wsMed convention:
-  `a1`, `b1`, `d1`, `b_1_2`, `d_1_2`, and `cp`.
+labels follow the existing wsMed convention:
+\code{a1}, \code{b1}, \code{d1}, \code{b_1_2}, \code{d_1_2}, and \code{cp}.
 
 Main effects of W are always labeled and used for conditional intercepts,
 including when a/cp is not explicitly listed in MP.}

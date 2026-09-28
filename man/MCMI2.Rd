@@ -2,7 +2,7 @@
 % Please edit documentation in R/MCMI2.R
 \name{MCMI2}
 \alias{MCMI2}
-\title{Monte Carlo Confidence Intervals for Multiple Imputation SEM Models}
+\title{Monte Carlo confidence intervals for multiple imputation SEM models}
 \usage{
 MCMI2(
   sem_model,
@@ -24,35 +24,37 @@ MCMI2(
 
 \item{imputations}{A list of data frames, where each data frame represents an imputed dataset.}
 
-\item{R}{An integer specifying the number of Monte Carlo samples. Default is `20000L`.}
+\item{R}{An integer specifying the number of Monte Carlo samples. Default is \code{20000L}.}
 
-\item{alpha}{A numeric vector specifying significance levels for the confidence intervals. Default is `c(0.001, 0.01, 0.05)`.}
+\item{alpha}{A numeric vector specifying significance levels for the confidence intervals. Default is \code{c(0.001, 0.01, 0.05)}.}
 
 \item{decomposition}{A character string specifying the decomposition method for the covariance matrix.
-Default is `"eigen"`. Options include `"chol"`, `"eigen"`, or `"svd"`.}
+Default is \code{"eigen"}. Options include \code{"chol"}, \code{"eigen"}, or \code{"svd"}.}
 
-\item{pd}{A logical value indicating whether to ensure positive definiteness of the covariance matrix. Default is `TRUE`.}
+\item{pd}{A logical value indicating whether to ensure positive definiteness of the covariance matrix. Default is \code{TRUE}.}
 
-\item{tol}{A numeric value specifying the tolerance for positive definiteness checks. Default is `1e-06`.}
+\item{tol}{A numeric value specifying the tolerance for positive definiteness checks. Default is \code{1e-06}.}
 
-\item{seed}{An optional integer specifying the random seed for reproducibility. Default is `NULL`.}
+\item{seed}{An optional integer specifying the random seed for reproducibility. Default is \code{NULL}.}
 
-\item{estimator}{A character string specifying the estimator for SEM fitting. Default is `"ML"` (Maximum Likelihood).}
+\item{estimator}{A character string specifying the estimator for SEM fitting. Default is \code{"ML"} (Maximum Likelihood).}
 
-\item{se}{A character string specifying the type of standard errors to compute. Default is `"standard"`.}
+\item{se}{A character string specifying the type of standard errors to compute. Default is \code{"standard"}.}
 
-\item{missing}{A character string specifying the method for handling missing data in SEM fitting. Default is `"listwise"`.}
+\item{missing}{A character string specifying the method for handling missing data in SEM fitting. Default is \code{"listwise"}.}
 
 \item{fixed.x}{Whether exogenous covariates are treated as fixed in every
 imputation. Defaults to FALSE, consistently with wsMed().}
 }
 \value{
-An object of class `semmcci` containing:
-- `call`: The matched function call.
-- `args`: A list of input arguments.
-- `thetahat`: The pooled parameter estimates.
-- `thetahatstar`: Monte Carlo samples for parameter estimates.
-- `fun`: The name of the function (`"MCMI2"`).
+An object of class \code{semmcci} containing:
+\itemize{
+\item \code{call}: The matched function call.
+\item \code{args}: A list of input arguments.
+\item \code{thetahat}: The pooled parameter estimates.
+\item \code{thetahatstar}: Monte Carlo samples for parameter estimates.
+\item \code{fun}: The name of the function (\code{"MCMI2"}).
+}
 }
 \description{
 Computes Monte Carlo confidence intervals (MCCI) for structural equation models (SEM)
@@ -62,14 +64,13 @@ pools the results, and generates confidence intervals through Monte Carlo sampli
 \details{
 This function is designed for SEM models that require multiple imputation to handle missing data.
 It performs the following steps:
-
-- **SEM Fitting**: Fits the specified SEM model to each imputed dataset using [lavaan::sem()].
-
-- **Pooling Results**: Combines parameter estimates and covariance matrices across imputations
+\itemize{
+\item \strong{SEM Fitting}: Fits the specified SEM model to each imputed dataset using \code{\link[lavaan:sem]{lavaan::sem()}}.
+\item \strong{Pooling Results}: Combines parameter estimates and covariance matrices across imputations
 using Rubin's rules.
-
-- **Monte Carlo Sampling**: Generates Monte Carlo samples based on the pooled estimates and covariance matrices,
+\item \strong{Monte Carlo Sampling}: Generates Monte Carlo samples based on the pooled estimates and covariance matrices,
 and calculates confidence intervals for model parameters.
+}
 
 This function supports custom estimators, handling of missing data, and precision adjustments for
 Monte Carlo sampling. It is particularly useful for mediation analysis or complex SEM models
@@ -107,5 +108,5 @@ result <- MCMI2(
 )
 }
 \seealso{
-[lavaan::sem()], [semmcci::MC()], [semmcci::MCStd()]
+\code{\link[lavaan:sem]{lavaan::sem()}}, \code{\link[semmcci:MC]{semmcci::MC()}}, \code{\link[semmcci:MCStd]{semmcci::MCStd()}}
 }

@@ -1,4 +1,4 @@
-#' @title Generate Parallel Mediation Model
+#' @title Generate a parallel mediation model
 #'
 #' @description Dynamically generates a structural equation modeling (SEM) syntax for
 #' parallel mediation analysis based on the prepared dataset. The function computes regression
@@ -66,7 +66,7 @@
 GenerateModelP <- function(prepared_data,
                            MP = character(0)) {
 
-  ## ---------- 识别变量 ----------
+  # Identify variables
   Mdiff_vars <- sort(grep("^M\\d+diff$", colnames(prepared_data), value = TRUE))
   Mavg_vars  <- sort(grep("^M\\d+avg$",  colnames(prepared_data), value = TRUE))
 
@@ -77,7 +77,7 @@ GenerateModelP <- function(prepared_data,
   W_vars          <- grep("^W\\d+$", colnames(prepared_data), value = TRUE)
   interaction_vars <- grep("^int_", colnames(prepared_data), value = TRUE)
 
-  ## ---------- Ydiff 回归 ----------
+  # Regress Ydiff
   y_terms <- c("cp*1")
   for (i in seq_along(Mdiff_vars)) {
     y_terms <- c(y_terms,
@@ -111,7 +111,7 @@ GenerateModelP <- function(prepared_data,
 
   regression_y <- paste("Ydiff ~", paste(unique(y_terms), collapse = " + "))
 
-  ## ---------- 每个 Mdiff 回归 ----------
+  # Regress each mediator difference
   regression_m <- sapply(seq_along(Mdiff_vars), function(i) {
     rhs <- c(paste0("a", i, "*1"))
     if (paste0("a", i) %in% MP && length(W_vars)) {
@@ -125,7 +125,7 @@ GenerateModelP <- function(prepared_data,
   })
   regression_m <- paste(regression_m, collapse = "\n")
 
-  ## ---------- 基础间接效应 ----------
+  # Basic indirect effects
   indirect_effects <- paste(
     sapply(seq_along(Mdiff_vars),
            function(i) paste0("indirect_", i, " := a", i, " * b", i)),

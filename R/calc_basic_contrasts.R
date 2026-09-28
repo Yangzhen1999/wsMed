@@ -1,4 +1,4 @@
-#' @title Basic Contrasts for Indirect Effects and Pre/Post Path Coefficients
+#' @title Basic contrasts for indirect effects and pre/post path coefficients
 #'
 #' @description
 #' `calc_basic_contrasts()` extracts two convenient sets of contrasts from a
@@ -48,7 +48,7 @@ calc_basic_contrasts <- function(mc_result, ci_level=.95, digits=3, point_estima
     out$Estimate <- round(x[1], digits)
     out
   }
-  ## 所有 indirect_* 两两差
+  # Pairwise differences among all indirect_ effects
   ind_cols <- grep("^indirect_",colnames(th_star),value=TRUE)
   ie_diff <- list()
   if (length(ind_cols)>1)
@@ -58,7 +58,7 @@ calc_basic_contrasts <- function(mc_result, ci_level=.95, digits=3, point_estima
         data.frame(Contrast=paste(pair[2]," - ",pair[1]),
                    mc_summary_pct(diff,".",ci_level,digits)[,-1])
     }
-  ## X1/X0  前后测
+  # Condition-specific X1/X0 path coefficients
   b_cols <- grep("^b(_|\\d)",colnames(th_star),value=TRUE)
   X_tbl  <- list()
   for (b in b_cols){
@@ -76,7 +76,7 @@ calc_basic_contrasts <- function(mc_result, ci_level=.95, digits=3, point_estima
 }
 
 
-#' @title Compute Monte Carlo Estimates, Standard Errors, and CIs (with Percent Labels)
+#' @title Compute Monte Carlo estimates, standard errors, and CIs (with percent labels)
 #'
 #' @description
 #' `mc_summary_pct()` summarizes a numeric vector of Monte Carlo samples `x` by

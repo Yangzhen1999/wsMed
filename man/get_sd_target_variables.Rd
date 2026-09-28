@@ -2,7 +2,7 @@
 % Please edit documentation in R/MC_get_sd_target_variables.R
 \name{get_sd_target_variables}
 \alias{get_sd_target_variables}
-\title{Extract Target Variables for Standardization}
+\title{Extract target variables for standardization}
 \usage{
 get_sd_target_variables(fit, definition_map, data)
 }

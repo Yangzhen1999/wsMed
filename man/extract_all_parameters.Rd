@@ -2,7 +2,7 @@
 % Please edit documentation in R/MC_extract_all_parameters.R
 \name{extract_all_parameters}
 \alias{extract_all_parameters}
-\title{Extract All Parameters and Definitions}
+\title{Extract all parameters and definitions}
 \usage{
 extract_all_parameters(fit)
 }

@@ -1,9 +1,9 @@
 # test-GenerateModelCN.R
-# 精细测试高阶路径调节项在 GenerateModelCN 中是否被正确建模且出现在正确方程中
+# Check that interactions are assigned to the correct equations
 
 library(testthat)
 
-# 构造模拟数据
+# Simulated data
 mock_data_cn <- function(W_type = "continuous") {
   dat <- data.frame(
     Ydiff = rnorm(100),
@@ -38,7 +38,7 @@ mock_data_cn <- function(W_type = "continuous") {
   dat
 }
 
-# --- 连续变量下的高阶路径调节项 ---
+# Continuous-moderator interactions
 test_that("High-order moderation with continuous W are in correct equations", {
   dat <- mock_data_cn("continuous")
   mod <- GenerateModelCN(dat, MP = c("b_1_2", "d_1_2", "b_2_3", "d_2_3"))
@@ -56,7 +56,7 @@ test_that("High-order moderation with continuous W are in correct equations", {
   expect_match(m3, "dw_2_3_W1\\*int_M2avg_W1")
 })
 
-# --- 二分类 W 的高阶路径调节 ---
+# Binary-moderator interactions
 test_that("High-order moderation with binary W generates single dummy-based moderation terms", {
   dat <- mock_data_cn("binary")
   mod <- GenerateModelCN(dat, MP = c("b_1_2", "d_2_3"))
@@ -67,7 +67,7 @@ test_that("High-order moderation with binary W generates single dummy-based mode
   expect_false(grepl("dw_2_3_W2", mod))
 })
 
-# --- 三分类 W 的高阶路径调节 ---
+# Three-level moderator interactions
 test_that("High-order moderation with factor W generates two dummy-based moderation terms", {
   dat <- mock_data_cn("factor3")
   mod <- GenerateModelCN(dat, MP = c("b_1_2", "d_2_3"))
@@ -78,7 +78,7 @@ test_that("High-order moderation with factor W generates two dummy-based moderat
   expect_match(mod, "dw_2_3_W2\\*int_M2avg_W2")
 })
 
-# --- 检查是否出现在错误方程（例如 b_1_2 不应出现在 M3） ---
+# Exclude interactions from unrelated mediator equations
 test_that("Moderated terms do not appear in unrelated regression equations", {
   dat <- mock_data_cn("continuous")
   mod <- GenerateModelCN(dat, MP = c("b_1_2", "d_1_2"))
@@ -88,7 +88,7 @@ test_that("Moderated terms do not appear in unrelated regression equations", {
   expect_false(grepl("d_1_2|dw_1_2", m3line))
 })
 
-# --- 间接效应项生成是否正确 ---
+# Check indirect-effect definitions
 test_that("Indirect effects are correctly computed for serial paths", {
   dat <- mock_data_cn("continuous")
   mod <- GenerateModelCN(dat)
@@ -100,7 +100,7 @@ test_that("Indirect effects are correctly computed for serial paths", {
   expect_match(mod, "total_effect := cp \\+ total_indirect")
 })
 
-# --- 主效应W不重复添加 ---
+# Do not duplicate moderator main effects
 test_that("Main effect W is not duplicated when modulation term exists", {
   dat <- mock_data_cn("continuous")
   mod <- GenerateModelCN(dat, MP = c("a2", "cp"))

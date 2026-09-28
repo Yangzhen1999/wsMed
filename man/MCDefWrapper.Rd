@@ -2,7 +2,7 @@
 % Please edit documentation in R/MCDefWrapper.R
 \name{MCDefWrapper}
 \alias{MCDefWrapper}
-\title{Process Monte Carlo Samples for Defined Parameters in SEM}
+\title{Process Monte Carlo samples for defined parameters in SEM}
 \usage{
 MCDefWrapper(object, thetahat, thetahatstar_orig)
 }

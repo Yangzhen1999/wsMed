@@ -2,7 +2,7 @@
 % Please edit documentation in R/MC_generate_mc_samples.R
 \name{generate_mc_samples}
 \alias{generate_mc_samples}
-\title{Generate Monte Carlo Samples}
+\title{Generate Monte Carlo samples}
 \usage{
 generate_mc_samples(fit, resolved_map, R = 20000, seed = NULL)
 }

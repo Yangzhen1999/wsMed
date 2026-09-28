@@ -1,4 +1,4 @@
-#' @title Build Unstandardized Parameter Definitions
+#' @title Build unstandardized parameter definitions
 #'
 #' @description Extracts parameter definition expressions from a fitted model.
 #'

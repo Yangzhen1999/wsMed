@@ -1,4 +1,4 @@
-#' @title Bootstrap Standard Deviations for Standardization
+#' @title Bootstrap standard deviations for standardization
 #'
 #' @description Performs bootstrap sampling to estimate SDs of variables used in standardization.
 #'

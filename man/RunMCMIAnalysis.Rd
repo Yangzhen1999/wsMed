@@ -2,7 +2,7 @@
 % Please edit documentation in R/RunMCMIAnalysis.R
 \name{RunMCMIAnalysis}
 \alias{RunMCMIAnalysis}
-\title{Monte Carlo SEM with Multiple Imputation (WsMed Workflow)}
+\title{Monte Carlo SEM with multiple imputation (wsMed workflow)}
 \usage{
 RunMCMIAnalysis(
   data_missing,
@@ -84,33 +84,33 @@ processed data? Defaults \code{TRUE}.}
 \value{
 A list with three elements:
 \describe{
-  \item{\code{mc_result}}{A \code{semmcci} object returned by
-        \code{MCMI2()}.}
-  \item{\code{first_imputed_data}}{The first processed data frame
-        (useful for inspection or plotting).}
-  \item{\code{imputation_summary}}{Diagnostics from
-        \code{PrepareMissingData()}.}
+\item{\code{mc_result}}{A \code{semmcci} object returned by
+\code{MCMI2()}.}
+\item{\code{first_imputed_data}}{The first processed data frame
+(useful for inspection or plotting).}
+\item{\code{imputation_summary}}{Diagnostics from
+\code{PrepareMissingData()}.}
 }
 }
 \description{
-`RunMCMIAnalysis()` is a helper that:
+\code{RunMCMIAnalysis()} is a helper that:
 \enumerate{
 \item imputes missing data via \code{\link{PrepareMissingData}};
 \item generates all WsMed variables in each completed data set;
 \item fits the user-supplied SEM model to each replicate; and
 \item pools the results via \code{MCMI2()}, producing Monte Carlo
-      confidence intervals (MCCI) for all model parameters.
+confidence intervals (MCCI) for all model parameters.
 }
 }
 \details{
 Internally the function calls:
 \itemize{
-  \item \code{PrepareMissingData()} – performs multiple imputation
-        (\strong{logreg} / \strong{polyreg} for categorical variables,
-        and \code{method_num} for numeric) and applies
-        \code{\link{PrepareData}} to each imputed set;
-  \item \code{MCMI2()} – pools parameter estimates across the
-        \code{m} imputations and draws \code{R} Monte Carlo samples.
+\item \code{PrepareMissingData()} – performs multiple imputation
+(\strong{logreg} / \strong{polyreg} for categorical variables,
+and \code{method_num} for numeric) and applies
+\code{\link{PrepareData}} to each imputed set;
+\item \code{MCMI2()} – pools parameter estimates across the
+\code{m} imputations and draws \code{R} Monte Carlo samples.
 }
 
 Only the missing-data strategy \code{Na = "MI"} is supported.

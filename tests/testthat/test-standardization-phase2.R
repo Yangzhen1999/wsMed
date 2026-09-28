@@ -103,7 +103,7 @@ test_that("stored-draw API, both printing and standardized plotting work", {
   expect_equal(standardize_moderation(out), out$moderation_std)
   saved <- out; saved$moderation_std <- NULL
   expect_equal(standardize_moderation(saved), out$moderation_std)
-  expect_output(print(out), "STANDARDIZED CONDITIONAL EFFECTS")
+  expect_output(print(out, detail = "full"), "STANDARDIZED CONDITIONAL EFFECTS")
   g <- plot_moderation_curve(out, "total_indirect", standardized = TRUE, engine = "boot")
   expect_s3_class(g, "ggplot")
   expect_equal(g$data$Estimate, subset(out$moderation_std$boot$theta_curve, Path == "total_indirect")$Estimate)

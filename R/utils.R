@@ -4,7 +4,7 @@
 #' @keywords internal
 get_safe_ncpus <- function() {
   if (Sys.getenv("_R_CHECK_PACKAGE_NAME_", "") != "") {
-    # 在 R CMD check 环境中强制用 1 核
+    # Use one CPU under R CMD check
     return(1L)
   } else {
     return(min(4L, parallel::detectCores(logical = FALSE)))

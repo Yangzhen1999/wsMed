@@ -1,4 +1,4 @@
-#' @title Impute Missing Data Using Multiple Imputation
+#' @title Impute missing data using multiple imputation
 #'
 #' @description The `ImputeData` function performs multiple imputation on a data frame with missing values using the \code{mice} package. It handles missing data by creating multiple imputed datasets based on a specified imputation method and returns a list of completed data frames.
 #'
@@ -39,13 +39,13 @@ ImputeData <- function(data_missing,
 
 
   if (!is.data.frame(data_missing))
-    stop("Input data must be a data.frame")   # ← 提到最前
+    stop("Input data must be a data.frame")   # Validate the data type first
 
 
   `%||%` <- function(a,b) if (is.null(a)) b else a
   nullfile <- if (.Platform$OS.type == "windows") "NUL" else "/dev/null"
 
-  ## ---- 0 预处理 --------------------------------------------------------
+  # Preprocess the data
   data_missing[data_missing == -999] <- NA
   if (!is.data.frame(data_missing))
     stop("Input data must be a data.frame")
@@ -58,16 +58,16 @@ ImputeData <- function(data_missing,
   if (is.null(predictorMatrix))
     predictorMatrix <- mice::quickpred(data_missing, mincor = 0.10)
 
-  ## ---- 2 method 向量化 -------------------------------------------------
+  # Expand imputation methods to one entry per variable
   if (is.null(method)) {
     method <- vapply(data_missing, function(z) {
       if (is.numeric(z)) {
-        "pmm"                   # 连续变量用 PMM
+        "pmm"                   # Predictive mean matching for continuous variables
       } else if (is.factor(z)) {
         if (nlevels(z) == 2) {
-          "logreg"              # 二分类因子 → 逻辑回归插补
+          "logreg"              # Logistic regression for binary factors
         } else {
-          "polyreg"             # 多分类因子 → 多项逻辑回归插补
+          "polyreg"             # Multinomial logistic regression for factors with more than two levels
         }
       } else {
         stop("Unsupported variable type for imputation: must be numeric or factor.")
@@ -81,7 +81,7 @@ ImputeData <- function(data_missing,
   names(method) <- names(data_missing)
 
 
-  ## ---- 3 完全静音调用 mice ---------------------------------------------
+  # Run mice without console output
   imp <- local({
     zz <- file(nullfile, open = "wt")
     sink(zz)                      # stdout
@@ -99,23 +99,23 @@ ImputeData <- function(data_missing,
           printFlag       = FALSE)))
   })
 
-  ## ---- 4 完全静音 summary(mids) ---------------------------------------
+  # Capture the printed summary of the mids object
   summary_imp <- local({
     zz <- file(nullfile, open = "wt")
     sink(zz)
     sink(zz, type = "message")
     on.exit({ sink(type = "message"); sink(); close(zz) }, add = TRUE)
 
-    summary(imp)        # 返回对象，但所有打印被吞掉
+    summary(imp)        # Return the summary while capturing its printed output
   })
 
-  ## ---- 5 返回 ----------------------------------------------------------
+  # Return results
   imputed_list <- lapply(mice::complete(imp, "all"), as.data.frame)
 
   list(
-    mids              = imp,            # 静默 mids 对象
-    imputed_data_list = imputed_list,   # data.frame 列表
-    summary           = summary_imp     # summary 结果（无控制台输出）
+    mids              = imp,            # Imputation object
+    imputed_data_list = imputed_list,   # List of completed data frames
+    summary           = summary_imp     # Captured summary
   )
 }
 

@@ -2,22 +2,22 @@
 % Please edit documentation in R/MClav_StdRAM2.R
 \name{StdRAM2}
 \alias{StdRAM2}
-\title{Standardize RAM Matrices}
+\title{Standardize RAM matrices}
 \usage{
 StdRAM2(ram_est, roles = NULL)
 }
 \arguments{
-\item{ram_est}{A RAM object list with matrices `A`, `S`, `F`, and `M` as returned by `Lav2RAM2()`.}
+\item{ram_est}{A RAM object list with matrices \code{A}, \code{S}, \code{F}, and \code{M} as returned by \code{Lav2RAM2()}.}
 
 \item{roles}{Internal list of dummy variable names and interaction components.}
 }
 \value{
 A list of standardized RAM matrices:
 \describe{
-  \item{A}{Standardized asymmetric path matrix}
-  \item{S}{Standardized symmetric path matrix}
-  \item{F}{Unchanged filter matrix}
-  \item{M}{Standardized intercept vector}
+\item{A}{Standardized asymmetric path matrix}
+\item{S}{Standardized symmetric path matrix}
+\item{F}{Unchanged filter matrix}
+\item{M}{Standardized intercept vector}
 }
 }
 \description{

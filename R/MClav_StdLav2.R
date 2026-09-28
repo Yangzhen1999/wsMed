@@ -1,4 +1,4 @@
-#' @title Standardize Parameter Estimates in a Lavaan Model
+#' @title Standardize parameter estimates in a lavaan model
 #'
 #' @description Applies full standardization (including intercepts) to a fitted lavaan model
 #' by converting to RAM form, performing standardization, and converting back to lavaan matrix structure.

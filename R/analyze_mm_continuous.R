@@ -1,4 +1,4 @@
-#' @title Summarise Effects with a Continuous Moderator
+#' @title Summarize effects with a continuous moderator
 #'
 #' @description
 #' `analyze_mm_continuous()` summarises Monte Carlo draws from a `semmcci`
@@ -109,11 +109,11 @@ analyze_mm_continuous <- function(mc_result, data, MP,
   extend <- 0.5
   Wc_seq <- seq(min(Wraw, na.rm = TRUE) - extend*sdW, max(Wraw, na.rm = TRUE) + extend*sdW, length.out = n_curve) - center
 
-  ## ---------- 1. 所有调节项 ----------
+  # All moderation terms
   mod_cols <- grep("^(aw|bw|dw|cpw)", colnames(th), value = TRUE)
   mod_cols <- mod_cols[!grepl("_W[2-9]\\d*$", mod_cols)]
 
-  ## ---------- 2. 提取 base 系数 ----------
+  # Extract base coefficients
   mod_coeff <- do.call(rbind, lapply(mod_cols, function(nm) {
     base <- sub("_W\\d+$", "", nm)
     base <- sub("^aw", "a", base)
@@ -132,11 +132,11 @@ analyze_mm_continuous <- function(mc_result, data, MP,
   }))
   mod_coeff <- fix_pct_names(mod_coeff)
 
-  ## ---------- 3. 识别包含 MP 的所有路径 ----------
+  # Identify all paths containing MP
   paths_all <- get_indirect_paths(colnames(th))
   paths <- paths_all
 
-  ## ---------- 4. 分析路径 ----------
+  # Analyze paths
   beta_tbl <- list(); theta_curve <- list()
   path_HML <- list(); path_curve <- list()
 
@@ -179,20 +179,20 @@ analyze_mm_continuous <- function(mc_result, data, MP,
   }
 
   ## ---------- 4-bis. Total effect / Total indirect ----------
-  ## (A) 先准备直接效应和调节项 -------------------------------
+  # Prepare direct effects and moderation terms
   cp_base  <- if ("cp" %in% colnames(th)) th[, "cp"] else 0
   cpw_cols <- grep("^cpw", colnames(th), value = TRUE)
   cpw_sum  <- if (length(cpw_cols))
     rowSums(th[, cpw_cols, drop = FALSE])
   else
-    rep(0, length(cp_base))          # 与 cp_base 等长
+    rep(0, length(cp_base))          # Match the length of cp_base
 
-  ## (B) 计算 Wc_seq 上的采样矩阵 -----------------------------
+  # Compute draws along Wc_seq
   # direct: cp + cpw * w
   direct_mat <- outer(cp_base, rep(1, length(Wc_seq))) +
     outer(cpw_sum,  Wc_seq, `*`)
 
-  # indirect: 对每条路径求乘积，再对路径求和
+  # Multiply coefficients within each indirect path, then sum paths
   ind_mat <- sapply(Wc_seq, function(wc){
     Reduce(`+`, lapply(paths, function(pth){
       Reduce(`*`, lapply(pth$coefs, function(cn){
@@ -208,7 +208,7 @@ analyze_mm_continuous <- function(mc_result, data, MP,
 
   tot_mat <- direct_mat + ind_mat   # total effect
 
-  ## (C) 把整条曲线写入 theta_curve ---------------------------
+  # Store the complete curves in theta_curve
   make_curve_df <- function(mat, label){
     ci <- t(apply(mat[-1, , drop = FALSE], 2, quantile, probs = probs))
     data.frame(
@@ -227,7 +227,7 @@ analyze_mm_continuous <- function(mc_result, data, MP,
   theta_curve[[length(theta_curve)+1]] <- make_curve_df(ind_mat,  "total_indirect")
   theta_curve[[length(theta_curve)+1]] <- make_curve_df(tot_mat,  "total_effect")
 
-  ## (D) 三个典型点（-1SD, 0, +1SD） --------------------------
+  # Probe at minus one SD, the mean, and plus one SD
   overall_tbl <- list()
 
   for (k in seq_along(W_values)) {
@@ -255,10 +255,10 @@ analyze_mm_continuous <- function(mc_result, data, MP,
                  row.names = NULL)
   }
 
-  ## (E) 排序 + 清洗列名 + 显著性 ------------------------------
+  # Sort, clean column names, and mark significance
   overall_tbl <- do.call(rbind, overall_tbl)
 
-  ord <- c("total_indirect", "total_effect")        # ② 排序
+  ord <- c("total_indirect", "total_effect")        # Display order
   overall_tbl <- overall_tbl[
     order(match(overall_tbl$Effect, ord),
           overall_tbl$W_value),]
@@ -266,7 +266,7 @@ analyze_mm_continuous <- function(mc_result, data, MP,
   #conditional_overall <- add_sig(.clean_ci_names(overall_tbl))
 
 
-  ## ---------- 5. 计算单路径 HML ----------
+  # Compute high, mean, and low results for individual paths
   moderated_base <- unique(union(MP, mod_coeff$BaseCoef))
   moderated_base <- intersect(moderated_base, colnames(th))
 
@@ -320,7 +320,7 @@ analyze_mm_continuous <- function(mc_result, data, MP,
 
 
 
-  # ---------- 计算 Indirect Effect Contrasts ----------
+  # Compute indirect-effect contrasts
   IE_contrasts <- NULL
   if (!is.null(beta_out)) {
     IE_contrast_raw <- make_contrasts(beta_out, value_col = "Estimate", contrast_col = "Contrast")
@@ -355,7 +355,7 @@ analyze_mm_continuous <- function(mc_result, data, MP,
     IE_contrasts <- .clean_ci_names(IE_contrasts)
   }
 
-  # ---------- 计算 Path Coefficient Contrasts ----------
+  # Compute path-coefficient contrasts
   path_contrasts <- NULL
   if (!is.null(path_HML)) {
     path_contrast_raw <- make_contrasts(path_HML, value_col = "Estimate", contrast_col = "Contrast")
@@ -398,14 +398,14 @@ analyze_mm_continuous <- function(mc_result, data, MP,
     IE_contrasts        = IE_contrasts,
     path_contrasts      = path_contrasts,
     path_HML          = path_HML,
-    conditional_overall = conditional_overall,   # ★ 新增 ★
+    conditional_overall = conditional_overall,   # Conditional overall effects
     theta_curve       = if (length(theta_curve)) do.call(rbind, theta_curve) else NULL,
     path_curve        = if (length(path_curve))  do.call(rbind, path_curve)  else NULL
   )
 
 }
 
-#' @title Parse All Possible Indirect Paths from Column Names
+#' @title Parse indirect paths from coefficient names
 #'
 #' @description
 #' Infers every unique mediation chain that can be constructed from a set of
@@ -443,12 +443,12 @@ analyze_mm_continuous <- function(mc_result, data, MP,
 #' @keywords internal
 
 get_indirect_paths <- function(col_names) {
-  # 收集路径系数
+  # Collect path coefficients
   a <- grep("^a\\d+$", col_names, value = TRUE)
   b <- grep("^b\\d+$", col_names, value = TRUE)
   b_nm <- grep("^b_\\d+_\\d+$", col_names, value = TRUE)
 
-  # 构建边：X → M#diff（由 a_i），M#diff → M#diff（b_i_j），M#diff → Y（b_i）
+  # Build edges: X to Mdiff (a_i), Mdiff to Mdiff (b_i_j), and Mdiff to Y (b_i)
   edges <- data.frame(src = character(), tgt = character(), label = character())
 
   # X → Mi
@@ -471,10 +471,10 @@ get_indirect_paths <- function(col_names) {
                                      label = bij))
   }
 
-  # 构建图
+  # Build the graph
   graph <- split(edges, edges$src)
 
-  # DFS 查找所有从 X 到 Y 的路径
+  # Enumerate all X-to-Y paths by depth-first search
   dfs <- function(path) {
     last <- tail(path, 1)
     if (last == "Y") return(list(path))
@@ -490,7 +490,7 @@ get_indirect_paths <- function(col_names) {
   raw_paths <- dfs("X")
   if (!length(raw_paths)) return(list())
 
-  # 构建间接路径列表
+  # Construct the indirect-path list
   result <- lapply(raw_paths, function(nodes) {
     coefs <- character()
     mediators <- character()
@@ -508,7 +508,7 @@ get_indirect_paths <- function(col_names) {
     )
   })
 
-  # 去重
+  # Remove duplicates
   result[!duplicated(sapply(result, `[[`, "path_name"))]
 }
 
@@ -546,7 +546,7 @@ add_sig <- function(df) {
   df
 }
 
-#' Fix characters mangled by `make.names()`
+#' Repair percent signs altered by \code{make.names()}
 #' @keywords internal
 fix_pct_names <- function(df) {
   if (is.null(df) || !is.data.frame(df)) return(df)
@@ -565,13 +565,13 @@ fix_pct_names <- function(df) {
     ignore.case = TRUE
   )
 
-  # 找到所有匹配"%CI."结尾且未明确标记Lo/Up的列
+  # Find CI columns ending in %CI without Lo or Up
   ci_cols <- grep("%CI\\.$", names(df))
   if (length(ci_cols) == 2) {
     names(df)[ci_cols[1]] <- sub("%CI\\.$", "%CI.Lo", names(df)[ci_cols[1]])
     names(df)[ci_cols[2]] <- sub("%CI\\.$", "%CI.Up", names(df)[ci_cols[2]])
   } else if (length(ci_cols) == 1) {
-    # 如果只有一个匹配，默认当作Lo
+    # Treat a single matched column as the lower limit
     names(df)[ci_cols] <- sub("%CI\\.$", "%CI.Lo", names(df)[ci_cols])
   }
 
@@ -579,7 +579,7 @@ fix_pct_names <- function(df) {
 }
 
 
-#' make_contrasts
+#' Compare indirect effects across moderator levels
 #' @keywords internal
 make_contrasts <- function(df, value_col = "Estimate", contrast_col = "Contrast") {
   combs <- combn(unique(df$Level), 2, simplify = FALSE)
@@ -607,14 +607,14 @@ make_contrasts <- function(df, value_col = "Estimate", contrast_col = "Contrast"
   })
   out <- do.call(rbind, contrast_list)
 
-  # 加入排序逻辑
+  # Apply sorting rules
   ord <- c("a", "b", "cp", "indirect_effect")
   out$sort_index <- sapply(out$Path, function(x) {
     idx <- which(startsWith(x, ord))
     if (length(idx)) idx else Inf
   })
   out <- out[order(out$sort_index, out$Path), ]
-  out$sort_index <- NULL  # 去掉临时列
+  out$sort_index <- NULL  # Remove the temporary sorting column
 
   out
 }

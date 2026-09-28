@@ -2,7 +2,7 @@
 % Please edit documentation in R/MC_run_mc_mediation.R
 \name{get_all_variables_from_path_map}
 \alias{get_all_variables_from_path_map}
-\title{Extract All Variables Needed for Standardization}
+\title{Extract all variables needed for standardization}
 \usage{
 get_all_variables_from_path_map(path_std_map)
 }

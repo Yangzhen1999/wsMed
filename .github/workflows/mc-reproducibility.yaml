@@ -2,7 +2,7 @@ name: Monte Carlo reproducibility
 on:
   workflow_dispatch:
   push:
-    branches: [fix/mc-reproducibility]
+    branches: [fix/mc-reproducibility, feature/modular-api]
     paths:
       - 'R/**'
       - 'tests/**'
@@ -37,6 +37,8 @@ jobs:
 
   package-tests:
     name: Package tests (${{ matrix.os }}, R-release)
+    env:
+      NOT_CRAN: 'true'
     strategy:
       fail-fast: false
       matrix:

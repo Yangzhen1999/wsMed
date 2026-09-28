@@ -4,7 +4,7 @@ library(knitr)
 
 library(testthat)
 
-# 构造测试数据（含缺失值）
+# Test data with missing values
 set.seed(123)
 test_data <- data.frame(
   A1 = rnorm(100), A2 = rnorm(100),   # M_C1, M_C2
@@ -17,12 +17,12 @@ test_data <- data.frame(
   W_fac3 = factor(sample(c("low", "med", "high"), 100, TRUE))  # W = 3-level
 )
 
-# 人为制造缺失值
+# Introduce missing values
 test_data$A1[1:5] <- NA
 test_data$C2[6:10] <- NA
 test_data$W_fac3[11:15] <- NA
 
-# 测试函数调用模板
+# Shared function call
 run_prepare <- function(W, W_type) {
   PrepareMissingData(
     data_missing = test_data,
@@ -38,35 +38,35 @@ run_prepare <- function(W, W_type) {
   )
 }
 
-# --- T1：检查是否插补完成，且无 NA ---
+# Completed imputations contain no missing values
 test_that("No missing values after PrepareMissingData", {
   pm <- run_prepare("W_cont", "continuous")
   proc <- pm$processed_data_list[[1]]
   expect_false(anyNA(proc))
 })
 
-# --- T2：行数一致性 ---
+# Preserve the number of rows
 test_that("Row count preserved after imputation", {
   pm <- run_prepare("W_cont", "continuous")
   proc <- pm$processed_data_list[[1]]
   expect_equal(nrow(proc), nrow(test_data))
 })
 
-# --- T3：生成 Ydiff / Mdiff / Mavg ---
+# Construct derived variables
 test_that("Ydiff, Mdiff, Mavg are generated", {
   pm <- run_prepare("W_cont", "continuous")
   proc <- pm$processed_data_list[[1]]
   expect_true(all(c("Ydiff", "M1diff", "M1avg") %in% names(proc)))
 })
 
-# --- T4a：连续型 W 的交互项生成 ---
+# Continuous-moderator interactions
 test_that("Continuous W generates centered W and interactions", {
   pm <- run_prepare("W_cont", "continuous")
   proc <- pm$processed_data_list[[1]]
   expect_true(all(c("W1", "int_M1diff_W1", "int_M1avg_W1") %in% names(proc)))
 })
 
-# --- T4b：二分类 W 的 dummy 与交互项 ---
+# Binary-moderator dummy variables and interactions
 test_that("Binary categorical W generates dummy and interactions", {
   pm <- run_prepare("W_bin", "categorical")
   proc <- pm$processed_data_list[[1]]
@@ -77,7 +77,7 @@ test_that("Binary categorical W generates dummy and interactions", {
   expect_true(any(grepl("int_M1avg_", names(proc))))
 })
 
-# --- T4c：三分类 W 的 dummy 与交互项 ---
+# Three-level moderator dummy variables and interactions
 test_that("Three-level categorical W generates 2 dummy and interactions", {
   pm <- run_prepare("W_fac3", "categorical")
   proc <- pm$processed_data_list[[1]]
@@ -89,7 +89,7 @@ test_that("Three-level categorical W generates 2 dummy and interactions", {
   expect_true(any(grepl("int_M1avg_", names(proc))))
 })
 
-# --- T5：控制变量（被试内、被试间）是否生成 ---
+# Within- and between-subject covariates
 test_that("Cw and Cb variables are generated from C_C1/C_C2/C", {
   pm <- run_prepare("W_cont", "continuous")
   proc <- pm$processed_data_list[[1]]

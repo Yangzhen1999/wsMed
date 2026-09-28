@@ -1,4 +1,4 @@
-#' @title Apply Standardization to Parameter Definitions
+#' @title Apply standardization to parameter definitions
 #'
 #' @description Replaces parameters in expressions with their standardized versions.
 #'

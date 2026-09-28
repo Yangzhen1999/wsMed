@@ -1,6 +1,6 @@
 library(testthat)
 
-# 构造测试数据函数
+# Construct test data
 mock_data <- function(include_C = FALSE, W_type = NULL) {
   dat <- data.frame(
     Ydiff    = rnorm(100),
@@ -33,7 +33,7 @@ mock_data <- function(include_C = FALSE, W_type = NULL) {
   dat
 }
 
-# ---------- T1: 无 C 无 W ----------
+# No covariates or moderator
 test_that("T1: No C, No W – baseline model", {
   dat <- mock_data()
   out <- GenerateModelP(dat)
@@ -45,7 +45,7 @@ test_that("T1: No C, No W – baseline model", {
   expect_match(out, "total_effect := cp \\+ total_indirect")
 })
 
-# ---------- T2: 有控制变量 ----------
+# Include covariates
 test_that("T2: Includes Cb and Cw variables", {
   dat <- mock_data(include_C = TRUE)
   out <- GenerateModelP(dat)
@@ -54,7 +54,7 @@ test_that("T2: Includes Cb and Cw variables", {
   expect_match(out, "M1diff ~ .*Cb1.*Cw1diff.*Cw1avg", perl = TRUE)
 })
 
-# ---------- T3a: 连续 W + MP = b1 ----------
+# Continuous moderator with MP = b1
 test_that("T3a: Continuous W with MP = b1", {
   dat <- mock_data(W_type = "continuous")
   out <- GenerateModelP(dat, MP = c("a1","b1" ))
@@ -64,19 +64,19 @@ test_that("T3a: Continuous W with MP = b1", {
   y_line <- strsplit(out, "\n")[[1]][1]
   m1_line <- grep("^M1diff ~", strsplit(out, "\n")[[1]], value = TRUE)
 
-  # 如果 cp 不被调节则主效应保留，否则不应出现
+  # Check the direct-path moderator term
   if (!"cp" %in% c("b1")) {
     expect_true(grepl("cpw_W1*W1", y_line, fixed = TRUE))
   } else {
     expect_true(grepl("cpw_W1*W1", y_line, fixed = TRUE))
   }
 
-  # 如果 a1 未被调节，主效应应存在
+  # Keep the moderator main effect when a1 is not listed
   expect_true(grepl("\\+\\s*(\\w+\\*)?W1", m1_line))
 
 })
 
-# ---------- T3b: 三分类 W + MP = b1, d1, cp ----------
+# Three-level moderator with MP = b1, d1, and cp
 test_that("T3b: Factor W (3-level) with MP = b1, d1, cp", {
   dat <- mock_data(W_type = "factor3")
   out <- GenerateModelP(dat, MP = c("a1", "b1", "d1", "cp"))
@@ -89,7 +89,7 @@ test_that("T3b: Factor W (3-level) with MP = b1, d1, cp", {
   expect_match(out, "cpw_W2\\*W2")
 })
 
-# ---------- T3c: 二分类 W + MP = a1 ----------
+# Binary moderator with MP = a1
 test_that("T3c: Binary W with MP = a1", {
   dat <- mock_data(W_type = "binary")
   out <- GenerateModelP(dat, MP = c("a1"))
@@ -97,6 +97,6 @@ test_that("T3c: Binary W with MP = a1", {
   expect_match(out, "M1diff ~ a1\\*1 \\+ aw1_W1\\*W1")
 
   y_line <- strsplit(out, "\n")[[1]][1]
-  expect_true(grepl("cpw_W1*W1", y_line, fixed = TRUE))  # W1 为主效应在 Ydiff 中
+  expect_true(grepl("cpw_W1*W1", y_line, fixed = TRUE))  # Keep the W1 main effect in the outcome-difference equation
 })
 

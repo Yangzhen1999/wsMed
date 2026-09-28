@@ -30,7 +30,7 @@ mock_data_cp <- function(W_type = "continuous") {
   dat
 }
 
-# --- 基础模型 ---
+# Basic model
 test_that("CP model baseline structure is correct", {
   dat <- mock_data_cp()
   mod <- GenerateModelCP(dat)
@@ -50,11 +50,11 @@ test_that("CP model with continuous moderator and interaction terms", {
 
   expect_match(m2_line, "aw2_W1\\*W1")
   expect_match(m2_line, "bw_1_2_W1\\*int_M1diff_W1")
-  expect_false(grepl(" \\+ W1( |$)", m2_line))  # 不应出现重复主效应项
+  expect_false(grepl(" \\+ W1( |$)", m2_line))  # Do not duplicate main-effect terms
 })
 
 
-# --- 分类 W + 全部路径调节 ---
+# Categorical moderator with all requested moderated paths
 test_that("CP model with factor moderator includes dummy-coded interactions", {
   dat <- mock_data_cp("factor")
   mod <- GenerateModelCP(dat, MP = c("b_1_2", "d_1_2", "a2", "cp"))

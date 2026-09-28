@@ -1,8 +1,8 @@
 ---
-title: "User-defined mediation models with GenerateModelCustom"
+title: "Specifying user-defined mediation models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{User-defined mediation models with GenerateModelCustom}
+  %\VignetteIndexEntry{Specifying user-defined mediation models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -270,7 +270,7 @@ result_custom <- wsMed(
   seed = 123
 )
 
-print(result_custom)
+print(result_custom, detail = "full")
 ```
 
 ## Input requirements

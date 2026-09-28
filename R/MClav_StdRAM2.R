@@ -1,4 +1,4 @@
-#' @title Standardize RAM Matrices
+#' @title Standardize RAM matrices
 #'
 #' @description Performs standardization of RAM matrices by rescaling path and variance structures
 #' using the implied covariance matrix. Intercepts are also standardized.

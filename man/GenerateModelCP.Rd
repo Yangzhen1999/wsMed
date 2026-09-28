@@ -2,7 +2,7 @@
 % Please edit documentation in R/GenerateModelCP.R
 \name{GenerateModelCP}
 \alias{GenerateModelCP}
-\title{Generate Combined Parallel and Chained Mediation Model}
+\title{Generate a serial-parallel mediation model}
 \usage{
 GenerateModelCP(prepared_data, MP = character(0))
 }

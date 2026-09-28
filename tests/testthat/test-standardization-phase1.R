@@ -142,7 +142,7 @@ test_that("public both mode prints raw conditional tables and standardized table
   expect_false(is.null(out$mc$std_mc))
   expect_false(is.null(out$mc$std_boot))
   expect_equal(out$mc$std_mc$Estimate, out$mc$std_boot$est.std)
-  expect_output(print(out), "UNSTANDARDIZED CONDITIONAL EFFECTS")
+  expect_output(print(out, detail = "full"), "UNSTANDARDIZED CONDITIONAL EFFECTS")
 })
 
 test_that("changing measurement units preserves standardized estimates", {
@@ -181,7 +181,7 @@ test_that("unmoderated and FIML models retain intercept and endpoint scales", {
   sy <- sqrt(lavaan::fitted(fit)$cov["Ydiff", "Ydiff"])
   take <- pt$label %in% c("cp", "indirect_1", "indirect_2", "total_indirect", "total_effect")
   expect_equal(out$mc$std_mc$Estimate[take], pt$est[take] / sy, tolerance = 1e-7)
-  expect_output(print(out), "UNSTANDARDIZED CONDITIONAL EFFECTS")
+  expect_output(print(out, detail = "full"), "UNSTANDARDIZED CONDITIONAL EFFECTS")
 })
 
 test_that("public moderated MI forwards fixed.x to pooled fitting", {
@@ -274,5 +274,5 @@ test_that("UD public both mode preserves paths and standardized MC/bootstrap agr
   expect_equal(out$mc$std_mc$Estimate, out$mc$std_boot$est.std)
   expect_equal(out$moderation$mc$conditional_overall$Estimate,
                out$moderation$boot$conditional_overall$Estimate)
-  expect_output(print(out), "UNSTANDARDIZED CONDITIONAL EFFECTS")
+  expect_output(print(out, detail = "full"), "UNSTANDARDIZED CONDITIONAL EFFECTS")
 })

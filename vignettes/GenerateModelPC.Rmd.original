@@ -1,8 +1,8 @@
 ---
-title: "GenerateModelPC"
+title: "Specifying parallel-serial mediation models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{GenerateModelPC}
+  %\VignetteIndexEntry{Specifying parallel-serial mediation models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

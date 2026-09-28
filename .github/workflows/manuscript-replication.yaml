@@ -2,8 +2,11 @@ name: Manuscript replication
 on:
   workflow_dispatch:
   push:
-    branches: [fix/mc-reproducibility]
+    branches: [fix/mc-reproducibility, feature/modular-api]
     paths:
+      - 'R/**'
+      - 'NAMESPACE'
+      - 'DESCRIPTION'
       - '.github/replication/**'
       - '.github/workflows/manuscript-replication.yaml'
 permissions:

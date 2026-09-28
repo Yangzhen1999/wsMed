@@ -2,7 +2,7 @@
 % Please edit documentation in R/totaladjwrapper.R
 \name{TotalAdjwrapper}
 \alias{TotalAdjwrapper}
-\title{Adjusted Total Sampling Covariance Matrix}
+\title{Adjusted total sampling covariance matrix}
 \usage{
 TotalAdjwrapper(ariv, within)
 }
@@ -15,7 +15,7 @@ Covariance within imputations
 \eqn{\mathbf{V}_{\mathrm{within}}}.}
 }
 \description{
-Adjusted Total Sampling Covariance Matrix
+Adjusted total sampling covariance matrix
 }
 \details{
 The adjusted total sampling covariance matrix

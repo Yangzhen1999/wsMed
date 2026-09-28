@@ -22,26 +22,32 @@ navbar:
     articles:
       text: "Tutorials"
       menu:
-        - text: "Using wsMed: A step-by-step tutorial"
+        - text: "One-call and staged workflows"
+          href: articles/ModularWorkflow.html
+        - text: "Diagnostics, reproducibility, and migration"
+          href: articles/WorkflowReliability.html
+        - text: "Using wsMed step by step"
           href: articles/WsMed.html
-        - text: "Plotting effects and contrasts"
+        - text: "Plotting mediation effects and contrasts"
           href: articles/PlottingEffects.html
         - text: "Standardized moderated mediation"
           href: articles/StandardizedModeratedMediation.html
-        - text: "Using printGM() to Generate SEM Models"
+        - text: "Inspecting generated SEM syntax"
           href: articles/printGM.html
-        - text: "Parallel Mediation (P)"
+        - text: "Specifying parallel mediation models"
           href: articles/GenerateModelP.html
-        - text: "Chained Mediation (CN)"
+        - text: "Specifying serial mediation models"
           href: articles/GenerateModelCN.html
-        - text: "Combined Parallel and Chained (CP)"
+        - text: "Specifying serial-parallel mediation models"
           href: articles/GenerateModelCP.html
-        - text: "Parallel + Chained (PC)"
+        - text: "Specifying parallel-serial mediation models"
           href: articles/GenerateModelPC.html
-        - text: "Comparison: MEMORE 3.0 vs wsMed"
+        - text: "Comparing wsMed and MEMORE"
           href: articles/MEMORE_vs_wsMed.html
-        - text: "User-defined mediation models"
+        - text: "Specifying user-defined mediation models"
           href: articles/GenerateModelCustom.html
+        - text: "Working with categorical predictors"
+          href: articles/CategoricalPredictors.html
     news:
       text: "Changelog"
       href: news/index.html
@@ -51,13 +57,24 @@ navbar:
       aria-label: "GitHub Repository"
 
 reference:
-  - title: "Main Functions"
+  - title: "Main functions"
     desc: "Core functions for within-subject mediation analysis"
     contents:
       - wsMed
-      - print.wsMed
       - printGM
-  - title: "Model Generation"
+  - title: "Staged workflow"
+    desc: "Specify, fit, infer, and extract without repeating earlier stages"
+    contents:
+      - wsmed_model
+      - wsmed_fit
+      - wsmed_infer
+      - wsmed_effects
+      - wsmed_contrasts
+      - wsmed_inspect
+      - wsmed_reproducibility
+      - wsmed_methods
+      - wsmed_plots
+  - title: "Model generation"
     desc: "Functions for generating SEM syntax for different mediation structures"
     contents:
       - GenerateModelP
@@ -65,14 +82,14 @@ reference:
       - GenerateModelCP
       - GenerateModelPC
       - GenerateModelCustom
-  - title: "Missing Data and Imputation"
+  - title: "Missing data and imputation"
     desc: "Functions to handle missing data with multiple imputation"
     contents:
       - ImputeData
       - PrepareMissingData
       - MCMI2
       - PrepareData
-  - title: "Standardization and Conditional Effects"
+  - title: "Standardization and conditional effects"
     desc: "Standardize conditional results and visualize effect curves"
     contents:
       - standardize_moderation
@@ -80,3 +97,9 @@ reference:
       - plot_effects
       - plot_conditional_effects
       - plot_contrasts
+  - title: "Data and variable types"
+    desc: "Packaged datasets and supported categorical predictors"
+    contents:
+      - wsmed_examples
+      - example_data
+      - wsmed_categorical

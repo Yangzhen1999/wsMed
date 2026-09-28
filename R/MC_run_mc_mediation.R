@@ -1,4 +1,4 @@
-#' @title Run Monte Carlo-Based Mediation Inference
+#' @title Run Monte Carlo-based mediation inference
 #'
 #' @description Performs Monte Carlo simulation to estimate confidence intervals for both
 #' unstandardized and (optionally) standardized mediation parameters, based on fitted SEM models.
@@ -82,7 +82,7 @@ run_mc_mediation <- function(fit,
 }
 
 
-#' @title Extract All Variables Needed for Standardization
+#' @title Extract all variables needed for standardization
 #'
 #' @description Extracts predictor and outcome variable names from a path standardization map.
 #' @param path_std_map A named list returned by [build_path_std_map()].

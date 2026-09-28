@@ -2,7 +2,7 @@
 % Please edit documentation in R/WSMed.R
 \name{wsMed}
 \alias{wsMed}
-\title{Within-Subject Mediation Analysis (Two-Condition)}
+\title{Analyze two-condition within-subject mediation}
 \usage{
 wsMed(
   data,
@@ -67,14 +67,14 @@ Values are case-insensitive.}
 
 \item{mi_args}{List of MI-specific controls:
 \describe{
-  \item{\code{m}}{Number of imputations. Default 5.}
-  \item{\code{method_num}}{Imputation method for \code{mice()}.}
-  \item{\code{decomposition}}{Covariance-decomposition method
-    (\code{"eigen"}, \code{"chol"}, \code{"svd"}). The default
-    \code{"eigen"} uses the principal symmetric covariance square root;
-    fixed-seed MI draws differ from wsMed 1.1.0.}
-  \item{\code{pd}}{Logical; positive-definiteness check.}
-  \item{\code{tol}}{Tolerance for the positive-definiteness check.}
+\item{\code{m}}{Number of imputations. Default 5.}
+\item{\code{method_num}}{Imputation method for \code{mice()}.}
+\item{\code{decomposition}}{Covariance-decomposition method
+(\code{"eigen"}, \code{"chol"}, \code{"svd"}). The default
+\code{"eigen"} uses the principal symmetric covariance square root;
+fixed-seed MI draws differ from wsMed 1.1.0.}
+\item{\code{pd}}{Logical; positive-definiteness check.}
+\item{\code{tol}}{Tolerance for the positive-definiteness check.}
 }}
 
 \item{R}{Integer; number of Monte Carlo draws. Default \code{20000L}.}
@@ -92,8 +92,8 @@ or \code{"bca.simple"}.}
 Values are case-insensitive. The default (also used for \code{NULL}) is
 \code{"mc"}. With \code{Na = "MI"}, only \code{"mc"} is supported.}
 
-\item{MCmethod}{If \code{Na = "FIML"} and \code{ci_method = "mc"},
-choose \code{"mc"} (default) or \code{"bootSD"}.}
+\item{MCmethod}{NULL or \code{"mc"}. The unimplemented \code{"bootSD"}
+option is rejected explicitly.}
 
 \item{standardized}{Logical; if \code{TRUE}, return standardized parameter
 tables (including defined effects at the reference moderator value).
@@ -111,17 +111,19 @@ Must be \code{NULL} for the predefined model forms.}
 \value{
 An object of class \code{"wsMed"} with elements:
 \describe{
-  \item{data}{Preprocessed data frame.}
-  \item{sem_model}{Generated \pkg{lavaan} syntax.}
-  \item{mc}{List with Monte Carlo draws, bootstrap tables (if any),
-    and the fitted model.}
-  \item{moderation}{Raw conditional or moderated effect tables.}
-  \item{moderation_std}{Standardized conditional tables and curves when
-    standardized=TRUE and a moderator is supplied.}
-  \item{form,Na,alpha}{Analysis settings.}
-  \item{paths}{The user-defined paths when \code{form = "UD"};
-    otherwise \code{NULL}.}
-  \item{input_vars}{Names of all user-supplied variables.}
+\item{data}{Preprocessed data frame.}
+\item{sem_model}{Generated \pkg{lavaan} syntax.}
+\item{mc}{List with Monte Carlo draws, bootstrap tables (if any),
+and the fitted model.}
+\item{moderation}{Raw conditional or moderated effect tables.}
+\item{moderation_std}{Standardized conditional tables and curves when
+standardized=TRUE and a moderator is supplied.}
+\item{form,Na,alpha}{Analysis settings.}
+\item{paths}{The user-defined paths when \code{form = "UD"};
+otherwise \code{NULL}.}
+\item{input_vars}{Names of all user-supplied variables.}
+\item{model,fit,inference}{Structured specification, reusable fit (including
+all imputation fits), and named stored inference objects.}
 }
 }
 \description{
@@ -133,27 +135,28 @@ Monte Carlo confidence intervals.
 \details{
 Model structures:
 \itemize{
-  \item \code{"P"}: parallel mediation
-  \item \code{"CN"}: chained (serial) mediation
-  \item \code{"CP"}: chained then parallel
-  \item \code{"PC"}: parallel then chained
-  \item \code{"UD"}: user-defined mediation model
+\item \code{"P"}: parallel mediation
+\item \code{"CN"}: chained (serial) mediation
+\item \code{"CP"}: chained then parallel
+\item \code{"PC"}: parallel then chained
+\item \code{"UD"}: user-defined mediation model
 }
 
 Missing-data strategies:
 \itemize{
-  \item \code{"DE"}: list-wise deletion
-  \item \code{"FIML"}: full-information maximum likelihood
-  \item \code{"MI"}: multiple imputation via \pkg{mice}
+\item \code{"DE"}: list-wise deletion
+\item \code{"FIML"}: full-information maximum likelihood
+\item \code{"MI"}: multiple imputation via \pkg{mice}
 }
 
 Confidence-interval engines:
 \itemize{
-  \item Bootstrap: percentile, BC, or BCa (DE and FIML only)
-  \item Monte Carlo: draws via \pkg{semmcci} (all \code{Na} options)
+\item Bootstrap: percentile, BC, or BCa (DE and FIML only)
+\item Monte Carlo: draws via \pkg{semmcci} (all \code{Na} options)
 }
-For \code{Na = "FIML"}, you may choose \code{MCmethod = "mc"} (default) or
-\code{"bootSD"} to add a finite-sample SD correction.
+Monte Carlo inference uses the existing joint-parameter sampler. The legacy
+\code{MCmethod = "bootSD"} option was accepted but never applied; it now
+produces an explicit error rather than silently returning ordinary MC results.
 
 Standardization divides differences by their marginal model-implied SDs,
 without recentering them. Dummy variables retain 0/1 units; interaction
@@ -172,6 +175,14 @@ No new population-relative probing or imputation method is implemented here.
 
 Workflow: (1) preprocess -> (2) generate SEM syntax -> (3) fit
 -> (4) compute confidence intervals -> (5) optional: standardize estimates.
+See \link{wsmed_categorical} for supported categorical predictors, reference
+coding, and missing-data restrictions. The empirical manuscript dataset is
+available as \code{\link[=wsmed_examples]{wsmed_examples()}}; \code{\link[=example_data]{example_data()}} is simulated tutorial data.
+
+The one-call interface uses the same fitting and inference engines
+as \code{\link[=wsmed_model]{wsmed_model()}}, \code{\link[=wsmed_fit]{wsmed_fit()}}, and \code{\link[=wsmed_infer]{wsmed_infer()}}. Default printing is
+concise; use \code{print(result, detail = "full")} for the original tables.
+Use \code{\link[=wsmed_effects]{wsmed_effects()}} to query stored draws without rerunning the analysis.
 }
 \examples{
 data("example_data", package = "wsMed")

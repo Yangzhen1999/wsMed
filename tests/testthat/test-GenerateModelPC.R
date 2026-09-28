@@ -35,30 +35,30 @@ mock_data_pc <- function(W_type = "continuous") {
   dat
 }
 
-# 测试连续调节项出现在正确回归方程中
+# Place continuous-moderator interactions in the correct regressions
 test_that("PC model with continuous W generates correct moderated paths", {
   dat <- mock_data_pc("continuous")
   mod <- GenerateModelPC(dat, MP = c("b1", "d2", "cp", "a3", "b_2_1"))
   lines <- strsplit(mod, "\n")[[1]]
 
-  # Ydiff 结构检查
+  # Check the Ydiff equation
   yline <- lines[grepl("^Ydiff ~", lines)]
   expect_match(yline, "cpw_W1\\*W1")
   expect_match(yline, "bw1_W1\\*int_M1diff_W1")
   expect_match(yline, "dw2_W1\\*int_M2avg_W1")
 
-  # M3diff 中检查 aw3
+  # Check aw3 in the M3diff equation
   m3line <- lines[grepl("^M3diff ~", lines)]
   expect_match(m3line, "aw3_W1\\*W1")
 
-  # M1diff 中检查 bw_2_1
+  # Check bw_2_1 in the M1diff equation
   m1line <- lines[grepl("^M1diff ~", lines)]
   expect_match(m1line, "bw_2_1_W1\\*int_M2diff_W1")
 })
 
 
 
-# ---- 二分类 W：调节项命名 ----
+# Binary-moderator interaction names
 test_that("PC model with binary W uses correct dummy interaction names", {
   dat <- mock_data_pc("binary")
   mod <- GenerateModelPC(dat, MP = c("b1", "d2", "b_2_1"))
@@ -69,7 +69,7 @@ test_that("PC model with binary W uses correct dummy interaction names", {
 })
 
 
-# ---- 三分类 W：多 dummy 交互项 ----
+# Three-level moderator with multiple dummy interactions
 test_that("PC model with factor W generates multiple dummy-based moderated paths", {
   dat <- mock_data_pc("factor3")
   mod <- GenerateModelPC(dat, MP = c("b1", "d2", "b_2_1"))

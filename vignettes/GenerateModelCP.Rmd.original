@@ -1,8 +1,8 @@
 ---
-title: "GenerateModelCP"
+title: "Specifying serial-parallel mediation models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{GenerateModelCP}
+  %\VignetteIndexEntry{Specifying serial-parallel mediation models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

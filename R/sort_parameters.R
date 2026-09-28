@@ -1,4 +1,4 @@
-#' @title Sort Parameters for Printing in SEM Output
+#' @title Sort parameters for printing in SEM output
 #' @description Sorts a parameter table by conceptual priority for presentation purposes.
 #' This function is designed to support formatted output of mediation and SEM results
 #' by organizing parameters such as a-paths, b-paths, indirect effects, contrasts, etc.
@@ -30,10 +30,10 @@
 sort_parameters <- function(df) {
   if (!"Parameter" %in% colnames(df)) return(df)
 
-  # 获取参数名
+  # Get parameter names
   param <- df$Parameter
 
-  # 定义排序优先级规则
+  # Define parameter ordering
   priority <- rep(99, length(param))
   priority[grepl("^a\\d+$", param)] <- 1
   priority[grepl("^b\\d+$", param)] <- 2

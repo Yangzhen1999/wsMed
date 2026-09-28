@@ -2,7 +2,7 @@
 % Please edit documentation in R/GenerateModelCN.R
 \name{GenerateModelCN}
 \alias{GenerateModelCN}
-\title{Generate Chained Mediation Model}
+\title{Generate a serial mediation model}
 \usage{
 GenerateModelCN(prepared_data, MP = character(0))
 }

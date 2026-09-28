@@ -13,7 +13,12 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>", cache = FALSE,
                      fig.width = 8, fig.height = 5)
 ```
 
-The four plotting functions return editable `ggplot` objects and retain the
+The `plot()` methods work with fitted models, stored inference, and extracted
+effects. They return editable `ggplot` objects without fitting or drawing new
+samples. The four named plotting helpers remain available for one-call `wsMed`
+objects and preserve their existing stored tables and interval conventions.
+
+The named plotting functions return editable `ggplot` objects and retain the
 plotted estimates and interval limits in `p$data`. Set `standardized = TRUE`
 to use the standardized results already requested during fitting. With
 `ci_method = "both"`, use `engine = "mc"` or `engine = "boot"` consistently.
@@ -47,6 +52,83 @@ categorical <- do.call(wsMed, c(fit_args,
 These separate fits illustrate each plotting interface; changing W from
 continuous to grouped changes the fitted model and is not a transformation
 of the original conditional estimates.
+
+## A consistent plot method
+
+`plot()` uses a forest plot for ordinary effects, a continuous curve for a
+continuous moderator, and category points for a categorical moderator. Specify
+`view` to choose another supported display. `terms` selects effects and their
+order; `labels` changes displayed names.
+
+```{r plot-method}
+plot(plain, terms = c("indirect_2", "indirect_1"),
+     labels = c(indirect_1 = "Via M1", indirect_2 = "Via M2"),
+     title = "Indirect effects")
+plot(continuous, n = 41, scale = "marginal", terms = "indirect_1",
+     title = "Conditional indirect effect", x_label = "W (raw units)", rug = TRUE)
+plot(categorical, at = list(Group = c("C", "A", "B")), ncol = 2,
+     title = "Effects in the selected category order")
+```
+
+An automatic curve uses 51 equally spaced probes by default, from the smallest
+to the largest finite raw moderator value among fitted cases. For MI, the
+first completed dataset defines this range. The caption reports the range and
+number of probes. Curves join those probes; their bands are pointwise intervals,
+not simultaneous bands or exact Johnson--Neyman regions. A forest plot of a
+continuous-moderator model uses the reference value unless `at` is supplied.
+
+`rug = TRUE` marks observed raw moderator values along a curve's horizontal
+axis. It uses fitted cases and excludes missing or imputed moderator values,
+including in MI. It is available when plotting a fitted/inference/one-call
+object, which retains the original data; extracted effects alone do not contain
+the observations. Rug marks describe where data occur, without changing estimates
+or interval widths.
+
+```{r selected-probes}
+plot(continuous, view = "conditional", at = list(W = c(1, 3, 5)),
+     terms = "indirect_1", title = "Effects at three raw W values")
+```
+
+The same methods work after a staged analysis. A fit without inference shows
+point estimates only. Extracting results first is useful for checking exactly
+which estimates and intervals a plot displays:
+
+```{r extraction-first}
+effects <- wsmed_effects(continuous, at = list(W = c(1, 3, 5)),
+                         terms = "indirect_1", scale = "marginal")
+summary(effects)
+p <- plot(effects, view = "conditional", title = "Extracted conditional effects")
+p
+stopifnot(identical(p$data$estimate, as.data.frame(effects)$estimate),
+          identical(p$data$conf.low, as.data.frame(effects)$conf.low))
+```
+
+Extracted results retain only the probes they contain; `plot(effects)` does not
+add a grid. Use `wsmed_effects()` to choose different probes or a different scale.
+`plot(effects, level = .90)` recalculates percentile limits from its stored draws.
+`p$data` retains unrounded values; `estimate`, `conf.low`, and `conf.high` are
+also available in plots produced by the named helpers. Unknown arguments are
+rejected by the plot methods, so a misspelled title is not silently ignored.
+
+The summary uses a coefficient-style numeric table without adding p-values.
+It identifies whether standard errors come from effect draws; summaries of
+fits instead identify the fitted or Rubin-pooled parameter covariance.
+`as.data.frame(effects)` retains the complete table and metadata.
+
+## Interval conventions
+
+`plot()` uses the percentile intervals returned by `wsmed_effects()`, including
+when bootstrap parameter tables were requested with another interval type.
+For a one-call object holding two inference methods, specify
+`plot(result, method = "mc")` or `plot(result, method = "bootstrap")`.
+
+The named helpers preserve legacy behavior: `plot_effects()` uses the stored
+parameter-table limits, including bias-corrected bootstrap limits if requested.
+Conditional and contrast helpers use their stored percentile intervals. The
+subtitle identifies the convention. A difference between a percentile interval
+and a bias-corrected interval is therefore expected; it does not indicate that
+plotting reran the analysis. The helpers continue to accept `engine = "boot"`,
+while the plot methods use `method = "bootstrap"`.
 
 ## Forest plots
 

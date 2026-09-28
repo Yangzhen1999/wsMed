@@ -1,4 +1,4 @@
-#' Matrix of Standard Normal Random Variates
+#' Matrix of standard normal random variates
 #'
 #' @author Ivan Jacob Agaloos Pesigan
 #'

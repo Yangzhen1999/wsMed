@@ -2,7 +2,7 @@
 % Please edit documentation in R/ThetaHatStarWrapper.R
 \name{ThetaHatStarWrapper}
 \alias{ThetaHatStarWrapper}
-\title{Monte Carlo Sampling for Parameter Estimates}
+\title{Monte Carlo sampling for parameter estimates}
 \usage{
 ThetaHatStarWrapper(
   R = 20000L,

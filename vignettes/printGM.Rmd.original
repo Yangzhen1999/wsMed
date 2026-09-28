@@ -1,8 +1,8 @@
 ---
-title: "Demonstration of printGM()"
+title: "Inspecting generated SEM syntax"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Demonstration of printGM()}
+  %\VignetteIndexEntry{Inspecting generated SEM syntax}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

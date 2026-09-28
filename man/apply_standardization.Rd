@@ -2,7 +2,7 @@
 % Please edit documentation in R/MC_apply_standardization.R
 \name{apply_standardization}
 \alias{apply_standardization}
-\title{Apply Standardization to Parameter Definitions}
+\title{Apply standardization to parameter definitions}
 \usage{
 apply_standardization(definitions, std_map, path_std_map = list())
 }

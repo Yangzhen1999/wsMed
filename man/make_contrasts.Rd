@@ -2,11 +2,11 @@
 % Please edit documentation in R/analyze_mm_continuous.R
 \name{make_contrasts}
 \alias{make_contrasts}
-\title{make_contrasts}
+\title{Compare indirect effects across moderator levels}
 \usage{
 make_contrasts(df, value_col = "Estimate", contrast_col = "Contrast")
 }
 \description{
-make_contrasts
+Compare indirect effects across moderator levels
 }
 \keyword{internal}

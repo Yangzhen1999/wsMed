@@ -1,0 +1,197 @@
+---
+title: "Working with categorical predictors"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Working with categorical predictors}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+library(wsMed)
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", cache = FALSE,
+                     fig.width = 7, fig.height = 4)
+```
+
+## Supported variable roles
+
+| Role | Supported representation |
+|:--|:--|
+| Outcome and mediators | Numeric measures analyzed as continuous responses |
+| Within-subject covariates | Paired numeric measures |
+| Between-subject covariates | Numeric measures or unordered factors |
+| Moderator | One numeric measure or one unordered factor with two or more levels |
+
+Categorical support concerns predictors. It does not add binary or ordinal
+outcome models, thresholds, or categorical links. A numerically coded binary
+outcome would still be analyzed as continuous. In the staged interface,
+character predictors and ordered factors must be converted explicitly; use an
+unordered factor only when categories should be treated as nominal.
+
+## Choose the reference category
+
+The simulated `example_data` has 100 complete rows and 14 columns. Its `Group`
+variable is already a factor, originally ordered as `high`, `med`, `low`. These
+are nominal labels in artificial data, not observed subgroups of the manuscript
+dataset. Here we select `low` as the reference.
+
+```{r categories}
+data(example_data)
+dat <- example_data
+dat$Group <- factor(dat$Group, levels = c("low", "med", "high"))
+table(dat$Group)
+levels(dat$Group)
+```
+
+Three categories require two indicators: `W1 = 1` for `med` and `W2 = 1` for
+`high`; both are zero for `low`. Indicators are not centered. Coding uses
+treatment contrasts regardless of the global R contrast option. For a binary
+factor the first level is likewise the reference and one indicator is created.
+
+The staged interface treats numeric 0/1 predictors as continuous. Convert them
+with `factor(x, levels = c(0, 1))` for a categorical interpretation. The one-call
+`wsMed()` interface retains automatic 0/1 detection; explicit factors and
+`W_type = "categorical"` avoid relying on that difference between interfaces.
+
+## Fit categorical moderated mediation
+
+This parallel model has two mediators. Group main effects enter every difference
+equation. `interactions = "A -> Y"` additionally allows the A-to-Y difference
+slope to vary by group. The B-to-Y slope is constant, although the indirect
+effect through B can still vary because its condition effect varies by group.
+
+```{r fit}
+model <- wsmed_model(
+  outcome = c(before = "D1", after = "D2"),
+  mediators = list(A = c(before = "A1", after = "A2"),
+                   B = c(before = "B1", after = "B2")),
+  moderator = list(variable = "Group", main_effects = "all_equations",
+                   interactions = "A -> Y"))
+fit <- wsmed_fit(model, dat)
+inference <- wsmed_infer(fit, draws = 2000, seed = 604)
+fit
+```
+
+The tutorial uses 2,000 Monte Carlo draws for speed; the package default is
+20,000. Inspect the coding before interpreting coefficients:
+
+```{r coding}
+prepared <- wsmed_inspect(fit, "data")
+unique(prepared[c("Group", "W1", "W2")])
+attr(prepared, "W_info")
+```
+
+In the mapping, `low vs med` means an indicator equal to one for `med` and zero
+for `low`; its coefficient is **med minus low**. Use `relevel(dat$Group,
+ref = "high")` before fitting to choose a different reference.
+
+## Conditional effects and group differences
+
+Queries use factor labels, not indicator numbers. With `at` omitted, all levels
+are returned. Specify labels explicitly when their order matters.
+
+```{r effects}
+effects <- wsmed_effects(inference,
+                         at = list(Group = c("low", "med", "high")))
+effects
+plot(effects, title = "Conditional effects by group", ncol = 2)
+```
+
+The plot retains `low`, `med`, `high` on the category axis, in the requested
+order. Use `view = "forest"` to display the same values as horizontal intervals.
+
+Compare the indirect effect through A between `high` and `low` by assigning
+weights to the corresponding effect identifiers. The contrast uses matched
+joint draws, so its interval includes covariance between the two effects.
+
+```{r contrasts}
+tab <- as.data.frame(effects)
+selected <- tab$effect == "indirect_1" & tab$at %in% c("low", "high")
+weights <- setNames(ifelse(tab$at[selected] == "high", 1, -1),
+                    tab$term[selected])
+difference <- wsmed_contrasts(effects, list(high_minus_low = weights))
+difference
+plot(difference)
+```
+
+The effect intervals in the group plot are pointwise. Their overlap is not a
+test of equality; use the contrast interval to assess the difference.
+
+```{r standardized}
+standardized <- wsmed_effects(inference, scale = "marginal",
+                              at = list(Group = c("low", "med", "high")))
+standardized
+```
+
+Marginal standardization divides conditional indirect effects by the common
+model-implied SD of the outcome difference. It does not divide by a different
+within-group SD for each category. Factor labels and indicator coding remain
+fixed, while coefficients and the common SD vary together across simulation
+draws. See the [standardization tutorial](StandardizedModeratedMediation.html).
+
+## The same analysis in one call
+
+`wsMed()` remains available. The staged model above corresponds to moderator
+main effects on `a1`, `a2`, and `cp`, plus the `b1` interaction:
+
+```{r one-call}
+one_call <- wsMed(dat,
+  M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"),
+  Y_C1 = "D1", Y_C2 = "D2", form = "P",
+  W = "Group", W_type = "categorical", MP = c("a1", "a2", "cp", "b1"),
+  R = 2000, seed = 604)
+wsmed_effects(one_call, at = list(Group = c("low", "med", "high")))
+one_call_effects <- wsmed_effects(one_call,
+  at = list(Group = c("low", "med", "high")))
+stopifnot(isTRUE(all.equal(coef(one_call_effects), coef(effects))),
+          isTRUE(all.equal(one_call_effects$draws, effects$draws)))
+```
+
+## Categorical covariates
+
+A categorical between-subject covariate uses the same reference coding. This
+separate example adjusts for `Group` without treating it as a moderator:
+
+```{r covariates}
+adjusted_model <- wsmed_model(
+  outcome = c(before = "D1", after = "D2"),
+  mediators = list(A = c(before = "A1", after = "A2")),
+  covariates = list(between = "Group"))
+adjusted_fit <- wsmed_fit(adjusted_model, dat)
+attr(wsmed_inspect(adjusted_fit, "data"), "C_info")
+```
+
+## Missing categorical predictors
+
+`wsmed_fit()` defaults to `missing = "error"`. Listwise deletion is available,
+but can discard otherwise useful measurements. FIML can be used when categorical
+predictors are fully observed; missing categorical predictors are unsupported
+and rejected by the staged interface. Apply the same restriction in one-call
+analyses.
+
+For multiple imputation, impute raw variables before computing dummy indicators
+and interactions. The following deliberately introduces missingness into the
+simulated data. In the staged interface, `mi$method` selects the method for
+numeric variables (here PMM). Binary factors automatically use logistic
+regression; factors with more than two levels use multinomial logistic
+regression. This setting differs from the lower-level `ImputeData()` interface.
+
+```{r missing}
+incomplete <- dat
+incomplete$Group[c(3, 18, 37, 68, 89)] <- NA
+incomplete$A2[c(8, 25, 43)] <- NA
+mi_fit <- wsmed_fit(model, incomplete, missing = "mi",
+  mi = list(m = 5, method = "pmm", seed = 123))
+mi_inference <- wsmed_infer(mi_fit, method = "mc", draws = 2000, seed = 604)
+wsmed_effects(mi_inference, at = list(Group = c("low", "med", "high")))
+```
+
+```{r verify-imputation, include=FALSE}
+stopifnot(mi_fit$mi$prepared$mids$method[["Group"]] == "polyreg",
+          mi_fit$mi$prepared$mids$method[["A2"]] == "pmm")
+```
+
+Imputation and inference have separate seeds. Five imputations keep this example
+small; choose the number and imputation model for the actual analysis. MI with
+bootstrap inference is not implemented. For MI, the package retains the current
+per-imputation centering and first-imputation reporting reference.

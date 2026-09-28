@@ -2,7 +2,13 @@
 # From the repository root: source("rebuild_vignettes.R"); rebuild_vignettes()
 # Or: Rscript rebuild_vignettes.R [package_root] [output_directory]
 # A separate output directory permits validation without updating frozen files.
-rebuild_vignettes <- function(root = getwd(), output_dir = file.path(root, "vignettes")) {
+# Use articles = "ModularWorkflow" to rebuild only the staged-workflow tutorial.
+# Use articles = "CategoricalPredictors" to rebuild the categorical examples.
+# Use articles = "WorkflowReliability" for diagnostics, manifests, and migration.
+# Edit executable sources as .Rmd temporarily, then restore .Rmd.original before
+# running this helper. Frozen .Rmd files are generated output, not source files.
+rebuild_vignettes <- function(root = getwd(), output_dir = file.path(root, "vignettes"),
+                             articles = NULL) {
   root <- normalizePath(root, winslash = "/", mustWork = TRUE)
   description <- file.path(root, "DESCRIPTION")
   if (!file.exists(description) || read.dcf(description)[1, "Package"] != "wsMed") {
@@ -14,6 +20,14 @@ rebuild_vignettes <- function(root = getwd(), output_dir = file.path(root, "vign
   inputs <- sort(list.files(file.path(root, "vignettes"),
                             pattern = "\\.Rmd\\.original$", full.names = TRUE))
   if (!length(inputs)) stop("No .Rmd.original vignette sources found.")
+  if (!is.null(articles)) {
+    available <- sub("\\.Rmd\\.original$", "", basename(inputs))
+    if (!is.character(articles) || !length(articles) || anyNA(articles) ||
+        anyDuplicated(articles) || any(!articles %in% available)) {
+      stop("articles must name existing .Rmd.original sources without extensions.")
+    }
+    inputs <- inputs[match(articles, available)]
+  }
   dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
   output_dir <- normalizePath(output_dir, winslash = "/", mustWork = TRUE)
   old_wd <- getwd()
