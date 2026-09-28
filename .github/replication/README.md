@@ -12,6 +12,10 @@ Two profiles are compared on Windows, Linux, and macOS:
   is not a byte-for-byte recreation of the full historical environment.
 - `current-cran`: current R-release and currently available CRAN dependencies.
 
+Only required analysis dependencies are installed. Suggested documentation/
+development tools are not needed to source the examples; current rmarkdown
+requires a newer knitr than the historical reference version.
+
 The analysis settings and calls are retained from the local candidate script.
 Warnings and invalid standardized draws are recorded, not suppressed. Each
 run exports numerical imputation values, pooled means/covariances, the first

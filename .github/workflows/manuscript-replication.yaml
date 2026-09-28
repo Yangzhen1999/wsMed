@@ -35,6 +35,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         if: matrix.profile == 'reference-core'
         with:
+          dependencies: '"hard"'
           extra-packages: |
             local::.
             any::jsonlite
@@ -49,6 +50,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         if: matrix.profile == 'current-cran'
         with:
+          dependencies: '"hard"'
           extra-packages: any::haven, any::jsonlite, local::.
       - name: Reproduce all manuscript examples
         run: Rscript .github/replication/run.R
