@@ -73,6 +73,8 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: replication-artifacts
+      - name: Test comparison and manuscript mapping
+        run: python -m unittest discover -s .github/replication -p 'test_*.py'
       - name: Compare environments and manuscript tables
         run: python .github/replication/compare.py replication-artifacts replication-comparison
       - uses: actions/upload-artifact@v4

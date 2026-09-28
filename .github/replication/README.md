@@ -25,12 +25,24 @@ Cross-platform comparisons distinguish upstream fitting differences from
 downstream Monte Carlo differences. Figures are rendered, but their bitmap
 or PDF bytes are not used as a cross-platform numerical equality criterion.
 
-`compare.py` checks all 812 table rows between environments, compares to the
-local candidate reference, and maps 86 manuscript rows using the historical
-verification manifest. It fails on missing runs or within-profile numeric/
-label differences. Whitespace and signed-zero display differences are
-reported separately. Between-profile and original-paper differences are
-reported without automatically declaring the changed numerical method wrong.
+`compare.py` checks every current table row between environments and maps 86
+manuscript rows using the historical verification manifest. Rows are matched
+by model, table header/scale occurrence, and parameter or probe labels, not
+absolute line numbers. The original 812-row submission and local candidate
+remain unchanged; the covariance correction adds auxiliary parameters (820
+current rows). Added, removed, and changed rows are reported separately.
+
+Each run also prints the tables to ten decimal places for numerical comparison.
+Within-profile differences fail if they exceed
+`max(1e-5, 1e-5 * max(abs(left), abs(right)))` (Python `math.isclose`).
+This allows small optimizer differences across platforms without treating a
+three-decimal rounding boundary as a statistical discrepancy. All differences
+in the ordinary three-decimal output are still reported. Missing environments,
+missing precise output, missing manuscript rows, ambiguous row identities, and
+within-profile label/structure differences fail. Between-profile and original-
+paper differences are reported without automatically declaring the changed
+numerical method wrong. Comparison tests inject missing rows, genuine numerical
+changes, and display-only differences to verify these checks.
 
 ## Data attribution
 

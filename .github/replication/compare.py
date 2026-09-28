@@ -5,12 +5,13 @@ import json
 from pathlib import Path
 import re
 import sys
+from table_comparison import (ABS_TOL, REL_TOL, case_rows, index_rows,
+                              numerically_equal, signature)
 
 inputs = Path(__file__).resolve().parent
 source, output = map(Path, sys.argv[1:3])
 output.mkdir(parents=True, exist_ok=True)
 partial = "--allow-partial" in sys.argv
-number = re.compile(r"^-?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$")
 
 
 def compact(x):
@@ -19,15 +20,6 @@ def compact(x):
 
 def cells(row):
     return [compact(c) for c in row.strip()[1:-1].split("|")]
-
-
-def table_rows(lines):
-    return [x for x in lines if x.startswith("|")]
-
-
-def signature(row):
-    # Signed zero is numerically equal; the raw text is retained separately.
-    return [float(x) if number.fullmatch(x) else x for x in cells(row)]
 
 
 def distance(a, b):
@@ -56,6 +48,9 @@ def write_csv(name, rows):
 
 cases = {p.parent.name: json.loads(p.read_text(encoding="utf-8-sig"))
          for p in source.glob("*/snapshot.json")}
+for name, case in cases.items():
+    if set(case["fits"]) != {"example1", "example2_pc", "example2_ud", "example3"}:
+        raise RuntimeError(f"Missing or unexpected fitted models: {name}")
 expected = {f"{profile}-{os}-latest"
             for profile in ("reference-core", "current-cran")
             for os in ("ubuntu", "windows", "macos")}
@@ -63,10 +58,15 @@ missing = sorted(expected - set(cases))
 stages = ("imputations", "pooled_mean", "pooled_covariance", "mc_preview",
           "parameter_tables", "conditional_tables", "standardization_diagnostics")
 stage_comparisons, table_comparisons, changed_rows = [], [], []
-
-
-def flattened_tables(case):
-    return [row for fit in case["fits"].values() for row in table_rows(fit["printed"])]
+numerical_comparisons, numerical_failures = [], []
+indexed = {name: index_rows(*case_rows(case))[0] for name, case in cases.items()}
+missing_precision = [name for name, case in cases.items()
+                     if any("printed_precise" not in fit for fit in case["fits"].values())]
+precise = {name: index_rows(*case_rows(case, "printed_precise"))[0]
+           for name, case in cases.items() if name not in missing_precision}
+for name, rows in precise.items():
+    if rows.keys() != indexed[name].keys():
+        raise RuntimeError(f"Normal and precise table identities differ: {name}")
 
 
 for left, right in itertools.combinations(sorted(cases), 2):
@@ -78,11 +78,15 @@ for left, right in itertools.combinations(sorted(cases), 2):
             stage_comparisons.append(dict(left=left, right=right, same_profile=same_profile,
                 example=name, stage=stage, max_absolute_difference=delta,
                 structural_or_text_mismatches=structure))
-    ar, br = flattened_tables(a), flattened_tables(b)
-    count = abs(len(ar) - len(br))
+    ar, br = indexed[left], indexed[right]
+    count = len(ar.keys() ^ br.keys())
     text_count = count
     max_delta = 0
-    for i, (x, y) in enumerate(zip(ar, br), 1):
+    for key in sorted(ar.keys() | br.keys()):
+        x, y = ar.get(key), br.get(key)
+        if x is None or y is None:
+            changed_rows.append(dict(left=left, right=right, row=str(key), left_row=x, right_row=y))
+            continue
         sx, sy = signature(x), signature(y)
         delta, structure = distance(sx, sy)
         different = sx != sy
@@ -90,13 +94,22 @@ for left, right in itertools.combinations(sorted(cases), 2):
         text_count += compact(x) != compact(y)
         max_delta = max(max_delta, delta)
         if different:
-            changed_rows.append(dict(left=left, right=right, row=i, left_row=x, right_row=y))
+            changed_rows.append(dict(left=left, right=right, row=str(key), left_row=x, right_row=y))
     table_comparisons.append(dict(left=left, right=right, same_profile=same_profile,
         left_rows=len(ar), right_rows=len(br), changed_numeric_or_label_rows=count,
         changed_text_rows=text_count, max_displayed_numeric_difference=max_delta))
+    if left in precise and right in precise:
+        pa, pb = precise[left], precise[right]
+        failed = [key for key in sorted(pa.keys() | pb.keys())
+                  if key not in pa or key not in pb or not numerically_equal(pa[key], pb[key])]
+        numerical_comparisons.append(dict(left=left, right=right, same_profile=same_profile,
+            mismatched_rows=len(failed)))
+        numerical_failures.extend(dict(left=left, right=right, same_profile=same_profile,
+            row=str(key), left_row=pa.get(key), right_row=pb.get(key)) for key in failed)
 
 # Map each manuscript row to the verified historical table, then compare the
-# same indexed row in new runs. Mapping is checked rather than guessed by label.
+# same semantic row in new runs. Mapping is checked rather than guessed by label
+# or assumed to remain at the same line after a model changes its parameters.
 old_lines = (inputs / "submitted-results.txt").read_text(encoding="utf-8-sig").splitlines()
 old_rows, locations = [], []
 example, custom = None, False
@@ -107,6 +120,9 @@ for line in old_lines:
     if line.startswith("|"):
         old_rows.append(line)
         locations.append((example, custom))
+contexts = ["example2_ud" if custom else "example2_pc" if example == 2
+            else f"example{example}" for example, custom in locations]
+_, historical_keys = index_rows(old_rows, contexts)
 with (inputs / "manuscript-rows.csv").open(encoding="utf-8-sig") as f:
     manuscript = list(csv.DictReader(f))
 mapping = []
@@ -130,31 +146,43 @@ paper_rows, local_rows = [], []
 local = (inputs / "candidate-tables.txt").read_text(encoding="utf-8").splitlines()
 if len(local) != len(old_rows):
     raise RuntimeError("Historical and local candidate table structures differ")
+local_index, _ = index_rows(local, contexts)
 for name, case in sorted(cases.items()):
-    rows = flattened_tables(case)
-    if len(rows) != len(old_rows):
-        raise RuntimeError(f"Changed output structure for {name}: {len(rows)} rows")
+    rows = indexed[name]
+    shared = local_index.keys() & rows.keys()
     local_rows.append(dict(environment=name, rows=len(rows),
-        changed_vs_local_candidate=sum(signature(a) != signature(b) for a, b in zip(local, rows))))
+        added_rows=len(rows.keys() - local_index.keys()),
+        removed_rows=len(local_index.keys() - rows.keys()),
+        changed_vs_local_candidate=sum(signature(local_index[k]) != signature(rows[k]) for k in shared)))
     for item, i in mapping:
-        delta, structure = distance(signature(old_rows[i]), signature(rows[i]))
+        key = historical_keys[i]
+        if key not in rows:
+            raise RuntimeError(f"Missing manuscript row for {name}: {key}")
+        current = rows[key]
+        delta, structure = distance(signature(old_rows[i]), signature(current))
         paper_rows.append(dict(environment=name, example=item["example"],
             manuscript_file=item["manuscript_file"], line=item["line"], label=item["label"],
-            old_row=old_rows[i], new_row=rows[i],
-            max_displayed_numeric_difference=delta, changed=signature(old_rows[i]) != signature(rows[i])))
+            old_row=old_rows[i], new_row=current,
+            max_displayed_numeric_difference=delta, changed=signature(old_rows[i]) != signature(current)))
 
 write_csv("stage-comparisons.csv", stage_comparisons)
 write_csv("table-comparisons.csv", table_comparisons)
 write_csv("changed-table-rows.csv", changed_rows)
 write_csv("manuscript-comparisons.csv", paper_rows)
 write_csv("local-candidate-comparisons.csv", local_rows)
+write_csv("numerical-comparisons.csv", numerical_comparisons)
+write_csv("numerical-failures.csv", numerical_failures)
 summary = dict(completed_environments=sorted(cases), missing_environments=missing,
+    missing_precision=missing_precision,
+    numerical_tolerance=dict(absolute=ABS_TOL, relative=REL_TOL, printed_digits=10),
     manuscript_rows_mapped=len(mapping),
     same_profile_table_mismatches=[x for x in table_comparisons
                                   if x["same_profile"] and x["changed_numeric_or_label_rows"]],
+    same_profile_numerical_failures=[x for x in numerical_comparisons
+                                    if x["same_profile"] and x["mismatched_rows"]],
     comparisons=table_comparisons, local_reference=local_rows,
     warnings={k: v["environment"]["warnings"] for k, v in cases.items()})
 (output / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
 print(json.dumps(summary, indent=2))
-if (missing and not partial) or summary["same_profile_table_mismatches"]:
-    raise SystemExit("Replication comparison detected missing runs or cross-platform table differences.")
+if (missing and not partial) or missing_precision or summary["same_profile_numerical_failures"]:
+    raise SystemExit("Replication comparison detected missing runs/precision or cross-platform numerical differences.")
