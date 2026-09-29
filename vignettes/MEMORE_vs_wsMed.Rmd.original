@@ -50,7 +50,7 @@ result1 <- wsMed(
   standardized = TRUE,
   Na = "DE", ci_method = "mc", R = 5000, seed = 123
 )
-print(result1,digits=4, detail = "full")
+print(result1,digits=4, detail = "legacy")
 printGM(result1)
 ```
 
@@ -79,6 +79,6 @@ result2 <- wsMed(
   standardized = TRUE,
   Na = "DE", ci_method = "mc", R = 5000, seed = 123
 )
-print(result2,digits=4, detail = "full")
+print(result2,digits=4, detail = "legacy")
 printGM(result2)
 ```

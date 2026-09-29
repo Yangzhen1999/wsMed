@@ -27,7 +27,7 @@ test_that("all interval entry points retain the selected level by default", {
     expect_equal(confint(object, level = .80), confint(r, level = .80))
     expect_equal(unname(confint(object)[, 1]),
       unname(apply(i$draws[, names(coef(i)), drop = FALSE], 2, quantile, .05)))
-    e <- summary(object)
+    e <- summary(object, type = "indirect")
     p <- plot(object, at = list(D3 = i$fit$reference$by_dataset[[1]]$moderator$center))
     expect_equal(p$data$conf.low, unname(confint(e)[, 1]))
     expect_equal(summary(e, level = NULL), e)

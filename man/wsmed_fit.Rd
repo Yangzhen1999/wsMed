@@ -10,7 +10,8 @@ wsmed_fit(
   missing = c("error", "listwise", "fiml", "mi"),
   mi = list(),
   fixed.x = FALSE,
-  verbose = FALSE
+  verbose = FALSE,
+  standardized = FALSE
 )
 }
 \arguments{
@@ -28,6 +29,9 @@ Omit method and seed with completed data. Inference has its own seed.}
 \item{fixed.x}{Whether exogenous moments are fixed in the SEM.}
 
 \item{verbose}{Show progress messages.}
+
+\item{standardized}{Logical default for effect extraction, summaries and plots.
+Does not change model fitting; inference inherits this setting.}
 }
 \value{
 A \code{wsmed_fit} containing all fits and pooled estimates for MI.

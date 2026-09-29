@@ -107,6 +107,8 @@ wsmed_model <- function(outcome, mediators, conditions = names(outcome),
 #' Omit method and seed with completed data. Inference has its own seed.
 #' @param fixed.x Whether exogenous moments are fixed in the SEM.
 #' @param verbose Show progress messages.
+#' @param standardized Logical default for effect extraction, summaries and plots.
+#'   Does not change model fitting; inference inherits this setting.
 #' @return A `wsmed_fit` containing all fits and pooled estimates for MI.
 #' @details This release preserves the existing per-imputation centering and
 #' first-imputation reporting reference. It does not implement MI-bootstrap.
@@ -136,7 +138,8 @@ wsmed_model <- function(outcome, mediators, conditions = names(outcome),
 #' @md
 #' @export
 wsmed_fit <- function(model, data, missing = c("error", "listwise", "fiml", "mi"),
-                       mi = list(), fixed.x = FALSE, verbose = FALSE) {
+                       mi = list(), fixed.x = FALSE, verbose = FALSE, standardized = FALSE) {
+  .wsmed_scale(NULL, standardized = standardized)
   if (!inherits(model, "wsmed_model")) stop("model must be a wsmed_model.")
   missing <- match.arg(missing)
   if (!is.data.frame(data) || !nrow(data) || anyDuplicated(names(data)))
@@ -188,6 +191,7 @@ wsmed_fit <- function(model, data, missing = c("error", "listwise", "fiml", "mi"
       completed = ctrl$completed,
       engine = if (!is.null(ctrl$completed)) "external" else "mice"), fixed.x, verbose),
     preserve = Na != "MI" || !is.null(ctrl$seed) || !is.null(ctrl$completed))
+  fit$standardized <- standardized
   fit$call <- match.call()
   fit
 }

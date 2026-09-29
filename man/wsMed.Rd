@@ -106,7 +106,10 @@ option is rejected explicitly.}
 \item{standardized}{Logical; if \code{TRUE}, return standardized parameter
 tables (including defined effects at the reference moderator value).
 Raw conditional results remain in moderation; standardized conditional
-tables and curves are added in moderation_std. Default FALSE.}
+tables and curves are added in moderation_std. Default FALSE. This choice
+is saved as the default for print, summary, wsmed_effects and generic plot;
+standardized = TRUE or FALSE on those methods overrides it for one query.
+Raw fitting parameters remain available through coef and vcov.}
 
 \item{verbose}{Logical; print progress messages.}
 

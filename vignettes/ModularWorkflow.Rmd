@@ -13,8 +13,10 @@ vignette: >
 
 `wsMed()` specifies, fits, and performs inference in one call. It uses the same
 engines as the staged interface below. Existing arguments and result fields
-remain available. Default printing gives an overview; `summary()` returns
-selected effects, and `print(result, detail = "full")` prints the original tables.
+remain available. Default printing shows the core effect report;
+`print(result, detail = "full")` also displays path coefficients.
+`summary()` creates a structured statistical summary with full-precision tables.
+`print(result, detail = "legacy")` retains the original stored report.
 
 
 ``` r
@@ -24,23 +26,201 @@ result <- wsMed(example_data,
   Y_C1 = "D1", Y_C2 = "D2", R = 2000, seed = 123)
 result
 #> wsMed analysis
-#> wsMed fit: P | DE | 1 fitted dataset(s)
-#> Observations: 100 of 100 input rows
-#> Converged: 1 of 1 
+#> Model: P | DE | Observations: 100 
+#> Effects:
+#> wsMed all | raw scale | mc 
+#> 95% percentile intervals; 2000 joint draws; SE from effect draws
 #> Condition contrast: C2 - C1 
-#> Post-fit admissibility: 1 of 1 ; excluded rows: 0 
-#> Stored inference: mc 
-#> Use summary() for effects; print(detail = 'full') for all legacy tables.
+#>                                        Estimate Std. Error  CI lower  CI upper
+#> cp: Direct effect                     -0.031795   0.017108 -0.064335  0.002990
+#> indirect_1: M1                         0.001311   0.003103 -0.004881  0.008066
+#> indirect_2: M2                        -0.001120   0.002563 -0.007323  0.003114
+#> total_indirect: Total indirect effect  0.000191   0.004044 -0.008220  0.007948
+#> total: Total effect                   -0.031604   0.016950 -0.063912  0.001889
+#> Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.
+#> Use as.data.frame() for the full-precision table and metadata.
+#> Post-fit admissibility: 1 of 1 ; excluded rows: 0
 summary(result)
+#> wsMed statistical summary
+#> Model: P | Missing: DE | Observations: 100 
+#> Effects:
+#> wsMed all | raw scale | mc 
+#> 95% percentile intervals; 2000 joint draws; SE from effect draws
+#> Condition contrast: C2 - C1 
+#>                                        Estimate Std. Error  CI lower  CI upper
+#> cp: Direct effect                     -0.031795   0.017108 -0.064335  0.002990
+#> indirect_1: M1                         0.001311   0.003103 -0.004881  0.008066
+#> indirect_2: M2                        -0.001120   0.002563 -0.007323  0.003114
+#> total_indirect: Total indirect effect  0.000191   0.004044 -0.008220  0.007948
+#> total: Total effect                   -0.031604   0.016950 -0.063912  0.001889
+#> Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.
+#> Use as.data.frame() for the full-precision table and metadata.
+#> 
+#> Path coefficients:
+#>    Estimate Std. Error CI lower CI upper
+#> cp -0.03180    0.01711 -0.06434  0.00299
+#> b1 -0.04834    0.09415 -0.23465  0.14198
+#> d1 -0.06905    0.09517 -0.25340  0.12149
+#> b2 -0.07732    0.09295 -0.25608  0.10887
+#> d2 -0.03676    0.08669 -0.21014  0.12946
+#> a1 -0.02712    0.01764 -0.06014  0.00789
+#> a2  0.01448    0.01791 -0.02054  0.04971
+#> Post-fit admissibility: 1 of 1 ; excluded rows: 0 
+#> Tables: $effects, $coefficients; analysis settings: $info.
+```
+
+## Read reports or extract tables
+
+The same effect calculations power both outputs. `print()` is for reading a
+report; `summary()` returns a structured object whose display uses ordinary R
+coefficient tables. The default summary includes the direct effect, each
+specific indirect effect, the total indirect effect and the total effect.
+The total indirect effect equals the specific indirect effect in a one-mediator
+model; both named rows are retained for a stable extraction schema.
+
+
+``` r
+s <- summary(result)
+s$effects[, c("effect", "label", "estimate", "std.error", "conf.low", "conf.high")]
+#>           effect                 label      estimate   std.error     conf.low
+#> 1             cp         Direct effect -0.0317954295 0.017108077 -0.064335385
+#> 2     indirect_1                    M1  0.0013113045 0.003103070 -0.004881299
+#> 3     indirect_2                    M2 -0.0011199168 0.002562857 -0.007323464
+#> 4 total_indirect Total indirect effect  0.0001913877 0.004043645 -0.008219743
+#> 5          total          Total effect -0.0316040417 0.016950481 -0.063912121
+#>     conf.high
+#> 1 0.002989586
+#> 2 0.008066491
+#> 3 0.003114028
+#> 4 0.007948215
+#> 5 0.001888977
+s$coefficients
+#>   term effect label moderator   at    estimate  std.error    conf.low
+#> 1   cp     cp    cp      <NA> <NA> -0.03179543 0.01710808 -0.06433538
+#> 2   b1     b1    b1      <NA> <NA> -0.04834449 0.09414650 -0.23465290
+#> 3   d1     d1    d1      <NA> <NA> -0.06905067 0.09517147 -0.25339953
+#> 4   b2     b2    b2      <NA> <NA> -0.07732384 0.09295419 -0.25608191
+#> 5   d2     d2    d2      <NA> <NA> -0.03675903 0.08668557 -0.21014137
+#> 6   a1     a1    a1      <NA> <NA> -0.02712418 0.01763957 -0.06014372
+#> 7   a2     a2    a2      <NA> <NA>  0.01448346 0.01790946 -0.02053748
+#>     conf.high effect_type path conf.level method   interval scale n.valid
+#> 1 0.002989586       paths <NA>       0.95     mc percentile   raw    2000
+#> 2 0.141983977       paths <NA>       0.95     mc percentile   raw    2000
+#> 3 0.121491557       paths <NA>       0.95     mc percentile   raw    2000
+#> 4 0.108874666       paths <NA>       0.95     mc percentile   raw    2000
+#> 5 0.129459767       paths <NA>       0.95     mc percentile   raw    2000
+#> 6 0.007889016       paths <NA>       0.95     mc percentile   raw    2000
+#> 7 0.049712847       paths <NA>       0.95     mc percentile   raw    2000
+#>      status moderator.value moderator.level
+#> 1 inference              NA            <NA>
+#> 2 inference              NA            <NA>
+#> 3 inference              NA            <NA>
+#> 4 inference              NA            <NA>
+#> 5 inference              NA            <NA>
+#> 6 inference              NA            <NA>
+#> 7 inference              NA            <NA>
+s$info$standardized
+#> [1] FALSE
+print(result, detail = "full")
+#> wsMed analysis
+#> Model: P | DE | Observations: 100 
+#> wsMed statistical summary
+#> Model: P | Missing: DE | Observations: 100 
+#> Effects:
+#> wsMed all | raw scale | mc 
+#> 95% percentile intervals; 2000 joint draws; SE from effect draws
+#> Condition contrast: C2 - C1 
+#>                                        Estimate Std. Error  CI lower  CI upper
+#> cp: Direct effect                     -0.031795   0.017108 -0.064335  0.002990
+#> indirect_1: M1                         0.001311   0.003103 -0.004881  0.008066
+#> indirect_2: M2                        -0.001120   0.002563 -0.007323  0.003114
+#> total_indirect: Total indirect effect  0.000191   0.004044 -0.008220  0.007948
+#> total: Total effect                   -0.031604   0.016950 -0.063912  0.001889
+#> Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.
+#> Use as.data.frame() for the full-precision table and metadata.
+#> 
+#> Path coefficients:
+#>    Estimate Std. Error CI lower CI upper
+#> cp -0.03180    0.01711 -0.06434  0.00299
+#> b1 -0.04834    0.09415 -0.23465  0.14198
+#> d1 -0.06905    0.09517 -0.25340  0.12149
+#> b2 -0.07732    0.09295 -0.25608  0.10887
+#> d2 -0.03676    0.08669 -0.21014  0.12946
+#> a1 -0.02712    0.01764 -0.06014  0.00789
+#> a2  0.01448    0.01791 -0.02054  0.04971
+#> Post-fit admissibility: 1 of 1 ; excluded rows: 0 
+#> Tables: $effects, $coefficients; analysis settings: $info.
+```
+
+`as.data.frame(s)`, `coef(s)`, `confint(s)`, `vcov(s)` and `plot(s)` concern the
+selected effects. `$coefficients` contains conditional path slopes; select
+`type = "parameters"` for primitive model parameters. `summary(s, level = .90)`
+updates intervals and both summary tables from the saved draws.
+
+Use `wsMed(..., standardized = TRUE)` to save the reporting preference, or
+`wsmed_fit(..., standardized = TRUE)` in the staged workflow. Printing,
+summaries, effect extraction and generic plotting inherit it, with or without
+moderation. The parameter changes the output scale, not the fitted model.
+Explicit `standardized = FALSE` or `TRUE` overrides it for one query. The older
+`scale = "raw"` / `"marginal"` spelling remains supported; conflicting arguments
+are rejected. Marginal endpoint standardization has the same definition as in
+the [standardization tutorial](StandardizedModeratedMediation.html).
+
+
+``` r
+standardized_summary <- summary(result, standardized = TRUE)
+standardized_summary$effects
+#>             term         effect                 label moderator   at
+#> 1             cp             cp         Direct effect      <NA> <NA>
+#> 2     indirect_1     indirect_1                    M1      <NA> <NA>
+#> 3     indirect_2     indirect_2                    M2      <NA> <NA>
+#> 4 total_indirect total_indirect Total indirect effect      <NA> <NA>
+#> 5          total          total          Total effect      <NA> <NA>
+#>       estimate  std.error    conf.low  conf.high    effect_type path conf.level
+#> 1 -0.187872685 0.10205327 -0.38780358 0.01911911         direct <NA>       0.95
+#> 2  0.007748230 0.01807421 -0.02841732 0.04635855       indirect   M1       0.95
+#> 3 -0.006617359 0.01490903 -0.04340102 0.01810294       indirect   M2       0.95
+#> 4  0.001130871 0.02359440 -0.04706976 0.04639482 total_indirect <NA>       0.95
+#> 5 -0.186741814 0.10103888 -0.38356324 0.01120246          total <NA>       0.95
+#>   method   interval    scale n.valid    status moderator.value moderator.level
+#> 1     mc percentile marginal    2000 inference              NA            <NA>
+#> 2     mc percentile marginal    2000 inference              NA            <NA>
+#> 3     mc percentile marginal    2000 inference              NA            <NA>
+#> 4     mc percentile marginal    2000 inference              NA            <NA>
+#> 5     mc percentile marginal    2000 inference              NA            <NA>
+summary(result, type = "indirect", terms = "indirect_1")
+#> wsMed statistical summary
+#> Model: P | Missing: DE | Observations: 100 
+#> Effects:
 #> wsMed indirect | raw scale | mc 
 #> 95% percentile intervals; 2000 joint draws; SE from effect draws
 #> Condition contrast: C2 - C1 
 #>                Estimate Std. Error CI lower CI upper
 #> indirect_1: M1  0.00131    0.00310 -0.00488  0.00807
-#> indirect_2: M2 -0.00112    0.00256 -0.00732  0.00311
 #> Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
+#> 
+#> Path coefficients:
+#>    Estimate Std. Error CI lower CI upper
+#> cp -0.03180    0.01711 -0.06434  0.00299
+#> b1 -0.04834    0.09415 -0.23465  0.14198
+#> d1 -0.06905    0.09517 -0.25340  0.12149
+#> b2 -0.07732    0.09295 -0.25608  0.10887
+#> d2 -0.03676    0.08669 -0.21014  0.12946
+#> a1 -0.02712    0.01764 -0.06014  0.00789
+#> a2  0.01448    0.01791 -0.02054  0.04971
+#> Post-fit admissibility: 1 of 1 ; excluded rows: 0 
+#> Tables: $effects, $coefficients; analysis settings: $info.
 ```
+
+For moderation, `at` contains **raw** moderator values or category labels.
+Continuous moderators default to the centering reference; categorical moderators
+default to all observed levels. This reports conditional effects, not an average
+over the moderator. `method` selects a saved inference engine, and `level`
+selects the confidence level. A report prints both engines separately when
+both are stored; `summary(result, method = "mc")` or `method = "bootstrap"`
+selects one coherent summary. No fitting or resampling is performed.
+
 
 The examples use 2,000 draws for speed. The Monte Carlo default remains 20,000.
 
@@ -75,7 +255,9 @@ stopifnot(isTRUE(all.equal(inference$draws, result$mc$result$thetahatstar)))
 `coef(fit)` and `vcov(fit)` return fitted primitive parameters and their covariance.
 For MI these are Rubin-pooled quantities. `vcov(inference)` instead returns the
 empirical covariance of its stored parameter draws. `summary(fit)` displays
-parameters; `summary(inference)` extracts indirect effects. `confint(fit)` asks
+native fitted parameters; `summary(inference)` collects all core effects
+and conditional path coefficients. A fit-only summary retains native parameter
+standard errors; obtain inference before requesting standardized effect intervals. `confint(fit)` asks
 you to run inference first. `wsmed_inspect(fit, "syntax")` exposes the generated
 SEM syntax, while `wsmed_inspect(fit, "fits")` returns all backend fits.
 

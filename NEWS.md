@@ -1,5 +1,14 @@
 # wsMed 1.1.0.9000
 
+* Separate readable reports from structured summaries: `print()` shows core
+  effects, `detail = "full"` adds path coefficients, and `detail = "legacy"`
+  preserves historical stored tables. `summary()` defaults to all core effects
+  and exposes `$effects`, `$coefficients`, and `$info` without rounding data.
+* Inherit the analysis `standardized` preference in reports, summaries, effect
+  extraction and generic plots, with or without moderation. Explicit overrides
+  do not refit or sample; the existing `scale` spelling remains supported.
+
+
 - Warn once per internally imputed moderated fit about main-effects-only
   imputation; retain warnings in diagnostics and manifests. Explain numeric 0/1
   moderator interpretation in both interfaces without changing their coding.

@@ -147,7 +147,7 @@ unlink(saved)
 
 For an MI object, the same `wsmed_infer(compatible_fit, ...)` call regenerates
 its uncertainty estimates without reimputing or refitting. Stored coefficients,
-covariances and `print(result, detail = "full")` remain available for historical
+covariances and `print(result, detail = "legacy")` remain available for historical
 inspection. An old object without algorithm metadata can be statistically valid,
 but the package cannot safely certify its moment model from its version alone.
 
@@ -185,7 +185,7 @@ Missing provenance in older objects is not filled using current versions.
 | Previous usage or expectation | Current workflow |
 |:--|:--|
 | `wsMed(...)` performs the full analysis | Still supported; staged calls use the same engines |
-| Printing shows all tables | `print(result)` is an overview; use `print(result, detail = "full")` for legacy tables |
+| Printing shows all tables | `print(result)` shows core effects; `summary(result)` provides structured tables; use `detail = "legacy"` for historical output |
 | Read effects from nested fields | `wsmed_effects()` followed by `as.data.frame()` or `confint()` |
 | Change MC to bootstrap by rerunning everything | Pass an existing fit to `wsmed_infer()`; bootstrap still fits resampled datasets |
 | Inspect the generated syntax | `printGM(result)` or `wsmed_inspect(fit, "syntax")` |

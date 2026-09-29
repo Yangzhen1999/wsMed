@@ -8,6 +8,8 @@
 #' @param terms Effect identifiers to select, in display order. For a results
 #'   object, use either effect identifiers or complete row identifiers.
 #' @param at Named list of raw moderator values or factor labels.
+#' @param standardized NULL inherits the analysis setting; TRUE or FALSE overrides
+#'   it for this plot. Available on fit, inference and one-call objects.
 #' @param scale,method Passed to [wsmed_effects()]. Select method explicitly
 #'   when a one-call object contains both Monte Carlo and bootstrap inference.
 #' @param level Confidence level. NULL retains the stored level. For an extracted
@@ -63,14 +65,14 @@
 #' @rdname wsmed_plots
 #' @export
 plot.wsMed <- function(x, type = "indirect", terms = NULL, at = NULL,
-                       scale = "raw", method = NULL, level = NULL,
+                       scale = NULL, method = NULL, level = NULL,
                        view = c("auto", "forest", "curve", "conditional"), n = 51L,
                        labels = NULL, title = NULL, x_label = NULL, y_label = NULL,
-                       ncol = NULL, base_size = 12, rug = FALSE, ...) {
+                       ncol = NULL, base_size = 12, rug = FALSE, standardized = NULL, ...) {
   .wsmed_unused_dots(...)
   view <- match.arg(view)
   if (!is.logical(rug) || length(rug) != 1L || is.na(rug)) stop("rug must be TRUE or FALSE.")
-  type <- match.arg(type, c("indirect", "total", "direct", "total_indirect", "paths", "parameters"))
+  type <- match.arg(type, c("indirect", "all", "total", "direct", "total_indirect", "paths", "parameters"))
   assert_scalar_int(n, "n", lower = 2L)
   selected <- .wsmed_select(x, method)
   fit <- selected$fit
@@ -88,7 +90,7 @@ plot.wsMed <- function(x, type = "indirect", terms = NULL, at = NULL,
     }
   }
   result <- wsmed_effects(x, type = type, terms = terms, at = at,
-                          scale = scale, method = method, level = level)
+                          scale = scale, method = method, level = level, standardized = standardized)
   p <- plot(result, view = view, labels = labels, title = title,
     x_label = x_label, y_label = y_label, ncol = ncol, base_size = base_size)
   attr(p, "wsmed_plot")$grid_range <- grid

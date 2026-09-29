@@ -110,7 +110,7 @@
     cat("MI: per-imputation centering; first-imputation reporting reference.\n")
   if (!is.null(description$imputation_note)) cat(description$imputation_note, "\n")
   if (scale == "marginal") {
-    if (length(type) && type %in% c("indirect", "direct", "total", "total_indirect")) {
+    if (length(type) && type %in% c("all", "indirect", "direct", "total", "total_indirect")) {
       cat("Standardization: effect / marginal model-implied SD(",
         description$outcome[2], " - ", description$outcome[1],
         "); condition contrast is unscaled.\n", sep = "")

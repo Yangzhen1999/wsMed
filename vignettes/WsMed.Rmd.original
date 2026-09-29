@@ -113,7 +113,7 @@ result <- wsMed(
   seed = 123
 )
 
-print(result, detail = "full")
+print(result, detail = "legacy")
 ```
 
 The arguments in this call answer four basic questions:
@@ -507,7 +507,7 @@ included in the mediator and outcome regressions.
 Print the fitted object to obtain the main analysis summary:
 
 ```{r print-result, eval=FALSE}
-print(result, detail = "full")
+print(result, detail = "legacy")
 ```
 
 Depending on the selected options, the printed output includes:
@@ -577,7 +577,7 @@ result4_mi <- wsMed(
   seed = 123
 )
 
-print(result4_mi, detail = "full")
+print(result4_mi, detail = "legacy")
 ```
 
 The output sections and their main purposes are:
@@ -758,7 +758,7 @@ result4_mi$mc$result     # Monte Carlo results
 result4_mi$mc$std_mc     # standardized Monte Carlo results
 ```
 
-`print(result4_mi, detail = "full")` is intended for reading the analysis summary, whereas
+`print(result4_mi, detail = "legacy")` is intended for reading the analysis summary, whereas
 the stored components are intended for inspection or downstream
 programming.
 
@@ -786,7 +786,7 @@ result5 <- wsMed(
   seed = 123
 )
 
-print(result5, detail = "full")
+print(result5, detail = "legacy")
 ```
 
 Most printed sections have the same interpretation as in Example 1. The

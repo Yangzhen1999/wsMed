@@ -57,6 +57,21 @@ the eventual release archive or a later commit has been checked.
   NOTEs with --as-cran --no-manual. This remains a development validation record,
   not a CRAN release submission or PDF-manual check.
 
+## Reporting and summary follow-up: 2026-09-29
+
+* Complete suite: 1916 passing expectations; zero failures, warnings or skips.
+  Check covers raw/standardized defaults, explicit overrides, conditional probes,
+  structured tables, joint effect contrasts and unchanged random-number state.
+* All 14 tutorials rebuilt; the installed source archive exposes all 14 titles
+  with complete local images. The local pkgdown site was also rebuilt.
+* All 820 manuscript baseline rows still match. Ten comparison tests pass.
+  Replication scripts explicitly select the preserved legacy report format.
+* Source-archive R CMD check --as-cran --no-manual: 0 ERRORs, 0 WARNINGs,
+  2 NOTEs. Incoming feasibility notes the development version and three tutorial
+  URLs not yet present on the older public website. Current time could not be
+  verified. The PDF manual was not checked; this is not a release submission.
+* Checked archive MD5: 4828e4f343bde5f9813c059af6c20eb3.
+
 ## Changes since CRAN 1.1.0
 
 * Add staged model, fit, inference, extraction and plotting methods while

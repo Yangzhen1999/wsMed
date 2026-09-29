@@ -56,10 +56,10 @@ snapshot <- lapply(fits, function(x) {
     parameter_tables = x$mc$std_mc,
     conditional_tables = x$moderation,
     standardization_diagnostics = attr(x$mc$std_mc, "standardization_diagnostics"),
-    printed = capture.output(print(x, detail = "full")),
+    printed = capture.output(print(x, detail = "legacy")),
     # Preserve normal manuscript formatting, but test numerical agreement
     # before three-decimal rounding can amplify a tiny optimizer difference.
-    printed_precise = capture.output(print(x, detail = "full", digits = 10))
+    printed_precise = capture.output(print(x, detail = "legacy", digits = 10))
   )
 })
 versions <- vapply(loadedNamespaces(), function(p) packageDescription(p)$Version,

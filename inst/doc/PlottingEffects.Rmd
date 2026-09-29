@@ -287,8 +287,8 @@ supported <- wsmed_effects(continuous, at = list(W = probe_values), terms = "ind
 #> [-3.17113, 9.61675]: 10.6168. These estimates extrapolate.
 as.data.frame(supported)[, c("at", "estimate", "extrapolated")]
 #>                 at  estimate extrapolated
-#> 1 3.23287569618678  5.373759        FALSE
-#> 2 10.6167533949209 28.400634         TRUE
+#> 1 3.23287569618678 0.8544882        FALSE
+#> 2 10.6167533949209 4.5160208         TRUE
 plot(supported, view = "forest")
 ```
 

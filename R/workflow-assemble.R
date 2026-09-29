@@ -1,5 +1,7 @@
 # Assemble compatibility tables from already fitted objects and stored draws.
 .wsmed_assemble <- function(fit, inferences, alpha, standardized, verbose = FALSE) {
+  fit$standardized <- standardized
+  inferences <- lapply(inferences, function(x) { x$fit$standardized <- standardized; x })
   prep <- fit$data
   sem_model <- fit$sem_model
   Na <- fit$Na
@@ -91,6 +93,7 @@
     Na         = Na,
     form       = form,
     ci_method  = ci_method,
+    standardized = standardized,
     input_vars = input_vars,
     fit_u  = fit_u,
     paths = paths

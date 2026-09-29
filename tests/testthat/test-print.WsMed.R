@@ -16,7 +16,7 @@ expect_wsMed_structure <- function(obj) {
   expect_s3_class(obj, "wsMed")
 
   expect_setequal(
-    setdiff(names(obj), c("moderation_std", "model", "fit", "inference")),
+    setdiff(names(obj), c("moderation_std", "model", "fit", "inference", "standardized")),
     c(
       "Na",
       "alpha",
@@ -60,7 +60,7 @@ quick_ws <- function(..., .data = example_data) {
 # ── 1. No-moderation print smoke-test --------------------------------------
 test_that("print.wsMed works without moderator", {
   obj <- quick_ws()
-  expect_invisible( out <- capture.output(print(obj, digits = 2, detail = "full")) )
+  expect_invisible( out <- capture.output(print(obj, digits = 2, detail = "legacy")) )
   expect_true(any(grepl("VARIABLES",          out)))
   expect_true(any(grepl("MODEL FIT",          out)))
   expect_true(any(grepl("TOTAL / DIRECT",     out)))
@@ -71,7 +71,7 @@ test_that("print.wsMed works without moderator", {
 # ── 2. Continuous moderation ------------------------------------------------
 test_that("print.wsMed shows continuous moderation sections", {
   obj <- quick_ws(W = "D3", W_type = "continuous", MP = "a1")
-  out <- capture.output(print(obj, digits = 2, detail = "full"))
+  out <- capture.output(print(obj, digits = 2, detail = "legacy"))
   expect_true(any(grepl("MODERATION RESULTS \\(Continuous", out)))
   expect_true(any(grepl("Conditional Total Effect",         out)))
 })
@@ -81,7 +81,7 @@ test_that("print.wsMed shows categorical moderation sections", {
   skip_on_cran()
   obj <- quick_ws(W = "Group", W_type = "categorical",
                   MP = "a1")
-  out <- capture.output(print(obj, digits = 2, detail = "full"))
+  out <- capture.output(print(obj, digits = 2, detail = "legacy"))
   expect_true(any(grepl("MODERATION RESULTS \\(Categorical", out)))
   expect_true(any(grepl("Conditional Indirect Effects",      out)))
 })
@@ -159,7 +159,7 @@ test_that("print.wsMed works for a user-defined model", {
   out <- capture.output(
     print(
       obj,
-      digits = 2, detail = "full"
+      digits = 2, detail = "legacy"
     )
   )
 

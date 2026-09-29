@@ -1,22 +1,34 @@
 #' Methods for modular wsMed objects
 #'
 #' @param x,object A wsMed or modular workflow object.
-#' @param detail overview (default) or full for the original wsMed printed tables.
+#' @param detail effects (default) for core effects, full for effects and path
+#'   coefficients, overview for fit status, or legacy for original stored tables.
 #' @param digits Number of displayed digits. Stored estimates are not rounded.
 #' @param parm Names or positions of parameters/effects to include in intervals.
 #' @param level Confidence level. NULL uses the level saved in the selected inference or results object.
-#' @param type,at,scale,method Passed to [wsmed_effects()].
+#' @param type,at,scale,method Passed to [wsmed_effects()]. Summaries default to
+#'   all core effects. Select method when both inference engines are stored.
+#' @param standardized NULL inherits the saved analysis setting; TRUE or FALSE
+#'   overrides it without fitting or sampling. Applies with or without moderation.
 #' @param row.names,optional Standard data-frame conversion arguments.
 #' @param ... Additional arguments, passed to effect extraction by summary and
 #'   confint methods. See [wsmed_plots] for plotting arguments.
 #' @return print methods return their input invisibly. summary returns a
-#'   wsmed_results for inference or a summary_wsmed_fit for fits; coef returns
+#'   summary_wsmed (also a wsmed_results) for inference/one-call objects, or a
+#'   summary_wsmed_fit for fits. Structured summaries contain effects and
+#'   coefficients data frames, info, diagnostics and selected joint effect draws.
+#'   as.data.frame, coef, confint, vcov and plot on the summary concern the
+#'   selected effects; coefficients contains conditional path slopes (not all
+#'   primitive parameters). Use type = 'parameters' for primitive parameters.
+#'   Summary display uses printCoefmat; tables retain full precision. coef returns
 #'   a named numeric vector. vcov returns the fit covariance (Rubin-pooled for
 #'   MI), or the empirical covariance of stored draws for inference/results.
 #'   confint recomputes percentile limits from stored draws without sampling.
 #'   Its default level is the saved level, including when called on an inference
 #'   or one-call object; use an explicit level to override it. On those two
-#'   classes confint concerns primitive parameters; extract effects first to
+#'   classes confint concerns native primitive parameters, matching coef and
+#'   vcov regardless of the reporting preference (explicit scale overrides are
+#'   accepted). Fit-only summaries also describe native parameters. Extract effects first to
 #'   obtain indirect/conditional-effect intervals.
 #'   nobs returns the sample size for each fitted dataset. as.data.frame returns
 #'   a full-precision results table. plot returns a ggplot.
@@ -29,15 +41,43 @@ NULL
 
 #' @rdname wsmed_methods
 #' @export
-print.wsMed <- function(x, digits = 3, detail = c("overview", "full"), ...) {
+print.wsMed <- function(x, digits = 3, detail = c("effects", "full", "overview", "legacy"),
+                        type = "all", at = NULL, standardized = NULL,
+                        method = NULL, level = NULL, scale = NULL, ...) {
   detail <- match.arg(detail)
-  if (detail == "full") return(.print_wsmed_full(x, digits = digits, ...))
+  if (detail == "legacy") {
+    .wsmed_unused_dots(...)
+    if (!is.null(standardized) || !is.null(scale) || !is.null(at) ||
+        !is.null(method) || !is.null(level) || type != "all")
+      stop("Legacy printing uses saved tables; use detail = 'full' to select results.")
+    return(.print_wsmed_full(x, digits = digits))
+  }
   cat("wsMed analysis\n")
-  if (inherits(x$fit, "wsmed_fit")) {
+  if (!inherits(x$fit, "wsmed_fit")) {
+    cat("Model:", x$form, " Missing-data method:", x$Na, "\n")
+    cat("This older object supports print(detail = 'legacy'); refit for structured summaries.\n")
+    return(invisible(x))
+  }
+  if (detail == "overview") {
+    .wsmed_unused_dots(...)
     print(x$fit, digits = digits)
     cat("Stored inference:", paste(names(x$inference), collapse = ", "), "\n")
-  } else cat("Model:", x$form, " Missing-data method:", x$Na, "\n")
-  cat("Use summary() for effects; print(detail = 'full') for all legacy tables.\n")
+    cat("Default output:", if (.wsmed_scale(x, scale, standardized) == "marginal")
+      "standardized" else "unstandardized", "\n")
+    return(invisible(x))
+  }
+  cat("Model:", x$form, "|", x$Na, "| Observations:",
+    paste(unique(x$fit$diagnostics$n_used), collapse = ", "), "\n")
+  methods <- if (is.null(method)) names(x$inference) else method
+  for (engine in methods) {
+    report <- summary(x, type = type, at = at, standardized = standardized,
+      method = engine, level = level, scale = scale, ...)
+    if (detail == "full") print(report, digits = digits) else {
+      cat("Effects:\n")
+      print.wsmed_results(report, digits = digits)
+    }
+  }
+  if (detail != "full") .wsmed_print_fit_diagnostics(x$fit$diagnostics)
   invisible(x)
 }
 
@@ -101,16 +141,18 @@ print.summary_wsmed_fit <- function(x, digits = 3, ...) {
 
 #' @rdname wsmed_methods
 #' @export
-summary.wsmed_inference <- function(object, type = "indirect", at = NULL,
-                                     scale = "raw", ...) {
-  wsmed_effects(object, type = type, at = at, scale = scale, ...)
+summary.wsmed_inference <- function(object, type = "all", at = NULL,
+                                     scale = NULL, standardized = NULL, ...) {
+  .wsmed_summary(object, type = type, at = at, scale = scale,
+    standardized = standardized, ...)
 }
 
 #' @rdname wsmed_methods
 #' @export
-summary.wsMed <- function(object, type = "indirect", at = NULL, scale = "raw",
-                           method = NULL, ...) {
-  wsmed_effects(object, type = type, at = at, scale = scale, method = method, ...)
+summary.wsMed <- function(object, type = "all", at = NULL, scale = NULL,
+                           method = NULL, standardized = NULL, ...) {
+  .wsmed_summary(object, type = type, at = at, scale = scale,
+    method = method, standardized = standardized, ...)
 }
 
 #' @rdname wsmed_methods
@@ -168,16 +210,20 @@ confint.wsmed_fit <- function(object, parm, level = NULL, ...) {
 
 #' @rdname wsmed_methods
 #' @export
-confint.wsmed_inference <- function(object, parm, level = NULL, ...) {
-  result <- wsmed_effects(object, type = "parameters", level = level, ...)
+confint.wsmed_inference <- function(object, parm, level = NULL, standardized = NULL,
+                                    scale = NULL, ...) {
+  result <- wsmed_effects(object, type = "parameters", level = level,
+    scale = .wsmed_scale(NULL, scale, standardized), ...)
   if (missing(parm)) stats::confint(result) else
     stats::confint(result, parm = parm)
 }
 
 #' @rdname wsmed_methods
 #' @export
-confint.wsMed <- function(object, parm, level = NULL, method = NULL, ...) {
-  result <- wsmed_effects(object, type = "parameters", method = method, level = level, ...)
+confint.wsMed <- function(object, parm, level = NULL, method = NULL, standardized = NULL,
+                            scale = NULL, ...) {
+  result <- wsmed_effects(object, type = "parameters", method = method, level = level,
+    scale = .wsmed_scale(NULL, scale, standardized), ...)
   if (missing(parm)) stats::confint(result) else
     stats::confint(result, parm = parm)
 }
@@ -193,17 +239,8 @@ print.wsmed_results <- function(x, digits = 3, ...) {
   .wsmed_print_interpretation(x$query$interpretation, x$query$scale,
     if (x$query$type == "contrasts") x$query$source_type else x$query$type)
   .wsmed_print_contrast_definitions(x$query)
+  .wsmed_print_result_table(x, digits)
   d <- x$table
-  display <- ifelse(d$label == d$term, d$term, paste0(d$term, ": ", d$label))
-  probes <- if (identical(x$query$moderator_type, "continuous"))
-    format(signif(as.numeric(d$at), digits), trim = TRUE) else d$at
-  if (any(!is.na(d$at))) display <- paste0(display, " [", d$moderator, " = ", probes, "]")
-  mat <- cbind(Estimate = d$estimate)
-  if (nrow(x$draws)) mat <- cbind(mat, `Std. Error` = d$std.error,
-    `CI lower` = d$conf.low, `CI upper` = d$conf.high)
-  rownames(mat) <- display
-  stats::printCoefmat(mat, digits = digits, has.Pvalue = FALSE, signif.stars = FALSE,
-                      cs.ind = seq_len(ncol(mat)), tst.ind = integer())
   .wsmed_print_draw_diagnostics(x$query$inference_diagnostics, x$diagnostics)
   support_caption <- .wsmed_support_caption(x$query$support,
     d$at, if (x$query$type == "contrasts") d$extrapolated %||% NA else NULL)
@@ -280,4 +317,20 @@ wsmed_inspect <- function(object, component = c("model", "syntax", "data", "fits
   switch(component, model = object$model, syntax = object$sem_model,
     data = object$data, fits = object$backend, diagnostics = object$diagnostics,
     provenance = object$provenance)
+}
+
+# Shared numeric table renderer: display precision never changes stored data.
+.wsmed_print_result_table <- function(x, digits = 3) {
+  d <- x$table
+  display <- ifelse(d$label == d$term, d$term, paste0(d$term, ": ", d$label))
+  probes <- if (identical(x$query$moderator_type, "continuous"))
+    format(signif(as.numeric(d$at), digits), trim = TRUE) else d$at
+  if (any(!is.na(d$at))) display <- paste0(display, " [", d$moderator, " = ", probes, "]")
+  mat <- cbind(Estimate = d$estimate)
+  if (nrow(x$draws)) mat <- cbind(mat, `Std. Error` = d$std.error,
+    `CI lower` = d$conf.low, `CI upper` = d$conf.high)
+  rownames(mat) <- display
+  stats::printCoefmat(mat, digits = digits, has.Pvalue = FALSE, signif.stars = FALSE,
+                      cs.ind = seq_len(ncol(mat)), tst.ind = integer())
+  invisible(x)
 }

@@ -528,7 +528,7 @@ reuse the fit:</p>
 <code>wsmed_infer(compatible_fit, ...)</code> call regenerates its
 uncertainty estimates without reimputing or refitting. Stored
 coefficients, covariances and
-<code>print(result, detail = &quot;full&quot;)</code> remain available for
+<code>print(result, detail = &quot;legacy&quot;)</code> remain available for
 historical inspection. An old object without algorithm metadata can be
 statistically valid, but the package cannot safely certify its moment
 model from its version alone.</p>
@@ -636,8 +636,9 @@ versions.</p>
 </tr>
 <tr class="even">
 <td align="left">Printing shows all tables</td>
-<td align="left"><code>print(result)</code> is an overview; use
-<code>print(result, detail = &quot;full&quot;)</code> for legacy tables</td>
+<td align="left"><code>print(result)</code> shows core effects;
+<code>summary(result)</code> provides structured tables; use
+<code>detail = &quot;legacy&quot;</code> for historical output</td>
 </tr>
 <tr class="odd">
 <td align="left">Read effects from nested fields</td>

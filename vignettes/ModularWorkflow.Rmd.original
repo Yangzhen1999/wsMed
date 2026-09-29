@@ -17,8 +17,10 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>", cache = FALSE,
 
 `wsMed()` specifies, fits, and performs inference in one call. It uses the same
 engines as the staged interface below. Existing arguments and result fields
-remain available. Default printing gives an overview; `summary()` returns
-selected effects, and `print(result, detail = "full")` prints the original tables.
+remain available. Default printing shows the core effect report;
+`print(result, detail = "full")` also displays path coefficients.
+`summary()` creates a structured statistical summary with full-precision tables.
+`print(result, detail = "legacy")` retains the original stored report.
 
 ```{r one-call}
 data(example_data)
@@ -28,6 +30,52 @@ result <- wsMed(example_data,
 result
 summary(result)
 ```
+
+## Read reports or extract tables
+
+The same effect calculations power both outputs. `print()` is for reading a
+report; `summary()` returns a structured object whose display uses ordinary R
+coefficient tables. The default summary includes the direct effect, each
+specific indirect effect, the total indirect effect and the total effect.
+The total indirect effect equals the specific indirect effect in a one-mediator
+model; both named rows are retained for a stable extraction schema.
+
+```{r report-tables}
+s <- summary(result)
+s$effects[, c("effect", "label", "estimate", "std.error", "conf.low", "conf.high")]
+s$coefficients
+s$info$standardized
+print(result, detail = "full")
+```
+
+`as.data.frame(s)`, `coef(s)`, `confint(s)`, `vcov(s)` and `plot(s)` concern the
+selected effects. `$coefficients` contains conditional path slopes; select
+`type = "parameters"` for primitive model parameters. `summary(s, level = .90)`
+updates intervals and both summary tables from the saved draws.
+
+Use `wsMed(..., standardized = TRUE)` to save the reporting preference, or
+`wsmed_fit(..., standardized = TRUE)` in the staged workflow. Printing,
+summaries, effect extraction and generic plotting inherit it, with or without
+moderation. The parameter changes the output scale, not the fitted model.
+Explicit `standardized = FALSE` or `TRUE` overrides it for one query. The older
+`scale = "raw"` / `"marginal"` spelling remains supported; conflicting arguments
+are rejected. Marginal endpoint standardization has the same definition as in
+the [standardization tutorial](StandardizedModeratedMediation.html).
+
+```{r report-standardized}
+standardized_summary <- summary(result, standardized = TRUE)
+standardized_summary$effects
+summary(result, type = "indirect", terms = "indirect_1")
+```
+
+For moderation, `at` contains **raw** moderator values or category labels.
+Continuous moderators default to the centering reference; categorical moderators
+default to all observed levels. This reports conditional effects, not an average
+over the moderator. `method` selects a saved inference engine, and `level`
+selects the confidence level. A report prints both engines separately when
+both are stored; `summary(result, method = "mc")` or `method = "bootstrap"`
+selects one coherent summary. No fitting or resampling is performed.
+
 
 The examples use 2,000 draws for speed. The Monte Carlo default remains 20,000.
 
@@ -52,7 +100,9 @@ stopifnot(isTRUE(all.equal(inference$draws, result$mc$result$thetahatstar)))
 `coef(fit)` and `vcov(fit)` return fitted primitive parameters and their covariance.
 For MI these are Rubin-pooled quantities. `vcov(inference)` instead returns the
 empirical covariance of its stored parameter draws. `summary(fit)` displays
-parameters; `summary(inference)` extracts indirect effects. `confint(fit)` asks
+native fitted parameters; `summary(inference)` collects all core effects
+and conditional path coefficients. A fit-only summary retains native parameter
+standard errors; obtain inference before requesting standardized effect intervals. `confint(fit)` asks
 you to run inference first. `wsmed_inspect(fit, "syntax")` exposes the generated
 SEM syntax, while `wsmed_inspect(fit, "fits")` returns all backend fits.
 

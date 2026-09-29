@@ -13,7 +13,7 @@
   type = "indirect",
   terms = NULL,
   at = NULL,
-  scale = "raw",
+  scale = NULL,
   method = NULL,
   level = NULL,
   view = c("auto", "forest", "curve", "conditional"),
@@ -25,6 +25,7 @@
   ncol = NULL,
   base_size = 12,
   rug = FALSE,
+  standardized = NULL,
   ...
 )
 
@@ -33,7 +34,7 @@
   type = "indirect",
   terms = NULL,
   at = NULL,
-  scale = "raw",
+  scale = NULL,
   method = NULL,
   level = NULL,
   view = c("auto", "forest", "curve", "conditional"),
@@ -45,6 +46,7 @@
   ncol = NULL,
   base_size = 12,
   rug = FALSE,
+  standardized = NULL,
   ...
 )
 
@@ -53,7 +55,7 @@
   type = "indirect",
   terms = NULL,
   at = NULL,
-  scale = "raw",
+  scale = NULL,
   method = NULL,
   level = NULL,
   view = c("auto", "forest", "curve", "conditional"),
@@ -65,6 +67,7 @@
   ncol = NULL,
   base_size = 12,
   rug = FALSE,
+  standardized = NULL,
   ...
 )
 
@@ -118,6 +121,9 @@ Labels must distinguish effects. Defaults use mediator role names.}
 \item{rug}{Add observed raw moderator values along a continuous curve's
 horizontal axis. Available for fitted/inference/one-call objects only.
 Uses fitted cases with an observed moderator; imputed values are excluded.}
+
+\item{standardized}{NULL inherits the analysis setting; TRUE or FALSE overrides
+it for this plot. Available on fit, inference and one-call objects.}
 
 \item{...}{Additional arguments are rejected to catch misspellings.}
 }

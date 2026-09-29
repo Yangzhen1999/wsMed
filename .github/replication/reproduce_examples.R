@@ -41,7 +41,7 @@ result1 <- wsMed(
 
 write_results({
   cat("EXAMPLE 1: PARALLEL MEDIATION\n")
-  print(result1, detail = "full")
+  print(result1, detail = "legacy")
 })
 
 # Example 2: Parallel-serial mediation
@@ -65,7 +65,7 @@ result2_predefined <- wsMed(
 
 write_results({
   cat("EXAMPLE 2: PARALLEL-SERIAL MEDIATION (PC)\n")
-  print(result2_predefined, detail = "full")
+  print(result2_predefined, detail = "legacy")
   printGM(result2_predefined)
 })
 
@@ -98,7 +98,7 @@ result2_custom <- wsMed(
 
 write_results({
   cat("EXAMPLE 2: PARALLEL-SERIAL MEDIATION (UD)\n")
-  print(result2_custom, detail = "full")
+  print(result2_custom, detail = "legacy")
   printGM(result2_custom)
 })
 
@@ -126,7 +126,7 @@ result3 <- wsMed(
 
 write_results({
   cat("EXAMPLE 3: MODERATED MEDIATION\n")
-  print(result3, detail = "full")
+  print(result3, detail = "legacy")
 })
 
 # Example 3 figures

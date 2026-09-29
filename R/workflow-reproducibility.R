@@ -61,6 +61,7 @@ wsmed_reproducibility <- function(object, file = NULL) {
   if (inherits(object, "wsmed_model")) return(report)
   if (!inherits(object, "wsmed_fit")) stop("A wsMed workflow object is required.")
   report$analysis <- list(missing = object$Na, fixed.x = object$fixed.x,
+    standardized = object$standardized,
     imputation = if (object$Na == "MI") object$mi$controls else NULL,
     imputation_methods = object$mi$prepared$mids$method,
     input_rows = object$diagnostics$n_input, used_rows = object$diagnostics$n_used,

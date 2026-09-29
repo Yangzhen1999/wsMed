@@ -226,7 +226,7 @@ result_custom <- wsMed(
   seed = 123
 )
 
-print(result_custom, detail = "full")
+print(result_custom, detail = "legacy")
 ```
 
 ## Input requirements

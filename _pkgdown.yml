@@ -70,12 +70,13 @@ reference:
       - wsmed_model
       - wsmed_fit
       - wsmed_infer
-      - wsmed_effects
-      - wsmed_contrasts
       - wsmed_inspect
       - wsmed_reproducibility
-      - wsmed_methods
-      - wsmed_plots
+  - title: "Reports, summaries, and effect comparisons"
+    desc: "Use [print() and summary()](wsmed_methods.html) to read reports and extract structured tables, and [plot()](wsmed_plots.html) to visualize results. The functions below support focused effect queries and comparisons."
+    contents:
+      - wsmed_effects
+      - wsmed_contrasts
   - title: "Model generation"
     desc: "Functions for generating SEM syntax for different mediation structures"
     contents:
@@ -105,3 +106,8 @@ reference:
       - wsmed_examples
       - example_data
       - wsmed_categorical
+
+  - title: internal
+    contents:
+      - wsmed_methods
+      - wsmed_plots

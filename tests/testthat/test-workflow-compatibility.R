@@ -44,7 +44,7 @@ test_that("old MI draws can be replaced without repeating a compatible fit", {
   legacy <- .wsmed_assemble(f, list(mc = i), .05, TRUE)
   legacy$fit$provenance$algorithms <- NULL
   expect_error(standardize_moderation(legacy), "Refit")
-  expect_output(print(legacy, detail = "full"), "STANDARDIZED")
+  expect_output(print(legacy, detail = "legacy"), "STANDARDIZED")
   legacy$fit <- NULL; legacy$inference <- NULL
   expect_error(standardize_moderation(legacy), "predates algorithm metadata")
 })

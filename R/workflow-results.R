@@ -1,14 +1,19 @@
 #' Extract effects from fitted models or stored inference
 #'
 #' @param object A wsmed_fit, wsmed_inference, or wsMed result.
-#' @param type Effect family: indirect, total, direct, total_indirect, paths,
+#' @param type Effect family: indirect, all (direct, specific indirect, total
+#'   indirect and total effects), total, direct, total_indirect, paths,
 #'   or parameters (primitive model parameters).
 #' @param terms Optional coefficient or effect names within the selected family.
 #' @param at Named list of raw moderator values, for example list(Age = c(30, 50)).
 #'   Defaults to the centering reference for a continuous moderator, or all
 #'   observed levels for a categorical moderator. Parameters ignore no probes:
 #'   supplying at with type = "parameters" is an error.
-#' @param scale raw or marginal model-implied endpoint standardization.
+#' @param standardized NULL inherits the saved analysis setting (FALSE for older
+#'   objects without a setting). TRUE uses model-implied marginal endpoint SDs,
+#'   with or without moderation. FALSE returns raw effects.
+#' @param scale Compatibility spelling: raw or marginal. Explicit conflicting
+#'   scale and standardized arguments are rejected.
 #' @param method Stored inference to use when object is wsMed: mc or bootstrap.
 #'   Required if both are stored. A fit alone returns point estimates only.
 #' @param level Confidence level; defaults to the stored inference level or .95.
@@ -38,11 +43,11 @@
 #' its MI sampler is unversioned or outdated, rerun [wsmed_infer()] on that fit.
 #' Stored primitive coefficients and full legacy tables remain inspectable.
 #' @export
-wsmed_effects <- function(object, type = c("indirect", "total", "direct",
+wsmed_effects <- function(object, type = c("indirect", "all", "total", "direct",
                            "total_indirect", "paths", "parameters"), terms = NULL,
-                           at = NULL, scale = c("raw", "marginal"),
-                           method = NULL, level = NULL) {
-  type <- match.arg(type); scale <- match.arg(scale)
+                           at = NULL, scale = NULL,
+                           method = NULL, level = NULL, standardized = NULL) {
+  type <- match.arg(type); scale <- .wsmed_scale(object, scale, standardized)
   selected <- .wsmed_select(object, method)
   fit <- selected$fit; inference <- selected$inference
   if (is.null(level)) level <- inference$controls$level %||% .95
@@ -78,7 +83,7 @@ wsmed_effects <- function(object, type = c("indirect", "total", "direct",
   theta <- rbind(point, draws)
   paths <- .cat_get_indirect_paths(colnames(theta))
   path_ids <- vapply(paths, `[[`, character(1), "path_name")
-  available <- switch(type, indirect = path_ids, total = "total", direct = "cp",
+  available <- switch(type, all = c("cp", path_ids, "total_indirect", "total"), indirect = path_ids, total = "total", direct = "cp",
     total_indirect = "total_indirect", parameters = names(fit$coefficients),
     paths = grep("^(a[0-9]+|[bd]([0-9]+|_[0-9]+_[0-9]+)|cp)$", colnames(theta), value = TRUE))
   if (is.null(terms)) terms <- available
@@ -108,7 +113,8 @@ wsmed_effects <- function(object, type = c("indirect", "total", "direct",
     estimates[[i]] <- do.call(cbind, effects)
     labels <- vapply(terms, function(term) {
       p <- match(term, path_ids)
-      if (is.na(p)) return(term)
+      if (is.na(p)) return(if (type == "all") switch(term, cp = "Direct effect",
+        total_indirect = "Total indirect effect", total = "Total effect", term) else term)
       ix <- as.integer(strsplit(paths[[p]]$mediators, " ", fixed = TRUE)[[1]])
       paste(fit$model$mediator_names[ix], collapse = " -> ")
     }, character(1))
@@ -206,7 +212,9 @@ wsmed_effects <- function(object, type = c("indirect", "total", "direct",
   }
   rownames(table) <- NULL
   table$effect_type <- query$type
-  table$path <- if (query$type == "indirect") table$label else NA_character_
+  if (query$type == "all") table$effect_type <- ifelse(table$effect == "cp", "direct",
+    ifelse(table$effect %in% c("total", "total_indirect"), table$effect, "indirect"))
+  table$path <- ifelse(table$effect_type == "indirect", table$label, NA_character_)
   table$conf.level <- if (nrow(draws)) query$level else NA_real_
   table$method <- query$method
   table$interval <- if (nrow(draws)) query$interval else NA_character_

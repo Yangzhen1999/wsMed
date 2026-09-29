@@ -387,7 +387,7 @@ package.</p>
 <span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">123</span></span>
 <span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>)</span>
 <span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a></span>
-<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="fu">print</span>(result, <span class="at">detail =</span> <span class="st">&quot;full&quot;</span>)</span></code></pre></div>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="fu">print</span>(result, <span class="at">detail =</span> <span class="st">&quot;legacy&quot;</span>)</span></code></pre></div>
 <p>The arguments in this call answer four basic questions:</p>
 <ul>
 <li>Which data set should be analyzed?</li>
@@ -805,7 +805,7 @@ the mediator and outcome regressions.</p>
 <div id="step-5-inspect-the-results" class="section level2">
 <h2>Step 5: Inspect the results</h2>
 <p>Print the fitted object to obtain the main analysis summary:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="fu">print</span>(result, <span class="at">detail =</span> <span class="st">&quot;full&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="fu">print</span>(result, <span class="at">detail =</span> <span class="st">&quot;legacy&quot;</span>)</span></code></pre></div>
 <p>Depending on the selected options, the printed output includes:</p>
 <ul>
 <li>the variables included in the analysis;</li>
@@ -864,7 +864,7 @@ illustrated.</p>
 <span id="cb24-16"><a href="#cb24-16" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">123</span></span>
 <span id="cb24-17"><a href="#cb24-17" tabindex="-1"></a>)</span>
 <span id="cb24-18"><a href="#cb24-18" tabindex="-1"></a></span>
-<span id="cb24-19"><a href="#cb24-19" tabindex="-1"></a><span class="fu">print</span>(result4_mi, <span class="at">detail =</span> <span class="st">&quot;full&quot;</span>)</span>
+<span id="cb24-19"><a href="#cb24-19" tabindex="-1"></a><span class="fu">print</span>(result4_mi, <span class="at">detail =</span> <span class="st">&quot;legacy&quot;</span>)</span>
 <span id="cb24-20"><a href="#cb24-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb24-21"><a href="#cb24-21" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb24-22"><a href="#cb24-22" tabindex="-1"></a><span class="co">#&gt; *************** VARIABLES ***************</span></span>
@@ -1241,7 +1241,7 @@ generated model:</p>
 <span id="cb28-5"><a href="#cb28-5" tabindex="-1"></a>result4_mi<span class="sc">$</span>mc<span class="sc">$</span>fit        <span class="co"># fitted lavaan model</span></span>
 <span id="cb28-6"><a href="#cb28-6" tabindex="-1"></a>result4_mi<span class="sc">$</span>mc<span class="sc">$</span>result     <span class="co"># Monte Carlo results</span></span>
 <span id="cb28-7"><a href="#cb28-7" tabindex="-1"></a>result4_mi<span class="sc">$</span>mc<span class="sc">$</span>std_mc     <span class="co"># standardized Monte Carlo results</span></span></code></pre></div>
-<p><code>print(result4_mi, detail = &quot;full&quot;)</code> is intended for
+<p><code>print(result4_mi, detail = &quot;legacy&quot;)</code> is intended for
 reading the analysis summary, whereas the stored components are intended
 for inspection or downstream programming.</p>
 </div>
@@ -1268,7 +1268,7 @@ for inspection or downstream programming.</p>
 <span id="cb29-15"><a href="#cb29-15" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">123</span></span>
 <span id="cb29-16"><a href="#cb29-16" tabindex="-1"></a>)</span>
 <span id="cb29-17"><a href="#cb29-17" tabindex="-1"></a></span>
-<span id="cb29-18"><a href="#cb29-18" tabindex="-1"></a><span class="fu">print</span>(result5, <span class="at">detail =</span> <span class="st">&quot;full&quot;</span>)</span>
+<span id="cb29-18"><a href="#cb29-18" tabindex="-1"></a><span class="fu">print</span>(result5, <span class="at">detail =</span> <span class="st">&quot;legacy&quot;</span>)</span>
 <span id="cb29-19"><a href="#cb29-19" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb29-20"><a href="#cb29-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb29-21"><a href="#cb29-21" tabindex="-1"></a><span class="co">#&gt; *************** VARIABLES ***************</span></span>

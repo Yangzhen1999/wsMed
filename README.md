@@ -106,8 +106,12 @@ plot(effects)
 
 `wsMed()` remains the one-call interface and uses the same engines. Its existing
 fields remain available alongside `model`, `fit`, and `inference`. Default
-printing is concise; `summary(result)` returns selected effects and
-`print(result, detail = "full")` displays the original full tables. See the
+printing shows core effects; `print(result, detail = "full")` adds path coefficients.
+`summary(result)` returns all core effects in `$effects`, conditional path
+coefficients in `$coefficients`, and analysis settings in `$info`. The tables
+retain full precision. Set `standardized = TRUE` in `wsMed()` (or `wsmed_fit()`):
+reports, summaries, effect extraction and generic plots inherit that setting.
+Use `print(result, detail = "legacy")` for historical stored tables. See the
 "One-call and staged workflows" tutorial for MI, moderation, and joint contrasts.
 
 `plot(result)` and `plot(inference)` select forests, continuous moderator curves,

@@ -6,18 +6,20 @@
 \usage{
 wsmed_effects(
   object,
-  type = c("indirect", "total", "direct", "total_indirect", "paths", "parameters"),
+  type = c("indirect", "all", "total", "direct", "total_indirect", "paths", "parameters"),
   terms = NULL,
   at = NULL,
-  scale = c("raw", "marginal"),
+  scale = NULL,
   method = NULL,
-  level = NULL
+  level = NULL,
+  standardized = NULL
 )
 }
 \arguments{
 \item{object}{A wsmed_fit, wsmed_inference, or wsMed result.}
 
-\item{type}{Effect family: indirect, total, direct, total_indirect, paths,
+\item{type}{Effect family: indirect, all (direct, specific indirect, total
+indirect and total effects), total, direct, total_indirect, paths,
 or parameters (primitive model parameters).}
 
 \item{terms}{Optional coefficient or effect names within the selected family.}
@@ -27,12 +29,17 @@ Defaults to the centering reference for a continuous moderator, or all
 observed levels for a categorical moderator. Parameters ignore no probes:
 supplying at with type = "parameters" is an error.}
 
-\item{scale}{raw or marginal model-implied endpoint standardization.}
+\item{scale}{Compatibility spelling: raw or marginal. Explicit conflicting
+scale and standardized arguments are rejected.}
 
 \item{method}{Stored inference to use when object is wsMed: mc or bootstrap.
 Required if both are stored. A fit alone returns point estimates only.}
 
 \item{level}{Confidence level; defaults to the stored inference level or .95.}
+
+\item{standardized}{NULL inherits the saved analysis setting (FALSE for older
+objects without a setting). TRUE uses model-implied marginal endpoint SDs,
+with or without moderation. FALSE returns raw effects.}
 }
 \value{
 A wsmed_results object with a full-precision table, joint effect draws,

@@ -344,32 +344,209 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h2>One call remains available</h2>
 <p><code>wsMed()</code> specifies, fits, and performs inference in one
 call. It uses the same engines as the staged interface below. Existing
-arguments and result fields remain available. Default printing gives an
-overview; <code>summary()</code> returns selected effects, and
-<code>print(result, detail = &quot;full&quot;)</code> prints the original
-tables.</p>
+arguments and result fields remain available. Default printing shows the
+core effect report; <code>print(result, detail = &quot;full&quot;)</code> also
+displays path coefficients. <code>summary()</code> creates a structured
+statistical summary with full-precision tables.
+<code>print(result, detail = &quot;legacy&quot;)</code> retains the original
+stored report.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">data</span>(example_data)</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">wsMed</span>(example_data,</span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>  <span class="at">M_C1 =</span> <span class="fu">c</span>(<span class="st">&quot;A1&quot;</span>, <span class="st">&quot;B1&quot;</span>), <span class="at">M_C2 =</span> <span class="fu">c</span>(<span class="st">&quot;A2&quot;</span>, <span class="st">&quot;B2&quot;</span>),</span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>  <span class="at">Y_C1 =</span> <span class="st">&quot;D1&quot;</span>, <span class="at">Y_C2 =</span> <span class="st">&quot;D2&quot;</span>, <span class="at">R =</span> <span class="dv">2000</span>, <span class="at">seed =</span> <span class="dv">123</span>)</span>
 <span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>result</span>
 <span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co">#&gt; wsMed analysis</span></span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="co">#&gt; wsMed fit: P | DE | 1 fitted dataset(s)</span></span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#&gt; Observations: 100 of 100 input rows</span></span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co">#&gt; Converged: 1 of 1 </span></span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span></span>
-<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co">#&gt; Stored inference: mc </span></span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co">#&gt; Use summary() for effects; print(detail = &#39;full&#39;) for all legacy tables.</span></span>
-<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="fu">summary</span>(result)</span>
-<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="co">#&gt; wsMed indirect | raw scale | mc </span></span>
-<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
-<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
-<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="co">#&gt;                Estimate Std. Error CI lower CI upper</span></span>
-<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="co">#&gt; indirect_1: M1  0.00131    0.00310 -0.00488  0.00807</span></span>
-<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="co">#&gt; indirect_2: M2 -0.00112    0.00256 -0.00732  0.00311</span></span>
-<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
-<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span></code></pre></div>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="co">#&gt; Model: P | DE | Observations: 100 </span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#&gt; Effects:</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co">#&gt; wsMed all | raw scale | mc </span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co">#&gt;                                        Estimate Std. Error  CI lower  CI upper</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co">#&gt; cp: Direct effect                     -0.031795   0.017108 -0.064335  0.002990</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="co">#&gt; indirect_1: M1                         0.001311   0.003103 -0.004881  0.008066</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="co">#&gt; indirect_2: M2                        -0.001120   0.002563 -0.007323  0.003114</span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="co">#&gt; total_indirect: Total indirect effect  0.000191   0.004044 -0.008220  0.007948</span></span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="co">#&gt; total: Total effect                   -0.031604   0.016950 -0.063912  0.001889</span></span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0</span></span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="fu">summary</span>(result)</span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="co">#&gt; wsMed statistical summary</span></span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a><span class="co">#&gt; Model: P | Missing: DE | Observations: 100 </span></span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a><span class="co">#&gt; Effects:</span></span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a><span class="co">#&gt; wsMed all | raw scale | mc </span></span>
+<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
+<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a><span class="co">#&gt;                                        Estimate Std. Error  CI lower  CI upper</span></span>
+<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a><span class="co">#&gt; cp: Direct effect                     -0.031795   0.017108 -0.064335  0.002990</span></span>
+<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a><span class="co">#&gt; indirect_1: M1                         0.001311   0.003103 -0.004881  0.008066</span></span>
+<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a><span class="co">#&gt; indirect_2: M2                        -0.001120   0.002563 -0.007323  0.003114</span></span>
+<span id="cb1-32"><a href="#cb1-32" tabindex="-1"></a><span class="co">#&gt; total_indirect: Total indirect effect  0.000191   0.004044 -0.008220  0.007948</span></span>
+<span id="cb1-33"><a href="#cb1-33" tabindex="-1"></a><span class="co">#&gt; total: Total effect                   -0.031604   0.016950 -0.063912  0.001889</span></span>
+<span id="cb1-34"><a href="#cb1-34" tabindex="-1"></a><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
+<span id="cb1-35"><a href="#cb1-35" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span id="cb1-36"><a href="#cb1-36" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-37"><a href="#cb1-37" tabindex="-1"></a><span class="co">#&gt; Path coefficients:</span></span>
+<span id="cb1-38"><a href="#cb1-38" tabindex="-1"></a><span class="co">#&gt;    Estimate Std. Error CI lower CI upper</span></span>
+<span id="cb1-39"><a href="#cb1-39" tabindex="-1"></a><span class="co">#&gt; cp -0.03180    0.01711 -0.06434  0.00299</span></span>
+<span id="cb1-40"><a href="#cb1-40" tabindex="-1"></a><span class="co">#&gt; b1 -0.04834    0.09415 -0.23465  0.14198</span></span>
+<span id="cb1-41"><a href="#cb1-41" tabindex="-1"></a><span class="co">#&gt; d1 -0.06905    0.09517 -0.25340  0.12149</span></span>
+<span id="cb1-42"><a href="#cb1-42" tabindex="-1"></a><span class="co">#&gt; b2 -0.07732    0.09295 -0.25608  0.10887</span></span>
+<span id="cb1-43"><a href="#cb1-43" tabindex="-1"></a><span class="co">#&gt; d2 -0.03676    0.08669 -0.21014  0.12946</span></span>
+<span id="cb1-44"><a href="#cb1-44" tabindex="-1"></a><span class="co">#&gt; a1 -0.02712    0.01764 -0.06014  0.00789</span></span>
+<span id="cb1-45"><a href="#cb1-45" tabindex="-1"></a><span class="co">#&gt; a2  0.01448    0.01791 -0.02054  0.04971</span></span>
+<span id="cb1-46"><a href="#cb1-46" tabindex="-1"></a><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span></span>
+<span id="cb1-47"><a href="#cb1-47" tabindex="-1"></a><span class="co">#&gt; Tables: $effects, $coefficients; analysis settings: $info.</span></span></code></pre></div>
+</div>
+<div id="read-reports-or-extract-tables" class="section level2">
+<h2>Read reports or extract tables</h2>
+<p>The same effect calculations power both outputs. <code>print()</code>
+is for reading a report; <code>summary()</code> returns a structured
+object whose display uses ordinary R coefficient tables. The default
+summary includes the direct effect, each specific indirect effect, the
+total indirect effect and the total effect. The total indirect effect
+equals the specific indirect effect in a one-mediator model; both named
+rows are retained for a stable extraction schema.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">summary</span>(result)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>s<span class="sc">$</span>effects[, <span class="fu">c</span>(<span class="st">&quot;effect&quot;</span>, <span class="st">&quot;label&quot;</span>, <span class="st">&quot;estimate&quot;</span>, <span class="st">&quot;std.error&quot;</span>, <span class="st">&quot;conf.low&quot;</span>, <span class="st">&quot;conf.high&quot;</span>)]</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#&gt;           effect                 label      estimate   std.error     conf.low</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt; 1             cp         Direct effect -0.0317954295 0.017108077 -0.064335385</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&gt; 2     indirect_1                    M1  0.0013113045 0.003103070 -0.004881299</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt; 3     indirect_2                    M2 -0.0011199168 0.002562857 -0.007323464</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt; 4 total_indirect Total indirect effect  0.0001913877 0.004043645 -0.008219743</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; 5          total          Total effect -0.0316040417 0.016950481 -0.063912121</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt;     conf.high</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; 1 0.002989586</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt; 2 0.008066491</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; 3 0.003114028</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt; 4 0.007948215</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; 5 0.001888977</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>s<span class="sc">$</span>coefficients</span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt;   term effect label moderator   at    estimate  std.error    conf.low</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; 1   cp     cp    cp      &lt;NA&gt; &lt;NA&gt; -0.03179543 0.01710808 -0.06433538</span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; 2   b1     b1    b1      &lt;NA&gt; &lt;NA&gt; -0.04834449 0.09414650 -0.23465290</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt; 3   d1     d1    d1      &lt;NA&gt; &lt;NA&gt; -0.06905067 0.09517147 -0.25339953</span></span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="co">#&gt; 4   b2     b2    b2      &lt;NA&gt; &lt;NA&gt; -0.07732384 0.09295419 -0.25608191</span></span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt; 5   d2     d2    d2      &lt;NA&gt; &lt;NA&gt; -0.03675903 0.08668557 -0.21014137</span></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&gt; 6   a1     a1    a1      &lt;NA&gt; &lt;NA&gt; -0.02712418 0.01763957 -0.06014372</span></span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="co">#&gt; 7   a2     a2    a2      &lt;NA&gt; &lt;NA&gt;  0.01448346 0.01790946 -0.02053748</span></span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="co">#&gt;     conf.high effect_type path conf.level method   interval scale n.valid</span></span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a><span class="co">#&gt; 1 0.002989586       paths &lt;NA&gt;       0.95     mc percentile   raw    2000</span></span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a><span class="co">#&gt; 2 0.141983977       paths &lt;NA&gt;       0.95     mc percentile   raw    2000</span></span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a><span class="co">#&gt; 3 0.121491557       paths &lt;NA&gt;       0.95     mc percentile   raw    2000</span></span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a><span class="co">#&gt; 4 0.108874666       paths &lt;NA&gt;       0.95     mc percentile   raw    2000</span></span>
+<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a><span class="co">#&gt; 5 0.129459767       paths &lt;NA&gt;       0.95     mc percentile   raw    2000</span></span>
+<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a><span class="co">#&gt; 6 0.007889016       paths &lt;NA&gt;       0.95     mc percentile   raw    2000</span></span>
+<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a><span class="co">#&gt; 7 0.049712847       paths &lt;NA&gt;       0.95     mc percentile   raw    2000</span></span>
+<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a><span class="co">#&gt;      status moderator.value moderator.level</span></span>
+<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a><span class="co">#&gt; 1 inference              NA            &lt;NA&gt;</span></span>
+<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a><span class="co">#&gt; 2 inference              NA            &lt;NA&gt;</span></span>
+<span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a><span class="co">#&gt; 3 inference              NA            &lt;NA&gt;</span></span>
+<span id="cb2-36"><a href="#cb2-36" tabindex="-1"></a><span class="co">#&gt; 4 inference              NA            &lt;NA&gt;</span></span>
+<span id="cb2-37"><a href="#cb2-37" tabindex="-1"></a><span class="co">#&gt; 5 inference              NA            &lt;NA&gt;</span></span>
+<span id="cb2-38"><a href="#cb2-38" tabindex="-1"></a><span class="co">#&gt; 6 inference              NA            &lt;NA&gt;</span></span>
+<span id="cb2-39"><a href="#cb2-39" tabindex="-1"></a><span class="co">#&gt; 7 inference              NA            &lt;NA&gt;</span></span>
+<span id="cb2-40"><a href="#cb2-40" tabindex="-1"></a>s<span class="sc">$</span>info<span class="sc">$</span>standardized</span>
+<span id="cb2-41"><a href="#cb2-41" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span>
+<span id="cb2-42"><a href="#cb2-42" tabindex="-1"></a><span class="fu">print</span>(result, <span class="at">detail =</span> <span class="st">&quot;full&quot;</span>)</span>
+<span id="cb2-43"><a href="#cb2-43" tabindex="-1"></a><span class="co">#&gt; wsMed analysis</span></span>
+<span id="cb2-44"><a href="#cb2-44" tabindex="-1"></a><span class="co">#&gt; Model: P | DE | Observations: 100 </span></span>
+<span id="cb2-45"><a href="#cb2-45" tabindex="-1"></a><span class="co">#&gt; wsMed statistical summary</span></span>
+<span id="cb2-46"><a href="#cb2-46" tabindex="-1"></a><span class="co">#&gt; Model: P | Missing: DE | Observations: 100 </span></span>
+<span id="cb2-47"><a href="#cb2-47" tabindex="-1"></a><span class="co">#&gt; Effects:</span></span>
+<span id="cb2-48"><a href="#cb2-48" tabindex="-1"></a><span class="co">#&gt; wsMed all | raw scale | mc </span></span>
+<span id="cb2-49"><a href="#cb2-49" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
+<span id="cb2-50"><a href="#cb2-50" tabindex="-1"></a><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span id="cb2-51"><a href="#cb2-51" tabindex="-1"></a><span class="co">#&gt;                                        Estimate Std. Error  CI lower  CI upper</span></span>
+<span id="cb2-52"><a href="#cb2-52" tabindex="-1"></a><span class="co">#&gt; cp: Direct effect                     -0.031795   0.017108 -0.064335  0.002990</span></span>
+<span id="cb2-53"><a href="#cb2-53" tabindex="-1"></a><span class="co">#&gt; indirect_1: M1                         0.001311   0.003103 -0.004881  0.008066</span></span>
+<span id="cb2-54"><a href="#cb2-54" tabindex="-1"></a><span class="co">#&gt; indirect_2: M2                        -0.001120   0.002563 -0.007323  0.003114</span></span>
+<span id="cb2-55"><a href="#cb2-55" tabindex="-1"></a><span class="co">#&gt; total_indirect: Total indirect effect  0.000191   0.004044 -0.008220  0.007948</span></span>
+<span id="cb2-56"><a href="#cb2-56" tabindex="-1"></a><span class="co">#&gt; total: Total effect                   -0.031604   0.016950 -0.063912  0.001889</span></span>
+<span id="cb2-57"><a href="#cb2-57" tabindex="-1"></a><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
+<span id="cb2-58"><a href="#cb2-58" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span id="cb2-59"><a href="#cb2-59" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-60"><a href="#cb2-60" tabindex="-1"></a><span class="co">#&gt; Path coefficients:</span></span>
+<span id="cb2-61"><a href="#cb2-61" tabindex="-1"></a><span class="co">#&gt;    Estimate Std. Error CI lower CI upper</span></span>
+<span id="cb2-62"><a href="#cb2-62" tabindex="-1"></a><span class="co">#&gt; cp -0.03180    0.01711 -0.06434  0.00299</span></span>
+<span id="cb2-63"><a href="#cb2-63" tabindex="-1"></a><span class="co">#&gt; b1 -0.04834    0.09415 -0.23465  0.14198</span></span>
+<span id="cb2-64"><a href="#cb2-64" tabindex="-1"></a><span class="co">#&gt; d1 -0.06905    0.09517 -0.25340  0.12149</span></span>
+<span id="cb2-65"><a href="#cb2-65" tabindex="-1"></a><span class="co">#&gt; b2 -0.07732    0.09295 -0.25608  0.10887</span></span>
+<span id="cb2-66"><a href="#cb2-66" tabindex="-1"></a><span class="co">#&gt; d2 -0.03676    0.08669 -0.21014  0.12946</span></span>
+<span id="cb2-67"><a href="#cb2-67" tabindex="-1"></a><span class="co">#&gt; a1 -0.02712    0.01764 -0.06014  0.00789</span></span>
+<span id="cb2-68"><a href="#cb2-68" tabindex="-1"></a><span class="co">#&gt; a2  0.01448    0.01791 -0.02054  0.04971</span></span>
+<span id="cb2-69"><a href="#cb2-69" tabindex="-1"></a><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span></span>
+<span id="cb2-70"><a href="#cb2-70" tabindex="-1"></a><span class="co">#&gt; Tables: $effects, $coefficients; analysis settings: $info.</span></span></code></pre></div>
+<p><code>as.data.frame(s)</code>, <code>coef(s)</code>,
+<code>confint(s)</code>, <code>vcov(s)</code> and <code>plot(s)</code>
+concern the selected effects. <code>$coefficients</code> contains
+conditional path slopes; select <code>type = &quot;parameters&quot;</code> for
+primitive model parameters. <code>summary(s, level = .90)</code> updates
+intervals and both summary tables from the saved draws.</p>
+<p>Use <code>wsMed(..., standardized = TRUE)</code> to save the
+reporting preference, or
+<code>wsmed_fit(..., standardized = TRUE)</code> in the staged workflow.
+Printing, summaries, effect extraction and generic plotting inherit it,
+with or without moderation. The parameter changes the output scale, not
+the fitted model. Explicit <code>standardized = FALSE</code> or
+<code>TRUE</code> overrides it for one query. The older
+<code>scale = &quot;raw&quot;</code> / <code>&quot;marginal&quot;</code> spelling remains
+supported; conflicting arguments are rejected. Marginal endpoint
+standardization has the same definition as in the <a href="StandardizedModeratedMediation.html">standardization
+tutorial</a>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>standardized_summary <span class="ot">&lt;-</span> <span class="fu">summary</span>(result, <span class="at">standardized =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>standardized_summary<span class="sc">$</span>effects</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt;             term         effect                 label moderator   at</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; 1             cp             cp         Direct effect      &lt;NA&gt; &lt;NA&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; 2     indirect_1     indirect_1                    M1      &lt;NA&gt; &lt;NA&gt;</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; 3     indirect_2     indirect_2                    M2      &lt;NA&gt; &lt;NA&gt;</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; 4 total_indirect total_indirect Total indirect effect      &lt;NA&gt; &lt;NA&gt;</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; 5          total          total          Total effect      &lt;NA&gt; &lt;NA&gt;</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt;       estimate  std.error    conf.low  conf.high    effect_type path conf.level</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; 1 -0.187872685 0.10205327 -0.38780358 0.01911911         direct &lt;NA&gt;       0.95</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; 2  0.007748230 0.01807421 -0.02841732 0.04635855       indirect   M1       0.95</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; 3 -0.006617359 0.01490903 -0.04340102 0.01810294       indirect   M2       0.95</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt; 4  0.001130871 0.02359440 -0.04706976 0.04639482 total_indirect &lt;NA&gt;       0.95</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; 5 -0.186741814 0.10103888 -0.38356324 0.01120246          total &lt;NA&gt;       0.95</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt;   method   interval    scale n.valid    status moderator.value moderator.level</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt; 1     mc percentile marginal    2000 inference              NA            &lt;NA&gt;</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt; 2     mc percentile marginal    2000 inference              NA            &lt;NA&gt;</span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt; 3     mc percentile marginal    2000 inference              NA            &lt;NA&gt;</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt; 4     mc percentile marginal    2000 inference              NA            &lt;NA&gt;</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt; 5     mc percentile marginal    2000 inference              NA            &lt;NA&gt;</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="fu">summary</span>(result, <span class="at">type =</span> <span class="st">&quot;indirect&quot;</span>, <span class="at">terms =</span> <span class="st">&quot;indirect_1&quot;</span>)</span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt; wsMed statistical summary</span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt; Model: P | Missing: DE | Observations: 100 </span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt; Effects:</span></span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt; wsMed indirect | raw scale | mc </span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a><span class="co">#&gt;                Estimate Std. Error CI lower CI upper</span></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a><span class="co">#&gt; indirect_1: M1  0.00131    0.00310 -0.00488  0.00807</span></span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a><span class="co">#&gt; Path coefficients:</span></span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a><span class="co">#&gt;    Estimate Std. Error CI lower CI upper</span></span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a><span class="co">#&gt; cp -0.03180    0.01711 -0.06434  0.00299</span></span>
+<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a><span class="co">#&gt; b1 -0.04834    0.09415 -0.23465  0.14198</span></span>
+<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a><span class="co">#&gt; d1 -0.06905    0.09517 -0.25340  0.12149</span></span>
+<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a><span class="co">#&gt; b2 -0.07732    0.09295 -0.25608  0.10887</span></span>
+<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a><span class="co">#&gt; d2 -0.03676    0.08669 -0.21014  0.12946</span></span>
+<span id="cb3-40"><a href="#cb3-40" tabindex="-1"></a><span class="co">#&gt; a1 -0.02712    0.01764 -0.06014  0.00789</span></span>
+<span id="cb3-41"><a href="#cb3-41" tabindex="-1"></a><span class="co">#&gt; a2  0.01448    0.01791 -0.02054  0.04971</span></span>
+<span id="cb3-42"><a href="#cb3-42" tabindex="-1"></a><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span></span>
+<span id="cb3-43"><a href="#cb3-43" tabindex="-1"></a><span class="co">#&gt; Tables: $effects, $coefficients; analysis settings: $info.</span></span></code></pre></div>
+<p>For moderation, <code>at</code> contains <strong>raw</strong>
+moderator values or category labels. Continuous moderators default to
+the centering reference; categorical moderators default to all observed
+levels. This reports conditional effects, not an average over the
+moderator. <code>method</code> selects a saved inference engine, and
+<code>level</code> selects the confidence level. A report prints both
+engines separately when both are stored;
+<code>summary(result, method = &quot;mc&quot;)</code> or
+<code>method = &quot;bootstrap&quot;</code> selects one coherent summary. No
+fitting or resampling is performed.</p>
 <p>The examples use 2,000 draws for speed. The Monte Carlo default
 remains 20,000.</p>
 </div>
@@ -379,62 +556,65 @@ remains 20,000.</p>
 <code>after - before</code>. Mediator role names make custom edges and
 displayed pathways readable. Data remain wide, with one row per
 participant. Fitting alone does not generate simulation draws.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">wsmed_model</span>(</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;D1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;D2&quot;</span>),</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="at">mediators =</span> <span class="fu">list</span>(<span class="at">A =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;A1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;A2&quot;</span>),</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>                   <span class="at">B =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;B1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;B2&quot;</span>)))</span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">wsmed_fit</span>(model, example_data)</span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>inference <span class="ot">&lt;-</span> <span class="fu">wsmed_infer</span>(fit, <span class="at">method =</span> <span class="st">&quot;mc&quot;</span>, <span class="at">draws =</span> <span class="dv">2000</span>, <span class="at">seed =</span> <span class="dv">123</span>)</span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>fit</span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; wsMed fit: P | DE | 1 fitted dataset(s)</span></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; Observations: 100 of 100 input rows</span></span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; Converged: 1 of 1 </span></span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt; Condition contrast: after - before </span></span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0</span></span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>inference</span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; wsMed inference: mc | 2000 valid draws of 2000 requested</span></span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt; 95% effect intervals: percentile; stored parameter-table convention: percentile</span></span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; Use summary() or wsmed_effects() to select effects.</span></span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">isTRUE</span>(<span class="fu">all.equal</span>(inference<span class="sc">$</span>draws, result<span class="sc">$</span>mc<span class="sc">$</span>result<span class="sc">$</span>thetahatstar)))</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">wsmed_model</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;D1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;D2&quot;</span>),</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">mediators =</span> <span class="fu">list</span>(<span class="at">A =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;A1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;A2&quot;</span>),</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>                   <span class="at">B =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;B1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;B2&quot;</span>)))</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">wsmed_fit</span>(model, example_data)</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>inference <span class="ot">&lt;-</span> <span class="fu">wsmed_infer</span>(fit, <span class="at">method =</span> <span class="st">&quot;mc&quot;</span>, <span class="at">draws =</span> <span class="dv">2000</span>, <span class="at">seed =</span> <span class="dv">123</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>fit</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; wsMed fit: P | DE | 1 fitted dataset(s)</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; Observations: 100 of 100 input rows</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; Converged: 1 of 1 </span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; Condition contrast: after - before </span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>inference</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; wsMed inference: mc | 2000 valid draws of 2000 requested</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; 95% effect intervals: percentile; stored parameter-table convention: percentile</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; Use summary() or wsmed_effects() to select effects.</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">isTRUE</span>(<span class="fu">all.equal</span>(inference<span class="sc">$</span>draws, result<span class="sc">$</span>mc<span class="sc">$</span>result<span class="sc">$</span>thetahatstar)))</span></code></pre></div>
 <p><code>coef(fit)</code> and <code>vcov(fit)</code> return fitted
 primitive parameters and their covariance. For MI these are Rubin-pooled
 quantities. <code>vcov(inference)</code> instead returns the empirical
 covariance of its stored parameter draws. <code>summary(fit)</code>
-displays parameters; <code>summary(inference)</code> extracts indirect
-effects. <code>confint(fit)</code> asks you to run inference first.
+displays native fitted parameters; <code>summary(inference)</code>
+collects all core effects and conditional path coefficients. A fit-only
+summary retains native parameter standard errors; obtain inference
+before requesting standardized effect intervals.
+<code>confint(fit)</code> asks you to run inference first.
 <code>wsmed_inspect(fit, &quot;syntax&quot;)</code> exposes the generated SEM
 syntax, while <code>wsmed_inspect(fit, &quot;fits&quot;)</code> returns all
 backend fits.</p>
 </div>
 <div id="query-results-without-rerunning-the-analysis" class="section level2">
 <h2>Query results without rerunning the analysis</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>effects <span class="ot">&lt;-</span> <span class="fu">wsmed_effects</span>(inference)</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">as.data.frame</span>(effects)</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt;         term     effect label moderator   at     estimate   std.error</span></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; 1 indirect_1 indirect_1     A      &lt;NA&gt; &lt;NA&gt;  0.001311305 0.003103070</span></span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; 2 indirect_2 indirect_2     B      &lt;NA&gt; &lt;NA&gt; -0.001119917 0.002562857</span></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt;       conf.low   conf.high effect_type path conf.level method   interval scale</span></span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; 1 -0.004881299 0.008066491    indirect    A       0.95     mc percentile   raw</span></span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; 2 -0.007323464 0.003114028    indirect    B       0.95     mc percentile   raw</span></span>
-<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt;   n.valid    status moderator.value moderator.level</span></span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; 1    2000 inference              NA            &lt;NA&gt;</span></span>
-<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; 2    2000 inference              NA            &lt;NA&gt;</span></span>
-<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="fu">confint</span>(effects, <span class="at">level =</span> .<span class="dv">90</span>)</span>
-<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt;                     5 %        95 %</span></span>
-<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; indirect_1 -0.002966660 0.006683333</span></span>
-<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt; indirect_2 -0.005713307 0.002124195</span></span>
-<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="fu">wsmed_effects</span>(inference, <span class="at">type =</span> <span class="st">&quot;total&quot;</span>, <span class="at">scale =</span> <span class="st">&quot;marginal&quot;</span>)</span>
-<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt; wsMed total | marginal scale | mc </span></span>
-<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
-<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt; Condition contrast: after - before </span></span>
-<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt; Standardization: effect / marginal model-implied SD(D2 - D1); condition contrast is unscaled.</span></span>
-<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt; Plug-in marginal outcome-difference SD: 0.169239 </span></span>
-<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
-<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt;       Estimate Std. Error CI lower CI upper</span></span>
-<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt; total  -0.1867     0.1010  -0.3836   0.0112</span></span>
-<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
-<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>effects <span class="ot">&lt;-</span> <span class="fu">wsmed_effects</span>(inference)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">as.data.frame</span>(effects)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt;         term     effect label moderator   at     estimate   std.error</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; 1 indirect_1 indirect_1     A      &lt;NA&gt; &lt;NA&gt;  0.001311305 0.003103070</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; 2 indirect_2 indirect_2     B      &lt;NA&gt; &lt;NA&gt; -0.001119917 0.002562857</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt;       conf.low   conf.high effect_type path conf.level method   interval scale</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; 1 -0.004881299 0.008066491    indirect    A       0.95     mc percentile   raw</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; 2 -0.007323464 0.003114028    indirect    B       0.95     mc percentile   raw</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt;   n.valid    status moderator.value moderator.level</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; 1    2000 inference              NA            &lt;NA&gt;</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; 2    2000 inference              NA            &lt;NA&gt;</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="fu">confint</span>(effects, <span class="at">level =</span> .<span class="dv">90</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt;                     5 %        95 %</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt; indirect_1 -0.002966660 0.006683333</span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt; indirect_2 -0.005713307 0.002124195</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="fu">wsmed_effects</span>(inference, <span class="at">type =</span> <span class="st">&quot;total&quot;</span>, <span class="at">scale =</span> <span class="st">&quot;marginal&quot;</span>)</span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt; wsMed total | marginal scale | mc </span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt; Condition contrast: after - before </span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt; Standardization: effect / marginal model-implied SD(D2 - D1); condition contrast is unscaled.</span></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; Plug-in marginal outcome-difference SD: 0.169239 </span></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="co">#&gt;       Estimate Std. Error CI lower CI upper</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; total  -0.1867     0.1010  -0.3836   0.0112</span></span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span></code></pre></div>
 <p>These operations reuse stored joint draws. Tables retain full
 precision; <code>digits</code> controls printing only. Effect and
 contrast intervals are percentile intervals. This convention also
@@ -443,19 +623,19 @@ parameter tables. It is recorded in <code>effects$query</code> and the
 printed/plot labels. When <code>wsMed(ci_method = &quot;both&quot;)</code> stores
 two inference engines, specify <code>method = &quot;mc&quot;</code> or
 <code>method = &quot;bootstrap&quot;</code> in effect queries.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>contrast <span class="ot">&lt;-</span> <span class="fu">wsmed_contrasts</span>(effects,</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">B_minus_A =</span> <span class="fu">c</span>(<span class="at">indirect_2 =</span> <span class="dv">1</span>, <span class="at">indirect_1 =</span> <span class="sc">-</span><span class="dv">1</span>)))</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>contrast</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt; wsMed contrasts | raw scale | mc </span></span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; Condition contrast: after - before </span></span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; Contrast direction (signed weights):</span></span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt;  B_minus_A: +1 * B -1 * A</span></span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt;           Estimate Std. Error CI lower CI upper</span></span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; B_minus_A -0.00243    0.00401 -0.01141  0.00521</span></span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="fu">plot</span>(effects)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>contrast <span class="ot">&lt;-</span> <span class="fu">wsmed_contrasts</span>(effects,</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">B_minus_A =</span> <span class="fu">c</span>(<span class="at">indirect_2 =</span> <span class="dv">1</span>, <span class="at">indirect_1 =</span> <span class="sc">-</span><span class="dv">1</span>)))</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>contrast</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt; wsMed contrasts | raw scale | mc </span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; Condition contrast: after - before </span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt; Contrast direction (signed weights):</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt;  B_minus_A: +1 * B -1 * A</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt;           Estimate Std. Error CI lower CI upper</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; B_minus_A -0.00243    0.00401 -0.01141  0.00521</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="fu">plot</span>(effects)</span></code></pre></div>
 <div class="float">
 <img role="img" aria-label="plot of chunk contrasts" src="data:image/png;base64,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" alt="plot of chunk contrasts" />
 <div class="figcaption">plot of chunk contrasts</div>
@@ -470,34 +650,34 @@ interactions. Moderator main effects remain in <strong>all difference
 equations</strong>, consistent with the existing model generators.
 Average-component slope interactions can be requested separately through
 <code>average_interactions</code>.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>moderated <span class="ot">&lt;-</span> <span class="fu">wsmed_model</span>(</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;D1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;D2&quot;</span>),</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="at">mediators =</span> <span class="fu">list</span>(<span class="at">A =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;A1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;A2&quot;</span>),</span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>                   <span class="at">B =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;B1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;B2&quot;</span>)),</span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="at">moderator =</span> <span class="fu">list</span>(<span class="at">variable =</span> <span class="st">&quot;D3&quot;</span>, <span class="at">main_effects =</span> <span class="st">&quot;all_equations&quot;</span>,</span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>                   <span class="at">interactions =</span> <span class="fu">c</span>(<span class="st">&quot;A -&gt; Y&quot;</span>, <span class="st">&quot;B -&gt; Y&quot;</span>)))</span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>mod_fit <span class="ot">&lt;-</span> <span class="fu">wsmed_fit</span>(moderated, example_data)</span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>mod_inference <span class="ot">&lt;-</span> <span class="fu">wsmed_infer</span>(mod_fit, <span class="at">draws =</span> <span class="dv">2000</span>, <span class="at">seed =</span> <span class="dv">123</span>)</span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>conditional <span class="ot">&lt;-</span> <span class="fu">wsmed_effects</span>(mod_inference, <span class="at">at =</span> <span class="fu">list</span>(<span class="at">D3 =</span> <span class="fu">c</span>(.<span class="dv">2</span>, .<span class="dv">4</span>, .<span class="dv">6</span>)),</span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>                              <span class="at">scale =</span> <span class="st">&quot;marginal&quot;</span>)</span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>conditional</span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; wsMed indirect | marginal scale | mc </span></span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
-<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt; Condition contrast: after - before </span></span>
-<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt; Moderator: D3 in raw units; centering reference = 0.452271 </span></span>
-<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#&gt; Standardization: effect / marginal model-implied SD(D2 - D1); condition contrast is unscaled.</span></span>
-<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt; Plug-in marginal outcome-difference SD: 0.169191 </span></span>
-<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
-<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt;                            Estimate Std. Error CI lower CI upper</span></span>
-<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt; indirect_1@1: A [D3 = 0.2]  0.01695    0.03640 -0.05036  0.09900</span></span>
-<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; indirect_2@1: B [D3 = 0.2]  0.01668    0.03604 -0.04130  0.10725</span></span>
-<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co">#&gt; indirect_1@2: A [D3 = 0.4]  0.01040    0.01985 -0.02481  0.05323</span></span>
-<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="co">#&gt; indirect_2@2: B [D3 = 0.4] -0.00597    0.01511 -0.04268  0.02099</span></span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; indirect_1@3: A [D3 = 0.6]  0.00508    0.02194 -0.03986  0.05635</span></span>
-<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; indirect_2@3: B [D3 = 0.6] -0.00764    0.03052 -0.07449  0.05259</span></span>
-<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
-<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="fu">plot</span>(conditional)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>moderated <span class="ot">&lt;-</span> <span class="fu">wsmed_model</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;D1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;D2&quot;</span>),</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">mediators =</span> <span class="fu">list</span>(<span class="at">A =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;A1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;A2&quot;</span>),</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>                   <span class="at">B =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;B1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;B2&quot;</span>)),</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="at">moderator =</span> <span class="fu">list</span>(<span class="at">variable =</span> <span class="st">&quot;D3&quot;</span>, <span class="at">main_effects =</span> <span class="st">&quot;all_equations&quot;</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>                   <span class="at">interactions =</span> <span class="fu">c</span>(<span class="st">&quot;A -&gt; Y&quot;</span>, <span class="st">&quot;B -&gt; Y&quot;</span>)))</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>mod_fit <span class="ot">&lt;-</span> <span class="fu">wsmed_fit</span>(moderated, example_data)</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>mod_inference <span class="ot">&lt;-</span> <span class="fu">wsmed_infer</span>(mod_fit, <span class="at">draws =</span> <span class="dv">2000</span>, <span class="at">seed =</span> <span class="dv">123</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>conditional <span class="ot">&lt;-</span> <span class="fu">wsmed_effects</span>(mod_inference, <span class="at">at =</span> <span class="fu">list</span>(<span class="at">D3 =</span> <span class="fu">c</span>(.<span class="dv">2</span>, .<span class="dv">4</span>, .<span class="dv">6</span>)),</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>                              <span class="at">scale =</span> <span class="st">&quot;marginal&quot;</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>conditional</span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#&gt; wsMed indirect | marginal scale | mc </span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="co">#&gt; Condition contrast: after - before </span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="co">#&gt; Moderator: D3 in raw units; centering reference = 0.452271 </span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="co">#&gt; Standardization: effect / marginal model-implied SD(D2 - D1); condition contrast is unscaled.</span></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="co">#&gt; Plug-in marginal outcome-difference SD: 0.169191 </span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt;                            Estimate Std. Error CI lower CI upper</span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co">#&gt; indirect_1@1: A [D3 = 0.2]  0.01695    0.03640 -0.05036  0.09900</span></span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="co">#&gt; indirect_2@1: B [D3 = 0.2]  0.01668    0.03604 -0.04130  0.10725</span></span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co">#&gt; indirect_1@2: A [D3 = 0.4]  0.01040    0.01985 -0.02481  0.05323</span></span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="co">#&gt; indirect_2@2: B [D3 = 0.4] -0.00597    0.01511 -0.04268  0.02099</span></span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="co">#&gt; indirect_1@3: A [D3 = 0.6]  0.00508    0.02194 -0.03986  0.05635</span></span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a><span class="co">#&gt; indirect_2@3: B [D3 = 0.6] -0.00764    0.03052 -0.07449  0.05259</span></span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
+<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a><span class="fu">plot</span>(conditional)</span></code></pre></div>
 <div class="float">
 <img role="img" aria-label="plot of chunk moderation" src="data:image/png;base64,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" alt="plot of chunk moderation" />
 <div class="figcaption">plot of chunk moderation</div>
@@ -532,10 +712,10 @@ missing data.</p>
 SEM fit, and the pooled estimates/covariance. Its imputation seed is
 separate from the inference seed. A new inference can reuse the fit
 without reimputing.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>mi_fit <span class="ot">&lt;-</span> <span class="fu">wsmed_fit</span>(model, incomplete_data, <span class="at">missing =</span> <span class="st">&quot;mi&quot;</span>,</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>                    <span class="at">mi =</span> <span class="fu">list</span>(<span class="at">m =</span> <span class="dv">5</span>, <span class="at">method =</span> <span class="st">&quot;pmm&quot;</span>, <span class="at">seed =</span> <span class="dv">123</span>))</span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>mi_inference <span class="ot">&lt;-</span> <span class="fu">wsmed_infer</span>(mi_fit, <span class="at">draws =</span> <span class="dv">20000</span>, <span class="at">seed =</span> <span class="dv">604</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="fu">summary</span>(mi_inference)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>mi_fit <span class="ot">&lt;-</span> <span class="fu">wsmed_fit</span>(model, incomplete_data, <span class="at">missing =</span> <span class="st">&quot;mi&quot;</span>,</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>                    <span class="at">mi =</span> <span class="fu">list</span>(<span class="at">m =</span> <span class="dv">5</span>, <span class="at">method =</span> <span class="st">&quot;pmm&quot;</span>, <span class="at">seed =</span> <span class="dv">123</span>))</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>mi_inference <span class="ot">&lt;-</span> <span class="fu">wsmed_infer</span>(mi_fit, <span class="at">draws =</span> <span class="dv">20000</span>, <span class="at">seed =</span> <span class="dv">604</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="fu">summary</span>(mi_inference)</span></code></pre></div>
 <p>This interface preserves the existing per-imputation centering and
 first-imputation moderator reference; it does not introduce a different
 MI estimand. MI with nonparametric bootstrap remains unsupported. Non-MI
