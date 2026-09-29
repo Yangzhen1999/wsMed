@@ -42,8 +42,8 @@ check_frozen_vignettes <- function(root) {
   invisible(expected)
 }
 
-check_installed_vignettes <- function(root, lib) {
-  expected <- check_frozen_vignettes(root)
+check_installed_vignettes <- function(root, lib, expected = NULL) {
+  if (is.null(expected)) expected <- check_frozen_vignettes(root)
   installed <- find.package("wsMed", lib.loc = lib)
   index <- utils::vignette(package = "wsMed", lib.loc = lib)$results
   # R adds an '(source, pdf)' suffix to display titles; inspect the stored index.
@@ -53,6 +53,10 @@ check_installed_vignettes <- function(root, lib) {
   if (!identical(as.character(meta$Title[match(expected$Article, ids)]), expected$Title))
     stop("Installed tutorial titles differ from sources.")
   if (is.null(index) || nrow(index) != nrow(expected)) stop("Installed tutorials are not discoverable through vignette().")
+  installed_sources <- file.path(installed, "doc", paste0(expected$Article, ".Rmd"))
+  if (!all(file.exists(installed_sources)) ||
+      !identical(unname(vapply(installed_sources, vignette_text_hash, character(1))), expected$Rendered))
+    stop("Installed tutorial content differs from the validated build inputs.")
   for (id in expected$Article) {
     html <- file.path(installed, "doc", paste0(id, ".html"))
     if (!file.exists(html) || file.info(html)$size == 0) stop("Missing installed HTML tutorial: ", id)

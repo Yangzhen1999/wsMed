@@ -51,17 +51,20 @@ test_that("binary type decisions remain explicit and interfaces agree for factor
 })
 
 test_that("extrapolation uses observed used rows and survives extraction and plotting", {
-  a <- support_fixture(); a$data$D3[1] <- 1000; a$data$A1[1] <- NA
+  a <- support_fixture()
+  # Still outside support, without introducing an unrelated ill-scaled fit.
+  outside <- max(a$data$D3) + 1
+  a$data$D3[1] <- outside; a$data$A1[1] <- NA
   f <- wsmed_fit(a$model, a$data, missing = "listwise")
   limits <- range(a$data$D3[-1])
-  probes <- c(limits[1], mean(limits), limits[2], 1000)
+  probes <- c(limits[1], mean(limits), limits[2], outside)
   expect_warning(r <- wsmed_effects(f, at = list(D3 = probes)), class = "wsmed_extrapolation_warning")
   expect_identical(r$table$extrapolated, c(FALSE, FALSE, FALSE, TRUE))
   expect_equal(r$query$support$observed_range, limits)
   set.seed(902); before <- .Random.seed
   expect_no_warning(p <- plot(r))
   expect_identical(.Random.seed, before)
-  expect_match(p$labels$caption, "Extrapolation.*1000")
+  expect_match(p$labels$caption, "Extrapolation")
   expect_equal(p$data$extrapolated, r$table$extrapolated)
   expect_equal(attr(p, "wsmed_plot")$support, r$query$support)
   expect_no_warning(wsmed_effects(f, at = list(D3 = limits)))

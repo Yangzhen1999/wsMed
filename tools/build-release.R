@@ -22,17 +22,24 @@ build_wsmed_release <- function(root, output) {
   sys.source(file.path(stage, "rebuild_vignettes.R"), e)
   e$rebuild_vignettes(stage)
   sys.source(file.path(stage, "tools", "vignette-build-utils.R"), e)
-  e$check_frozen_vignettes(stage)
+  expected <- e$check_frozen_vignettes(stage)
+  write.dcf(expected, file.path(output, "tutorial-input-manifest.dcf"))
   archive <- pkgbuild::build(stage, dest_path = output, vignettes = TRUE, manual = FALSE)
+  # R CMD build may regenerate inst/doc HTML. Verify unchanged numerical/text
+  # inputs separately from those intentionally regenerated presentation files.
+  after <- e$vignette_build_index(stage, file.path(stage, "vignettes"))
+  rownames(after) <- NULL
+  stable <- setdiff(names(expected), "HTML")
+  if (!identical(expected[stable], after[stable])) stop("Tutorial inputs changed during source-archive construction.")
   lib <- file.path(output, "library")
   dir.create(lib)
   log <- file.path(output, "install.log")
   status <- system2(file.path(R.home("bin"), if (.Platform$OS.type == "windows") "R.exe" else "R"),
     c("CMD", "INSTALL", "-l", shQuote(lib), shQuote(archive)), stdout = log, stderr = log)
   if (status != 0L) stop("Archive installation failed; inspect ", log)
-  e$check_installed_vignettes(stage, lib)
+  e$check_installed_vignettes(stage, lib, expected = expected)
   writeLines(c(paste("Archive:", archive), paste("MD5:", tools::md5sum(archive)),
-    paste("Tutorials:", nrow(e$check_frozen_vignettes(stage))),
+    paste("Tutorials:", nrow(expected)),
     "Installed tutorial inventory, titles and images verified.",
     "This builds a candidate archive; R CMD check and release approval remain separate."), file.path(output, "BUILD-RESULT.txt"))
   invisible(archive)
