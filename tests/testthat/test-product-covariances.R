@@ -158,7 +158,8 @@ test_that("formatted syntax keeps auxiliary equations separate from mediation pa
 
 test_that("MI pools new product parameters and retains reference coding for paired imputations", {
   d <- product_data(); d$m11[seq(2, nrow(d), 13)] <- NA
-  f <- wsmed_fit(product_model(one = TRUE), d, missing = "mi", mi = list(m = 3, seed = 11))
+  expect_warning(f <- wsmed_fit(product_model(one = TRUE), d, missing = "mi", mi = list(m = 3, seed = 11)),
+    class = "wsmed_mi_compatibility_warning")
   nuisance <- "M1diff~~int_M1diff_W1"
   expect_true(nuisance %in% names(f$coefficients))
   expect_equal(unname(f$coefficients[nuisance]),
@@ -192,7 +193,8 @@ test_that("MI pools new product parameters and retains reference coding for pair
 test_that("serial MI pools marginal variances before standardization and samples their joint covariance", {
   d <- product_data(n = 300)
   d$m11[seq(2, nrow(d), 5)] <- NA; d$m21[seq(4, nrow(d), 6)] <- NA
-  f <- wsmed_fit(product_model("parallel_serial"), d, missing = "mi", mi = list(m = 4, seed = 18))
+  expect_warning(f <- wsmed_fit(product_model("parallel_serial"), d, missing = "mi", mi = list(m = 4, seed = 18)),
+    class = "wsmed_mi_compatibility_warning")
   moments <- f$mi$pooled$marginal
   expected <- mean(vapply(f$backend, function(z) lavaan::fitted(z)$cov["Ydiff", "Ydiff"], numeric(1)))
   expect_equal(moments$point[["Ydiff"]], expected, tolerance = 1e-12)

@@ -31,6 +31,10 @@
 #'   confidence level, interval convention, view, and automatic-grid range.
 #' @details Curves connect finite probes; bands are pointwise percentile
 #' intervals, not simultaneous bands or Johnson--Neyman regions. Supplied probes
+#' outside the observed fitted-case range are identified in the caption and
+#' plotted data (`extrapolated`). Group counts appear in categorical captions;
+#' for MI these are ranges across completed datasets, not effective sample sizes.
+#' Plot metadata retain `support`, including the observed range or group counts.
 #' remain in raw units. A continuous conditional point plot requires explicit
 #' `at` values. Forest plots without `at` use the usual reference value.
 #' Category and effect selections retain their supplied order. A fitted object
@@ -168,12 +172,16 @@ plot.wsmed_results <- function(x, view = c("auto", "forest", "curve", "condition
   }
   if (x$diagnostics$invalid > 0L) caption <- paste0(caption, "\n",
     x$diagnostics$invalid, " invalid draws excluded jointly; ", x$diagnostics$valid, " valid draws.")
+  support_caption <- .wsmed_support_caption(x$query$support,
+    d$at, if (x$query$type == "contrasts") d$extrapolated %||% NA else NULL)
+  if (!is.null(support_caption)) caption <- paste(caption, support_caption, sep = "\n")
   p <- .wsmed_render_effect_plot(d, view, has_ci, title, subtitle, caption,
     x_label %||% if (view == "forest") scale_label else unique(d$moderator),
     y_label %||% if (view == "forest") NULL else scale_label, ncol, base_size)
   attr(p, "wsmed_plot") <- list(method = x$query$method, scale = x$query$scale,
     level = if (has_ci) x$query$level else NULL, interval = if (has_ci) "percentile" else NULL,
     view = view, grid_range = NULL, draw_ids = x$draw_ids, diagnostics = x$diagnostics)
+  attr(p, "wsmed_plot")$support <- x$query$support
   p
 }
 

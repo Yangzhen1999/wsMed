@@ -1,0 +1,166 @@
+---
+title: "Model-compatible multiple imputation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Model-compatible multiple imputation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+
+## Match imputation to the analysis
+
+Default `mice` imputation in wsMed uses main effects of the raw variables.
+Transforming completed data into difference scores and products does not make
+that imputation model compatible with a moderated analysis. More imputations
+reduce simulation error; they do not repair an incompatible conditional model.
+Both interfaces now emit one `wsmed_mi_compatibility_warning` per internally
+imputed fit with moderator interactions, even when the result is assigned
+without printing it. The message remains in `wsmed_inspect(fit, "diagnostics")$warnings`
+and the analysis manifest. External completions do not trigger this particular
+warning; their compatibility still requires the imputer's own checks.
+
+[Bartlett et al. (2015)](https://doi.org/10.1177/0962280214521348) describe
+substantive-model-compatible fully conditional specification (SMC-FCS).
+Here we use it to supply completed datasets to wsMed. The numerical pooling
+and standardization procedure is the same as for internal imputation.
+
+This worked example is deliberately limited: one mediator, observed moderator,
+observed first-condition outcome and second-condition mediator, with a
+normally distributed mediator conditional on its predictors. The first-condition
+outcome is generated independently. This is **not** a general imputation recipe
+for all within-subject models. In particular, missing values in both outcome
+conditions, missing moderators, serial paths or extra auxiliary variables need
+an appropriate joint/conditional model and their own validation.
+
+Install the optional dependency with `install.packages("smcfcs")`.
+
+## Generate the illustrative incomplete data
+
+
+``` r
+set.seed(720)
+n <- 300
+W <- rnorm(n)
+A <- rnorm(n)
+M <- .4 + .3*W + rnorm(n)
+Y <- .2 + .1*W + (.4 + .2*W)*M + .2*A + rnorm(n)
+y1 <- rnorm(n)
+dat <- data.frame(y1, y2 = y1+Y, m1 = A-M/2, m2 = A+M/2, W)
+dat$m1[runif(n) < .2] <- NA
+dat$y2[runif(n) < .2] <- NA
+model <- wsmed_model(c(before = "y1", after = "y2"),
+  list(M = c(before = "m1", after = "m2")),
+  moderator = list(variable = "W", interactions = "M -> Y"))
+```
+
+## Impute using the outcome interaction
+
+Because y1 is observed, the outcome difference can be imputed and mapped back
+to missing y2 values. The formula explicitly uses the mediator difference and
+average; `I(m2-m1)*W` includes their difference slope, W and its interaction.
+This avoids redundant columns when W is a factor. Product terms
+are evaluated within the substantive model, not imputed as independent variables.
+For this data-generating model, the imputation regression for m1 given m2 and W
+is normal and linear. These are model assumptions, not data-validation results.
+
+
+``` r
+imp_data <- data.frame(yd = dat$y2-dat$y1, m1 = dat$m1, m2 = dat$m2, W = dat$W)
+pred <- matrix(0, ncol(imp_data), ncol(imp_data),
+  dimnames = list(names(imp_data), names(imp_data)))
+pred["m1", c("m2", "W")] <- 1
+set.seed(721)
+imp <- withCallingHandlers(smcfcs::smcfcs(imp_data, smtype = "lm",
+  smformula = "yd ~ I(m2-m1)*W + I((m1+m2)/2)",
+  method = c("", "norm", "", ""), predictorMatrix = pred,
+  m = 5, numit = 20, rjlimit = 5000), warning = function(w) {
+    if (grepl("Rejection sampling failed", conditionMessage(w), fixed = TRUE))
+      stop("Resolve the rejection-sampling warning before analysis: increase rjlimit, rerun imputation and review diagnostics.", call. = FALSE)
+  })
+#> [1] "Outcome variable(s): yd"
+#> [1] "Passive variables: "
+#> [1] "Partially obs. variables: m1"
+#> [1] "Fully obs. substantive model variables: W"
+#> [1] "Imputation  1"
+#> [1] "Imputing missing outcomes using specified substantive model."
+#> [1] "Imputing:  m1  using  m2,W  plus outcome"
+#> [1] "Imputation  2"
+#> [1] "Imputation  3"
+#> [1] "Imputation  4"
+#> [1] "Imputation  5"
+completed <- lapply(imp$impDatasets, function(x) {
+  d <- dat
+  d$m1 <- x$m1
+  missing_y <- is.na(dat$y2)
+  d$y2[missing_y] <- dat$y1[missing_y]+x$yd[missing_y]
+  d
+})
+```
+
+Five imputations keep this tutorial short; choose the number of imputations and
+iterations for the actual missing-information fraction and required precision.
+Inspect `imp$smCoefIter` for mixing/stability and review rejection-sampling
+warnings. The example stops on rejection-sampling failures; do not pass warned
+imputations to the fitting step without resolving the issue. Twenty iterations
+are an example setting, not a convergence guarantee.
+
+The explicit predictor matrix matters: automatic predictor discovery in smcfcs
+can miss m2 when it appears only inside `I(...)`. We specify the covariate model
+`m1 ~ m2 + W`; the outcome is handled by the substantive-model step and must not
+be added to that predictor matrix.
+
+## Use either wsMed interface
+
+
+``` r
+fit <- wsmed_fit(model, dat, missing = "mi", mi = list(completed = completed))
+inference <- wsmed_infer(fit, draws = 2000, seed = 722)
+effects <- wsmed_effects(inference, at = list(W = c(-1, 0, 1)), scale = "marginal")
+effects
+#> wsMed indirect | marginal scale | mc 
+#> 95% percentile intervals; 2000 joint draws; SE from effect draws
+#> Condition contrast: after - before 
+#> Moderator: W in raw units; centering reference = 0.00106494 
+#> MI: per-imputation centering; first-imputation reporting reference.
+#> External imputations: compatibility and convergence require the imputer's own checks. 
+#> Standardization: effect / marginal model-implied SD(y2 - y1); condition contrast is unscaled.
+#> Plug-in marginal outcome-difference SD: 1.16987 
+#> The denominator is not a moderator-specific conditional SD.
+#>                          Estimate Std. Error CI lower CI upper
+#> indirect_1@1: M [W = -1]  0.04352    0.02870  0.00287  0.10946
+#> indirect_1@2: M [W = 0]   0.17787    0.03456  0.11559  0.25144
+#> indirect_1@3: M [W = 1]   0.40188    0.06618  0.28050  0.54041
+#> Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.
+#> Use as.data.frame() for the full-precision table and metadata.
+
+# The original one-call interface remains available.
+one_call <- wsMed(dat, "m1", "m2", "y1", "y2", W = "W",
+  MP = c("a1", "b1", "cp"), Na = "MI", R = 2000, standardized = TRUE,
+  mi_args = list(completed = completed, seed = 722))
+stopifnot(isTRUE(all.equal(coef(fit), coef(one_call$fit))))
+```
+
+The staged interface also accepts a `mice` mids object as `mi$completed`.
+It infers m, validates row names/order, observed cells and factor levels, then
+regenerates all differences, averages and products within each completed dataset.
+It does not reimpute, and it cannot verify statistical compatibility from the
+completed values alone. With the one-call interface, `mi_args$seed` still
+controls MC; it does not describe the external imputation seed.
+
+Save the external imputer object, its settings and package version separately
+from the wsMed analysis manifest. The latter records that imputations were
+external and their count, and deliberately excludes participant-level data.
+
+## What the validation can establish
+
+The development repository contains a paired study of the same incomplete
+datasets analyzed with default PMM, SMC-FCS and the underlying complete data.
+It records raw and standardized effects, estimated standardization denominators,
+bias, coverage, simulation uncertainty, warnings and failures. This isolates the
+effect of changing the imputer while keeping pooling and effect inference fixed.
+See the [paired study report](https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/.github/validation/mi-comparison/RESULTS.md).
+
+The comparison is restricted to its stated scenarios; it is not proof of nominal
+coverage for arbitrary models, data distributions or missingness mechanisms.

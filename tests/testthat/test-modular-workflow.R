@@ -189,7 +189,8 @@ test_that("MI imputes raw categorical predictors before creating dummy interacti
   d$Group[c(1, 4, 8)] <- NA
   m <- wsmed_model(c(T1 = "D1", T2 = "D2"), list(A = c(T1 = "A1", T2 = "A2")),
     moderator = list(variable = "Group", interactions = "A -> Y"))
-  f <- wsmed_fit(m, d, missing = "mi", mi = list(m = 2, seed = 123))
+  expect_warning(f <- wsmed_fit(m, d, missing = "mi", mi = list(m = 2, seed = 123)),
+    class = "wsmed_mi_compatibility_warning")
   expect_equal(unname(nobs(f)), c(100, 100))
   expect_identical(f$reference$by_dataset[[1]]$moderator$levels, c("L", "M", "H"))
   expect_identical(f$reference$by_dataset[[2]]$moderator$coding,

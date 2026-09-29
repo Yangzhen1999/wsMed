@@ -217,3 +217,10 @@ This does not reimpute or change the pooling/standardization engine. See the
 [model-compatible imputation tutorial](CompatibleImputation.html) for a scoped
 SMC-FCS example and the paired follow-up study. Save external imputation settings
 and convergence diagnostics separately; they cannot be inferred from completed data.
+
+Internal MI with moderator interactions emits a typed compatibility warning
+once per fit. This is retained in fit diagnostics and analysis manifests even
+when fitted objects are never printed. The warning does not establish that an
+external imputer is appropriate; its statistical and numerical checks remain
+necessary. Numeric 0/1 moderator interpretation messages are separately retained
+in `diagnostics$input_notes`.

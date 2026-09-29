@@ -43,6 +43,20 @@ the eventual release archive or a later commit has been checked.
   MC draws. The model-compatible MI tutorial and four SMC-FCS pipeline checks
   passed; the paired follow-up report records its separate statistical results.
 
+## Local usability/build follow-up: 2026-09-29
+
+* Complete suite: 1751 passing expectations; zero failures, warnings or skips.
+  Expected compatibility warnings are asserted by class in the relevant tests.
+* All 14 tutorials rebuilt, including prebuilt installed documentation.
+  Both a source-archive installation and a direct installation without rebuilding
+  vignettes expose the 14 current titles and complete HTML images.
+* The 820-row manuscript candidate baseline remains unchanged. Numeric 0/1
+  categorical labels now work in the legacy result assembler; explicit-factor
+  one-call/staged estimates and intervals agree in the new regression tests.
+* Checked candidate source archive: 0 ERRORs, 0 WARNINGs, 2 development/environment
+  NOTEs with --as-cran --no-manual. This remains a development validation record,
+  not a CRAN release submission or PDF-manual check.
+
 ## Changes since CRAN 1.1.0
 
 * Add staged model, fit, inference, extraction and plotting methods while

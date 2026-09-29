@@ -9,7 +9,9 @@ reliability_fixture <- local({
     m <- wsmed_model(c(before = "D1", after = "D2"),
       list(A = c(before = "A1", after = "A2")), moderator = if (kind == "plain") NULL else
         list(variable = if (kind == "categorical") "Group" else "D3", interactions = "A -> Y"))
-    f <- wsmed_fit(m, d, missing = missing, mi = list(m = 3, seed = 92))
+    run_fit <- function() wsmed_fit(m, d, missing = missing, mi = list(m = 3, seed = 92))
+    if (missing == "mi" && kind != "plain") expect_warning(f <- run_fit(),
+      class = "wsmed_mi_compatibility_warning") else f <- run_fit()
     cache[[key]] <- wsmed_infer(f, draws = 100, seed = 48, level = .90)
     cache[[key]]
   }

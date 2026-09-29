@@ -11,7 +11,9 @@ presentation_fixture <- local({
       list(A = c(before = "A1", after = "A2"), B = c(before = "B1", after = "B2")),
       moderator = if (kind == "plain") NULL else list(
         variable = if (kind == "continuous") "D3" else "Group", interactions = "A -> Y"))
-    f <- wsmed_fit(m, d, missing = missing, mi = list(m = 3, seed = 51))
+    run_fit <- function() wsmed_fit(m, d, missing = missing, mi = list(m = 3, seed = 51))
+    if (missing == "mi" && kind != "plain") expect_warning(f <- run_fit(),
+      class = "wsmed_mi_compatibility_warning") else f <- run_fit()
     cache[[key]] <- wsmed_infer(f, draws = 100, seed = 19, level = .90)
     cache[[key]]
   }

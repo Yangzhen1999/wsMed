@@ -12,7 +12,7 @@
 
 
 
-<title>Demonstration of printGM()</title>
+<title>Inspecting generated SEM syntax</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -336,15 +336,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">Demonstration of printGM()</h1>
+<h1 class="title toc-ignore">Inspecting generated SEM syntax</h1>
 
 
 
 <div id="demonstration-of-printgm" class="section level2">
 <h2>Demonstration of <code>printGM()</code></h2>
 <div id="using-printgm-with-wsmed" class="section level3">
-<h3>Using <code>printGM()</code> with <code>WsMed()</code></h3>
-<p>The <code>WsMed()</code> function returns a list containing
+<h3>Using <code>printGM()</code> with <code>wsMed()</code></h3>
+<p>The <code>wsMed()</code> function returns a list containing
 <code>sem_model</code>. <code>printGM()</code> can automatically extract
 and format the model equations.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(wsMed)</span>
@@ -356,9 +356,9 @@ and format the model equations.</p>
 <span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>  <span class="at">Y_C2 =</span> <span class="st">&quot;D2&quot;</span>,</span>
 <span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>  <span class="at">form =</span> <span class="st">&quot;P&quot;</span>,</span>
 <span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>  <span class="at">Na =</span> <span class="st">&quot;DE&quot;</span>,</span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>  <span class="at">standardized =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>  <span class="at">bootstrap =</span> <span class="dv">1000</span>,</span>
-<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>  <span class="at">iseed =</span> <span class="dv">123</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>  <span class="at">standardized =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>  <span class="at">ci_method =</span> <span class="st">&quot;mc&quot;</span>, <span class="at">R =</span> <span class="dv">1000</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">123</span></span>
 <span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>)</span>
 <span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="fu">printGM</span>(result1)</span></code></pre></div>
 <pre><code>## 
@@ -396,10 +396,10 @@ functions.</p>
 <span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co"># Prepare data</span></span>
 <span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>prepared_data <span class="ot">&lt;-</span> <span class="fu">PrepareData</span>(</span>
 <span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>  <span class="at">data =</span> example_data,</span>
-<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>  <span class="at">M_C1 =</span> <span class="fu">c</span>(<span class="st">&quot;A1&quot;</span>, <span class="st">&quot;B1&quot;</span>),</span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>  <span class="at">M_C2 =</span> <span class="fu">c</span>(<span class="st">&quot;A2&quot;</span>, <span class="st">&quot;B2&quot;</span>),</span>
-<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>  <span class="at">Y_C1 =</span> <span class="st">&quot;C1&quot;</span>,</span>
-<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>  <span class="at">Y_C2 =</span> <span class="st">&quot;C2&quot;</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>  <span class="at">M_C1 =</span> <span class="fu">c</span>(<span class="st">&quot;A1&quot;</span>, <span class="st">&quot;B1&quot;</span>, <span class="st">&quot;C1&quot;</span>),</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>  <span class="at">M_C2 =</span> <span class="fu">c</span>(<span class="st">&quot;A2&quot;</span>, <span class="st">&quot;B2&quot;</span>, <span class="st">&quot;C2&quot;</span>),</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>  <span class="at">Y_C1 =</span> <span class="st">&quot;D1&quot;</span>,</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>  <span class="at">Y_C2 =</span> <span class="st">&quot;D2&quot;</span></span>
 <span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>)</span>
 <span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a></span>
 <span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co"># Generate Model</span></span>
@@ -409,24 +409,34 @@ functions.</p>
 <span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="fu">printGM</span>(sem_model)</span></code></pre></div>
 <pre><code>## 
 ## Outcome Difference Model (Ydiff):
-##  Ydiff ~ cp*1 + b1*M1diff + d1*M1avg + b2*M2diff + d2*M2avg 
+##  Ydiff ~ cp*1 + b1*M1diff + d1*M1avg + b2*M2diff + b3*M3diff + d2*M2avg + d3*M3avg 
 ## 
 ## Mediator Difference Model (Chained Mediator - M1diff):
-## M1diff ~ a1*1 + b_2_1*M2diff + d_2_1*M2avg 
+## M1diff ~ a1*1 + b_2_1*M2diff + d_2_1*M2avg + b_3_1*M3diff + d_3_1*M3avg 
 ## 
 ## Mediator Difference Model (Other Mediators):
-## M2diff ~ a2*1 
+## M2diff ~ a2*1
+## M3diff ~ a3*1 
 ## 
 ## Indirect Effects:
 ## indirect_1 := a1 * b1
 ## indirect_2 := a2 * b2
-## indirect_2_1 := a2 * b_2_1 * b1 
+## indirect_2_1 := a2 * b_2_1 * b1
+## indirect_3 := a3 * b3
+## indirect_3_1 := a3 * b_3_1 * b1 
 ## 
 ## Total Indirect Effect:
-##  total_indirect := indirect_1 + indirect_2 + indirect_2_1 
+##  total_indirect := indirect_1 + indirect_2 + indirect_2_1 + indirect_3 + indirect_3_1 
 ## 
 ## Total Effect:
 ##  total_effect := cp + total_indirect</code></pre>
+<p><code>printGM()</code> displays the unstandardized model equations;
+requesting standardized estimates does not rewrite the SEM syntax. For
+standardized conditional estimates and plots, use
+<code>moderation_std</code> and
+<code>plot_moderation_curve(..., standardized = TRUE)</code>, as shown
+in <a href="StandardizedModeratedMediation.html">Standardized moderated
+mediation</a>.</p>
 </div>
 </div>
 

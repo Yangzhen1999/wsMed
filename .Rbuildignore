@@ -14,7 +14,10 @@
 ^Meta$
 ^cd$
 ^git$
+^vignettes/build-manifest\.dcf$
 ^vignettes/figure$
+^tools/build-release\.R$
+^tools/vignette-build-utils\.R$
 
 ^CRAN-SUBMISSION$
 ^cran-comments\.md$

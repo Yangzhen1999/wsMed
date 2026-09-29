@@ -132,6 +132,10 @@ The returned ggplot contains the full-precision plotted table in \code{data}.
 \details{
 Curves connect finite probes; bands are pointwise percentile
 intervals, not simultaneous bands or Johnson--Neyman regions. Supplied probes
+outside the observed fitted-case range are identified in the caption and
+plotted data (\code{extrapolated}). Group counts appear in categorical captions;
+for MI these are ranges across completed datasets, not effective sample sizes.
+Plot metadata retain \code{support}, including the observed range or group counts.
 remain in raw units. A continuous conditional point plot requires explicit
 \code{at} values. Forest plots without \code{at} use the usual reference value.
 Category and effect selections retain their supplied order. A fitted object

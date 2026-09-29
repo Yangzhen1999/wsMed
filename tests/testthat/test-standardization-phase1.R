@@ -196,10 +196,11 @@ test_that("public moderated MI forwards fixed.x to pooled fitting", {
   raw$y2 <- raw$y2 + raw$y1
   raw$m11[seq(1, 240, 20)] <- NA
   for (fixed in c(FALSE, TRUE)) {
-    out <- wsMed(raw, M_C1 = c("m11", "m21"), M_C2 = c("m12", "m22"),
+    expect_warning(out <- wsMed(raw, M_C1 = c("m11", "m21"), M_C2 = c("m12", "m22"),
                  Y_C1 = "y1", Y_C2 = "y2", W = "W", W_type = "continuous", MP = "b1",
                  form = "P", Na = "MI", ci_method = "mc", fixed.x = fixed,
-                 mi_args = list(m = 3), R = 80, standardized = TRUE, verbose = FALSE)
+                 mi_args = list(m = 3), R = 80, standardized = TRUE, verbose = FALSE),
+      class = "wsmed_mi_compatibility_warning")
     expect_identical(lavaan::lavInspect(out$mc$result$args$lav, "options")$fixed.x, fixed)
     expect_false(is.null(out$mc$std_mc))
     p <- out$mc$result$thetahat$est

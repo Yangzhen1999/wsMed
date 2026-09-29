@@ -52,6 +52,8 @@ The staged interface treats numeric 0/1 predictors as continuous. Convert them
 with `factor(x, levels = c(0, 1))` for a categorical interpretation. The one-call
 `wsMed()` interface retains automatic 0/1 detection; explicit factors and
 `W_type = "categorical"` avoid relying on that difference between interfaces.
+Both interfaces explain their numeric 0/1 moderator decision in a message,
+retained in `fit$diagnostics$input_notes`. These messages do not alter coding.
 
 ## Fit categorical moderated mediation
 
@@ -116,6 +118,10 @@ plot(difference)
 
 The effect intervals in the group plot are pointwise. Their overlap is not a
 test of equality; use the contrast interval to assess the difference.
+The caption reports fitted group counts. With MI it reports their range across
+completed datasets, rather than treating imputed memberships as observed.
+The result table also provides `n.observed`, `n.fitted.min`, and `n.fitted.max`.
+These are descriptive participant counts, not effective sample sizes for effects.
 
 ```{r standardized}
 standardized <- wsmed_effects(inference, scale = "marginal",

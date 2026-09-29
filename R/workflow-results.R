@@ -27,6 +27,13 @@
 #' and Rubin's rules; MC draws retain their covariance. Refit objects saved before
 #' this correction. Finite MC draws or new imputations need not match after recoding.
 #' The query interpretation records the plug-in outcome-difference SD.
+#' Conditional result tables include `extrapolated` flags relative to observed
+#' moderator values among used participants (imputed values excluded). Out-of-range
+#' continuous probes signal `wsmed_extrapolation_warning` once per extraction;
+#' this checks the marginal range, not joint covariate overlap or data density.
+#' Categorical tables include `n.observed`, `n.fitted.min`, and `n.fitted.max`;
+#' for MI the latter span the completed datasets and are not effective sample sizes.
+#' The descriptive support metadata are retained in `query$support`.
 #' Incompatible saved fits stop before extraction. If a fit is compatible but
 #' its MI sampler is unversioned or outdated, rerun [wsmed_infer()] on that fit.
 #' Stored primitive coefficients and full legacy tables remain inspectable.
@@ -123,6 +130,7 @@ wsmed_effects <- function(object, type = c("indirect", "total", "direct",
       interpretation = .wsmed_analysis_description(fit),
       reproducibility = .wsmed_repro_details(inference %||% fit),
       probe_reference = probes$center,
+      support = probes$support,
       inference_diagnostics = inference$diagnostics), diagnostics)
 }
 
@@ -181,7 +189,7 @@ wsmed_effects <- function(object, type = c("indirect", "total", "direct",
     if (!length(values) || anyNA(values) || anyDuplicated(values) || any(!values %in% levels))
       stop("Unknown or duplicate moderator levels.")
   }
-  list(values = as.list(values), center = center)
+  list(values = as.list(values), center = center, support = .wsmed_probe_support(fit, values))
 }
 
 .wsmed_result <- function(table, point, draws, ids, query, diagnostics) {
@@ -209,6 +217,11 @@ wsmed_effects <- function(object, type = c("indirect", "total", "direct",
     as.numeric(table$at) else NA_real_
   table$moderator.level <- if (identical(query$moderator_type, "categorical"))
     table$at else NA_character_
+  if (!is.null(query$support) && query$type != "contrasts") {
+    support <- query$support$probes
+    index <- match(table$at, support$at)
+    for (nm in setdiff(names(support), "at")) table[[nm]] <- support[[nm]][index]
+  }
   structure(list(schema_version = 1L, table = table, point = stats::setNames(unname(point), table$term),
     draws = draws, draw_ids = ids, query = query, diagnostics = diagnostics), class = "wsmed_results")
 }
@@ -252,8 +265,15 @@ wsmed_contrasts <- function(object, contrasts, level = object$query$level) {
   query <- object$query; query$level <- level
   query$source_type <- query$source_type %||% query$type; query$type <- "contrasts"
   query$contrasts <- contrasts; query$source_terms <- object$table
+  extrapolated <- vapply(seq_len(ncol(weights)), function(j) {
+    flags <- object$table$extrapolated[weights[, j] != 0]
+    if (is.null(object$table$extrapolated) || anyNA(flags)) {
+      if (any(flags %in% TRUE)) TRUE else NA
+    } else any(flags)
+  }, logical(1))
   .wsmed_result(data.frame(term = names(contrasts), effect = names(contrasts),
     label = names(contrasts), moderator = NA_character_, at = NA_character_,
+    extrapolated = extrapolated,
     contrast_definition = vapply(contrasts, function(w)
       paste(sprintf("%+.15g * %s", w, names(w)), collapse = " "), character(1))),
     as.vector(object$point %*% weights), draws, object$draw_ids, query, object$diagnostics)

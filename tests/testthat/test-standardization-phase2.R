@@ -84,7 +84,8 @@ test_that("MC conditional intervals use each joint draw's own SD and fixed raw W
 
 test_that("MI and FIML standardization use their own point estimates and fixed.x", {
   for (na in c("MI", "FIML")) for (fixed in c(FALSE, TRUE)) {
-    out <- phase2_result(missing = na, fixed = fixed)
+    if (na == "MI") expect_warning(out <- phase2_result(missing = na, fixed = fixed),
+      class = "wsmed_mi_compatibility_warning") else out <- phase2_result(missing = na, fixed = fixed)
     std <- out$moderation_std
     expect_identical(attr(std, "standardization")$fixed.x, fixed)
     # MI pools the marginal variance itself; FIML uses its fitted implied SD.

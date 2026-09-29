@@ -5,7 +5,8 @@ completed_fixture <- function() {
   model <- wsmed_model(c(before = "D1", after = "D2"),
     list(A = c(before = "A1", after = "A2")),
     moderator = list(variable = "D3", interactions = "A -> Y"))
-  internal <- wsmed_fit(model, d, missing = "mi", mi = list(m = 3, seed = 62))
+  expect_warning(internal <- wsmed_fit(model, d, missing = "mi", mi = list(m = 3, seed = 62)),
+    class = "wsmed_mi_compatibility_warning")
   list(data = d, model = model, fit = internal,
     completed = mice::complete(internal$mi$prepared$mids, "all"))
 }

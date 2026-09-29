@@ -55,6 +55,13 @@ variances with coefficients, using a delta-method within-imputation covariance
 and Rubin's rules; MC draws retain their covariance. Refit objects saved before
 this correction. Finite MC draws or new imputations need not match after recoding.
 The query interpretation records the plug-in outcome-difference SD.
+Conditional result tables include \code{extrapolated} flags relative to observed
+moderator values among used participants (imputed values excluded). Out-of-range
+continuous probes signal \code{wsmed_extrapolation_warning} once per extraction;
+this checks the marginal range, not joint covariate overlap or data density.
+Categorical tables include \code{n.observed}, \code{n.fitted.min}, and \code{n.fitted.max};
+for MI the latter span the completed datasets and are not effective sample sizes.
+The descriptive support metadata are retained in \code{query$support}.
 Incompatible saved fits stop before extraction. If a fit is compatible but
 its MI sampler is unversioned or outdated, rerun \code{\link[=wsmed_infer]{wsmed_infer()}} on that fit.
 Stored primitive coefficients and full legacy tables remain inspectable.

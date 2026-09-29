@@ -205,6 +205,9 @@ print.wsmed_results <- function(x, digits = 3, ...) {
   stats::printCoefmat(mat, digits = digits, has.Pvalue = FALSE, signif.stars = FALSE,
                       cs.ind = seq_len(ncol(mat)), tst.ind = integer())
   .wsmed_print_draw_diagnostics(x$query$inference_diagnostics, x$diagnostics)
+  support_caption <- .wsmed_support_caption(x$query$support,
+    d$at, if (x$query$type == "contrasts") d$extrapolated %||% NA else NULL)
+  if (!is.null(support_caption)) cat(support_caption, "\n")
   cat("Use as.data.frame() for the full-precision table and metadata.\n")
   invisible(x)
 }

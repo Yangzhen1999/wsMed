@@ -1,5 +1,16 @@
 # wsMed 1.1.0.9000
 
+- Warn once per internally imputed moderated fit about main-effects-only
+  imputation; retain warnings in diagnostics and manifests. Explain numeric 0/1
+  moderator interpretation in both interfaces without changing their coding.
+  Fix legacy numeric categorical group labels being used as list indices.
+- Record observed-range extrapolation in conditional tables and plot captions;
+  report observed and fitted categorical counts, including ranges across MI
+  completions. Descriptive counts are not effect-specific effective sample sizes.
+- Rebuild and commit all executable tutorials, detect stale frozen content in
+  CI, and add an isolated source-archive builder that installs and verifies the
+  tutorial inventory, titles and images. Keep .Rmd.original as editable sources.
+
 - Accept externally generated completed datasets or a mice mids object through
   `wsmed_fit(mi = list(completed = ...))` and `wsMed(mi_args = list(completed = ...))`.
   Validate observed cells, participant rows and factor coding; regenerate

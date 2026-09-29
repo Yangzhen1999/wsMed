@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>One-call and staged workflows</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">One-call and staged workflows</h1>
+
+
+
+<div id="one-call-remains-available" class="section level2">
+<h2>One call remains available</h2>
+<p><code>wsMed()</code> specifies, fits, and performs inference in one
+call. It uses the same engines as the staged interface below. Existing
+arguments and result fields remain available. Default printing gives an
+overview; <code>summary()</code> returns selected effects, and
+<code>print(result, detail = &quot;full&quot;)</code> prints the original
+tables.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">data</span>(example_data)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">wsMed</span>(example_data,</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>  <span class="at">M_C1 =</span> <span class="fu">c</span>(<span class="st">&quot;A1&quot;</span>, <span class="st">&quot;B1&quot;</span>), <span class="at">M_C2 =</span> <span class="fu">c</span>(<span class="st">&quot;A2&quot;</span>, <span class="st">&quot;B2&quot;</span>),</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>  <span class="at">Y_C1 =</span> <span class="st">&quot;D1&quot;</span>, <span class="at">Y_C2 =</span> <span class="st">&quot;D2&quot;</span>, <span class="at">R =</span> <span class="dv">2000</span>, <span class="at">seed =</span> <span class="dv">123</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>result</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co">#&gt; wsMed analysis</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="co">#&gt; wsMed fit: P | DE | 1 fitted dataset(s)</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#&gt; Observations: 100 of 100 input rows</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co">#&gt; Converged: 1 of 1 </span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co">#&gt; Stored inference: mc </span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co">#&gt; Use summary() for effects; print(detail = &#39;full&#39;) for all legacy tables.</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="fu">summary</span>(result)</span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="co">#&gt; wsMed indirect | raw scale | mc </span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="co">#&gt;                Estimate Std. Error CI lower CI upper</span></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="co">#&gt; indirect_1: M1  0.00131    0.00310 -0.00488  0.00807</span></span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="co">#&gt; indirect_2: M2 -0.00112    0.00256 -0.00732  0.00311</span></span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span></code></pre></div>
+<p>The examples use 2,000 draws for speed. The Monte Carlo default
+remains 20,000.</p>
+</div>
+<div id="separate-specification-fitting-and-inference" class="section level2">
+<h2>Separate specification, fitting, and inference</h2>
+<p>Pairs are named by condition; every difference is
+<code>after - before</code>. Mediator role names make custom edges and
+displayed pathways readable. Data remain wide, with one row per
+participant. Fitting alone does not generate simulation draws.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">wsmed_model</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;D1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;D2&quot;</span>),</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="at">mediators =</span> <span class="fu">list</span>(<span class="at">A =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;A1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;A2&quot;</span>),</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>                   <span class="at">B =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;B1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;B2&quot;</span>)))</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">wsmed_fit</span>(model, example_data)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>inference <span class="ot">&lt;-</span> <span class="fu">wsmed_infer</span>(fit, <span class="at">method =</span> <span class="st">&quot;mc&quot;</span>, <span class="at">draws =</span> <span class="dv">2000</span>, <span class="at">seed =</span> <span class="dv">123</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>fit</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; wsMed fit: P | DE | 1 fitted dataset(s)</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; Observations: 100 of 100 input rows</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; Converged: 1 of 1 </span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt; Condition contrast: after - before </span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>inference</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; wsMed inference: mc | 2000 valid draws of 2000 requested</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt; 95% effect intervals: percentile; stored parameter-table convention: percentile</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; Use summary() or wsmed_effects() to select effects.</span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">isTRUE</span>(<span class="fu">all.equal</span>(inference<span class="sc">$</span>draws, result<span class="sc">$</span>mc<span class="sc">$</span>result<span class="sc">$</span>thetahatstar)))</span></code></pre></div>
+<p><code>coef(fit)</code> and <code>vcov(fit)</code> return fitted
+primitive parameters and their covariance. For MI these are Rubin-pooled
+quantities. <code>vcov(inference)</code> instead returns the empirical
+covariance of its stored parameter draws. <code>summary(fit)</code>
+displays parameters; <code>summary(inference)</code> extracts indirect
+effects. <code>confint(fit)</code> asks you to run inference first.
+<code>wsmed_inspect(fit, &quot;syntax&quot;)</code> exposes the generated SEM
+syntax, while <code>wsmed_inspect(fit, &quot;fits&quot;)</code> returns all
+backend fits.</p>
+</div>
+<div id="query-results-without-rerunning-the-analysis" class="section level2">
+<h2>Query results without rerunning the analysis</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>effects <span class="ot">&lt;-</span> <span class="fu">wsmed_effects</span>(inference)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">as.data.frame</span>(effects)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt;         term     effect label moderator   at     estimate   std.error</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; 1 indirect_1 indirect_1     A      &lt;NA&gt; &lt;NA&gt;  0.001311305 0.003103070</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; 2 indirect_2 indirect_2     B      &lt;NA&gt; &lt;NA&gt; -0.001119917 0.002562857</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt;       conf.low   conf.high effect_type path conf.level method   interval scale</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; 1 -0.004881299 0.008066491    indirect    A       0.95     mc percentile   raw</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; 2 -0.007323464 0.003114028    indirect    B       0.95     mc percentile   raw</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt;   n.valid    status moderator.value moderator.level</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; 1    2000 inference              NA            &lt;NA&gt;</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; 2    2000 inference              NA            &lt;NA&gt;</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="fu">confint</span>(effects, <span class="at">level =</span> .<span class="dv">90</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt;                     5 %        95 %</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; indirect_1 -0.002966660 0.006683333</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt; indirect_2 -0.005713307 0.002124195</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="fu">wsmed_effects</span>(inference, <span class="at">type =</span> <span class="st">&quot;total&quot;</span>, <span class="at">scale =</span> <span class="st">&quot;marginal&quot;</span>)</span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt; wsMed total | marginal scale | mc </span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt; Condition contrast: after - before </span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt; Standardization: effect / marginal model-implied SD(D2 - D1); condition contrast is unscaled.</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt; Plug-in marginal outcome-difference SD: 0.169239 </span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt;       Estimate Std. Error CI lower CI upper</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt; total  -0.1867     0.1010  -0.3836   0.0112</span></span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span></code></pre></div>
+<p>These operations reuse stored joint draws. Tables retain full
+precision; <code>digits</code> controls printing only. Effect and
+contrast intervals are percentile intervals. This convention also
+applies if a bootstrap inference object stores bias-corrected legacy
+parameter tables. It is recorded in <code>effects$query</code> and the
+printed/plot labels. When <code>wsMed(ci_method = &quot;both&quot;)</code> stores
+two inference engines, specify <code>method = &quot;mc&quot;</code> or
+<code>method = &quot;bootstrap&quot;</code> in effect queries.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>contrast <span class="ot">&lt;-</span> <span class="fu">wsmed_contrasts</span>(effects,</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">B_minus_A =</span> <span class="fu">c</span>(<span class="at">indirect_2 =</span> <span class="dv">1</span>, <span class="at">indirect_1 =</span> <span class="sc">-</span><span class="dv">1</span>)))</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>contrast</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt; wsMed contrasts | raw scale | mc </span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; Condition contrast: after - before </span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; Contrast direction (signed weights):</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt;  B_minus_A: +1 * B -1 * A</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt;           Estimate Std. Error CI lower CI upper</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; B_minus_A -0.00243    0.00401 -0.01141  0.00521</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="fu">plot</span>(effects)</span></code></pre></div>
+<div class="float">
+<img role="img" aria-label="plot of chunk contrasts" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfgAAAFoCAMAAACMkBkOAAABKVBMVEUAAAAAADoAAGYAOmYAOpAAZpAAZrYjSGY1YY06AAA6ADo6AGY6OgA6Ojo6OmY6OpA6ZpA6ZrY6kJA6kLY6kNtNTU1NTW5NTY5NbqtNjshmAABmADpmAGZmOgBmOjpmOpBmZgBmZjpmZmZmZpBmZrZmkJBmtv9uTU1uTY5ubqtuq+SOTU2OTY6Obm6ObquOjo6OyP+QOgCQOjqQOmaQZgCQZmaQZpCQkDqQkGaQkLaQtpCQ27aQ2/+ZmZmrbm6rbo6rjqur5P+2ZgC2Zjq2Zma2kDq2kJC2tma225C2/7a2/9u2///Ijk3I///bkDrbkGbbtmbb25Db29vb/7bb/9vb///kq27k/8jk///r6+v/tmb/yI7/25D/5Kv//7b//8j//9v//+T////ibDjuAAAACXBIWXMAAAsSAAALEgHS3X78AAAOxUlEQVR4nO2aj38atxmHD9fDdVhKveK1cciydCvdsq6LnW7LMpYt5/2wR0LXpXQpoYTc//9HTK9+nA7M5XDuFQje7/eTYnwnPSfpOekEbpIhIpNsugHIZgLxQgPxQgPxQgPxQgPxQrNM/OQw2Rtk2TBJ6Gea7I+y2WlvWcHW4Mq7+ffXi6pp/lVdoqwZrv1N9ZruDd5abKy6p3r2Fs41UqPqhrJE/PSklw3VkKTa9aQ9SjvZuPl2DE/HDaWEdQ3xNz4cZdOfLZafLzak+yKdMy9dvFKdTW/3Z2d9+k0pH3bse3VTdP+YNPp0c9BiQNOz/VWS9NSvjR/31Ij3s/H+N2oQxnqxsMWu1vvgzt6A6vTdAUfZuzAzPq9YvISuY6rrVeisr9ampKdH3VzQ3Tn3+tnk0xxzBUANuk09ooXMMlSTLnwNw6Fm6tO6nO4c3Si+c6oDvgk5eytSLl71Q3eJZvzQTfjpyf5oTOt/hwaBrBy6d8OOejiotaKj3k+7g4zqqGKmaqGeOjA57OkxVxXdgZxnxOcV5y7hq9OdOGm/UPZMBXdB04HWv3rZ149beTMXASpjN9enlnFo7JkalqOO2dN556iGuZbpgG+CZ29Fypb6Rp/ucBpf9Yx/0b08STrunDpIfVdDYntsfbVH54+aNA2VBz2f9KhRUV/PHLCVfIkCxXjMK85dolCaTJgWdQf+giaT1sXR7OGFuR1MM7NF7tyzy7fA1nCcQX7adS5zi0VhdfdNMOytSMnm7iO7tpvn/LAz7Jju6te0R502iguD2r3sXrQu7Rge2nU80Su8q2cP6BJtmlfFA0XxecX5SxSrf0tNTGnV9Re07W/9+w8vfmlrmmZmV7jt/OnuGXkNxxm403nn7PjQGm8Jrrpnb0VKPs65W1eLV7+kPX+3l8z4LP3saHb2qOmmglox/QQo1MvMiNoZP3fAi88rLtxbeenZ2eP2iNYR/zHAL9Gtwfkj98SZn/FzDdLP+AJj2Yy3p/PO2dgnR5b56ls02ynLlnrVcfWwonGcPaTO6GXVzvgTcyItPJPduI0T8yBU76mIL7asntlXtQb+QFG8r7hwb+Wl1ZU65n650S9cUId+N+vCIr3wCHe7es+4+oy3x/S2znYuMzeY+s904MJXL1aNP8tm/Nh8wB0WVsWpe8bfvrewqzeDMztVyx2Nj90Sp8WN73y9Rt/M9nxXbw8Yit/VN9yTtHCJQnW6GjXxvTs9f8FJy+8LJnN79DmA66XrpmXM17BLvTmduc5R5jrnqxfYW5BrfnM3t4laQ73r5u9Myy0XJ97slvjZn+LiRBx8Vy80EC80EC80EC80EC80q4j/nuVKPBQuzF94MHF16joYiK+VuDoF8dWBeGZeaArEM2GkihePgXihGIgXioF4oRip4rG5Y+aFpkA8EwbiayWuTkF8dSCemReaAgwTBuKFYiBeKAbihWKkisfmjpkXmgLxTBiIr5W4OgXx1YF4Zl5oCjBMGIgXioF4oRiIF4qRKh6bO2ZeaArEM2Egvlbi6hTEVwfimXmhKcAwYSBeKAbihWIgXihGqnhs7ph5oSkQz4SB+FqJq1MQXx2IZ+aFpgDDhIF4oRiIF4qBeKEYqeKxuWPmhaZAPBMG4mslrk5BfHUgnpkXmgIMEwbihWIgXigG4oVipIrH5o6ZF5oC8UwYiK+VuDoF8dWBeGZeaAowTBiIF4qBeKEYiBeKkSoemztmXmgKxDNhIL5W4uoUxFcH4pl5oSnAMGEgXigG4oViIF4oRqp4bO6YeaEpEM+EgfhaiatTEF8diGfmhaYAw4SBeKEYiBeKgXihGKnisblj5oWmQDwTBuJrJa5OQXx1VhF/cFBZJK5OvYv4H371nIVXnq0bo4ODavNb16k8Tvyz391n4ZVn28bo4GAF89vWKR8r/vWX//vCTfnvw+X9LYoRv+lW1MpyCXPiv3tA/xhupPJs3eSQsNS//s3x8fEnLxl45YlrjLC506+vbqmXZ2VTXqr4FRJXp64t/s2Tp+r1VdmUh/jSxNUpfI6vDsQz80JTgGHCQLxQDMQLxUC8UIxU8djcMfNCUyCeCQPxtRJXpyC+OhDPzAtNAYYJA/FCMRAvFAPxQjFSxWNzx8wLTYF4JgzE10pcnYL46kA8My80BRgmDMQLxUC8UAzEC8VIFY/NHTMvNAXimTAQXytxdQriqwPxzLzQFGCYMBAvFAPxQjEQLxQjVTw2d8y80BSIZ8JAfK3E1SmIrw7EM/NCU4BhwkC8UAzEC8VAvFCMVPHY3DHzQlMgngkD8bUSV6cgvjoQz8wLTQGGCQPxQjEQLxQD8UIxUsVjc8fMC02BeCYMxNdKXJ2C+OpAPDMvNAUYJgzEC8VAvFAMxAvFSBWPzR0zLzQF4pkwEF8rcXUK4qsD8cy80BRgmDAQLxQD8UIxEC8UI1U8NnfMvNAUiGfCQHytxNUpiK8OxDPzQlOAYcJAvFAMxAvFQLxQjFTx2Nwx80JTIJ4JA/G1ElenIL46EM/MC00BhgkD8UIxEC8UA/FCMVLFY3PHzAtNgXgmDMTXSlydgvjqQDwzLzQFGCYMxAvFQLxQDMQLxUgVj80dMy80BeKZMBBfK3F1CuKrA/HMvNAUYJgwEC8UA/FCMRAvFCNVPDZ3zLzQFIhnwkB8rcTVKYivDsQz80JTgGHCQLxQDMQLxUC8UIxU8djcMfNCUyCeCQPxtRJXpyC+OhDPzAtNAYYJA/FCMRAvFAPxQjFSxWNzx8wLTYF4JgzE10pcnYL46kA8My80BRgmDMQLxUC8UAzEC8VIFY/NHTMvNAXimTAQXytxdQriqwPxzLzQlBUxBwcsmMpsL8aI/+Hz4+Pj+xy88qyzcwcHVea31xgTxor/9cvszZOnDLzyrLFzBweV5rfXGBOmIP5vL231pXl/i2LEb+TSywcvqsyJp6X+4+cMN1J54lrqsbnTrzTjs2cPGHjliWtzB/H6defEVwbi9ate6m9x8MoT1xhBPDMvNAUYJgzEC8VAvFAMxAvFSBWPzR0zLzQF4pkwEF8rcXUK4qsD8cy80BRgmDAQLxQD8UIxEC8UI1U8NnfMvNAUiGfCQHytxNUpiK8OxDPzQlOAYcJAvFAMxAvFQLxQjFTx2Nwx80JTIJ4JA/G1ElenIL46EM/MC00BhgkD8UIxEC8UA/FCMVLFY3PHzAtNgXgmDMTXSlydgvjqQDwzLzQFGCYMxAvFQLxQDMQLxUgVj80dMy80BeKZMBBfK3F1CuKrA/HMvNAUYJgwEC8UA/FCMRAvFCNVPDZ3zLzQFIhnwkB8rcTVKYivDsQz80JTgGHCQLxQDMQLxUC8UIxU8djcMfNCUyCeCQPxtRJXpyC+OhDPzAtNAYYJA/FCMRAvFAPxQjFSxWNzx8wLTYF4JgzE10pcnYL46kA8My80BRgmDMQLxUC8UAzEC8VIFY/NHTMvNAXimTAQXytxdQriqwPxPJdEti0QLzQQLzQQLzQQLzQQLzQQLzQQLzSBxT87/unTwhv36o6uNSVt2URTyluztuaEFf/qk5fqX/7G/HvzZCNDvbQt+cEoWrPOkQkr/rv72esvnudvzOvr335+fCvoZVdvS34witasc2QCi3+Qvfnr8/yNeX318XP6fd1Z2pb8YBStWefIBBT/7PjW0vuazr26H+66JdmCGU8n1jUyG3jGU9c2MOO34Bm/zpFZx67+9ZcvF/eu65/wpW3Z5K5+gyODz/FCA/FCA/FCA/FCA/FCA/FCs5PiJ4eJSqM/O00+Ok06c6daA/1z2Fla8wqpNXA11C/tEWszN5rdFG9dzWmbO3UNhwXCinfLVmSXxU9PzMRXP/cG+tfGn83bLO1lkw/u7A1obejNTtVvN/rZeH9k6tIN0/5KnVHvLqnGODGE7qDiytuTXRbvZnzayYbNjPSO97/Rp8jg5LCXTW/3qZCayUNlWU9oJ/6wQzeCIVBxRdD3y65kN8XrZ3yuTdlV6szdYF/VSu/uDjrVHp0/as7O+pkXn/+wBJ0dWut3U/zcjNcrfqNvHuvmFC3q5l1Ki/i0e9m9aF123Z2xKJ7upAa5h/i4syDePJmXzfjpSU//TD87mp09arpiV8Rn5l6B+Mhz9RmvtOktXOvCP+Nb9j/a1iXmKU+n1LI+3JsXT9K1eDzj4455xic9K562832zq1cf7fNdPd0CwyR5747d0+/ZT/hJ8pNuQTzVSLGr35G823cxO7TSSxX/Tg7xzR2y/YF4oYF4oYF4oYF4oYF4oYF4oZEhXn+Vt28/hfvv3/7pPpcvfiW3pEjJeZvzPh1KG/200a/RztW/Glxsl/79Os0WIr697C8s07uVX8iUFFki3hxd15e6i+1a+H2FZssSnyZJU/8B/uahWgDS5EcP6W/t07svuvQ/2fTovL47CkWa5uDw5t69PnEcgsrb8U0TdU4dUj9/nugv9nV588Zw6C8ARFMH9IUyX8BUnxzZZcMf1+RE/8kwr97M8nbZgk0NTHW5FZqdD4kQ8WapHzfpzzPm/7yYnSnho2FvfLM37qhDas7+l84PyUqxiDk4VAPcVD+VIDpsyhu4Ok53j57udEcUylMFzaE7b3hTH7AV8wKmuhfvjlOz9cUyc+Pq6mnPN71pzxPQ3IIrNDsfEiHizbfsNJrash3mu6PJ0dePj/SAq3ujM6S/6dFcKxYxB9VyQf+7xoDmXsOVN3CinnvxeXnzxnDGVNYeMBXzAqa6F++OZ6aG3jOY6rr1vl0de56AXnxFs/MhESXez3g3PLOzD7/9/S9GekQm7f+4XUCxyNgooGH+tEM/3dRxf7NRVHPIznhX3rwxHCo7dneKe/CYAqa6OmaWjfy4gfgZP07MjC+Id+cn7RdXxJc220aUeP+MN8Nzsk8LZkqzgh6X+hmfuKU+L6IP0gjSX+3pf8K617Pl82d846YXn+Xl9RvDoRmnH8n0ODbPeFfAVJ+d2o2CP57Zi9ElXPVmlrfrHx17XrfkhD6zrNDsfNsnQ3ygrPCxYLWc1/kM+G6B+BgC8ci6AvFCA/FCA/FCA/FC83+i/1DzOo/QeAAAAABJRU5ErkJggg==" alt="plot of chunk contrasts" />
+<div class="figcaption">plot of chunk contrasts</div>
+</div>
+<p>The contrast is evaluated within each joint draw. Its interval is not
+obtained by subtracting the endpoints of two separate intervals.</p>
+</div>
+<div id="moderated-mediation" class="section level2">
+<h2>Moderated mediation</h2>
+<p>The moderator specification states which difference slopes have
+interactions. Moderator main effects remain in <strong>all difference
+equations</strong>, consistent with the existing model generators.
+Average-component slope interactions can be requested separately through
+<code>average_interactions</code>.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>moderated <span class="ot">&lt;-</span> <span class="fu">wsmed_model</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;D1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;D2&quot;</span>),</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="at">mediators =</span> <span class="fu">list</span>(<span class="at">A =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;A1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;A2&quot;</span>),</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>                   <span class="at">B =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;B1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;B2&quot;</span>)),</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="at">moderator =</span> <span class="fu">list</span>(<span class="at">variable =</span> <span class="st">&quot;D3&quot;</span>, <span class="at">main_effects =</span> <span class="st">&quot;all_equations&quot;</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>                   <span class="at">interactions =</span> <span class="fu">c</span>(<span class="st">&quot;A -&gt; Y&quot;</span>, <span class="st">&quot;B -&gt; Y&quot;</span>)))</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>mod_fit <span class="ot">&lt;-</span> <span class="fu">wsmed_fit</span>(moderated, example_data)</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>mod_inference <span class="ot">&lt;-</span> <span class="fu">wsmed_infer</span>(mod_fit, <span class="at">draws =</span> <span class="dv">2000</span>, <span class="at">seed =</span> <span class="dv">123</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>conditional <span class="ot">&lt;-</span> <span class="fu">wsmed_effects</span>(mod_inference, <span class="at">at =</span> <span class="fu">list</span>(<span class="at">D3 =</span> <span class="fu">c</span>(.<span class="dv">2</span>, .<span class="dv">4</span>, .<span class="dv">6</span>)),</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>                              <span class="at">scale =</span> <span class="st">&quot;marginal&quot;</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>conditional</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; wsMed indirect | marginal scale | mc </span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt; Condition contrast: after - before </span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt; Moderator: D3 in raw units; centering reference = 0.452271 </span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#&gt; Standardization: effect / marginal model-implied SD(D2 - D1); condition contrast is unscaled.</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt; Plug-in marginal outcome-difference SD: 0.169191 </span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt;                            Estimate Std. Error CI lower CI upper</span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt; indirect_1@1: A [D3 = 0.2]  0.01695    0.03640 -0.05036  0.09900</span></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; indirect_2@1: B [D3 = 0.2]  0.01668    0.03604 -0.04130  0.10725</span></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co">#&gt; indirect_1@2: A [D3 = 0.4]  0.01040    0.01985 -0.02481  0.05323</span></span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="co">#&gt; indirect_2@2: B [D3 = 0.4] -0.00597    0.01511 -0.04268  0.02099</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; indirect_1@3: A [D3 = 0.6]  0.00508    0.02194 -0.03986  0.05635</span></span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; indirect_2@3: B [D3 = 0.6] -0.00764    0.03052 -0.07449  0.05259</span></span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="fu">plot</span>(conditional)</span></code></pre></div>
+<div class="float">
+<img role="img" aria-label="plot of chunk moderation" src="data:image/png;base64,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" alt="plot of chunk moderation" />
+<div class="figcaption">plot of chunk moderation</div>
+</div>
+<p><code>plot(mod_inference)</code> automatically uses a continuous grid
+over fitted raw moderator values.
+<code>plot(mod_inference, view = &quot;forest&quot;)</code> instead displays the
+reference-value effects. Use <code>title</code>, <code>x_label</code>,
+<code>y_label</code>, <code>labels</code>, and <code>ncol</code> to
+customize the plot. For a fit without inference,
+<code>plot(mod_fit)</code> displays only point estimates. See the <a href="PlottingEffects.html">plotting tutorial</a> for the shared
+interface and the legacy helpers’ interval conventions.</p>
+<p>Probes remain fixed in the moderator’s raw units. For marginal
+standardization, conditional indirect effects are divided by the
+marginal model-implied SD of the outcome difference. Coefficients and
+scales vary jointly across draws. Invalid standardized draws are
+excluded together across effects; their original identities are in
+<code>conditional$diagnostics$invalid_draw_ids</code>. Plot bands are
+pointwise intervals, not simultaneous confidence bands.</p>
+<p>In the staged interface, categorical predictors must be factors.
+Numerical predictors, including 0/1 columns, are treated as continuous
+unless converted to factors. Default categorical probes include every
+observed factor level. The <a href="CategoricalPredictors.html">categorical predictor tutorial</a>
+demonstrates reference coding, conditional effects, group contrasts, and
+missing data.</p>
+</div>
+<div id="missing-data-and-repeated-inference" class="section level2">
+<h2>Missing data and repeated inference</h2>
+<p>The staged fitting default rejects missing analysis values. Choose
+<code>missing = &quot;listwise&quot;</code>, <code>&quot;fiml&quot;</code>, or
+<code>&quot;mi&quot;</code> explicitly. MI stores every completed dataset, every
+SEM fit, and the pooled estimates/covariance. Its imputation seed is
+separate from the inference seed. A new inference can reuse the fit
+without reimputing.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>mi_fit <span class="ot">&lt;-</span> <span class="fu">wsmed_fit</span>(model, incomplete_data, <span class="at">missing =</span> <span class="st">&quot;mi&quot;</span>,</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>                    <span class="at">mi =</span> <span class="fu">list</span>(<span class="at">m =</span> <span class="dv">5</span>, <span class="at">method =</span> <span class="st">&quot;pmm&quot;</span>, <span class="at">seed =</span> <span class="dv">123</span>))</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>mi_inference <span class="ot">&lt;-</span> <span class="fu">wsmed_infer</span>(mi_fit, <span class="at">draws =</span> <span class="dv">20000</span>, <span class="at">seed =</span> <span class="dv">604</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="fu">summary</span>(mi_inference)</span></code></pre></div>
+<p>This interface preserves the existing per-imputation centering and
+first-imputation moderator reference; it does not introduce a different
+MI estimand. MI with nonparametric bootstrap remains unsupported. Non-MI
+bootstrap necessarily refits resampled datasets, but does not refit the
+original dataset. Seeded workflow calls restore the caller’s random
+state. With <code>seed = NULL</code>, the current random stream advances
+normally.</p>
+<p>New results can be saved with <code>saveRDS()</code> and queried
+later. Saved objects from older versions continue to support the
+existing fields, full printing, and plotting helpers; the new methods do
+not silently refit them to construct missing modular metadata.</p>
+<p><code>confint()</code> now keeps the confidence level saved in the
+selected inference or results object, just like effect summaries and
+plots. Supply <code>level</code> to override it without drawing new
+samples. Primitive-parameter intervals and indirect-effect intervals
+concern different quantities: use
+<code>confint(wsmed_effects(inference))</code> for indirect effects. See
+<a href="WorkflowReliability.html">diagnostics and migration</a> for
+dataset-level checks, reproducibility reports, and changes from wsMed
+1.1.0.</p>
+</div>
+<div id="externally-generated-imputations" class="section level2">
+<h2>Externally generated imputations</h2>
+<p>For an imputation model chosen to match substantive interactions,
+supply <code>mi = list(completed = completed)</code> to
+<code>wsmed_fit()</code> (with <code>missing = &quot;mi&quot;</code>).
+<code>completed</code> can be a list of wide datasets or a
+<code>mice</code> mids object. The number of imputations is inferred;
+omit internal imputation method and seed controls. Both this interface
+and <code>wsMed(..., mi_args = list(completed = completed))</code> reuse
+the existing fitting, Rubin pooling and effect inference. See the <a href="CompatibleImputation.html">model-compatible imputation
+tutorial</a>.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

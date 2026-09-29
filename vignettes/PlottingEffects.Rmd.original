@@ -223,6 +223,26 @@ change from a negative to a positive interval breaks a highlighted range.
 
 ## Inspect and export
 
+The `plot()` methods retain descriptive data-support information. Continuous
+probes outside the observed fitted-case moderator range issue a warning when
+effects are extracted and remain marked in the table and plot caption. This
+is a marginal-range check, not a test of joint covariate overlap or density.
+Imputed moderator values do not extend the observed range.
+
+```{r support}
+probe_values <- c(mean(dat$W), max(dat$W) + 1)
+supported <- wsmed_effects(continuous, at = list(W = probe_values), terms = "indirect_1")
+as.data.frame(supported)[, c("at", "estimate", "extrapolated")]
+plot(supported, view = "forest")
+```
+
+The warning above is intentional. Plotting the extracted object again does not
+repeat the warning or resample. `attr(plot(supported), "wsmed_plot")$support`
+records its observed range. Category plots report fitted group counts; MI
+captions report the minimum and maximum across completed datasets. The table
+also distinguishes observed memberships (`n.observed`) from fitted counts.
+These counts are not effective sample sizes for the conditional effects.
+
 ```{r inspect}
 forest$data[, c("Path","Estimate","CI.LL","CI.UL")]
 attr(forest, "wsmed_plot")

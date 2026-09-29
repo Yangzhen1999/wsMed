@@ -19,6 +19,11 @@ Default `mice` imputation in wsMed uses main effects of the raw variables.
 Transforming completed data into difference scores and products does not make
 that imputation model compatible with a moderated analysis. More imputations
 reduce simulation error; they do not repair an incompatible conditional model.
+Both interfaces now emit one `wsmed_mi_compatibility_warning` per internally
+imputed fit with moderator interactions, even when the result is assigned
+without printing it. The message remains in `wsmed_inspect(fit, "diagnostics")$warnings`
+and the analysis manifest. External completions do not trigger this particular
+warning; their compatibility still requires the imputer's own checks.
 
 [Bartlett et al. (2015)](https://doi.org/10.1177/0962280214521348) describe
 substantive-model-compatible fully conditional specification (SMC-FCS).

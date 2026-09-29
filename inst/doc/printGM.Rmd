@@ -1,17 +1,17 @@
 ---
-title: "Demonstration of printGM()"
+title: "Inspecting generated SEM syntax"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Demonstration of printGM()}
+  %\VignetteIndexEntry{Inspecting generated SEM syntax}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 ## Demonstration of `printGM()`
 
-### Using `printGM()` with `WsMed()`
+### Using `printGM()` with `wsMed()`
+The `wsMed()` function returns a list containing `sem_model`. `printGM()` can automatically extract and format the model equations.
 
-The `WsMed()` function returns a list containing `sem_model`. `printGM()` can automatically extract and format the model equations.
 
 ``` r
 library(wsMed)
@@ -23,14 +23,14 @@ result1 <- wsMed(
   Y_C2 = "D2",
   form = "P",
   Na = "DE",
-  standardized = TRUE,
-  bootstrap = 1000,
-  iseed = 123
+  standardized = FALSE,
+  ci_method = "mc", R = 1000,
+  seed = 123
 )
 printGM(result1)
 ```
 
-```         
+```
 ## 
 ## Outcome Difference Model (Ydiff):
 ##  Ydiff ~ cp*1 + b1*M1diff + d1*M1avg + b2*M2diff + d2*M2avg + b3*M3diff + d3*M3avg 
@@ -54,9 +54,9 @@ printGM(result1)
 ##  total_effect := cp + total_indirect
 ```
 
-### Using printGM() with GenerateModel\*()
+### Using printGM() with GenerateModel*()
+If you already have preprocessed data, you can directly generate the SEM model syntax using GenerateModelPC() or other GenerateModel*() functions.
 
-If you already have preprocessed data, you can directly generate the SEM model syntax using GenerateModelPC() or other GenerateModel\*() functions.
 
 ``` r
 # Load necessary packages
@@ -67,10 +67,10 @@ data(example_data)
 # Prepare data
 prepared_data <- PrepareData(
   data = example_data,
-  M_C1 = c("A1", "B1"),
-  M_C2 = c("A2", "B2"),
-  Y_C1 = "C1",
-  Y_C2 = "C2"
+  M_C1 = c("A1", "B1", "C1"),
+  M_C2 = c("A2", "B2", "C2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2"
 )
 
 # Generate Model
@@ -80,25 +80,34 @@ sem_model <- GenerateModelPC(prepared_data)
 printGM(sem_model)
 ```
 
-```         
+```
 ## 
 ## Outcome Difference Model (Ydiff):
-##  Ydiff ~ cp*1 + b1*M1diff + d1*M1avg + b2*M2diff + d2*M2avg 
+##  Ydiff ~ cp*1 + b1*M1diff + d1*M1avg + b2*M2diff + b3*M3diff + d2*M2avg + d3*M3avg 
 ## 
 ## Mediator Difference Model (Chained Mediator - M1diff):
-## M1diff ~ a1*1 + b_2_1*M2diff + d_2_1*M2avg 
+## M1diff ~ a1*1 + b_2_1*M2diff + d_2_1*M2avg + b_3_1*M3diff + d_3_1*M3avg 
 ## 
 ## Mediator Difference Model (Other Mediators):
-## M2diff ~ a2*1 
+## M2diff ~ a2*1
+## M3diff ~ a3*1 
 ## 
 ## Indirect Effects:
 ## indirect_1 := a1 * b1
 ## indirect_2 := a2 * b2
-## indirect_2_1 := a2 * b_2_1 * b1 
+## indirect_2_1 := a2 * b_2_1 * b1
+## indirect_3 := a3 * b3
+## indirect_3_1 := a3 * b_3_1 * b1 
 ## 
 ## Total Indirect Effect:
-##  total_indirect := indirect_1 + indirect_2 + indirect_2_1 
+##  total_indirect := indirect_1 + indirect_2 + indirect_2_1 + indirect_3 + indirect_3_1 
 ## 
 ## Total Effect:
 ##  total_effect := cp + total_indirect
 ```
+
+`printGM()` displays the unstandardized model equations; requesting
+standardized estimates does not rewrite the SEM syntax. For standardized
+conditional estimates and plots, use `moderation_std` and
+`plot_moderation_curve(..., standardized = TRUE)`, as shown in
+[Standardized moderated mediation](StandardizedModeratedMediation.html).

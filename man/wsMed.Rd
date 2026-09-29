@@ -49,7 +49,10 @@ wsMed(
 
 \item{W}{Character vector of moderators. Default \code{NULL}.}
 
-\item{W_type}{Character; \code{"continuous"} or \code{"categorical"}.}
+\item{W_type}{Character; \code{"continuous"} or \code{"categorical"}.
+Automatic numeric 0/1 moderator detection emits a message and is recorded in
+\code{fit$diagnostics$input_notes}. Use an explicit type or factor for
+consistency with \code{wsmed_fit()}.}
 
 \item{MP}{Character vector identifying which regression paths are moderated
 (for example, \code{"a1"}, \code{"b_1_2"}, \code{"cp"}). Main effects of

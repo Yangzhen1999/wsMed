@@ -71,6 +71,24 @@ print(result)
 
 ## Main Function Overview
 
+For maintainers, executable tutorial sources remain `vignettes/*.Rmd.original`.
+After changes, run `source("rebuild_vignettes.R"); rebuild_vignettes()` and commit
+the regenerated `.Rmd`, figures, `inst/doc` and `build-manifest.dcf` alongside the sources.
+The default rebuild also renders the installed HTML documentation, so a GitHub
+installation without rebuilding vignettes still includes current tutorials.
+CI rejects stale tutorial sources or outputs before rebuilding them.
+To build a separate candidate source archive and check the installed tutorial
+inventory, titles and images, run:
+
+```r
+source("tools/build-release.R")
+archive <- build_wsmed_release(getwd(), "../wsMed-candidate-build")
+```
+
+The output directory must be new. This does not publish a release or change
+branches. It rebuilds and validates all 14 tutorials in an isolated copy;
+the exact resulting archive still needs its release checks before submission.
+
 The development version also supports a staged workflow:
 
 ```r

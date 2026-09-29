@@ -30,7 +30,7 @@ test_that("saved moderated fits require explicit compatible algorithm identities
 })
 
 test_that("old MI draws can be replaced without repeating a compatible fit", {
-  f <- compatibility_fit(mi = TRUE)
+  expect_warning(f <- compatibility_fit(mi = TRUE), class = "wsmed_mi_compatibility_warning")
   i <- wsmed_infer(f, draws = 40, seed = 25)
   expect_no_error(wsmed_effects(i, scale = "marginal"))
   old <- i; old$provenance$algorithms <- NULL

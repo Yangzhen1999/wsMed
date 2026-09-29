@@ -51,12 +51,36 @@ jobs:
           extra-packages: any::rcmdcheck, any::XML
           needs: check
 
+      - name: Verify committed tutorial freshness
+        shell: Rscript {0}
+        run: |
+          source("tools/vignette-build-utils.R")
+          check_frozen_vignettes(getwd())
+
+      - name: Verify prebuilt tutorials without rebuilding vignettes
+        if: matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'release' && matrix.config.nosuggests != true
+        shell: Rscript {0}
+        run: |
+          source("tools/vignette-build-utils.R")
+          lib <- file.path(Sys.getenv("RUNNER_TEMP"), "wsmed-prebuilt-library")
+          dir.create(lib)
+          status <- system2(file.path(R.home("bin"), "R"), c("CMD", "INSTALL", "-l", shQuote(lib), "."))
+          stopifnot(status == 0L)
+          check_installed_vignettes(getwd(), lib)
+
       - name: Rebuild executable tutorials
         if: matrix.config.nosuggests != true
         shell: Rscript {0}
         run: |
           source("rebuild_vignettes.R")
           rebuild_vignettes()
+
+      - name: Verify tutorials installed from a source archive
+        if: matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'release' && matrix.config.nosuggests != true
+        shell: Rscript {0}
+        run: |
+          source("tools/build-release.R")
+          build_wsmed_release(getwd(), file.path(Sys.getenv("RUNNER_TEMP"), "wsmed-installed-tutorials"))
 
       - uses: r-lib/actions/check-r-package@v2
         with:

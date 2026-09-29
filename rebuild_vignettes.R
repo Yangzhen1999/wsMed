@@ -48,7 +48,7 @@ rebuild_vignettes <- function(root = getwd(), output_dir = file.path(root, "vign
     knitr::opts_chunk$restore(old_chunk)
     knitr::opts_knit$restore(old_knit)
     knitr::opts_chunk$set(cache = FALSE, error = FALSE,
-                         fig.path = paste0("figure/", name, "-"))
+                         fig.path = paste0("figures/", name, "-"))
     knitr::opts_knit$set(root.dir = output_dir)
     outputs[i] <- file.path(output_dir, paste0(name, ".Rmd"))
     message("Rebuilding ", basename(inputs[i]))
@@ -60,6 +60,28 @@ rebuild_vignettes <- function(root = getwd(), output_dir = file.path(root, "vign
                          pattern = "^W[a-d]\\.png$", full.names = TRUE)
   if (length(diagrams) && !all(file.copy(diagrams, output_dir, overwrite = TRUE))) {
     stop("Could not copy vignette model diagrams.")
+  }
+  # Keep ordinary GitHub installs current even when vignette building is disabled.
+  # Isolated output directories remain read-only with respect to the repository.
+  if (identical(output_dir, normalizePath(file.path(root, "vignettes"), winslash = "/"))) {
+    if (!requireNamespace("rmarkdown", quietly = TRUE)) stop("Install package: rmarkdown")
+    doc <- file.path(root, "inst", "doc")
+    dir.create(doc, recursive = TRUE, showWarnings = FALSE)
+    for (path in outputs) {
+      rmarkdown::render(path, output_dir = doc, quiet = TRUE,
+        envir = new.env(parent = globalenv()))
+    }
+    if (!all(file.copy(outputs, doc, overwrite = TRUE))) stop("Could not update installed tutorial sources.")
+    if (length(diagrams)) file.copy(diagrams, doc, overwrite = TRUE)
+    figures <- file.path(output_dir, "figures")
+    if (dir.exists(figures) && !file.copy(figures, doc, recursive = TRUE, overwrite = TRUE))
+      stop("Could not update installed tutorial figures.")
+  }
+  if (is.null(articles)) {
+    helpers <- new.env(parent = baseenv())
+    sys.source(file.path(root, "tools", "vignette-build-utils.R"), helpers)
+    write.dcf(helpers$vignette_build_index(root, output_dir),
+      file.path(output_dir, "build-manifest.dcf"))
   }
   invisible(outputs)
 }

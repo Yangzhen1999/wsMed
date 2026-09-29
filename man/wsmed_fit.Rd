@@ -50,6 +50,11 @@ and complete all analysis variables. Difference scores and products are
 rebuilt separately in every dataset, then the same Rubin/MC engine is used.
 Validation does not establish imputation-model compatibility. Save the external
 imputer's settings, convergence diagnostics and software versions separately.
+Internal MI with moderator interactions signals one
+\code{wsmed_mi_compatibility_warning} per fit and records it in fit diagnostics.
+Numeric 0/1 moderators remain continuous in this interface; a message explains
+this choice. Use a factor for categories. Type messages are retained as
+\code{diagnostics$input_notes} and do not change estimates or random-number state.
 Diagnostics include dataset-level convergence/admissibility, covariance checks,
 case counts, warnings, and fitted category counts. Complete-case matrix rank
 is descriptive, not an identification test for FIML. Counts below five receive

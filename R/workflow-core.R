@@ -68,6 +68,8 @@
 
 .wsmed_fit_core <- function(model, data, Na, mi_args, fixed.x, verbose = FALSE) {
   vars <- model$input_vars
+  input_notes <- .wsmed_input_notes(model, data)
+  if (length(input_notes)) message(paste(input_notes, collapse = "\n"))
   .v("Preparing data ...", verbose = verbose)
   prep_args <- vars[setdiff(names(vars), "MP")]
   prep <- syntax <- NULL
@@ -94,6 +96,10 @@
   fits <- withCallingHandlers({
     if (Na == "MI") {
       if (mi_args$m < 2L) stop("MI pooling requires at least two imputations.")
+      if (is.null(mi_args$completed) && length(vars$W) && any(grepl("^[bd]", vars$MP)))
+        warning(structure(list(message = paste0("Internal MI uses main effects only and may be incompatible with moderator interactions. ",
+          "Consider model-compatible external imputations via completed; see the CompatibleImputation tutorial."),
+          call = NULL), class = c("wsmed_mi_compatibility_warning", "warning", "condition")))
       if (!is.null(mi_args$completed)) {
         imputation <- .wsmed_prepare_completed(data, mi_args$completed, prep_args)
       } else invisible(utils::capture.output(imputation <- do.call(PrepareMissingData,
@@ -151,6 +157,7 @@
       moderator = attr(prep, "W_info"), covariates = attr(prep, "C_info"),
       by_dataset = references, reporting_dataset = 1L),
     diagnostics = list(converged = converged, warnings = unique(warnings_seen),
+      input_notes = input_notes,
       admissible = dataset_diagnostics$admissible, by_dataset = dataset_diagnostics,
       category_counts = category_counts,
       n_input = nrow(data), n_used = vapply(fits, function(x)

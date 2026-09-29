@@ -12,7 +12,7 @@
 
 
 
-<title>MEMORE_vs_wsMed</title>
+<title>Comparing wsMed and MEMORE</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -336,12 +336,22 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">MEMORE_vs_wsMed</h1>
+<h1 class="title toc-ignore">Comparing wsMed and MEMORE</h1>
 
 
 
 <div id="introduction" class="section level1">
 <h1>introduction</h1>
+<p>The MEMORE reports below are stored reference output, not rerun by
+this vignette. Compare estimates only after matching difference
+direction, model structure, missing-data handling and interval settings.
+Standardized results require matching the SD definition as well: wsMed
+uses marginal model-implied difference-component SDs. Matching raw
+estimates does not imply matching standardized estimates or confidence
+intervals.</p>
+<p>For moderation, see <a href="StandardizedModeratedMediation.html">Standardized moderated
+mediation</a>. This vignette does not establish agreement between the
+programs for moderated standardized effects.</p>
 <p>This document presents a comparison between the <strong>MEMORE 3.0
 (SPSS Plugin)</strong> and <strong>wsMed (R Package)</strong>
 outputs.</p>
@@ -538,18 +548,18 @@ model</strong>, comparing the results obtained from both methods.</p>
 ## 
 ## |Label          | Estimate|     SE| 2.5%CI.Lo| 97.5%CI.Up|
 ## |:--------------|--------:|------:|---------:|----------:|
-## |Total effect   |  -0.0316| 0.0169|   -0.0645|     0.0016|
-## |Direct effect  |  -0.0315| 0.0170|   -0.0644|     0.0019|
-## |Total indirect |  -0.0001| 0.0046|   -0.0096|     0.0094|
+## |Total effect   |  -0.0316| 0.0170|   -0.0648|     0.0023|
+## |Direct effect  |  -0.0315| 0.0170|   -0.0645|     0.0019|
+## |Total indirect |  -0.0001| 0.0046|   -0.0096|     0.0096|
 ## 
 ## Indirect effects:
 ## 
 ## 
 ## |Label | Estimate|     SE| 2.5%CI.Lo| 97.5%CI.Up|
 ## |:-----|--------:|------:|---------:|----------:|
-## |ind_1 |   0.0014| 0.0031|   -0.0043|     0.0087|
-## |ind_2 |  -0.0012| 0.0026|   -0.0078|     0.0031|
-## |ind_3 |  -0.0003| 0.0023|   -0.0055|     0.0044|
+## |ind_1 |   0.0014| 0.0032|   -0.0046|     0.0090|
+## |ind_2 |  -0.0012| 0.0026|   -0.0078|     0.0032|
+## |ind_3 |  -0.0003| 0.0023|   -0.0054|     0.0045|
 ## 
 ## Indirect-effect key:
 ## 
@@ -566,9 +576,9 @@ model</strong>, comparing the results obtained from both methods.</p>
 ## 
 ## |Coefficient | Estimate|     SE| 2.5%CI.Lo| 97.5%CI.Up|
 ## |:-----------|--------:|------:|---------:|----------:|
-## |d1          |  -0.0305| 0.0983|   -0.2217|     0.1623|
-## |d2          |  -0.0060| 0.0894|   -0.1805|     0.1685|
-## |d3          |  -0.1552| 0.1047|   -0.3621|     0.0490|
+## |d1          |  -0.0305| 0.0976|   -0.2214|     0.1561|
+## |d2          |  -0.0060| 0.0886|   -0.1812|     0.1655|
+## |d3          |  -0.1552| 0.1035|   -0.3558|     0.0465|
 ## 
 ## 
 ## *************** MODERATION KEY (d-paths) ***************
@@ -580,6 +590,9 @@ model</strong>, comparing the results obtained from both methods.</p>
 ## |d2          |M2avg -&gt; Ydiff |M2diff -&gt; Ydiff |
 ## |d3          |M3avg -&gt; Ydiff |M3diff -&gt; Ydiff |
 ## 
+## UNSTANDARDIZED CONDITIONAL EFFECTS (mc)
+## Percentile intervals; moderator probes and centering references are held fixed.
+## 
 ## 
 ## *************** CONTRAST INDIRECT EFFECTS (No Moderator) ***************
 ## 
@@ -587,8 +600,8 @@ model</strong>, comparing the results obtained from both methods.</p>
 ## |Contrast                  | Estimate|     SE| 2.5%CI.Lo| 97.5%CI.Up|
 ## |:-------------------------|--------:|------:|---------:|----------:|
 ## |indirect_2  -  indirect_1 |  -0.0030| 0.0040|   -0.0120|     0.0050|
-## |indirect_3  -  indirect_1 |  -0.0020| 0.0040|   -0.0100|     0.0060|
-## |indirect_3  -  indirect_2 |   0.0010| 0.0030|   -0.0060|     0.0090|
+## |indirect_3  -  indirect_1 |  -0.0020| 0.0040|   -0.0110|     0.0060|
+## |indirect_3  -  indirect_2 |   0.0010| 0.0040|   -0.0060|     0.0090|
 ## 
 ## 
 ## *************** C1-C2 COEFFICIENTS (No Moderator) ***************
@@ -596,12 +609,12 @@ model</strong>, comparing the results obtained from both methods.</p>
 ## 
 ## |Coeff | Estimate|     SE| 2.5%CI.Lo| 97.5%CI.Up|
 ## |:-----|--------:|------:|---------:|----------:|
-## |X1_b1 |  -0.0650| 0.1060|   -0.2730|     0.1440|
-## |X0_b1 |  -0.0350| 0.1070|   -0.2440|     0.1740|
-## |X1_b2 |  -0.0870| 0.1020|   -0.2860|     0.1140|
-## |X0_b2 |  -0.0800| 0.1020|   -0.2770|     0.1230|
-## |X1_b3 |  -0.0940| 0.1140|   -0.3180|     0.1300|
-## |X0_b3 |   0.0610| 0.1150|   -0.1630|     0.2880|
+## |X1_b1 |  -0.0650| 0.1070|   -0.2700|     0.1450|
+## |X0_b1 |  -0.0350| 0.1060|   -0.2400|     0.1720|
+## |X1_b2 |  -0.0870| 0.1040|   -0.2820|     0.1200|
+## |X0_b2 |  -0.0810| 0.1030|   -0.2820|     0.1160|
+## |X1_b3 |  -0.0940| 0.1150|   -0.3160|     0.1330|
+## |X0_b3 |   0.0610| 0.1150|   -0.1600|     0.2870|
 ## 
 ## 
 ## *************** REGRESSION PATHS (MC) ***************
@@ -609,12 +622,12 @@ model</strong>, comparing the results obtained from both methods.</p>
 ## 
 ## |Path           |Label | Estimate|     SE| 2.5%CI.Lo| 97.5%CI.Up|
 ## |:--------------|:-----|--------:|------:|---------:|----------:|
-## |Ydiff ~ M1diff |b1    |  -0.0501| 0.0945|   -0.2337|     0.1359|
-## |Ydiff ~ M1avg  |d1    |  -0.0305| 0.0983|   -0.2217|     0.1623|
-## |Ydiff ~ M2diff |b2    |  -0.0844| 0.0916|   -0.2629|     0.0996|
-## |Ydiff ~ M2avg  |d2    |  -0.0060| 0.0894|   -0.1805|     0.1685|
-## |Ydiff ~ M3diff |b3    |  -0.0167| 0.1023|   -0.2173|     0.1843|
-## |Ydiff ~ M3avg  |d3    |  -0.1552| 0.1047|   -0.3621|     0.0490|
+## |Ydiff ~ M1diff |b1    |  -0.0501| 0.0947|   -0.2371|     0.1337|
+## |Ydiff ~ M1avg  |d1    |  -0.0305| 0.0976|   -0.2214|     0.1561|
+## |Ydiff ~ M2diff |b2    |  -0.0844| 0.0932|   -0.2628|     0.0966|
+## |Ydiff ~ M2avg  |d2    |  -0.0060| 0.0886|   -0.1812|     0.1655|
+## |Ydiff ~ M3diff |b3    |  -0.0167| 0.1024|   -0.2159|     0.1852|
+## |Ydiff ~ M3avg  |d3    |  -0.1552| 0.1035|   -0.3558|     0.0465|
 ## 
 ## 
 ## *************** INTERCEPTS (MC) ***************
@@ -622,13 +635,13 @@ model</strong>, comparing the results obtained from both methods.</p>
 ## 
 ## |Intercept |Label | Estimate|     SE| 2.5%CI.Lo| 97.5%CI.Up|
 ## |:---------|:-----|--------:|------:|---------:|----------:|
-## |Ydiff~1   |cp    |  -0.0315| 0.0170|   -0.0644|     0.0019|
-## |M1diff~1  |a1    |  -0.0271| 0.0175|   -0.0608|     0.0076|
-## |M2diff~1  |a2    |   0.0145| 0.0180|   -0.0207|     0.0502|
-## |M3diff~1  |a3    |   0.0153| 0.0163|   -0.0170|     0.0471|
-## |M1avg~1   |      |  -0.0000| 0.0185|   -0.0361|     0.0361|
-## |M2avg~1   |      |   0.0000| 0.0202|   -0.0396|     0.0400|
-## |M3avg~1   |      |  -0.0000| 0.0175|   -0.0342|     0.0342|
+## |Ydiff~1   |cp    |  -0.0315| 0.0170|   -0.0645|     0.0019|
+## |M1diff~1  |a1    |  -0.0271| 0.0175|   -0.0613|     0.0073|
+## |M2diff~1  |a2    |   0.0145| 0.0180|   -0.0212|     0.0496|
+## |M3diff~1  |a3    |   0.0153| 0.0164|   -0.0172|     0.0470|
+## |M1avg~1   |      |  -0.0000| 0.0186|   -0.0367|     0.0363|
+## |M2avg~1   |      |   0.0000| 0.0201|   -0.0391|     0.0394|
+## |M3avg~1   |      |  -0.0000| 0.0175|   -0.0354|     0.0334|
 ## 
 ## 
 ## *************** VARIANCES (MC) ***************
@@ -636,48 +649,48 @@ model</strong>, comparing the results obtained from both methods.</p>
 ## 
 ## |Variance       |Label | Estimate|     SE| 2.5%CI.Lo| 97.5%CI.Up|
 ## |:--------------|:-----|--------:|------:|---------:|----------:|
-## |Ydiff~~Ydiff   |      |   0.0275| 0.0039|    0.0199|     0.0351|
-## |M1diff~~M1diff |      |   0.0308| 0.0044|    0.0221|     0.0391|
-## |M2diff~~M2diff |      |   0.0323| 0.0046|    0.0232|     0.0413|
-## |M3diff~~M3diff |      |   0.0264| 0.0037|    0.0191|     0.0337|
-## |M1avg~~M1avg   |      |   0.0339| 0.0048|    0.0245|     0.0433|
-## |M2avg~~M2avg   |      |   0.0407| 0.0058|    0.0294|     0.0520|
-## |M3avg~~M3avg   |      |   0.0306| 0.0043|    0.0221|     0.0390|
+## |Ydiff~~Ydiff   |      |   0.0275| 0.0038|    0.0200|     0.0350|
+## |M1diff~~M1diff |      |   0.0308| 0.0043|    0.0221|     0.0393|
+## |M2diff~~M2diff |      |   0.0323| 0.0046|    0.0233|     0.0413|
+## |M3diff~~M3diff |      |   0.0264| 0.0037|    0.0193|     0.0336|
+## |M1avg~~M1avg   |      |   0.0339| 0.0047|    0.0246|     0.0432|
+## |M2avg~~M2avg   |      |   0.0407| 0.0057|    0.0296|     0.0517|
+## |M3avg~~M3avg   |      |   0.0306| 0.0043|    0.0222|     0.0390|
 ## 
 ## 
 ## *************** STANDARDIZED (MC) ***************
 ## 
 ## 
-## |Parameter      | Estimate|     SE|          R|    2.5%|  97.5%|
-## |:--------------|--------:|------:|----------:|-------:|------:|
-## |cp             |  -0.1858| 0.0992| 20000.0000| -0.3775| 0.0106|
-## |b1             |  -0.0519| 0.0950| 20000.0000| -0.2366| 0.1367|
-## |d1             |  -0.0331| 0.1037| 20000.0000| -0.2335| 0.1716|
-## |b2             |  -0.0894| 0.0941| 20000.0000| -0.2669| 0.1038|
-## |d2             |  -0.0071| 0.1035| 20000.0000| -0.2093| 0.1937|
-## |b3             |  -0.0160| 0.0953| 20000.0000| -0.2012| 0.1716|
-## |d3             |  -0.1601| 0.1041| 20000.0000| -0.3586| 0.0502|
-## |a1             |  -0.1546| 0.1019| 20000.0000| -0.3560| 0.0432|
-## |a2             |   0.0806| 0.1015| 20000.0000| -0.1168| 0.2840|
-## |a3             |   0.0945| 0.1014| 20000.0000| -0.1045| 0.2976|
-## |Ydiff~~Ydiff   |   0.9578| 0.0468| 20000.0000|  0.7977| 0.9770|
-## |M1diff~~M1diff |   1.0000| 0.0000| 20000.0000|  1.0000| 1.0000|
-## |M2diff~~M2diff |   1.0000| 0.0000| 20000.0000|  1.0000| 1.0000|
-## |M3diff~~M3diff |   1.0000| 0.0000| 20000.0000|  1.0000| 1.0000|
-## |M1avg~~M1avg   |   1.0000| 0.0000| 20000.0000|  1.0000| 1.0000|
-## |M1avg~~M2avg   |   0.2898| 0.0931| 20000.0000|  0.0992| 0.4640|
-## |M1avg~~M3avg   |   0.3395| 0.0906| 20000.0000|  0.1521| 0.5080|
-## |M2avg~~M2avg   |   1.0000| 0.0000| 20000.0000|  1.0000| 1.0000|
-## |M2avg~~M3avg   |   0.3240| 0.0916| 20000.0000|  0.1347| 0.4941|
-## |M3avg~~M3avg   |   1.0000| 0.0000| 20000.0000|  1.0000| 1.0000|
-## |M1avg~1        |  -0.0000| 0.1016| 20000.0000| -0.1996| 0.1997|
-## |M2avg~1        |   0.0000| 0.1012| 20000.0000| -0.1967| 0.1997|
-## |M3avg~1        |  -0.0000| 0.1011| 20000.0000| -0.1967| 0.1977|
-## |indirect_1     |   0.0080| 0.0180| 20000.0000| -0.0250| 0.0497|
-## |indirect_2     |  -0.0072| 0.0149| 20000.0000| -0.0443| 0.0178|
-## |indirect_3     |  -0.0015| 0.0131| 20000.0000| -0.0320| 0.0254|
-## |total_indirect |  -0.0007| 0.0267| 20000.0000| -0.0552| 0.0540|
-## |total_effect   |  -0.1865| 0.0991| 20000.0000| -0.3788| 0.0093|</code></pre>
+## |Parameter      | Estimate|     SE|         R|    2.5%|  97.5%|
+## |:--------------|--------:|------:|---------:|-------:|------:|
+## |cp             |  -0.1858| 0.0993| 5000.0000| -0.3738| 0.0107|
+## |b1             |  -0.0519| 0.0955| 5000.0000| -0.2398| 0.1352|
+## |d1             |  -0.0331| 0.1028| 5000.0000| -0.2340| 0.1626|
+## |b2             |  -0.0894| 0.0959| 5000.0000| -0.2726| 0.0987|
+## |d2             |  -0.0071| 0.1022| 5000.0000| -0.2119| 0.1920|
+## |b3             |  -0.0160| 0.0956| 5000.0000| -0.2015| 0.1759|
+## |d3             |  -0.1601| 0.1029| 5000.0000| -0.3536| 0.0486|
+## |a1             |  -0.1546| 0.1015| 5000.0000| -0.3571| 0.0423|
+## |a2             |   0.0806| 0.1013| 5000.0000| -0.1201| 0.2803|
+## |a3             |   0.0945| 0.1024| 5000.0000| -0.1072| 0.2954|
+## |Ydiff~~Ydiff   |   0.9578| 0.0463| 5000.0000|  0.8004| 0.9775|
+## |M1diff~~M1diff |   1.0000| 0.0000| 5000.0000|  1.0000| 1.0000|
+## |M2diff~~M2diff |   1.0000| 0.0000| 5000.0000|  1.0000| 1.0000|
+## |M3diff~~M3diff |   1.0000| 0.0000| 5000.0000|  1.0000| 1.0000|
+## |M1avg~~M1avg   |   1.0000| 0.0000| 5000.0000|  1.0000| 1.0000|
+## |M1avg~~M2avg   |   0.2898| 0.0937| 5000.0000|  0.0995| 0.4659|
+## |M1avg~~M3avg   |   0.3395| 0.0894| 5000.0000|  0.1572| 0.5047|
+## |M2avg~~M2avg   |   1.0000| 0.0000| 5000.0000|  1.0000| 1.0000|
+## |M2avg~~M3avg   |   0.3240| 0.0934| 5000.0000|  0.1284| 0.4984|
+## |M3avg~~M3avg   |   1.0000| 0.0000| 5000.0000|  1.0000| 1.0000|
+## |M1avg~1        |  -0.0000| 0.1019| 5000.0000| -0.2018| 0.1988|
+## |M2avg~1        |   0.0000| 0.1006| 5000.0000| -0.1947| 0.2004|
+## |M3avg~1        |  -0.0000| 0.1013| 5000.0000| -0.2064| 0.1977|
+## |indirect_1     |   0.0080| 0.0183| 5000.0000| -0.0261| 0.0508|
+## |indirect_2     |  -0.0072| 0.0149| 5000.0000| -0.0448| 0.0181|
+## |indirect_3     |  -0.0015| 0.0133| 5000.0000| -0.0304| 0.0261|
+## |total_indirect |  -0.0007| 0.0265| 5000.0000| -0.0549| 0.0542|
+## |total_effect   |  -0.1865| 0.0993| 5000.0000| -0.3753| 0.0135|</code></pre>
 <pre><code>## 
 ## Outcome Difference Model (Ydiff):
 ##  Ydiff ~ cp*1 + b1*M1diff + d1*M1avg + b2*M2diff + d2*M2avg + b3*M3diff + d3*M3avg 
@@ -850,10 +863,11 @@ model</strong>, comparing the results obtained from both methods.</p>
 <span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="at">M_C2 =</span> <span class="fu">c</span>(<span class="st">&quot;A2&quot;</span>,<span class="st">&quot;B2&quot;</span>), <span class="co"># A2/B2 is A/B mediator variable in condition 2</span></span>
 <span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="at">Y_C1 =</span> <span class="st">&quot;C1&quot;</span>, <span class="co"># C1 is outcome variable in condition 1</span></span>
 <span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="at">Y_C2 =</span> <span class="st">&quot;C2&quot;</span>, <span class="co"># C2 is outcome variable in condition 2</span></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>  <span class="at">form =</span> <span class="st">&quot;CN&quot;</span>, <span class="co"># Parallel mediation</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>  <span class="at">form =</span> <span class="st">&quot;CN&quot;</span>, <span class="co"># Serial mediation</span></span>
 <span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>  <span class="at">standardized =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>)</span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="fu">print</span>(result2,<span class="at">digits=</span><span class="dv">4</span>)</span></code></pre></div>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>  <span class="at">Na =</span> <span class="st">&quot;DE&quot;</span>, <span class="at">ci_method =</span> <span class="st">&quot;mc&quot;</span>, <span class="at">R =</span> <span class="dv">5000</span>, <span class="at">seed =</span> <span class="dv">123</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>)</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="fu">print</span>(result2,<span class="at">digits=</span><span class="dv">4</span>, <span class="at">detail =</span> <span class="st">&quot;full&quot;</span>)</span></code></pre></div>
 <pre><code>## 
 ## 
 ## *************** VARIABLES ***************
@@ -891,17 +905,17 @@ model</strong>, comparing the results obtained from both methods.</p>
 ## 
 ## |Label          | Estimate|     SE| 2.5%CI.Lo| 97.5%CI.Up|
 ## |:--------------|--------:|------:|---------:|----------:|
-## |Total effect   |   0.0153| 0.0163|   -0.0169|     0.0469|
-## |Direct effect  |   0.0160| 0.0162|   -0.0161|     0.0479|
-## |Total indirect |  -0.0006| 0.0045|   -0.0100|     0.0083|
+## |Total effect   |   0.0153| 0.0165|   -0.0161|     0.0481|
+## |Direct effect  |   0.0160| 0.0165|   -0.0159|     0.0488|
+## |Total indirect |  -0.0006| 0.0044|   -0.0098|     0.0083|
 ## 
 ## Indirect effects:
 ## 
 ## 
 ## |Label   | Estimate|     SE| 2.5%CI.Lo| 97.5%CI.Up|
 ## |:-------|--------:|------:|---------:|----------:|
-## |ind_1   |   0.0010| 0.0031|   -0.0050|     0.0081|
-## |ind_2   |  -0.0023| 0.0032|   -0.0103|     0.0025|
+## |ind_1   |   0.0010| 0.0030|   -0.0050|     0.0083|
+## |ind_2   |  -0.0023| 0.0031|   -0.0100|     0.0024|
 ## |ind_1_2 |   0.0007| 0.0009|   -0.0005|     0.0031|
 ## 
 ## Indirect-effect key:
@@ -919,9 +933,9 @@ model</strong>, comparing the results obtained from both methods.</p>
 ## 
 ## |Coefficient | Estimate|     SE| 2.5%CI.Lo| 97.5%CI.Up|
 ## |:-----------|--------:|------:|---------:|----------:|
-## |d1          |  -0.0617| 0.0914|   -0.2433|     0.1203|
-## |d2          |  -0.0733| 0.0835|   -0.2367|     0.0913|
-## |d_1_2       |  -0.0578| 0.0943|   -0.2440|     0.1290|
+## |d1          |  -0.0617| 0.0907|   -0.2374|     0.1137|
+## |d2          |  -0.0733| 0.0830|   -0.2383|     0.0877|
+## |d_1_2       |  -0.0578| 0.0950|   -0.2449|     0.1272|
 ## 
 ## 
 ## *************** MODERATION KEY (d-paths) ***************
@@ -933,6 +947,9 @@ model</strong>, comparing the results obtained from both methods.</p>
 ## |d2          |M2avg -&gt; Ydiff  |M2diff -&gt; Ydiff  |
 ## |d_1_2       |M1avg -&gt; M2diff |M1diff -&gt; M2diff |
 ## 
+## UNSTANDARDIZED CONDITIONAL EFFECTS (mc)
+## Percentile intervals; moderator probes and centering references are held fixed.
+## 
 ## 
 ## *************** CONTRAST INDIRECT EFFECTS (No Moderator) ***************
 ## 
@@ -940,7 +957,7 @@ model</strong>, comparing the results obtained from both methods.</p>
 ## |Contrast                    | Estimate|     SE| 2.5%CI.Lo| 97.5%CI.Up|
 ## |:---------------------------|--------:|------:|---------:|----------:|
 ## |indirect_2    -  indirect_1 |  -0.0030| 0.0040|   -0.0130|     0.0040|
-## |indirect_1_2  -  indirect_1 |  -0.0000| 0.0030|   -0.0070|     0.0070|
+## |indirect_1_2  -  indirect_1 |  -0.0000| 0.0030|   -0.0080|     0.0070|
 ## |indirect_1_2  -  indirect_2 |   0.0030| 0.0040|   -0.0020|     0.0120|
 ## 
 ## 
@@ -949,12 +966,12 @@ model</strong>, comparing the results obtained from both methods.</p>
 ## 
 ## |Coeff    | Estimate|     SE| 2.5%CI.Lo| 97.5%CI.Up|
 ## |:--------|--------:|------:|---------:|----------:|
-## |X1_b1    |  -0.0660| 0.1030|   -0.2700|     0.1340|
-## |X0_b1    |  -0.0060| 0.1050|   -0.2130|     0.2000|
-## |X1_b2    |  -0.1480| 0.1000|   -0.3450|     0.0470|
-## |X0_b2    |  -0.0750| 0.1000|   -0.2720|     0.1210|
-## |X1_b_1_2 |   0.2030| 0.1110|   -0.0170|     0.4200|
-## |X0_b_1_2 |   0.2620| 0.1110|    0.0440|     0.4770|
+## |X1_b1    |  -0.0670| 0.1040|   -0.2690|     0.1350|
+## |X0_b1    |  -0.0050| 0.1050|   -0.2160|     0.1930|
+## |X1_b2    |  -0.1490| 0.1000|   -0.3440|     0.0490|
+## |X0_b2    |  -0.0760| 0.0990|   -0.2700|     0.1150|
+## |X1_b_1_2 |   0.2040| 0.1100|   -0.0120|     0.4170|
+## |X0_b_1_2 |   0.2620| 0.1110|    0.0500|     0.4760|
 ## 
 ## 
 ## *************** REGRESSION PATHS (MC) ***************
@@ -962,12 +979,12 @@ model</strong>, comparing the results obtained from both methods.</p>
 ## 
 ## |Path            |Label | Estimate|     SE| 2.5%CI.Lo| 97.5%CI.Up|
 ## |:---------------|:-----|--------:|------:|---------:|----------:|
-## |Ydiff ~ M1diff  |b1    |  -0.0360| 0.0930|   -0.2178|     0.1460|
-## |Ydiff ~ M1avg   |d1    |  -0.0617| 0.0914|   -0.2433|     0.1203|
-## |Ydiff ~ M2diff  |b2    |  -0.1123| 0.0911|   -0.2890|     0.0662|
-## |Ydiff ~ M2avg   |d2    |  -0.0733| 0.0835|   -0.2367|     0.0913|
-## |M2diff ~ M1diff |b_1_2 |   0.2333| 0.1002|    0.0358|     0.4305|
-## |M2diff ~ M1avg  |d_1_2 |  -0.0578| 0.0943|   -0.2440|     0.1290|
+## |Ydiff ~ M1diff  |b1    |  -0.0360| 0.0941|   -0.2200|     0.1462|
+## |Ydiff ~ M1avg   |d1    |  -0.0617| 0.0907|   -0.2374|     0.1137|
+## |Ydiff ~ M2diff  |b2    |  -0.1123| 0.0909|   -0.2898|     0.0657|
+## |Ydiff ~ M2avg   |d2    |  -0.0733| 0.0830|   -0.2383|     0.0877|
+## |M2diff ~ M1diff |b_1_2 |   0.2333| 0.0998|    0.0368|     0.4267|
+## |M2diff ~ M1avg  |d_1_2 |  -0.0578| 0.0950|   -0.2449|     0.1272|
 ## 
 ## 
 ## *************** INTERCEPTS (MC) ***************
@@ -975,11 +992,11 @@ model</strong>, comparing the results obtained from both methods.</p>
 ## 
 ## |Intercept |Label | Estimate|     SE| 2.5%CI.Lo| 97.5%CI.Up|
 ## |:---------|:-----|--------:|------:|---------:|----------:|
-## |Ydiff~1   |cp    |   0.0160| 0.0162|   -0.0161|     0.0479|
-## |M1diff~1  |a1    |  -0.0271| 0.0176|   -0.0618|     0.0073|
-## |M2diff~1  |a2    |   0.0208| 0.0177|   -0.0134|     0.0562|
-## |M1avg~1   |      |  -0.0000| 0.0186|   -0.0366|     0.0362|
-## |M2avg~1   |      |   0.0000| 0.0202|   -0.0396|     0.0392|
+## |Ydiff~1   |cp    |   0.0160| 0.0165|   -0.0159|     0.0488|
+## |M1diff~1  |a1    |  -0.0271| 0.0176|   -0.0614|     0.0077|
+## |M2diff~1  |a2    |   0.0208| 0.0176|   -0.0139|     0.0552|
+## |M1avg~1   |      |  -0.0000| 0.0184|   -0.0360|     0.0371|
+## |M2avg~1   |      |   0.0000| 0.0201|   -0.0391|     0.0398|
 ## 
 ## 
 ## *************** VARIANCES (MC) ***************
@@ -987,40 +1004,40 @@ model</strong>, comparing the results obtained from both methods.</p>
 ## 
 ## |Variance       |Label | Estimate|     SE| 2.5%CI.Lo| 97.5%CI.Up|
 ## |:--------------|:-----|--------:|------:|---------:|----------:|
-## |Ydiff~~Ydiff   |      |   0.0256| 0.0036|    0.0186|     0.0327|
-## |M2diff~~M2diff |      |   0.0305| 0.0043|    0.0220|     0.0389|
-## |M1diff~~M1diff |      |   0.0308| 0.0044|    0.0222|     0.0394|
-## |M1avg~~M1avg   |      |   0.0339| 0.0048|    0.0244|     0.0433|
-## |M2avg~~M2avg   |      |   0.0407| 0.0058|    0.0293|     0.0519|
+## |Ydiff~~Ydiff   |      |   0.0256| 0.0037|    0.0185|     0.0327|
+## |M2diff~~M2diff |      |   0.0305| 0.0043|    0.0218|     0.0391|
+## |M1diff~~M1diff |      |   0.0308| 0.0043|    0.0224|     0.0388|
+## |M1avg~~M1avg   |      |   0.0339| 0.0048|    0.0240|     0.0434|
+## |M2avg~~M2avg   |      |   0.0407| 0.0058|    0.0293|     0.0520|
 ## 
 ## 
 ## *************** STANDARDIZED (MC) ***************
 ## 
 ## 
-## |Parameter      | Estimate|     SE|          R|    2.5%|  97.5%|
-## |:--------------|--------:|------:|----------:|-------:|------:|
-## |cp             |   0.0983| 0.0989| 20000.0000| -0.0974| 0.2916|
-## |b1             |  -0.0388| 0.0983| 20000.0000| -0.2299| 0.1548|
-## |d1             |  -0.0697| 0.1012| 20000.0000| -0.2673| 0.1335|
-## |b2             |  -0.1239| 0.0988| 20000.0000| -0.3132| 0.0726|
-## |d2             |  -0.0908| 0.1010| 20000.0000| -0.2852| 0.1108|
-## |a1             |  -0.1546| 0.1020| 20000.0000| -0.3591| 0.0415|
-## |a2             |   0.1159| 0.0987| 20000.0000| -0.0757| 0.3112|
-## |b_1_2          |   0.2278| 0.0946| 20000.0000|  0.0346| 0.4082|
-## |d_1_2          |  -0.0592| 0.0956| 20000.0000| -0.2468| 0.1299|
-## |Ydiff~~Ydiff   |   0.9656| 0.0419| 20000.0000|  0.8320| 0.9891|
-## |M2diff~~M2diff |   0.9446| 0.0461| 20000.0000|  0.8186| 0.9930|
-## |M1diff~~M1diff |   1.0000| 0.0000| 20000.0000|  1.0000| 1.0000|
-## |M1avg~~M1avg   |   1.0000| 0.0000| 20000.0000|  1.0000| 1.0000|
-## |M1avg~~M2avg   |   0.2898| 0.0938| 20000.0000|  0.0944| 0.4651|
-## |M2avg~~M2avg   |   1.0000| 0.0000| 20000.0000|  1.0000| 1.0000|
-## |M1avg~1        |  -0.0000| 0.1020| 20000.0000| -0.2020| 0.2000|
-## |M2avg~1        |   0.0000| 0.1012| 20000.0000| -0.1985| 0.1984|
-## |indirect_1     |   0.0060| 0.0187| 20000.0000| -0.0302| 0.0485|
-## |indirect_2     |  -0.0144| 0.0192| 20000.0000| -0.0611| 0.0147|
-## |indirect_1_2   |   0.0044| 0.0056| 20000.0000| -0.0032| 0.0189|
-## |total_indirect |  -0.0040| 0.0269| 20000.0000| -0.0605| 0.0493|
-## |total_effect   |   0.0943| 0.0991| 20000.0000| -0.1023| 0.2878|</code></pre>
+## |Parameter      | Estimate|     SE|         R|    2.5%|  97.5%|
+## |:--------------|--------:|------:|---------:|-------:|------:|
+## |cp             |   0.0983| 0.1007| 5000.0000| -0.0959| 0.3021|
+## |b1             |  -0.0388| 0.0997| 5000.0000| -0.2383| 0.1559|
+## |d1             |  -0.0697| 0.1003| 5000.0000| -0.2633| 0.1280|
+## |b2             |  -0.1239| 0.0984| 5000.0000| -0.3178| 0.0727|
+## |d2             |  -0.0908| 0.1010| 5000.0000| -0.2905| 0.1079|
+## |a1             |  -0.1546| 0.1015| 5000.0000| -0.3536| 0.0442|
+## |a2             |   0.1159| 0.0978| 5000.0000| -0.0779| 0.3052|
+## |b_1_2          |   0.2278| 0.0947| 5000.0000|  0.0379| 0.4048|
+## |d_1_2          |  -0.0592| 0.0961| 5000.0000| -0.2500| 0.1269|
+## |Ydiff~~Ydiff   |   0.9656| 0.0416| 5000.0000|  0.8321| 0.9895|
+## |M2diff~~M2diff |   0.9446| 0.0466| 5000.0000|  0.8192| 0.9929|
+## |M1diff~~M1diff |   1.0000| 0.0000| 5000.0000|  1.0000| 1.0000|
+## |M1avg~~M1avg   |   1.0000| 0.0000| 5000.0000|  1.0000| 1.0000|
+## |M1avg~~M2avg   |   0.2898| 0.0943| 5000.0000|  0.1010| 0.4675|
+## |M2avg~~M2avg   |   1.0000| 0.0000| 5000.0000|  1.0000| 1.0000|
+## |M1avg~1        |  -0.0000| 0.1012| 5000.0000| -0.1958| 0.2048|
+## |M2avg~1        |   0.0000| 0.1011| 5000.0000| -0.1972| 0.1996|
+## |indirect_1     |   0.0060| 0.0183| 5000.0000| -0.0305| 0.0498|
+## |indirect_2     |  -0.0144| 0.0188| 5000.0000| -0.0610| 0.0149|
+## |indirect_1_2   |   0.0044| 0.0054| 5000.0000| -0.0033| 0.0181|
+## |total_indirect |  -0.0040| 0.0264| 5000.0000| -0.0593| 0.0501|
+## |total_effect   |   0.0943| 0.1008| 5000.0000| -0.0987| 0.2945|</code></pre>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">printGM</span>(result2)</span></code></pre></div>
 <pre><code>## 
 ## Outcome Difference Model (Ydiff):
