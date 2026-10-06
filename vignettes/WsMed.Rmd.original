@@ -1,8 +1,8 @@
 ---
-title: "Using wsMed step by step"
+title: "Analysis options: a complete walkthrough"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Using wsMed step by step}
+  %\VignetteIndexEntry{Analysis options: a complete walkthrough}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 editor_options:
@@ -63,6 +63,11 @@ if (!is.null(wsmed_root)) {
   library(wsMed)
 }
 ```
+
+**Looking for a short first example?** Start with [Get started](GetStarted.html).
+This longer guide explains analysis options and preserves historical full-report
+examples. Use [Read and export results](ResultsGuide.html) for the current
+`print()` and `summary()` workflow.
 
 ## Introduction
 

@@ -1,6 +1,5 @@
 url: https://yangzhen1999.github.io/wsMed
 
-
 template:
   bootstrap: 5
   bootswatch: flatly
@@ -10,60 +9,52 @@ assets:
 
 navbar:
   structure:
-    left: [home, reference, articles, news]
-    right: [github]
+    left: [start, analysis, results, reference, articles]
+    right: [search, github]
   components:
-    home:
-      text: "Home"
-      href: index.html
+    start:
+      text: Get started
+      href: articles/GetStarted.html
+    analysis:
+      text: Analysis guides
+      href: articles/AnalysisGuide.html
+    results:
+      text: Results & plots
+      menu:
+        - text: Read and export results
+          href: articles/ResultsGuide.html
+        - text: Plot gallery
+          href: articles/PlottingEffects.html
+        - text: Standardized effects
+          href: articles/StandardizedModeratedMediation.html
     reference:
-      text: "Functions"
+      text: Reference
       href: reference/index.html
     articles:
-      text: "Tutorials"
-      menu:
-        - text: "One-call and staged workflows"
-          href: articles/ModularWorkflow.html
-        - text: "Diagnostics, reproducibility, and migration"
-          href: articles/WorkflowReliability.html
-        - text: "Using wsMed step by step"
-          href: articles/WsMed.html
-        - text: "Plotting mediation effects and contrasts"
-          href: articles/PlottingEffects.html
-        - text: "Standardized moderated mediation"
-          href: articles/StandardizedModeratedMediation.html
-        - text: "Model-compatible multiple imputation"
-          href: articles/CompatibleImputation.html
-        - text: "Inspecting generated SEM syntax"
-          href: articles/printGM.html
-        - text: "Specifying parallel mediation models"
-          href: articles/GenerateModelP.html
-        - text: "Specifying serial mediation models"
-          href: articles/GenerateModelCN.html
-        - text: "Specifying serial-parallel mediation models"
-          href: articles/GenerateModelCP.html
-        - text: "Specifying parallel-serial mediation models"
-          href: articles/GenerateModelPC.html
-        - text: "Comparing wsMed and MEMORE"
-          href: articles/MEMORE_vs_wsMed.html
-        - text: "Specifying user-defined mediation models"
-          href: articles/GenerateModelCustom.html
-        - text: "Working with categorical predictors"
-          href: articles/CategoricalPredictors.html
-    news:
-      text: "Changelog"
-      href: news/index.html
+      text: Articles
+      href: articles/index.html
     github:
       icon: fab fa-github
       href: https://github.com/Yangzhen1999/wsMed
-      aria-label: "GitHub Repository"
+      aria-label: GitHub Repository
+
+articles:
+  - title: Start here
+    contents: [GetStarted, AnalysisGuide]
+  - title: Read and present results
+    contents: [ResultsGuide, PlottingEffects, StandardizedModeratedMediation]
+  - title: Analysis options
+    contents: [WsMed, CategoricalPredictors, GenerateModelCustom]
+  - title: Advanced workflows and reliability
+    contents: [ModularWorkflow, WorkflowReliability, CompatibleImputation]
+  - title: Model equations and software comparison
+    contents: [GenerateModelP, GenerateModelCN, GenerateModelCP, GenerateModelPC, printGM, MEMORE_vs_wsMed]
 
 reference:
   - title: "Main functions"
     desc: "Core functions for within-subject mediation analysis"
     contents:
       - wsMed
-      - printGM
   - title: "Staged workflow"
     desc: "Specify, fit, infer, and extract without repeating earlier stages"
     contents:
@@ -80,6 +71,7 @@ reference:
   - title: "Model generation"
     desc: "Functions for generating SEM syntax for different mediation structures"
     contents:
+      - printGM
       - GenerateModelP
       - GenerateModelCN
       - GenerateModelCP

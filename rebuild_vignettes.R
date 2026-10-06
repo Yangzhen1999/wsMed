@@ -2,6 +2,8 @@
 # From the repository root: source("rebuild_vignettes.R"); rebuild_vignettes()
 # Or: Rscript rebuild_vignettes.R [package_root] [output_directory]
 # A separate output directory permits validation without updating frozen files.
+# Use articles = c("GetStarted", "AnalysisGuide", "ResultsGuide") for the entry guides.
+# New .Rmd.original sources are discovered automatically; keep _pkgdown.yml in sync.
 # Use articles = "ModularWorkflow" to rebuild only the staged-workflow tutorial.
 # Use articles = "CategoricalPredictors" to rebuild the categorical examples.
 # Use articles = "WorkflowReliability" for diagnostics, manifests, and migration.

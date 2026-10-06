@@ -1,13 +1,52 @@
 ---
-title: "Standardized moderated mediation"
+title: "Standardized effects"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Standardized moderated mediation}
+  %\VignetteIndexEntry{Standardized effects}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 
+
+## Request standardized results
+
+Standardization is available **with or without a moderator**. Set
+`standardized = TRUE` in the analysis; subsequent summaries and generic plots
+inherit that preference.
+
+
+``` r
+data(example_data)
+standardized_intro <- wsMed(example_data,
+  M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"),
+  Y_C1 = "D1", Y_C2 = "D2", standardized = TRUE,
+  R = 2000, seed = 123, verbose = FALSE)
+standardized_table <- summary(standardized_intro)$effects
+knitr::kable(standardized_table[c("label", "estimate", "conf.low", "conf.high")], digits = 4)
+```
+
+
+
+|label                 | estimate| conf.low| conf.high|
+|:---------------------|--------:|--------:|---------:|
+|Direct effect         |  -0.1879|  -0.3878|    0.0191|
+|M1                    |   0.0077|  -0.0284|    0.0464|
+|M2                    |  -0.0066|  -0.0434|    0.0181|
+|Total indirect effect |   0.0011|  -0.0471|    0.0464|
+|Total effect          |  -0.1867|  -0.3836|    0.0112|
+
+
+
+These complete condition effects are expressed relative to the marginal SD of
+the outcome difference. For a one-off unstandardized query, use
+`summary(standardized_intro, standardized = FALSE)`. See the
+[results guide](ResultsGuide.html) for table export.
+
+**Choose what to read next:** [definitions](#what-is-standardized),
+[continuous moderators](#continuous-moderators-two-different-quantities),
+[categorical moderators](#categorical-moderators), or
+[missing data](#missing-data-and-reporting).
 
 ## What is standardized?
 

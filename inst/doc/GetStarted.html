@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Get started: your first mediation analysis</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Get started: your first mediation
+analysis</h1>
+
+
+
+<p>Fit a two-condition parallel mediation model, read its effects, and
+draw a forest plot. This example uses complete simulated data and the
+one-call <code>wsMed()</code> interface. No external data file is
+needed.</p>
+<p><strong>Documentation version:</strong> the reporting interfaces on
+this site require the <code>feature/modular-api</code> development build
+(<code>1.1.0.9000</code>). Install it once:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># install.packages(&quot;pak&quot;)</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>pak<span class="sc">::</span><span class="fu">pak</span>(<span class="st">&quot;Yangzhen1999/wsMed@feature/modular-api&quot;</span>)</span></code></pre></div>
+<p>Restart R after updating the package, then follow the steps below.
+For the published CRAN version, use
+<code>install.packages(&quot;wsMed&quot;)</code>; its reporting interface differs
+from this development tutorial.</p>
+<div id="match-your-columns-to-the-two-conditions" class="section level2">
+<h2>1. Match your columns to the two conditions</h2>
+<p>Use <strong>one row per participant</strong>, with a separate column
+for each measurement. Here, <code>A</code> and <code>B</code> are
+mediators and <code>D</code> is the outcome:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Role</th>
+<th>Condition 1</th>
+<th>Condition 2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Mediator A</td>
+<td><code>A1</code></td>
+<td><code>A2</code></td>
+</tr>
+<tr class="even">
+<td>Mediator B</td>
+<td><code>B1</code></td>
+<td><code>B2</code></td>
+</tr>
+<tr class="odd">
+<td>Outcome</td>
+<td><code>D1</code></td>
+<td><code>D2</code></td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">library</span>(wsMed)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">data</span>(example_data)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">head</span>(example_data[<span class="fu">c</span>(<span class="st">&quot;A1&quot;</span>, <span class="st">&quot;A2&quot;</span>, <span class="st">&quot;B1&quot;</span>, <span class="st">&quot;B2&quot;</span>, <span class="st">&quot;D1&quot;</span>, <span class="st">&quot;D2&quot;</span>)], <span class="dv">3</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt; # A tibble: 3 × 6</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&gt;      A1    A2     B1    B2    D1    D2</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt; 1 0.520 0.348 0.0935 0.254 0.702 0.485</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; 2 0.329 0.121 0.259  0.328 0     0.392</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; 3 0.208 0.168 0.295  0.342 0.336 0.706</span></span></code></pre></div>
+<p>The direction is <strong>condition 2 minus condition 1</strong>. Put
+the mediator columns in the same order in <code>M_C1</code> and
+<code>M_C2</code>. Replace the column names when using your data; wsMed
+constructs the differences internally.</p>
+</div>
+<div id="run-the-analysis" class="section level2">
+<h2>2. Run the analysis</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">wsMed</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="at">data =</span> example_data,</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="at">M_C1 =</span> <span class="fu">c</span>(<span class="st">&quot;A1&quot;</span>, <span class="st">&quot;B1&quot;</span>), <span class="at">M_C2 =</span> <span class="fu">c</span>(<span class="st">&quot;A2&quot;</span>, <span class="st">&quot;B2&quot;</span>),</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">Y_C1 =</span> <span class="st">&quot;D1&quot;</span>, <span class="at">Y_C2 =</span> <span class="st">&quot;D2&quot;</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="at">form =</span> <span class="st">&quot;P&quot;</span>, <span class="at">Na =</span> <span class="st">&quot;DE&quot;</span>, <span class="at">ci_method =</span> <span class="st">&quot;mc&quot;</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  <span class="at">R =</span> <span class="dv">2000</span>, <span class="at">seed =</span> <span class="dv">123</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>)</span></code></pre></div>
+<p><code>form = &quot;P&quot;</code> requests parallel mediation.
+<code>Na = &quot;DE&quot;</code> removes incomplete analysis rows; this dataset is
+complete. <code>R = 2000</code> keeps this teaching example quick, and
+<code>seed</code> makes its Monte Carlo draws repeatable in the same
+environment. For a final analysis, assess interval stability with more
+draws.</p>
+</div>
+<div id="read-the-core-effects" class="section level2">
+<h2>3. Read the core effects</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">summary</span>(result)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(s<span class="sc">$</span>effects[<span class="fu">c</span>(<span class="st">&quot;label&quot;</span>, <span class="st">&quot;estimate&quot;</span>, <span class="st">&quot;std.error&quot;</span>, <span class="st">&quot;conf.low&quot;</span>, <span class="st">&quot;conf.high&quot;</span>)],</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">digits =</span> <span class="dv">4</span>, <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;Effect / pathway&quot;</span>, <span class="st">&quot;Estimate&quot;</span>, <span class="st">&quot;SE&quot;</span>, <span class="st">&quot;CI lower&quot;</span>, <span class="st">&quot;CI upper&quot;</span>))</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Effect / pathway</th>
+<th align="right">Estimate</th>
+<th align="right">SE</th>
+<th align="right">CI lower</th>
+<th align="right">CI upper</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Direct effect</td>
+<td align="right">-0.0318</td>
+<td align="right">0.0171</td>
+<td align="right">-0.0643</td>
+<td align="right">0.0030</td>
+</tr>
+<tr class="even">
+<td align="left">M1</td>
+<td align="right">0.0013</td>
+<td align="right">0.0031</td>
+<td align="right">-0.0049</td>
+<td align="right">0.0081</td>
+</tr>
+<tr class="odd">
+<td align="left">M2</td>
+<td align="right">-0.0011</td>
+<td align="right">0.0026</td>
+<td align="right">-0.0073</td>
+<td align="right">0.0031</td>
+</tr>
+<tr class="even">
+<td align="left">Total indirect effect</td>
+<td align="right">0.0002</td>
+<td align="right">0.0040</td>
+<td align="right">-0.0082</td>
+<td align="right">0.0079</td>
+</tr>
+<tr class="odd">
+<td align="left">Total effect</td>
+<td align="right">-0.0316</td>
+<td align="right">0.0170</td>
+<td align="right">-0.0639</td>
+<td align="right">0.0019</td>
+</tr>
+</tbody>
+</table>
+<p>Read the table in three steps:</p>
+<ul>
+<li>The specific indirect rows describe the pathways through A
+(<code>M1</code>) and B (<code>M2</code>), in the order supplied to
+<code>M_C1</code> and <code>M_C2</code>. Their sum is the <strong>total
+indirect effect</strong>.</li>
+<li>The <strong>total effect</strong> is the direct effect plus the
+total indirect effect.</li>
+<li>The estimates above are <strong>unstandardized</strong>. The
+interval columns are 95% percentile Monte Carlo intervals. An interval
+containing zero does not establish that the effect is exactly zero.</li>
+</ul>
+<p>The synthetic variable names describe roles, not substantive
+constructs. Use study-specific names when reporting your own analysis,
+and distinguish statistical mediation from a causal interpretation.</p>
+<p>For the console report, use <code>print(result)</code>. For
+additional path coefficients, use
+<code>print(result, detail = &quot;full&quot;)</code>. The <a href="ResultsGuide.html">results guide</a> explains the report,
+structured tables and export options.</p>
+</div>
+<div id="draw-the-effects" class="section level2">
+<h2>4. Draw the effects</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">plot</span>(s, <span class="at">title =</span> <span class="st">&quot;Core mediation effects&quot;</span>)</span></code></pre></div>
+<div class="float">
+<img role="img" aria-label="plot of chunk first-plot" src="data:image/png;base64,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" alt="plot of chunk first-plot" />
+<div class="figcaption">plot of chunk first-plot</div>
+</div>
+<p>Each point is an effect estimate and each line is its confidence
+interval. This graph uses the same rows as <code>s$effects</code>.</p>
+</div>
+<div id="make-one-change-at-a-time" class="section level2">
+<h2>5. Make one change at a time</h2>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Your next task</th>
+<th>Where to go</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Choose serial, mixed or custom pathways</td>
+<td><a href="AnalysisGuide.html#choose-your-model">Choose an
+analysis</a></td>
+</tr>
+<tr class="even">
+<td>Read, standardize or export tables</td>
+<td><a href="ResultsGuide.html">Read and export results</a></td>
+</tr>
+<tr class="odd">
+<td>Add a continuous or categorical moderator</td>
+<td><a href="AnalysisGuide.html#add-moderation">Add moderation</a></td>
+</tr>
+<tr class="even">
+<td>Handle incomplete data</td>
+<td><a href="AnalysisGuide.html#handle-missing-data">Missing
+data</a></td>
+</tr>
+<tr class="odd">
+<td>Choose another figure</td>
+<td><a href="PlottingEffects.html">Plot gallery</a></td>
+</tr>
+</tbody>
+</table>
+<details>
+<summary>
+Copy the complete example
+</summary>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">library</span>(wsMed)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="fu">data</span>(example_data)</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">wsMed</span>(</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  <span class="at">data =</span> example_data,</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>  <span class="at">M_C1 =</span> <span class="fu">c</span>(<span class="st">&quot;A1&quot;</span>, <span class="st">&quot;B1&quot;</span>), <span class="at">M_C2 =</span> <span class="fu">c</span>(<span class="st">&quot;A2&quot;</span>, <span class="st">&quot;B2&quot;</span>),</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>  <span class="at">Y_C1 =</span> <span class="st">&quot;D1&quot;</span>, <span class="at">Y_C2 =</span> <span class="st">&quot;D2&quot;</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>  <span class="at">form =</span> <span class="st">&quot;P&quot;</span>, <span class="at">Na =</span> <span class="st">&quot;DE&quot;</span>, <span class="at">ci_method =</span> <span class="st">&quot;mc&quot;</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>  <span class="at">R =</span> <span class="dv">2000</span>, <span class="at">seed =</span> <span class="dv">123</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>)</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">summary</span>(result)</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>s<span class="sc">$</span>effects</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="fu">plot</span>(s, <span class="at">title =</span> <span class="st">&quot;Core mediation effects&quot;</span>)</span></code></pre></div>
+</details>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

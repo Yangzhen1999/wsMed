@@ -1,3 +1,10 @@
+Article: AnalysisGuide
+Title: Choose an analysis
+Source: 532a442f3383c789134d8af9261cb160
+Rendered: 179c819b5780913ae1b05309ec99699c
+HTML: bdd46da7b85c6146b02aebe9837ee61c
+Code: 7178077372cfceebbf33174000dd4888
+
 Article: CategoricalPredictors
 Title: Working with categorical predictors
 Source: 09592007f05f0708ce939012d28c589b
@@ -13,17 +20,17 @@ HTML: 9116f2463dbdad440a902c694564dc7b
 Code: 7178077372cfceebbf33174000dd4888
 
 Article: GenerateModelCN
-Title: Specifying serial mediation models
-Source: 8579cb883b5263c72175770330d03937
-Rendered: 9ec55b1cc11b1c3ad1b1dd8060095ba7
-HTML: 61746a31dbfe49649e74fd521ab2d83b
+Title: Model equations: serial mediation
+Source: 6af6e5037a7673cb7ef62a095b509c4e
+Rendered: 5420f513eca817aeab58fdca801f4c42
+HTML: 88906816d1b98874e586c1bed76a86f0
 Code: 7178077372cfceebbf33174000dd4888
 
 Article: GenerateModelCP
-Title: Specifying serial-parallel mediation models
-Source: 8e5be47ec0887eb7af69773587846eb2
-Rendered: bc2b31017f1bed3c6348c8064e7f3f46
-HTML: af74af1633170419cc3edb00528092c2
+Title: Model equations: serial-parallel mediation
+Source: 49b0ceeaf439c2865322c08f1fec866b
+Rendered: 534eaace9316468da7b22c189593dbc3
+HTML: a5fac64df4a68030dfe20ce540aae458
 Code: 7178077372cfceebbf33174000dd4888
 
 Article: GenerateModelCustom
@@ -34,17 +41,24 @@ HTML: 1ec8364a394f0e819e28e61f3afa8cc5
 Code: 7178077372cfceebbf33174000dd4888
 
 Article: GenerateModelP
-Title: Specifying parallel mediation models
-Source: 0b8983aa16fd1ff2e4cc5601fef173ee
-Rendered: d5ef2f6f633851ea6cfd32203bd04c90
-HTML: 18579aa0324d31b4163496b3ab1cd43e
+Title: Model equations: parallel mediation
+Source: 146adf99ddbb0783ecc0776de133ba6b
+Rendered: 39a4f576a4fe99addc8bc81a0e16e533
+HTML: cfd449c5fef0483a1f1e5565e4613b9a
 Code: 7178077372cfceebbf33174000dd4888
 
 Article: GenerateModelPC
-Title: Specifying parallel-serial mediation models
-Source: 4627c82fba7fa29cd2e86245760c1abb
-Rendered: 29db1d7a438adef67fd3d04b8001d639
-HTML: a2b934b147bc688a217e49ea89554db1
+Title: Model equations: parallel-serial mediation
+Source: a3c0978b138ae94040a46a8ea563d8e5
+Rendered: a0b755b563d609f70fb84b77f2d9481c
+HTML: f051e485432e755a2749c6934b8d89e8
+Code: 7178077372cfceebbf33174000dd4888
+
+Article: GetStarted
+Title: Get started: your first mediation analysis
+Source: 39f90e9785f4577350f9d6c5f743c65b
+Rendered: 8ecb80f44eeaa11cd76d94877ed7a21c
+HTML: f0aae0672b76476e079902c25b9dc7ed
 Code: 7178077372cfceebbf33174000dd4888
 
 Article: MEMORE_vs_wsMed
@@ -55,24 +69,31 @@ HTML: 07f9e1359ad6188216092267694a1fa3
 Code: 7178077372cfceebbf33174000dd4888
 
 Article: ModularWorkflow
-Title: One-call and staged workflows
-Source: 2a53f3faf583b14c38b0918b0fa95c0e
-Rendered: c80a3c3ce6163322000140db88c3d502
-HTML: c20a51cb91a8e6c7102a895ae7baae00
+Title: Reuse a fit: the staged workflow
+Source: 3864090596ed27bef6bb42b92964dba0
+Rendered: 075d97f55efed12957052cc5f18cbccf
+HTML: 48a1183c00c49429cf6da03cac5e71c9
 Code: 7178077372cfceebbf33174000dd4888
 
 Article: PlottingEffects
 Title: Plotting mediation effects and contrasts
-Source: c6023d3a40538aa688c2e54b8ebe5bf1
-Rendered: ffa44f584634ffcb3c21f5b6ce550d42
-HTML: 5ee8e9dded0a8032615c6a621037d88f
+Source: e58558e7ea898cb738bc86139331fca5
+Rendered: 71a14b41be3501b00be6d6b316ca716a
+HTML: 441c47267ae6cc84178edd8893a6ca91
+Code: 7178077372cfceebbf33174000dd4888
+
+Article: ResultsGuide
+Title: Read and export results
+Source: 2fe59db7fbfe2cbe5a8c2df428d0123e
+Rendered: d185019f8a188e93ec34647708788a3b
+HTML: 5ff12baaf943f0ddd5eded237922dc50
 Code: 7178077372cfceebbf33174000dd4888
 
 Article: StandardizedModeratedMediation
-Title: Standardized moderated mediation
-Source: 223fcdf0a7f9f160603c590fbaf92849
-Rendered: cd9f70602975f40a836e9883e3e87610
-HTML: a64d7b0122097ea3c216707a2f7631c7
+Title: Standardized effects
+Source: e4669c3202b298f59e23483e8364ccba
+Rendered: c0fcfce2e0a0d25844e0e72051537680
+HTML: c083cd1b78c5311c83eccf3b6e640018
 Code: 7178077372cfceebbf33174000dd4888
 
 Article: WorkflowReliability
@@ -83,10 +104,10 @@ HTML: b7ed55708e1d06c1e8906b47d336bc1b
 Code: 7178077372cfceebbf33174000dd4888
 
 Article: WsMed
-Title: Using wsMed step by step
-Source: a91ce85cf70466bec41bd30b61071f59
-Rendered: 60e643eeb0b2b143cd9d4cdbd0e38bc3
-HTML: 2914da5b6a9b0747f137913fccbe76ab
+Title: Analysis options: a complete walkthrough
+Source: 620a7a112973299dc8e7e8935a85f3a5
+Rendered: f98e7bf2b1c8b7768f19a04765c1486b
+HTML: 749428a0d05b646685a15ddeaf824f34
 Code: 7178077372cfceebbf33174000dd4888
 
 Article: printGM

@@ -1,0 +1,83 @@
+---
+title: "Choose an analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Choose an analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+
+Start with your research question, then follow the relevant guide. For a first
+analysis, complete [Get started](GetStarted.html); it uses `wsMed()` throughout.
+All models here require two within-subject conditions with paired measurements.
+
+## Prepare your data
+
+Use one row per participant, separate columns for the two conditions, and the
+same mediator order in both conditions. Decide which condition is subtracted
+from which before fitting: wsMed uses **condition 2 minus condition 1**.
+
+- **Column layout:** [a small worked example](GetStarted.html#match-your-columns-to-the-two-conditions).
+- **Within- and between-subject covariates:** [analysis options](WsMed.html#covariates).
+- **Category coding and reference groups:** [categorical predictors](CategoricalPredictors.html).
+
+## Choose your model
+
+| Research structure | `form` | Meaning / next step |
+|---|---|---|
+| Parallel pathways | `"P"` | Each mediator forms a separate pathway; start with the [quick start](GetStarted.html). |
+| Serial pathways | `"CN"` | Mediators are connected in order; see [model selection](WsMed.html#predefined-models). |
+| Serial-parallel structure | `"CP"` | A serial component feeds parallel pathways; inspect the diagram in [the model description](GenerateModelCP.html). |
+| Parallel-serial structure | `"PC"` | Parallel pathways feed a later mediator; inspect the diagram in [the model description](GenerateModelPC.html). |
+| User-defined pathways | `"UD"` | Specify the directed mediator connections; see [custom models](GenerateModelCustom.html). |
+
+Choose the structure using your research design and substantive assumptions.
+Check mediator ordering against the diagram and generated equations; the two
+mixed structures are not interchangeable. Their [equation articles](index.html)
+provide definitions rather than additional required steps for an ordinary fit.
+
+## Add moderation
+
+| Moderator | Guide | What to report |
+|---|---|---|
+| Continuous | [Specify moderated paths](WsMed.html#moderators) | Conditional effects at meaningful raw values, with a [curve or selected-level plot](PlottingEffects.html). |
+| Categorical | [Fit and compare groups](CategoricalPredictors.html#fit-categorical-moderated-mediation) | Reference coding, group-specific effects and intervals for group differences. |
+
+Use factors to make category coding explicit. A numerical 0/1 moderator can be
+interpreted differently by the one-call and staged interfaces; the categorical
+predictor guide explains how to avoid that ambiguity. Specify which paths are
+moderated rather than assuming that every path includes an interaction.
+
+## Handle missing data
+
+| Situation | Where to start |
+|---|---|
+| Complete data or deliberate complete-case analysis | `Na = "DE"`; inspect the number of retained participants. |
+| Full-information maximum likelihood | `Na = "FIML"`; see [options and restrictions](WsMed.html#missing-data-and-confidence-intervals). |
+| Multiple imputation | `Na = "MI"`; see [imputation options](WsMed.html#missing-data-and-confidence-intervals). |
+| Multiple imputation with moderation interactions | [Model-compatible imputation](CompatibleImputation.html), including external completed datasets. |
+
+The choice depends on the missing-data assumptions and variable types.
+Default main-effects imputation may not preserve moderation interactions.
+Do not treat successful fitting or reproducible output as proof that an
+imputation model is suitable. Missing categorical predictors have additional
+[restrictions](CategoricalPredictors.html#missing-categorical-predictors).
+
+## Read, compare and present results
+
+- [Read and export results](ResultsGuide.html): all core effects in one table.
+- [Standardized effects](StandardizedModeratedMediation.html): with or without moderation.
+- [Plot gallery](PlottingEffects.html): forest plots, curves, group effects and differences.
+
+## Go further when you need it
+
+| Task | Guide |
+|---|---|
+| Fit once, then compare inference methods | [Staged workflow](ModularWorkflow.html) |
+| Inspect generated SEM syntax | [Model syntax](printGM.html) |
+| Check warnings, diagnostics and reproducibility | [Diagnostics and migration](WorkflowReliability.html) |
+| Read mathematical definitions and software comparisons | [All articles](index.html) |
+
+**Next:** [run a first analysis](GetStarted.html) or [read its results](ResultsGuide.html).

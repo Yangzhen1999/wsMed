@@ -13,18 +13,57 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>", cache = FALSE,
                      fig.width = 8, fig.height = 5)
 ```
 
-The `plot()` methods work with fitted models, stored inference, and extracted
-effects. They return editable `ggplot` objects without fitting or drawing new
-samples. The four named plotting helpers remain available for one-call `wsMed`
-objects and preserve their existing stored tables and interval conventions.
+## Choose a figure
 
-The named plotting functions return editable `ggplot` objects and retain the
-plotted estimates and interval limits in `p$data`. Set `standardized = TRUE`
-to use the standardized results already requested during fitting. With
-`ci_method = "both"`, use `engine = "mc"` or `engine = "boot"` consistently.
-For a single engine, the stored engine is used automatically.
+Start with a fitted `result` from the [quick start](GetStarted.html).
+`plot(result)` selects an indirect-effect display automatically;
+`plot(summary(result))` displays all selected core effects.
+Both inherit the saved standardization setting and return editable ggplots.
+
+<div class="wsmed-plot-grid">
+<div class="wsmed-plot-card">
+
+**Forest: compare effects and intervals**
+
+[![Forest plot of indirect effects](figures/PlottingEffects-plot-method-1.png)](#a-consistent-plot-method)
+
+</div>
+<div class="wsmed-plot-card">
+
+**Curve: use a continuous moderator**
+
+[![Conditional indirect-effect curve](figures/PlottingEffects-plot-method-2.png)](#a-consistent-plot-method)
+
+</div>
+<div class="wsmed-plot-card">
+
+**Category points: compare groups**
+
+[![Effects in three moderator categories](figures/PlottingEffects-plot-method-3.png)](#a-consistent-plot-method)
+
+</div>
+<div class="wsmed-plot-card">
+
+**Difference: show a contrast and its interval**
+
+[![Intervals for differences between indirect effects](figures/PlottingEffects-path-contrasts-1.png)](#differences-need-their-own-intervals)
+
+</div>
+</div>
+
+**Recommended route:** [create the example fits](#reproducible-two-condition-data),
+then use [the shared plot method](#a-consistent-plot-method).
+For a custom contrast, extract it with `wsmed_contrasts()` and call `plot()`;
+the [results guide](ResultsGuide.html#compare-two-pathways) supplies a short example.
+
+The named plotting helpers later on this page remain available for stored-table
+compatibility. They can use different bootstrap interval conventions; review
+[interval conventions](#interval-conventions) before comparing figures.
 
 ## Reproducible two-condition data
+
+<details>
+<summary>Run once: create the three example fits</summary>
 
 ```{r simulation}
 set.seed(918)
@@ -48,6 +87,8 @@ continuous <- do.call(wsMed, c(fit_args,
 categorical <- do.call(wsMed, c(fit_args,
   list(W="Group", W_type="categorical", MP=c("b1","d1"))))
 ```
+
+</details>
 
 These separate fits illustrate each plotting interface; changing W from
 continuous to grouped changes the fitted model and is not a transformation

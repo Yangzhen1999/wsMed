@@ -1,11 +1,15 @@
 ---
-title: "Specifying parallel mediation models"
+title: "Model equations: parallel mediation"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Specifying parallel mediation models}
+  %\VignetteIndexEntry{Model equations: parallel mediation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+**Purpose:** definitions and equations for this model. To fit an analysis,
+start with [Choose an analysis](AnalysisGuide.html#choose-your-model) or the
+[quick start](GetStarted.html).
 
 ## Introduction
 The `GenerateModelP` function dynamically generates a Structural Equation Model (SEM) formula to analysis parallel mediation for 'lavaan' based on the prepared dataset. This document explains the mathematical principles and the structure of the generated model.

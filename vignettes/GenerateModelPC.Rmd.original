@@ -1,11 +1,15 @@
 ---
-title: "Specifying parallel-serial mediation models"
+title: "Model equations: parallel-serial mediation"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Specifying parallel-serial mediation models}
+  %\VignetteIndexEntry{Model equations: parallel-serial mediation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+**Purpose:** definitions and equations for this model. To fit an analysis,
+start with [Choose an analysis](AnalysisGuide.html#choose-your-model) or the
+[quick start](GetStarted.html).
 
 ## Introduction
 

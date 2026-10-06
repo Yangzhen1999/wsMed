@@ -1,8 +1,8 @@
 ---
-title: "One-call and staged workflows"
+title: "Reuse a fit: the staged workflow"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{One-call and staged workflows}
+  %\VignetteIndexEntry{Reuse a fit: the staged workflow}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -12,6 +12,10 @@ library(wsMed)
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", cache = FALSE,
                      fig.width = 7, fig.height = 5)
 ```
+
+**Use this guide when you want to reuse a fitted model or change inference without refitting.**
+For a first analysis, use [Get started](GetStarted.html). For everyday tables,
+use [Read and export results](ResultsGuide.html).
 
 ## One call remains available
 
