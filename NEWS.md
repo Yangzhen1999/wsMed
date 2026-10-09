@@ -1,4 +1,9 @@
-# wsMed 1.1.0.9000
+# wsMed 1.2.0
+
+* Recommend explicit unordered factors and reference levels for categorical
+  covariates and moderators in both interfaces. Align help pages, tutorials and
+  numeric 0/1 moderator messages around this input convention while retaining
+  the existing recognition defaults and numerical behavior.
 
 * Separate readable reports from structured summaries: `print()` shows core
   effects, `detail = "full"` adds path coefficients, and `detail = "legacy"`

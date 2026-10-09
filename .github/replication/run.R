@@ -7,7 +7,7 @@ output <- normalizePath(output, winslash = "/")
 profile <- Sys.getenv("WSMED_PROFILE", "reference-core")
 stopifnot(unname(tools::md5sum(file.path(inputs, "wsMed_examples.sav"))) ==
             "ce2bcbd3fde83a793e94b226892f7453")
-expected <- c(wsMed = "1.1.0.9000", lavaan = "0.6-19", mice = "3.17.0",
+expected <- c(wsMed = "1.2.0", lavaan = "0.6-19", mice = "3.17.0",
               haven = "2.5.4", semmcci = "1.1.4.9000",
               semboottools = "0.0.0.9011", MASS = "7.3-65",
               ggplot2 = "4.0.0", knitr = "1.49", xfun = "0.51")

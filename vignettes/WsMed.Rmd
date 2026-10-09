@@ -379,10 +379,10 @@ require a separate analysis workflow.
 
 ### Moderators
 
-A moderated mediation analysis requires three arguments:
+Three arguments control a moderated mediation analysis:
 
 - `W` identifies the moderator variable;
-- `W_type` specifies whether it is `"continuous"` or `"categorical"`; and
+- `W_type` optionally specifies `"continuous"` or `"categorical"`; and
 - `MP` identifies the paths moderated by `W`.
 
 For example:
@@ -416,12 +416,26 @@ The same arguments can be used with `form = "UD"`. For example, the
 user-defined model in Step 2 contains the labels `b_1_3`, `b2`, and `b3`,
 but it does not contain `b1` because `"M1 -> Y"` was not specified.
 
-For a categorical moderator, change the relevant arguments:
+Declare categorical covariates and moderators as unordered factors before
+using either interface. Set factor levels explicitly; the first level is the
+reference group. For example:
+
+```r
+example_data$Group <- factor(example_data$Group,
+                             levels = c("low", "med", "high"))
+```
+
+Then use the factor column as the moderator:
 
 ```r
 W = "Group"
-W_type = "categorical"
 ```
+
+`W_type = "categorical"` remains available, but is not needed for a factor.
+The same factor declaration applies to categorical between-subject covariates
+selected through `C`. The [categorical predictor guide](CategoricalPredictors.html)
+explains binary coding, reference groups, and compatibility defaults for
+numeric 0/1 columns.
 
 After fitting a moderated model, `plot_moderation_curve()` can be used to
 display conditional effects:

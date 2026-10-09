@@ -1,6 +1,6 @@
 # Release preparation
 
-The current development line is `feature/modular-api`, version 1.1.0.9000.
+The current development line is `feature/modular-api`, version 1.2.0.
 Do not reuse an archive built before the covariance/MI sampler correction.
 
 1. Review NEWS and choose the final release version. Update DESCRIPTION, NEWS,

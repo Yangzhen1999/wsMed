@@ -260,7 +260,7 @@ report$fitting_versions
 #> [1] "R version 4.4.3 (2025-02-28 ucrt)"
 #> 
 #> $wsMed
-#> [1] '1.1.0.9000'
+#> [1] '1.2.0'
 #> 
 #> $algorithms
 #> $algorithms$product_moments
@@ -309,7 +309,7 @@ Missing provenance in older objects is not filled using current versions.
 | Inspect the generated syntax | `printGM(result)` or `wsmed_inspect(fit, "syntax")` |
 | Use the named plotting helpers | Still supported; `plot()` also accepts workflow objects |
 | Expect implicit 95% intervals everywhere | Methods keep the saved level; specify `level = .95` when intended |
-| Numeric 0/1 predictors detected automatically | The staged interface requires explicit factors for categorical interpretation |
+| Numeric 0/1 predictors detected automatically | Use factors with explicit levels for categorical predictors in both interfaces; existing one-call recognition defaults are retained |
 
 Older saved one-call objects retain the legacy fields and plotting helpers.
 They cannot acquire missing staged metadata without refitting from the original

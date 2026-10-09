@@ -11,25 +11,27 @@
 #'   \item{WEMBS_T1, WEMBS_T2}{Subjective well-being scores at T1 and T2.}
 #'   \item{SMUF_T1, SMUF_T2}{Daily social media use scores at T1 and T2.}
 #'   \item{ISI_T1, ISI_T2}{Insomnia severity scores at T1 and T2.}
-#'   \item{DASSS_T1, DASSS_T2}{Psychological distress scores at T1 and T2.}
-#'   \item{HES_T1, HES_T2}{Health engagement scores at T1 and T2.}
+#'   \item{DASSS_T1, DASSS_T2}{DASS stress-subscale scores at T1 and T2,
+#'     each calculated as the sum of the seven stress items.}
+#'   \item{HES_T1, HES_T2}{Healthy eating scores at T1 and T2.}
 #'   \item{Age}{Age in years.}
 #'   \item{BMI}{Body mass index, recalculated from weight in pounds and
 #'     height in inches using \code{703 * weight / height^2}.}
 #' }
 #'
 #' @details
-#' Score descriptions follow the variable roles in the manuscript; score columns
-#' retain their prepared source values without rescaling or standardization.
-#' The original study compares an intervention group with a control group.
-#' The wsMed examples illustrate within-person mediation using paired T1/T2
-#' measurements; they do not reproduce the original study's group comparison.
+#' Score columns retain their prepared source values without rescaling or
+#' standardization. The original dataset contains 221 participants: 123 in the
+#' iWeek intervention group and 98 in the control group. This prepared dataset
+#' retains the 123 intervention-group participants. The wsMed examples illustrate
+#' within-person mediation using their paired T1/T2 measurements; they do not
+#' reproduce the original study's group comparison.
 #'
 #' The manuscript authors retained the 14 analysis columns and recalculated BMI.
 #' Height values outside the preparation rule of 48--84 inches, including
 #' ambiguous units, were not converted by guesswork. BMI remains missing for
-#' 13 such records. No participants were removed, no values were imputed, and
-#' no additional cleaning is performed when creating this package dataset.
+#' 13 such records. No further participants were removed, no values were imputed,
+#' and no additional cleaning is performed when creating this package dataset.
 #' SPSS storage attributes are omitted; numerical values, row order, and missing
 #' positions match the prepared \code{wsMed_examples.sav} replication file.
 #'

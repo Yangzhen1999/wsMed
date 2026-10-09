@@ -1,10 +1,10 @@
-# Reproduce manuscript Examples 1-3 with wsMed 1.1.0.9000.
+# Reproduce manuscript Examples 1-3 with wsMed 1.2.0.
 # Set the working directory to this folder, then source("reproduce_examples.R").
 # Results are saved to example_results.txt; plots are displayed in R.
 
 # Environment checks and recording are handled by run.R for each CI profile.
 library(wsMed)
-stopifnot(as.character(packageVersion("wsMed")) == "1.1.0.9000")
+stopifnot(as.character(packageVersion("wsMed")) == "1.2.0")
 options(width = 120, knitr.table.format = "pipe")
 RNGkind("Mersenne-Twister", "Inversion", "Rejection")
 
@@ -13,7 +13,7 @@ dat <- haven::read_sav("wsMed_examples.sav")
 # Five PMM imputations, 20,000 Monte Carlo draws, and 95% confidence intervals.
 # These package defaults are stated explicitly in each call below.
 output_file <- "example_results.txt"
-writeLines("wsMed 1.1.0.9000: manuscript Examples 1-3\n", output_file)
+writeLines("wsMed 1.2.0: manuscript Examples 1-3\n", output_file)
 write_results <- function(code) {
   out <- capture.output(force(code))
   cat(out, sep = "\n")

@@ -4,7 +4,7 @@ Mediation and moderated mediation for two-condition within-subject designs.
 
 ## Install
 
-The tutorials in this branch target **development version 1.1.0.9000**.
+The tutorials in this branch target **version 1.2.0**.
 
 ```r
 # install.packages("pak")
@@ -40,6 +40,22 @@ This complete simulated dataset needs no imputation. The example uses 2,000
 Monte Carlo draws for speed; assess interval stability with more draws for a
 final analysis. The [quick start](vignettes/GetStarted.Rmd.original) walks through the
 actual table and its interpretation.
+
+## Categorical predictors
+
+Use unordered factors for categorical between-subject covariates and moderators
+in both `wsMed()` and the staged workflow. Set levels explicitly; the first level
+is the reference group. For example:
+
+```r
+example_data$Group <- factor(example_data$Group,
+                             levels = c("low", "med", "high"))
+```
+
+For a binary predictor, use `factor(x, levels = c(0, 1))` to select 0 as the
+reference. Existing numeric 0/1 recognition defaults are retained for
+compatibility; the [categorical predictor guide](vignettes/CategoricalPredictors.Rmd.original)
+explains those defaults and missing-data restrictions.
 
 ## Find a guide
 

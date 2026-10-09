@@ -20,17 +20,22 @@ convert them to unordered factors only if a nominal interpretation is intended.
 
 \section{Declaring categories}{
 
-In the staged workflow, \code{\link[=wsmed_fit]{wsmed_fit()}} treats numeric predictors, including
-0/1 columns, as continuous. Declare categorical predictors with \code{\link[base:factor]{base::factor()}}
-and specify their levels explicitly. Every declared factor level must have
-observations in the supplied data.
+In both the one-call and staged workflows, use \code{\link[base:factor]{base::factor()}} to declare
+categorical between-subject covariates and moderators in the input data.
+Specify levels explicitly: the first level is the reference group. For a
+binary predictor, \code{factor(x, levels = c(0, 1))} selects 0 as the reference;
+reversing the levels selects 1. Use unordered factors for nominal categories.
+Every declared factor level must have observations in the supplied data.
 
+The existing default recognition rules are retained for compatibility.
+\code{\link[=wsmed_fit]{wsmed_fit()}} treats numeric predictors, including 0/1 columns, as continuous.
 The one-call \code{\link[=wsMed]{wsMed()}} and \code{\link[=PrepareData]{PrepareData()}} interfaces retain automatic
 detection: factors, character columns, and numeric columns whose observed
 values are exactly 0 and 1 are categorical. Other numeric columns are
 continuous unless \code{C_type} or \code{W_type} overrides detection.
-Explicit factors and explicit type arguments make the intended interpretation
-clear in scripts using the one-call interface.
+Explicit factors provide the same categorical interpretation and reference
+coding in both interfaces without relying on automatic recognition. The
+one-call type arguments remain available to override its default rules.
 }
 
 \section{Reference coding and comparisons}{

@@ -4,10 +4,13 @@
   if (!length(v$W)) return(character())
   x <- data[[v$W]]
   if (!is.numeric(x) || !setequal(unique(x[!is.na(x)]), c(0, 1))) return(character())
+  guidance <- paste("For categorical predictors in either interface, use factor()",
+    "with explicit levels; the first level is the reference group.")
   if (isTRUE(model$strict)) return(paste0("Numeric 0/1 moderator '", v$W,
-    "' is continuous in wsmed_fit(); use an explicit factor for categories."))
+    "' is continuous in wsmed_fit(). ", guidance))
   if (is.null(v$W_type) || identical(v$W_type, "auto")) return(paste0("wsMed() automatically treats numeric 0/1 moderator '",
-    v$W, "' as categorical (reference: 0). Set W_type explicitly, or use a factor; wsmed_fit() treats numeric predictors as continuous."))
+    v$W, "' as categorical (reference: 0). ", guidance,
+    " Set W_type = 'continuous' if a numeric interpretation is intended."))
   character()
 }
 

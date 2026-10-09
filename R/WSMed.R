@@ -53,7 +53,11 @@
 #' Workflow: (1) preprocess -> (2) generate SEM syntax -> (3) fit
 #' -> (4) compute confidence intervals -> (5) optional: standardize estimates.
 #' See [wsmed_categorical] for supported categorical predictors, reference
-#' coding, and missing-data restrictions. The empirical manuscript dataset is
+#' coding, and missing-data restrictions. In both interfaces, declare categorical
+#' covariates and moderators as unordered factors with explicit levels before
+#' fitting. The first factor level is the reference group. Existing automatic
+#' recognition of numeric 0/1 predictors is retained in this one-call interface.
+#' The empirical manuscript dataset is
 #' available as [wsmed_examples()]; [example_data()] is simulated tutorial data.
 #' @md
 #'

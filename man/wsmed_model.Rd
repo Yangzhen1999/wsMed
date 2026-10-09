@@ -41,7 +41,9 @@ Specify a two-condition mediation model
 \details{
 All moderator main effects are explicitly included in all difference
 equations. Difference-slope and average-slope interactions are separate.
-Categorical between-subject predictors must be factors in the new workflow.
+Categorical between-subject predictors must be unordered factors in the
+staged workflow. Use the same explicit factor declaration with \code{\link[=wsMed]{wsMed()}}.
+Set factor levels explicitly; the first level is the reference group.
 }
 \seealso{
 \link{wsmed_categorical} for supported variable roles and factor coding.

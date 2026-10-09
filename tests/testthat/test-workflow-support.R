@@ -50,6 +50,32 @@ test_that("binary type decisions remain explicit and interfaces agree for factor
   expect_equal(first[columns], second[columns])
 })
 
+test_that("declared binary and multicategory factors agree without type overrides", {
+  a <- support_fixture()
+  a$data$D3 <- factor(rep(0:1, length.out = nrow(a$data)), levels = c(1, 0))
+  a$data$Group <- factor(a$data$Group, levels = c("low", "med", "high"))
+  model <- wsmed_model(c(before = "D1", after = "D2"),
+    list(A = c(before = "A1", after = "A2")),
+    covariates = list(between = "Group"),
+    moderator = list(variable = "D3", interactions = "A -> Y"))
+  fit <- wsmed_fit(model, a$data)
+  one_call <- wsMed(a$data, "A1", "A2", "D1", "D2", C = "Group", W = "D3",
+    MP = c("a1", "b1", "cp"), R = 200, seed = 62)
+  staged <- wsmed_infer(fit, draws = 200, seed = 62)
+  expect_identical(fit$model$input_vars$W_type, "categorical")
+  expect_identical(one_call$fit$model$input_vars$W_type, "categorical")
+  expect_equal(coef(one_call), coef(staged))
+  prepared <- wsmed_inspect(fit, "data")
+  expect_equal(prepared$W1, as.numeric(a$data$D3 == "0"))
+  for (standardized in c(FALSE, TRUE)) {
+    first <- wsmed_effects(one_call, at = list(D3 = c("1", "0")), standardized = standardized)
+    second <- wsmed_effects(staged, at = list(D3 = c("1", "0")), standardized = standardized)
+    columns <- setdiff(names(as.data.frame(first)), c("label", "path"))
+    expect_equal(as.data.frame(first)[columns], as.data.frame(second)[columns])
+    expect_equal(first$draws, second$draws)
+  }
+})
+
 test_that("extrapolation uses observed used rows and survives extraction and plotting", {
   a <- support_fixture()
   # Still outside support, without introducing an unrelated ill-scaled fit.

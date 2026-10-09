@@ -700,10 +700,11 @@ scales vary jointly across draws. Invalid standardized draws are
 excluded together across effects; their original identities are in
 <code>conditional$diagnostics$invalid_draw_ids</code>. Plot bands are
 pointwise intervals, not simultaneous confidence bands.</p>
-<p>In the staged interface, categorical predictors must be factors.
-Numerical predictors, including 0/1 columns, are treated as continuous
-unless converted to factors. Default categorical probes include every
-observed factor level. The <a href="CategoricalPredictors.html">categorical predictor tutorial</a>
+<p>Use unordered factors with explicit levels for categorical covariates
+and moderators in both interfaces; the first level is the reference
+group. The staged interface treats numeric predictors, including 0/1
+columns, as continuous unless converted to factors. Default categorical
+probes include every observed factor level. The <a href="CategoricalPredictors.html">categorical predictor tutorial</a>
 demonstrates reference coding, conditional effects, group contrasts, and
 missing data.</p>
 </div>

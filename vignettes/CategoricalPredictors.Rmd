@@ -49,10 +49,16 @@ Three categories require two indicators: `W1 = 1` for `med` and `W2 = 1` for
 treatment contrasts regardless of the global R contrast option. For a binary
 factor the first level is likewise the reference and one indicator is created.
 
-The staged interface treats numeric 0/1 predictors as continuous. Convert them
-with `factor(x, levels = c(0, 1))` for a categorical interpretation. The one-call
-`wsMed()` interface retains automatic 0/1 detection; explicit factors and
-`W_type = "categorical"` avoid relying on that difference between interfaces.
+Use this explicit factor declaration for categorical covariates and moderators
+in both interfaces. For binary groups, `factor(x, levels = c(0, 1))` selects 0 as
+the reference; `factor(x, levels = c(1, 0))` selects 1. Set the levels before
+fitting so the intended categories and reference group are recorded in the model.
+
+Existing default recognition rules are retained for compatibility. The staged
+interface treats numeric 0/1 predictors as continuous, while the one-call
+`wsMed()` interface retains automatic 0/1 detection. Explicit factors avoid
+relying on those defaults. The one-call `C_type` and `W_type` arguments remain
+available for an explicit override.
 Both interfaces explain their numeric 0/1 moderator decision in a message,
 retained in `fit$diagnostics$input_notes`. These messages do not alter coding.
 
@@ -222,7 +228,7 @@ main effects on `a1`, `a2`, and `cp`, plus the `b1` interaction:
 one_call <- wsMed(dat,
   M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"),
   Y_C1 = "D1", Y_C2 = "D2", form = "P",
-  W = "Group", W_type = "categorical", MP = c("a1", "a2", "cp", "b1"),
+  W = "Group", MP = c("a1", "a2", "cp", "b1"),
   R = 2000, seed = 604)
 wsmed_effects(one_call, at = list(Group = c("low", "med", "high")))
 #> wsMed indirect | raw scale | mc 

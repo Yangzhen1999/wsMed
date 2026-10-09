@@ -49,10 +49,11 @@ provide definitions rather than additional required steps for an ordinary fit.
 | Continuous | [Specify moderated paths](WsMed.html#moderators) | Conditional effects at meaningful raw values, with a [curve or selected-level plot](PlottingEffects.html). |
 | Categorical | [Fit and compare groups](CategoricalPredictors.html#fit-categorical-moderated-mediation) | Reference coding, group-specific effects and intervals for group differences. |
 
-Use factors to make category coding explicit. A numerical 0/1 moderator can be
-interpreted differently by the one-call and staged interfaces; the categorical
-predictor guide explains how to avoid that ambiguity. Specify which paths are
-moderated rather than assuming that every path includes an interaction.
+Declare categorical between-subject covariates and moderators as unordered
+factors before using either interface. Set factor levels explicitly; the first
+level is the reference group. The [categorical predictor guide](CategoricalPredictors.html)
+shows binary and multicategory coding. Specify which paths are moderated rather
+than assuming that every path includes an interaction.
 
 ## Handle missing data
 

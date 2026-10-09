@@ -57,7 +57,9 @@ imputer's settings, convergence diagnostics and software versions separately.
 Internal MI with moderator interactions signals one
 \code{wsmed_mi_compatibility_warning} per fit and records it in fit diagnostics.
 Numeric 0/1 moderators remain continuous in this interface; a message explains
-this choice. Use a factor for categories. Type messages are retained as
+this choice. For categorical predictors in either interface, use unordered
+factors with explicit levels; the first level is the reference group.
+Type messages are retained as
 \code{diagnostics$input_notes} and do not change estimates or random-number state.
 Diagnostics include dataset-level convergence/admissibility, covariance checks,
 case counts, warnings, and fitted category counts. Complete-case matrix rank

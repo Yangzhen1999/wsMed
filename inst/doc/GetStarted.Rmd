@@ -14,7 +14,7 @@ forest plot. This example uses complete simulated data and the one-call
 `wsMed()` interface. No external data file is needed.
 
 **Documentation version:** the reporting interfaces on this site require the
-`feature/modular-api` development build (`1.1.0.9000`). Install it once:
+`feature/modular-api` development build (`1.2.0`). Install it once:
 
 
 ``` r

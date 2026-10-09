@@ -403,13 +403,19 @@ zero for <code>low</code>. Indicators are not centered. Coding uses
 treatment contrasts regardless of the global R contrast option. For a
 binary factor the first level is likewise the reference and one
 indicator is created.</p>
-<p>The staged interface treats numeric 0/1 predictors as continuous.
-Convert them with <code>factor(x, levels = c(0, 1))</code> for a
-categorical interpretation. The one-call <code>wsMed()</code> interface
-retains automatic 0/1 detection; explicit factors and
-<code>W_type = &quot;categorical&quot;</code> avoid relying on that difference
-between interfaces. Both interfaces explain their numeric 0/1 moderator
-decision in a message, retained in
+<p>Use this explicit factor declaration for categorical covariates and
+moderators in both interfaces. For binary groups,
+<code>factor(x, levels = c(0, 1))</code> selects 0 as the reference;
+<code>factor(x, levels = c(1, 0))</code> selects 1. Set the levels
+before fitting so the intended categories and reference group are
+recorded in the model.</p>
+<p>Existing default recognition rules are retained for compatibility.
+The staged interface treats numeric 0/1 predictors as continuous, while
+the one-call <code>wsMed()</code> interface retains automatic 0/1
+detection. Explicit factors avoid relying on those defaults. The
+one-call <code>C_type</code> and <code>W_type</code> arguments remain
+available for an explicit override. Both interfaces explain their
+numeric 0/1 moderator decision in a message, retained in
 <code>fit$diagnostics$input_notes</code>. These messages do not alter
 coding.</p>
 </div>
@@ -567,7 +573,7 @@ interaction:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>one_call <span class="ot">&lt;-</span> <span class="fu">wsMed</span>(dat,</span>
 <span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="at">M_C1 =</span> <span class="fu">c</span>(<span class="st">&quot;A1&quot;</span>, <span class="st">&quot;B1&quot;</span>), <span class="at">M_C2 =</span> <span class="fu">c</span>(<span class="st">&quot;A2&quot;</span>, <span class="st">&quot;B2&quot;</span>),</span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">Y_C1 =</span> <span class="st">&quot;D1&quot;</span>, <span class="at">Y_C2 =</span> <span class="st">&quot;D2&quot;</span>, <span class="at">form =</span> <span class="st">&quot;P&quot;</span>,</span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">W =</span> <span class="st">&quot;Group&quot;</span>, <span class="at">W_type =</span> <span class="st">&quot;categorical&quot;</span>, <span class="at">MP =</span> <span class="fu">c</span>(<span class="st">&quot;a1&quot;</span>, <span class="st">&quot;a2&quot;</span>, <span class="st">&quot;cp&quot;</span>, <span class="st">&quot;b1&quot;</span>),</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">W =</span> <span class="st">&quot;Group&quot;</span>, <span class="at">MP =</span> <span class="fu">c</span>(<span class="st">&quot;a1&quot;</span>, <span class="st">&quot;a2&quot;</span>, <span class="st">&quot;cp&quot;</span>, <span class="st">&quot;b1&quot;</span>),</span>
 <span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="at">R =</span> <span class="dv">2000</span>, <span class="at">seed =</span> <span class="dv">604</span>)</span>
 <span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="fu">wsmed_effects</span>(one_call, <span class="at">at =</span> <span class="fu">list</span>(<span class="at">Group =</span> <span class="fu">c</span>(<span class="st">&quot;low&quot;</span>, <span class="st">&quot;med&quot;</span>, <span class="st">&quot;high&quot;</span>)))</span>
 <span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; wsMed indirect | raw scale | mc </span></span>

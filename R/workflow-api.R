@@ -13,7 +13,9 @@
 #' @return A `wsmed_model` specification, without data or fitted estimates.
 #' @details All moderator main effects are explicitly included in all difference
 #' equations. Difference-slope and average-slope interactions are separate.
-#' Categorical between-subject predictors must be factors in the new workflow.
+#' Categorical between-subject predictors must be unordered factors in the
+#' staged workflow. Use the same explicit factor declaration with [wsMed()].
+#' Set factor levels explicitly; the first level is the reference group.
 #' @md
 #' @seealso [wsmed_categorical] for supported variable roles and factor coding.
 #' @export
@@ -127,7 +129,9 @@ wsmed_model <- function(outcome, mediators, conditions = names(outcome),
 #' Internal MI with moderator interactions signals one
 #' `wsmed_mi_compatibility_warning` per fit and records it in fit diagnostics.
 #' Numeric 0/1 moderators remain continuous in this interface; a message explains
-#' this choice. Use a factor for categories. Type messages are retained as
+#' this choice. For categorical predictors in either interface, use unordered
+#' factors with explicit levels; the first level is the reference group.
+#' Type messages are retained as
 #' `diagnostics$input_notes` and do not change estimates or random-number state.
 #' Diagnostics include dataset-level convergence/admissibility, covariance checks,
 #' case counts, warnings, and fitted category counts. Complete-case matrix rank
