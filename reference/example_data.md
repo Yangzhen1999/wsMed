@@ -1,18 +1,10 @@
-# Example Data for within subject mediation
+# Simulated data for mediation tutorials
 
-A simulated dataset containing variables for within-subject mediation
-analysis. The dataset includes four within-subject variables (A, B, C,
-D), each measured at three levels:
-
-- **A1, A2, A3**: Levels of within-subject variable A (e.g., mediator
-  conditions).
-
-- **B1, B2, B3**: Levels of within-subject variable B (e.g., outcome
-  conditions).
-
-- **C1, C2, C3**: Levels of within-subject variable.
-
-- **D1, D2, D3**: Levels of within-subject variable.
+Artificial data used to demonstrate model syntax, estimation, and
+categorical predictors. The labels do not identify substantive
+psychological constructs. This is distinct from the empirical manuscript
+dataset
+[`wsmed_examples()`](https://yangzhen1999.github.io/wsMed/reference/wsmed_examples.md).
 
 ## Usage
 
@@ -22,69 +14,50 @@ example_data
 
 ## Format
 
-A tibble (data frame) with 100 rows and 12 variables:
+A tibble (data frame) with 100 rows and 14 variables:
 
-- A1:
+- A1, A2, A3:
 
-  Numeric variable
+  Numeric measurements for variable A at three conditions.
 
-- A2:
+- B1, B2, B3:
 
-  Numeric variable
+  Numeric measurements for variable B at three conditions.
 
-- A3:
+- C1, C2, C3:
 
-  Numeric variable
+  Numeric measurements for variable C at three conditions.
 
-- B1:
+- D1, D2, D3:
 
-  Numeric variable
+  Numeric measurements for variable D at three conditions.
 
-- B2:
+- Group:
 
-  Numeric variable
+  An unordered factor with levels high, med, and low, in that order.
 
-- B3:
+- W_Group:
 
-  Numeric variable
+  An unordered factor with levels high, med, and low, in that order.
 
-- C1:
+## Details
 
-  Numeric variable
+All columns are complete. A wsMed analysis selects two condition columns
+per outcome or mediator. The factor labels are nominal categories; they
+do not request an ordinal regression model. Set their level order
+explicitly before fitting to select a different reference category.
 
-- C2:
+## See also
 
-  Numeric variable
-
-- C3:
-
-  Numeric variable
-
-- D1:
-
-  Numeric variable
-
-- D2:
-
-  Numeric variable
-
-- D3:
-
-  Numeric variable
+[`wsmed_examples()`](https://yangzhen1999.github.io/wsMed/reference/wsmed_examples.md),
+[wsmed_categorical](https://yangzhen1999.github.io/wsMed/reference/wsmed_categorical.md)
 
 ## Examples
 
 ``` r
 data(example_data)
-head(example_data)
-#> # A tibble: 6 × 14
-#>      A1    A2     A3     B1    B2    B3    C1    C2    C3    D1    D2     D3
-#>   <dbl> <dbl>  <dbl>  <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>  <dbl>
-#> 1 0.520 0.348 0.0518 0.0935 0.254 0.502 0     0.240 0     0.702 0.485 0.314 
-#> 2 0.329 0.121 0.291  0.259  0.328 0.152 0.116 0     0.118 0     0.392 0.0133
-#> 3 0.208 0.168 0.156  0.295  0.342 0.490 0.237 0.214 0.137 0.336 0.706 0.521 
-#> 4 0.565 0.175 0.401  0.622  0.450 0.536 0.285 0.395 0.143 0.532 0.437 0.290 
-#> 5 0.514 0.767 0.598  0.653  0.448 0.525 0.284 0.464 0.161 0.456 0.351 0.217 
-#> 6 0.763 0.567 0.803  0.766  0.716 0.554 0.260 0.313 0.177 0.813 0.666 1     
-#> # ℹ 2 more variables: Group <fct>, W_Group <fct>
+dim(example_data)
+#> [1] 100  14
+levels(example_data$Group)
+#> [1] "high" "med"  "low" 
 ```

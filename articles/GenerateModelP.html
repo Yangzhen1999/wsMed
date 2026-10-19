@@ -5,12 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>GenerateModelP • wsMed</title>
+<title>Model equations: parallel mediation • wsMed</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="GenerateModelP">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
+<meta property="og:title" content="Model equations: parallel mediation">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -20,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -29,26 +30,23 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../index.html">Home</a></li>
-<li class="nav-item"><a class="nav-link" href="../reference/index.html">Functions</a></li>
-<li class="active nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials">
-<li><a class="dropdown-item" href="../articles/WsMed.html">Using wsMed: A step-by-step tutorial</a></li>
-    <li><a class="dropdown-item" href="../articles/PlottingEffects.html">Plotting effects and contrasts</a></li>
-    <li><a class="dropdown-item" href="../articles/StandardizedModeratedMediation.html">Standardized moderated mediation</a></li>
-    <li><a class="dropdown-item" href="../articles/printGM.html">Using printGM() to Generate SEM Models</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelP.html">Parallel Mediation (P)</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelCN.html">Chained Mediation (CN)</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelCP.html">Combined Parallel and Chained (CP)</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelPC.html">Parallel + Chained (PC)</a></li>
-    <li><a class="dropdown-item" href="../articles/MEMORE_vs_wsMed.html">Comparison: MEMORE 3.0 vs wsMed</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelCustom.html">User-defined mediation models</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/GetStarted.html">Get started</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/AnalysisGuide.html">Analysis guides</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-results-plots" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Results &amp; plots</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-results-plots">
+<li><a class="dropdown-item" href="../articles/ResultsGuide.html">Read and export results</a></li>
+    <li><a class="dropdown-item" href="../articles/PlottingEffects.html">Plot gallery</a></li>
+    <li><a class="dropdown-item" href="../articles/StandardizedModeratedMediation.html">Standardized effects</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/Yangzhen1999/wsMed" aria-label="GitHub Repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -63,15 +61,18 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>GenerateModelP</h1>
+      <h1>Model equations: parallel mediation</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/master/vignettes/GenerateModelP.Rmd" class="external-link"><code>vignettes/GenerateModelP.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/vignettes/GenerateModelP.Rmd" class="external-link"><code>vignettes/GenerateModelP.Rmd</code></a></small>
       <div class="d-none name"><code>GenerateModelP.Rmd</code></div>
     </div>
 
     
     
+<p><strong>Purpose:</strong> definitions and equations for this model.
+To fit an analysis, start with <a href="AnalysisGuide.html#choose-your-model">Choose an analysis</a> or
+the <a href="GetStarted.html">quick start</a>.</p>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -303,15 +304,15 @@ Difference in effect.</p>
 <p>The C2-measurement coefficient
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">X1_{b,i}</annotation></semantics></math>
 is defined as:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><mi>b</mi><mo>+</mo><mi>d</mi></mrow><annotation encoding="application/x-tex">
-X1_{b,i} = b + d
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><mi>b</mi><mo>+</mo><mi>d</mi><mi>/</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">
+X1_{b,i} = b + d/2
 </annotation></semantics></math></p>
 <p>Substitute
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>b</mi><annotation encoding="application/x-tex">b</annotation></semantics></math>
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><mfrac><mrow><msub><mi>b</mi><mn>11</mn></msub><mo>+</mo><msub><mi>b</mi><mn>21</mn></msub></mrow><mn>2</mn></mfrac><mo>+</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>b</mi><mn>21</mn></msub><mo>−</mo><msub><mi>b</mi><mn>11</mn></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>b</mi><mn>21</mn></msub></mrow><annotation encoding="application/x-tex">
-X1_{b,i} = \frac{b_{11} + b_{21}}{2} + (b_{21} - b_{11}) = b_{21}
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><mfrac><mrow><msub><mi>b</mi><mn>11</mn></msub><mo>+</mo><msub><mi>b</mi><mn>21</mn></msub></mrow><mn>2</mn></mfrac><mo>+</mo><mfrac><mrow><msub><mi>b</mi><mn>21</mn></msub><mo>−</mo><msub><mi>b</mi><mn>11</mn></msub></mrow><mn>2</mn></mfrac><mo>=</mo><msub><mi>b</mi><mn>21</mn></msub></mrow><annotation encoding="application/x-tex">
+X1_{b,i} = \frac{b_{11} + b_{21}}{2} + \frac{b_{21} - b_{11}}{2} = b_{21}
 </annotation></semantics></math></p>
 <p>Thus,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">X1_{b,i}</annotation></semantics></math>
@@ -378,8 +379,8 @@ M_{\text{diff},i} = a_i + \epsilon_i
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>I</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></msub><mo>=</mo><msub><mtext mathvariant="normal">indirect</mtext><mi>i</mi></msub><mo>−</mo><msub><mtext mathvariant="normal">indirect</mtext><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">
 CI_{i,j} = \text{indirect}_i - \text{indirect}_j
 </annotation></semantics></math></p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><msub><mi>b</mi><mi>i</mi></msub><mo>+</mo><msub><mi>d</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">
-   X1_{b,i} = b_i + d_i
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><msub><mi>b</mi><mi>i</mi></msub><mo>+</mo><msub><mi>d</mi><mi>i</mi></msub><mi>/</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">
+   X1_{b,i} = b_i + d_i/2
    </annotation></semantics></math></p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>0</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><mi>X</mi><msub><mn>1</mn><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>−</mo><msub><mi>d</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">
    X0_{b,i} = X1_{b,i} - d_i
@@ -400,6 +401,56 @@ mediators’ relative importance. 3. C1- and C2-measurement coefficients
 quantify the effects in specific conditions.</p>
 <hr>
 </div>
+</div>
+<div class="section level2">
+<h2 id="standardization-and-moderation">Standardization and moderation<a class="anchor" aria-label="anchor" href="#standardization-and-moderation"></a>
+</h2>
+<p><code>GenerateModel*()</code> constructs the unstandardized model
+syntax. Request standardized estimates when fitting with
+<code>wsMed(..., standardized = TRUE)</code>. <code><a href="../reference/PrepareData.html">PrepareData()</a></code>
+uses condition-2 minus condition-1 differences and centered mediator
+averages. Differences are scaled without recentering; centering the
+average component changes the intercept, not the slopes above.</p>
+<p>Let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>s</mi><mrow><mi>D</mi><msub><mi>M</mi><mi>i</mi></msub></mrow></msub><annotation encoding="application/x-tex">s_{D M_i}</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>s</mi><mrow><mi>A</mi><msub><mi>M</mi><mi>i</mi></msub></mrow></msub><annotation encoding="application/x-tex">s_{A M_i}</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>s</mi><mrow><mi>D</mi><mi>Y</mi></mrow></msub><annotation encoding="application/x-tex">s_{D Y}</annotation></semantics></math>
+denote the marginal model-implied SDs of mediator differences, centered
+mediator averages and the outcome difference. Then</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>a</mi><mi>i</mi><mo>*</mo></msubsup><mo>=</mo><msub><mi>a</mi><mi>i</mi></msub><mi>/</mi><msub><mi>s</mi><mrow><mi>D</mi><msub><mi>M</mi><mi>i</mi></msub></mrow></msub><mo>,</mo><mspace width="1.0em"></mspace><msubsup><mi>b</mi><mi>i</mi><mo>*</mo></msubsup><mo>=</mo><msub><mi>b</mi><mi>i</mi></msub><msub><mi>s</mi><mrow><mi>D</mi><msub><mi>M</mi><mi>i</mi></msub></mrow></msub><mi>/</mi><msub><mi>s</mi><mrow><mi>D</mi><mi>Y</mi></mrow></msub><mo>,</mo><mspace width="1.0em"></mspace><msubsup><mi>d</mi><mi>i</mi><mo>*</mo></msubsup><mo>=</mo><msub><mi>d</mi><mi>i</mi></msub><msub><mi>s</mi><mrow><mi>A</mi><msub><mi>M</mi><mi>i</mi></msub></mrow></msub><mi>/</mi><msub><mi>s</mi><mrow><mi>D</mi><mi>Y</mi></mrow></msub><mo>,</mo><mspace width="1.0em"></mspace><msup><mi>c</mi><mo>′</mo></msup><msup><mi></mi><mo>*</mo></msup><mo>=</mo><msup><mi>c</mi><mo>′</mo></msup><mi>/</mi><msub><mi>s</mi><mrow><mi>D</mi><mi>Y</mi></mrow></msub><mi>.</mi></mrow><annotation encoding="application/x-tex">
+a_i^*=a_i/s_{D M_i},\quad
+b_i^*=b_i s_{D M_i}/s_{D Y},\quad
+d_i^*=d_i s_{A M_i}/s_{D Y},\quad
+c'^*=c'/s_{D Y}.
+</annotation></semantics></math></p>
+<p>A mediator-to-mediator coefficient uses its own source and
+destination SDs. Intermediate SDs cancel in a serial indirect-effect
+product, so every complete indirect effect satisfies
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><msup><mi>E</mi><mo>*</mo></msup><mo stretchy="false" form="prefix">(</mo><mi>w</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>I</mi><mi>E</mi><mo stretchy="false" form="prefix">(</mo><mi>w</mi><mo stretchy="false" form="postfix">)</mo><mi>/</mi><msub><mi>s</mi><mrow><mi>D</mi><mi>Y</mi></mrow></msub></mrow><annotation encoding="application/x-tex">IE^*(w)=IE(w)/s_{D Y}</annotation></semantics></math>.
+The same common marginal outcome SD applies across moderator values and
+categorical groups. Sum all model-implied indirect paths when computing
+the total indirect effect.</p>
+<p>With moderators, use <code>result$moderation_std</code> for
+standardized conditional effects and retain
+<code>result$moderation</code> for raw effects. <code>MP</code> selects
+requested interactions and focal paths; already-fitted moderator main
+effects also enter conditional intercepts even when the corresponding
+<code>a</code> or <code>cp</code> is absent from <code>MP</code>. See <a href="StandardizedModeratedMediation.html">Standardized moderated
+mediation</a> for continuous and categorical examples, joint-draw
+intervals and plots.</p>
+<p>The condition-specific slopes above are reconstructed on the raw
+scale:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>1</mn><mi>b</mi></msub><mo>=</mo><mi>b</mi><mo>+</mo><mi>d</mi><mi>/</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">X1_b=b+d/2</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><msub><mn>0</mn><mi>b</mi></msub><mo>=</mo><mi>b</mi><mo>−</mo><mi>d</mi><mi>/</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">X0_b=b-d/2</annotation></semantics></math>.
+Do not apply this reconstruction directly to standardized
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>b</mi><mo>*</mo></msup><annotation encoding="application/x-tex">b^*</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>d</mi><mo>*</mo></msup><annotation encoding="application/x-tex">d^*</annotation></semantics></math>,
+whose predictor scale factors differ. A difference between two indirect
+effects is a contrast estimate; its confidence interval must be computed
+from the joint sampling distribution.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

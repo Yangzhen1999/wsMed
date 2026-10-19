@@ -1,4 +1,4 @@
-# Run Monte Carlo-Based Mediation Inference
+# Run Monte Carlo-based mediation inference
 
 Performs Monte Carlo simulation to estimate confidence intervals for
 both unstandardized and (optionally) standardized mediation parameters,

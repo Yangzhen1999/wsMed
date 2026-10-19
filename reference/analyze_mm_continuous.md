@@ -1,9 +1,9 @@
-# Summarise Effects with a Continuous Moderator
+# Summarize effects with a continuous moderator
 
-\`analyze_mm_continuous()\` summarises Monte Carlo draws from a
-\`semmcci\` object when the moderator \`W\` is continuous. It reports
-moderated path coefficients, conditional indirect effects, conditional
-path coefficients, and effect curves across values of the moderator.
+`analyze_mm_continuous()` summarises Monte Carlo draws from a `semmcci`
+object when the moderator `W` is continuous. It reports moderated path
+coefficients, conditional indirect effects, conditional path
+coefficients, and effect curves across values of the moderator.
 
 ## Usage
 
@@ -25,12 +25,14 @@ analyze_mm_continuous(
 
 - mc_result:
 
-  A \`semmcci\` object returned by \`MCMI2()\`.
+  A `semmcci` object returned by
+  [`MCMI2()`](https://yangzhen1999.github.io/wsMed/reference/MCMI2.md).
 
 - data:
 
   A processed data frame containing the original moderator variable.
-  This is typically the first component returned by \`PrepareData()\`.
+  This is typically the first component returned by
+  [`PrepareData()`](https://yangzhen1999.github.io/wsMed/reference/PrepareData.md).
 
 - MP:
 
@@ -40,29 +42,29 @@ analyze_mm_continuous(
 - W_raw_name:
 
   A character string giving the name of the moderator variable in
-  \`data\`. The default is \`"W"\`.
+  `data`. The default is `"W"`.
 
 - ci_level:
 
   A numeric value between zero and one specifying the two-sided
-  confidence level. The default is \`0.95\`.
+  confidence level. The default is `0.95`.
 
 - W_values:
 
   An optional numeric vector containing at least two distinct raw
   moderator values at which to evaluate the conditional effects. If
-  \`NULL\`, the moderator mean and values one standard deviation below
-  and above the mean are used.
+  `NULL`, the moderator mean and values one standard deviation below and
+  above the mean are used.
 
 - n_curve:
 
   A positive integer specifying the number of moderator values used to
-  construct each effect curve. The default is \`120\`.
+  construct each effect curve. The default is `120`.
 
 - digits:
 
   A non-negative integer specifying the number of decimal places used to
-  round the reported results. The default is \`8\`.
+  round the reported results. The default is `8`.
 
 - point_estimates:
 
@@ -101,15 +103,15 @@ A named list with the following components:
 ## Details
 
 The function first summarises the coefficients associated with moderated
-paths, including interaction terms such as \`aw\`, \`bw\`, \`dw\`, and
-\`cpw\`, together with their corresponding base coefficients and
-confidence intervals.
+paths, including interaction terms such as `aw`, `bw`, `dw`, and `cpw`,
+together with their corresponding base coefficients and confidence
+intervals.
 
 It then evaluates conditional indirect effects and moderated path
 coefficients at three reference values of the moderator. By default,
 these values are the moderator mean and one standard deviation below and
 above the mean. Alternative reference values can be supplied through
-\`W_values\`.
+`W_values`.
 
 Finally, the function evaluates the conditional indirect effects and
 moderated path coefficients over a moderator grid. These results can be

@@ -1,4 +1,4 @@
-# Impute Missing Data Using Multiple Imputation
+# Impute missing data using multiple imputation
 
 The `ImputeData` function performs multiple imputation on a data frame
 with missing values using the `mice` package. It handles missing data by

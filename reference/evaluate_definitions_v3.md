@@ -1,4 +1,4 @@
-# Evaluate Standardized Monte Carlo Expressions
+# Evaluate standardized Monte Carlo expressions
 
 Evaluates user-defined parameters (defined via expressions) and
 standardized free parameters from Monte Carlo simulated samples. This

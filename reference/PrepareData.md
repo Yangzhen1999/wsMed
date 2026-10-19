@@ -1,7 +1,7 @@
-# Prepare Data for Two-Condition Within-Subject Mediation (WsMed)
+# Prepare data for two-condition mediation
 
 `PrepareData()` transforms raw pre/post data into the set of variables
-required by the **WsMed** workflow. It handles *mediators*, *outcome*,
+required by the **wsMed** workflow. It handles *mediators*, *outcome*,
 *within-subject controls*, *between-subject controls*, *moderators*, and
 all necessary **interaction terms**, while automatically centering /
 dummy-coding variables as needed.
@@ -57,7 +57,7 @@ PrepareData(
 
 - W:
 
-  Optional character vector: moderator names (one or more).
+  Optional character scalar: one moderator column name.
 
 - W_type:
 
@@ -110,7 +110,7 @@ The function performs the following steps:
 4.  Within-subject controls `Cw`: difference and centered-average
     versions (`Cw1diff`, `Cw1avg`, ...).
 
-5.  Moderators `W` (one or more):
+5.  Moderator `W` (at most one):
 
     - Continuous variables are grand-mean centered (`W1`, `W2`, ...).
 
@@ -134,7 +134,8 @@ Row counts are preserved even if input factors contain NA values
 
 [`PrepareMissingData`](https://yangzhen1999.github.io/wsMed/reference/PrepareMissingData.md),
 [`GenerateModelP`](https://yangzhen1999.github.io/wsMed/reference/GenerateModelP.md),
-[`wsMed`](https://yangzhen1999.github.io/wsMed/reference/wsMed.md)
+[`wsMed`](https://yangzhen1999.github.io/wsMed/reference/wsMed.md),
+[`wsmed_categorical`](https://yangzhen1999.github.io/wsMed/reference/wsmed_categorical.md)
 
 ## Examples
 

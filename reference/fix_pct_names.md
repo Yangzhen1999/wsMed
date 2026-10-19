@@ -1,6 +1,6 @@
-# Fix % characters mangled by `make.names()`
+# Repair percent signs altered by `make.names()`
 
-Fix % characters mangled by
+Repair percent signs altered by
 [`make.names()`](https://rdrr.io/r/base/make.names.html)
 
 ## Usage

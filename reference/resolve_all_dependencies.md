@@ -1,4 +1,4 @@
-# Resolve Dependencies of Defined Parameters
+# Resolve dependencies of defined parameters
 
 Recursively resolves all free parameters involved in each defined
 parameter.

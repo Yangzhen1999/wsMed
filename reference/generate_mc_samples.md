@@ -1,4 +1,4 @@
-# Generate Monte Carlo Samples
+# Generate Monte Carlo samples
 
 Generates a Monte Carlo sample of model parameters from a multivariate
 normal distribution.

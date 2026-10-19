@@ -1,6 +1,6 @@
-# Make CI column names like "2.5%CI.Lo / 97.5%CI.Up"
+# Make CI column names
 
-Make CI column names like "2.5%CI.Lo / 97.5%CI.Up"
+Make CI column names
 
 ## Usage
 

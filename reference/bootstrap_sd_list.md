@@ -1,4 +1,4 @@
-# Bootstrap Standard Deviations for Standardization
+# Bootstrap standard deviations for standardization
 
 Performs bootstrap sampling to estimate SDs of variables used in
 standardization.

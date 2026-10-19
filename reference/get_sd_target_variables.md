@@ -1,4 +1,4 @@
-# Extract Target Variables for Standardization
+# Extract target variables for standardization
 
 Extracts variable names from a fitted SEM model and a definition map
 that are required for computing standardized estimates in Monte Carlo

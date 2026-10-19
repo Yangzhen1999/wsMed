@@ -30,4 +30,8 @@ each draw. Intervals are percentile intervals, as in the raw conditional
 tables. Metadata attributes record scales, probe conventions and draw
 diagnostics. With fixed.x=TRUE, external moments are held fixed. MI uses
 pooled primitive parameters and the existing first-imputation probing
-reference.
+reference. For models with endogenous products, marginal variances are
+pooled jointly with coefficients before taking square roots, retaining
+their sampling covariance. Saved endogenous-product fits and MI draws
+require compatible algorithm identifiers. Refit unversioned old models
+rather than restandardizing them.

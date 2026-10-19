@@ -1,4 +1,4 @@
-# Evaluate Unstandardized Monte Carlo Definitions
+# Evaluate unstandardized Monte Carlo definitions
 
 Evaluates user-defined parameter expressions from Monte Carlo samples
 without any standardization.

@@ -1,4 +1,10 @@
-# GenerateModelPC
+# Model equations: parallel-serial mediation
+
+**Purpose:** definitions and equations for this model. To fit an
+analysis, start with [Choose an
+analysis](https://yangzhen1999.github.io/wsMed/articles/AnalysisGuide.html#choose-your-model)
+or the [quick
+start](https://yangzhen1999.github.io/wsMed/articles/GetStarted.md).
 
 ## Introduction
 
@@ -157,7 +163,7 @@ CI_{\text{path}_1\text{vs}\text{path}_2} = \text{indirect}_{\text{path}_1} - \te
 
 1.  **C2-Measurement Coefficient ($`X1_{b,i}`$):**
     ``` math
-    X1_{b,i} = b_i + d_i
+    X1_{b,i} = b_i + d_i/2
     ```
 
 2.  **C1-Measurement Coefficient ($`X0_{b,i}`$):**
@@ -170,7 +176,7 @@ CI_{\text{path}_1\text{vs}\text{path}_2} = \text{indirect}_{\text{path}_1} - \te
 1.  **Mediator $`M_1`$:**
 
     ``` math
-    X1_{b,1} = b_1 + d_1
+    X1_{b,1} = b_1 + d_1/2
     ```
 
     ``` math
@@ -180,7 +186,7 @@ CI_{\text{path}_1\text{vs}\text{path}_2} = \text{indirect}_{\text{path}_1} - \te
 2.  **Mediator $`M_2`$:**
 
     ``` math
-    X1_{b,2} = b_2 + d_2
+    X1_{b,2} = b_2 + d_2/2
     ```
 
     ``` math
@@ -190,7 +196,7 @@ CI_{\text{path}_1\text{vs}\text{path}_2} = \text{indirect}_{\text{path}_1} - \te
 3.  **Mediator $`M_3`$:**
 
     ``` math
-    X1_{b,3} = b_3 + d_3
+    X1_{b,3} = b_3 + d_3/2
     ```
 
     ``` math
@@ -200,7 +206,7 @@ CI_{\text{path}_1\text{vs}\text{path}_2} = \text{indirect}_{\text{path}_1} - \te
 4.  **Parallel to Chained Path ($`M_2 \to M_1`$):**
 
     ``` math
-    X1_{b,21} = b_{21} + d_{21}
+    X1_{b,21} = b_{21} + d_{21}/2
     ```
 
     ``` math
@@ -210,7 +216,7 @@ CI_{\text{path}_1\text{vs}\text{path}_2} = \text{indirect}_{\text{path}_1} - \te
 5.  **Parallel to Chained Path ($`M_3 \to M_1`$):**
 
     ``` math
-    X1_{b,31} = b_{31} + d_{31}
+    X1_{b,31} = b_{31} + d_{31}/2
     ```
 
     ``` math
@@ -259,7 +265,7 @@ This section summarizes all equations used in the model:
 ```
 
 ``` math
-   X1_{b,i} = b_i + d_i
+   X1_{b,i} = b_i + d_i/2
    
 ```
 
@@ -273,3 +279,47 @@ This section summarizes all equations used in the model:
 This comprehensive approach supports models with parallel mediators
 influencing a chained mediator, enabling detailed analysis of their
 effects and interactions.
+
+## Standardization and moderation
+
+`GenerateModel*()` constructs the unstandardized model syntax. Request
+standardized estimates when fitting with
+`wsMed(..., standardized = TRUE)`.
+[`PrepareData()`](https://yangzhen1999.github.io/wsMed/reference/PrepareData.md)
+uses condition-2 minus condition-1 differences and centered mediator
+averages. Differences are scaled without recentering; centering the
+average component changes the intercept, not the slopes above.
+
+Let $`s_{D M_i}`$, $`s_{A M_i}`$ and $`s_{D Y}`$ denote the marginal
+model-implied SDs of mediator differences, centered mediator averages
+and the outcome difference. Then
+
+``` math
+a_i^*=a_i/s_{D M_i},\quad
+b_i^*=b_i s_{D M_i}/s_{D Y},\quad
+d_i^*=d_i s_{A M_i}/s_{D Y},\quad
+c'^*=c'/s_{D Y}.
+```
+
+A mediator-to-mediator coefficient uses its own source and destination
+SDs. Intermediate SDs cancel in a serial indirect-effect product, so
+every complete indirect effect satisfies $`IE^*(w)=IE(w)/s_{D Y}`$. The
+same common marginal outcome SD applies across moderator values and
+categorical groups. Sum all model-implied indirect paths when computing
+the total indirect effect.
+
+With moderators, use `result$moderation_std` for standardized
+conditional effects and retain `result$moderation` for raw effects. `MP`
+selects requested interactions and focal paths; already-fitted moderator
+main effects also enter conditional intercepts even when the
+corresponding `a` or `cp` is absent from `MP`. See [Standardized
+moderated
+mediation](https://yangzhen1999.github.io/wsMed/articles/StandardizedModeratedMediation.md)
+for continuous and categorical examples, joint-draw intervals and plots.
+
+The condition-specific slopes above are reconstructed on the raw scale:
+$`X1_b=b+d/2`$ and $`X0_b=b-d/2`$. Do not apply this reconstruction
+directly to standardized $`b^*`$ and $`d^*`$, whose predictor scale
+factors differ. A difference between two indirect effects is a contrast
+estimate; its confidence interval must be computed from the joint
+sampling distribution.

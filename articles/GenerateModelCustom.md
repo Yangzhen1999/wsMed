@@ -1,4 +1,4 @@
-# User-defined mediation models with GenerateModelCustom
+# Specifying user-defined mediation models
 
 ## Introduction
 
@@ -226,7 +226,7 @@ result_custom <- wsMed(
   seed = 123
 )
 
-print(result_custom)
+print(result_custom, detail = "legacy")
 ```
 
 ## Input requirements
@@ -257,3 +257,63 @@ To fit a user-defined model:
 This workflow retains the existing difference-and-level parameterization
 in `wsMed` while allowing users to specify mediation structures beyond
 the four predefined model forms.
+
+## Standardized moderated custom models
+
+The same endpoint scaling applies to a sparse user-defined model. Only
+paths present in `paths` can be requested in `MP`. For the model above,
+`b_1_3` and `b3` exist, whereas `b1` does not.
+
+``` r
+
+set.seed(321)
+example_custom$W <- rnorm(nrow(example_custom))
+custom_moderated <- wsMed(
+  data = example_custom,
+  M_C1 = c("A1", "B1", "C1"), M_C2 = c("A2", "B2", "C2"),
+  Y_C1 = "D1", Y_C2 = "D2", form = "UD",
+  paths = c("M1 -> M3", "M3 -> Y", "M2 -> Y"),
+  W = "W", W_type = "continuous", MP = c("b_1_3", "b3"),
+  Na = "DE", ci_method = "mc", R = 2000, seed = 321,
+  standardized = TRUE, verbose = FALSE
+)
+head(custom_moderated$moderation_std$beta_coef)
+#>                  Path Mediators Level W_value    Estimate         SE
+#> 1 indirect_effect_1_3       1 3 -1 SD  -0.930 -0.00171149 0.00896884
+#> 2 indirect_effect_1_3       1 3  0 SD   0.004 -0.00246470 0.00330398
+#> 3 indirect_effect_1_3       1 3 +1 SD   0.937 -0.00091183 0.00257147
+#> 4   indirect_effect_2         2 -1 SD  -0.930 -0.00419332 0.01090538
+#> 5   indirect_effect_2         2  0 SD   0.004 -0.00424259 0.00936702
+#> 6   indirect_effect_2         2 +1 SD   0.937 -0.00429186 0.01083499
+#>    2.5.%CI.Lo 97.5.%CI.Up Sig
+#> 1 -0.02173237  0.01560893    
+#> 2 -0.01069421  0.00266372    
+#> 3 -0.00762023  0.00251605    
+#> 4 -0.03150758  0.01561788    
+#> 5 -0.02637473  0.01262748    
+#> 6 -0.03068075  0.01443963
+custom_moderated$moderation_std$conditional_overall
+#>           Effect Level W_value    Estimate         SE  2.5.%CI.Lo 97.5.%CI.Up
+#> 1 total_indirect -1 SD  -0.930 -0.00084816 0.02119490 -0.04316083  0.04458152
+#> 3 total_indirect  0 SD   0.004  0.00807839 0.01736182 -0.02472748  0.04602436
+#> 5 total_indirect +1 SD   0.937  0.01599172 0.02647981 -0.03131806  0.07447651
+#> 2   total_effect -1 SD  -0.930  0.22936688 0.10222839  0.03065478  0.43092945
+#> 4   total_effect  0 SD   0.004  0.32281782 0.07117755  0.18700246  0.45900965
+#> 6   total_effect +1 SD   0.937  0.41525554 0.09784977  0.22477118  0.60300468
+#>   Sig
+#> 1    
+#> 3    
+#> 5    
+#> 2   *
+#> 4   *
+#> 6   *
+```
+
+The total indirect effect includes every complete path in this model,
+including paths without a requested interaction. Moderator main effects
+already fitted in the mediator and outcome regressions enter conditional
+intercepts even though `a` and `cp` were not requested in `MP`. See
+[Standardized moderated
+mediation](https://yangzhen1999.github.io/wsMed/articles/StandardizedModeratedMediation.md)
+for raw-unit probing, categorical coding and uncertainty in the scale
+factors.

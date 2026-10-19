@@ -5,12 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>User-defined mediation models with GenerateModelCustom • wsMed</title>
+<title>Specifying user-defined mediation models • wsMed</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="User-defined mediation models with GenerateModelCustom">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
+<meta property="og:title" content="Specifying user-defined mediation models">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -20,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -29,26 +30,23 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../index.html">Home</a></li>
-<li class="nav-item"><a class="nav-link" href="../reference/index.html">Functions</a></li>
-<li class="active nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials">
-<li><a class="dropdown-item" href="../articles/WsMed.html">Using wsMed: A step-by-step tutorial</a></li>
-    <li><a class="dropdown-item" href="../articles/PlottingEffects.html">Plotting effects and contrasts</a></li>
-    <li><a class="dropdown-item" href="../articles/StandardizedModeratedMediation.html">Standardized moderated mediation</a></li>
-    <li><a class="dropdown-item" href="../articles/printGM.html">Using printGM() to Generate SEM Models</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelP.html">Parallel Mediation (P)</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelCN.html">Chained Mediation (CN)</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelCP.html">Combined Parallel and Chained (CP)</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelPC.html">Parallel + Chained (PC)</a></li>
-    <li><a class="dropdown-item" href="../articles/MEMORE_vs_wsMed.html">Comparison: MEMORE 3.0 vs wsMed</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelCustom.html">User-defined mediation models</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/GetStarted.html">Get started</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/AnalysisGuide.html">Analysis guides</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-results-plots" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Results &amp; plots</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-results-plots">
+<li><a class="dropdown-item" href="../articles/ResultsGuide.html">Read and export results</a></li>
+    <li><a class="dropdown-item" href="../articles/PlottingEffects.html">Plot gallery</a></li>
+    <li><a class="dropdown-item" href="../articles/StandardizedModeratedMediation.html">Standardized effects</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/Yangzhen1999/wsMed" aria-label="GitHub Repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -63,10 +61,10 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>User-defined mediation models with GenerateModelCustom</h1>
+      <h1>Specifying user-defined mediation models</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/master/vignettes/GenerateModelCustom.Rmd" class="external-link"><code>vignettes/GenerateModelCustom.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/vignettes/GenerateModelCustom.Rmd" class="external-link"><code>vignettes/GenerateModelCustom.Rmd</code></a></small>
       <div class="d-none name"><code>GenerateModelCustom.Rmd</code></div>
     </div>
 
@@ -327,7 +325,7 @@ because Monte Carlo confidence intervals can take some time. Remove
 <span>  seed <span class="op">=</span> <span class="fl">123</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result_custom</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result_custom</span>, detail <span class="op">=</span> <span class="st">"legacy"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="input-requirements">Input requirements<a class="anchor" aria-label="anchor" href="#input-requirements"></a>
@@ -367,6 +365,63 @@ complete analysis.</li>
 <p>This workflow retains the existing difference-and-level
 parameterization in <code>wsMed</code> while allowing users to specify
 mediation structures beyond the four predefined model forms.</p>
+</div>
+<div class="section level2">
+<h2 id="standardized-moderated-custom-models">Standardized moderated custom models<a class="anchor" aria-label="anchor" href="#standardized-moderated-custom-models"></a>
+</h2>
+<p>The same endpoint scaling applies to a sparse user-defined model.
+Only paths present in <code>paths</code> can be requested in
+<code>MP</code>. For the model above, <code>b_1_3</code> and
+<code>b3</code> exist, whereas <code>b1</code> does not.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">321</span><span class="op">)</span></span>
+<span><span class="va">example_custom</span><span class="op">$</span><span class="va">W</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">example_custom</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">custom_moderated</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">example_custom</span>,</span>
+<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span>, <span class="st">"C1"</span><span class="op">)</span>, M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span>, <span class="st">"C2"</span><span class="op">)</span>,</span>
+<span>  Y_C1 <span class="op">=</span> <span class="st">"D1"</span>, Y_C2 <span class="op">=</span> <span class="st">"D2"</span>, form <span class="op">=</span> <span class="st">"UD"</span>,</span>
+<span>  paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M1 -&gt; M3"</span>, <span class="st">"M3 -&gt; Y"</span>, <span class="st">"M2 -&gt; Y"</span><span class="op">)</span>,</span>
+<span>  W <span class="op">=</span> <span class="st">"W"</span>, W_type <span class="op">=</span> <span class="st">"continuous"</span>, MP <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"b_1_3"</span>, <span class="st">"b3"</span><span class="op">)</span>,</span>
+<span>  Na <span class="op">=</span> <span class="st">"DE"</span>, ci_method <span class="op">=</span> <span class="st">"mc"</span>, R <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">321</span>,</span>
+<span>  standardized <span class="op">=</span> <span class="cn">TRUE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">custom_moderated</span><span class="op">$</span><span class="va">moderation_std</span><span class="op">$</span><span class="va">beta_coef</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                  Path Mediators Level W_value    Estimate         SE</span></span>
+<span><span class="co">#&gt; 1 indirect_effect_1_3       1 3 -1 SD  -0.930 -0.00171149 0.00896884</span></span>
+<span><span class="co">#&gt; 2 indirect_effect_1_3       1 3  0 SD   0.004 -0.00246470 0.00330398</span></span>
+<span><span class="co">#&gt; 3 indirect_effect_1_3       1 3 +1 SD   0.937 -0.00091183 0.00257147</span></span>
+<span><span class="co">#&gt; 4   indirect_effect_2         2 -1 SD  -0.930 -0.00419332 0.01090538</span></span>
+<span><span class="co">#&gt; 5   indirect_effect_2         2  0 SD   0.004 -0.00424259 0.00936702</span></span>
+<span><span class="co">#&gt; 6   indirect_effect_2         2 +1 SD   0.937 -0.00429186 0.01083499</span></span>
+<span><span class="co">#&gt;    2.5.%CI.Lo 97.5.%CI.Up Sig</span></span>
+<span><span class="co">#&gt; 1 -0.02173237  0.01560893    </span></span>
+<span><span class="co">#&gt; 2 -0.01069421  0.00266372    </span></span>
+<span><span class="co">#&gt; 3 -0.00762023  0.00251605    </span></span>
+<span><span class="co">#&gt; 4 -0.03150758  0.01561788    </span></span>
+<span><span class="co">#&gt; 5 -0.02637473  0.01262748    </span></span>
+<span><span class="co">#&gt; 6 -0.03068075  0.01443963</span></span>
+<span><span class="va">custom_moderated</span><span class="op">$</span><span class="va">moderation_std</span><span class="op">$</span><span class="va">conditional_overall</span></span>
+<span><span class="co">#&gt;           Effect Level W_value    Estimate         SE  2.5.%CI.Lo 97.5.%CI.Up</span></span>
+<span><span class="co">#&gt; 1 total_indirect -1 SD  -0.930 -0.00084816 0.02119490 -0.04316083  0.04458152</span></span>
+<span><span class="co">#&gt; 3 total_indirect  0 SD   0.004  0.00807839 0.01736182 -0.02472748  0.04602436</span></span>
+<span><span class="co">#&gt; 5 total_indirect +1 SD   0.937  0.01599172 0.02647981 -0.03131806  0.07447651</span></span>
+<span><span class="co">#&gt; 2   total_effect -1 SD  -0.930  0.22936688 0.10222839  0.03065478  0.43092945</span></span>
+<span><span class="co">#&gt; 4   total_effect  0 SD   0.004  0.32281782 0.07117755  0.18700246  0.45900965</span></span>
+<span><span class="co">#&gt; 6   total_effect +1 SD   0.937  0.41525554 0.09784977  0.22477118  0.60300468</span></span>
+<span><span class="co">#&gt;   Sig</span></span>
+<span><span class="co">#&gt; 1    </span></span>
+<span><span class="co">#&gt; 3    </span></span>
+<span><span class="co">#&gt; 5    </span></span>
+<span><span class="co">#&gt; 2   *</span></span>
+<span><span class="co">#&gt; 4   *</span></span>
+<span><span class="co">#&gt; 6   *</span></span></code></pre></div>
+<p>The total indirect effect includes every complete path in this model,
+including paths without a requested interaction. Moderator main effects
+already fitted in the mediator and outcome regressions enter conditional
+intercepts even though <code>a</code> and <code>cp</code> were not
+requested in <code>MP</code>. See <a href="StandardizedModeratedMediation.html">Standardized moderated
+mediation</a> for raw-unit probing, categorical coding and uncertainty
+in the scale factors.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

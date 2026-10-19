@@ -1,4 +1,4 @@
-# Process Monte Carlo Samples for Defined Parameters in SEM
+# Process Monte Carlo samples for defined parameters in SEM
 
 A wrapper for the internal `.MCDef()` function from the `semmcci`
 package. This function processes Monte Carlo samples to compute defined

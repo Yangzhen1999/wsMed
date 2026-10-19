@@ -10,7 +10,8 @@
 <link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Within-Subject Mediation Analysis Using Structural Equation Modeling">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
+<meta property="og:title" content="Within-Subject Mediation Analysis Using Structural Equation Modeling">
 <meta name="description" content="Within-subject mediation analysis using structural equation modeling. Examine how changes in an outcome variable between two conditions are mediated through one or more variables. Supports within-subject mediation analysis using the lavaan package by Rosseel (2012) &lt;doi:10.18637/jss.v048.i02&gt;, and extends Monte Carlo confidence interval estimation to missing data scenarios using the semmcci package by Pesigan and Cheung (2023) &lt;doi:10.3758/s13428-023-02114-4&gt;.">
 <meta property="og:description" content="Within-subject mediation analysis using structural equation modeling. Examine how changes in an outcome variable between two conditions are mediated through one or more variables. Supports within-subject mediation analysis using the lavaan package by Rosseel (2012) &lt;doi:10.18637/jss.v048.i02&gt;, and extends Monte Carlo confidence interval estimation to missing data scenarios using the semmcci package by Pesigan and Cheung (2023) &lt;doi:10.3758/s13428-023-02114-4&gt;.">
 </head>
@@ -22,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,26 +32,23 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="active nav-item"><a class="nav-link" href="index.html">Home</a></li>
-<li class="nav-item"><a class="nav-link" href="reference/index.html">Functions</a></li>
+<li class="nav-item"><a class="nav-link" href="articles/GetStarted.html">Get started</a></li>
+<li class="nav-item"><a class="nav-link" href="articles/AnalysisGuide.html">Analysis guides</a></li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials">
-<li><a class="dropdown-item" href="articles/WsMed.html">Using wsMed: A step-by-step tutorial</a></li>
-    <li><a class="dropdown-item" href="articles/PlottingEffects.html">Plotting effects and contrasts</a></li>
-    <li><a class="dropdown-item" href="articles/StandardizedModeratedMediation.html">Standardized moderated mediation</a></li>
-    <li><a class="dropdown-item" href="articles/printGM.html">Using printGM() to Generate SEM Models</a></li>
-    <li><a class="dropdown-item" href="articles/GenerateModelP.html">Parallel Mediation (P)</a></li>
-    <li><a class="dropdown-item" href="articles/GenerateModelCN.html">Chained Mediation (CN)</a></li>
-    <li><a class="dropdown-item" href="articles/GenerateModelCP.html">Combined Parallel and Chained (CP)</a></li>
-    <li><a class="dropdown-item" href="articles/GenerateModelPC.html">Parallel + Chained (PC)</a></li>
-    <li><a class="dropdown-item" href="articles/MEMORE_vs_wsMed.html">Comparison: MEMORE 3.0 vs wsMed</a></li>
-    <li><a class="dropdown-item" href="articles/GenerateModelCustom.html">User-defined mediation models</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-results-plots" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Results &amp; plots</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-results-plots">
+<li><a class="dropdown-item" href="articles/ResultsGuide.html">Read and export results</a></li>
+    <li><a class="dropdown-item" href="articles/PlottingEffects.html">Plot gallery</a></li>
+    <li><a class="dropdown-item" href="articles/StandardizedModeratedMediation.html">Standardized effects</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
+<li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="articles/index.html">Articles</a></li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/Yangzhen1999/wsMed" aria-label="GitHub Repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -62,117 +60,111 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="wsmed">wsMed<a class="anchor" aria-label="anchor" href="#wsmed"></a>
 </h1></div>
-<p><!-- badges: start --></p>
-<p><!-- badges: end --></p>
-<p>The <code>wsMed</code> function is designed for two condition within-subject mediation analysis, incorporating SEM models through the <code>lavaan</code> package and Monte Carlo simulation methods. This document provides a detailed description of the function’s parameters, workflow, and usage, along with an example demonstration.</p>
+<p>Analyze mediation and moderated mediation in <strong>two-condition within-subject designs</strong>. Fit a model, read an organized effect table, and plot the results in R.</p>
+<div class="wsmed-version-note">
+<p><strong>Development documentation · 1.1.0.9000</strong><br> These tutorials use <code>feature/modular-api</code>. The published CRAN version has a different reporting interface.</p>
+</div>
 <div class="section level2">
-<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+<h2 id="start-here">Start here<a class="anchor" aria-label="anchor" href="#start-here"></a>
 </h2>
-<p>You can install the development version of wsMed from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<div class="wsmed-start-grid">
+<div class="wsmed-start-card">
+<p class="wsmed-card-title">
+Step 1: Run your first analysis
+</p>
+<p>
+Use paired data and one call to obtain a mediation model.
+</p>
+<p>
+<a href="articles/GetStarted.html">Get started →</a>
+</p>
+</div>
+<div class="wsmed-start-card">
+<p class="wsmed-card-title">
+Step 2: Choose your model
+</p>
+<p>
+Find the guide for your pathways, moderator and missing data.
+</p>
+<p>
+<a href="articles/AnalysisGuide.html">Choose an analysis →</a>
+</p>
+</div>
+<div class="wsmed-start-card">
+<p class="wsmed-card-title">
+Step 3: Read and present results
+</p>
+<p>
+Extract all core effects, export tables and choose a figure.
+</p>
+<p>
+<a href="articles/ResultsGuide.html">Read the results →</a>
+</p>
+</div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="install-the-version-used-here">Install the version used here<a class="anchor" aria-label="anchor" href="#install-the-version-used-here"></a>
+</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"Yangzhen1999/wsMed"</span><span class="op">)</span></span></code></pre></div>
-<p>Alternatively, if you prefer using devtools, you can install wsMed as follows:</p>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"Yangzhen1999/wsMed@feature/modular-api"</span><span class="op">)</span></span></code></pre></div>
+<p>Restart R after updating. For the published release, use <code>install.packages("wsMed")</code>. These development features require the branch above.</p>
+</div>
+<div class="section level2">
+<h2 id="a-complete-first-example">A complete first example<a class="anchor" aria-label="anchor" href="#a-complete-first-example"></a>
+</h2>
+<p>Each row is one participant. <code>A1</code> / <code>A2</code> and <code>B1</code> / <code>B2</code> are the two mediator measurements; <code>D1</code> / <code>D2</code> are the outcome measurements. The condition contrast is <strong>condition 2 minus condition 1</strong>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/install-deprecated.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"Yangzhen1999/wsMed"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
-</h2>
-<p>This is a basic example which shows you how to solve a common problem:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://yangzhen1999.github.io/wsMed/">wsMed</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Load example data</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span><span class="va">example_dataN</span> <span class="op">&lt;-</span> <span class="fu">mice</span><span class="fu">::</span><span class="fu"><a href="https://amices.org/mice/reference/ampute.html" class="external-link">ampute</a></span><span class="op">(</span></span>
-<span>data <span class="op">=</span> <span class="va">example_data</span>,</span>
-<span>prop <span class="op">=</span> <span class="fl">0.1</span>,</span>
-<span><span class="op">)</span><span class="op">$</span><span class="va">amp</span></span>
-<span></span>
-<span><span class="co"># Perform within-subject mediation analysis (Parallel mediation model)</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
-<span>data <span class="op">=</span> <span class="va">example_dataN</span>,   <span class="co">#dataset</span></span>
-<span>M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>,<span class="st">"B1"</span><span class="op">)</span>,    <span class="co"># A1/B1 is A/B mediator variable in condition 1</span></span>
-<span>M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>,<span class="st">"B2"</span><span class="op">)</span>,    <span class="co"># A2/B2 is A/B mediator variable in condition 2</span></span>
-<span>Y_C1 <span class="op">=</span> <span class="st">"C1"</span>,            <span class="co"># C1 is outcome variable in condition 1</span></span>
-<span>Y_C2 <span class="op">=</span> <span class="st">"C2"</span>,            <span class="co"># C2 is outcome variable in condition 2</span></span>
-<span>form <span class="op">=</span> <span class="st">"P"</span>,             <span class="co"># Parallel mediation</span></span>
-<span>C_C1 <span class="op">=</span> <span class="st">"D1"</span>,            <span class="co"># within-subject covariate (e.g., measured under D1)</span></span>
-<span>C_C2 <span class="op">=</span> <span class="st">"D2"</span>,            <span class="co"># within-subject covariate (e.g., measured under C2)</span></span>
-<span>C <span class="op">=</span> <span class="st">"D3"</span>,               <span class="co"># between-subject covariates</span></span>
-<span>Na <span class="op">=</span> <span class="st">"MI"</span>,              <span class="co"># Use multiple imputation for missing data</span></span>
-<span>standardized <span class="op">=</span> <span class="cn">TRUE</span>,    <span class="co"># Request standardized path coefficients and effects</span></span>
+<span>  data <span class="op">=</span> <span class="va">example_data</span>,</span>
+<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>, M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span><span class="op">)</span>,</span>
+<span>  Y_C1 <span class="op">=</span> <span class="st">"D1"</span>, Y_C2 <span class="op">=</span> <span class="st">"D2"</span>,</span>
+<span>  form <span class="op">=</span> <span class="st">"P"</span>, Na <span class="op">=</span> <span class="st">"DE"</span>, ci_method <span class="op">=</span> <span class="st">"mc"</span>,</span>
+<span>  R <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">123</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Print summary results</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="va">s</span><span class="op">$</span><span class="va">effects</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span></span></code></pre></div>
+<p>This complete simulated dataset needs no imputation. The example uses 2,000 Monte Carlo draws for speed; assess interval stability with more draws for a final analysis. The <a href="articles/GetStarted.html">quick start</a> walks through the actual table and its interpretation.</p>
 </div>
 <div class="section level2">
-<h2 id="main-function-overview">Main Function Overview<a class="anchor" aria-label="anchor" href="#main-function-overview"></a>
+<h2 id="what-would-you-like-to-do-next">What would you like to do next?<a class="anchor" aria-label="anchor" href="#what-would-you-like-to-do-next"></a>
 </h2>
-<p>The <code><a href="reference/wsMed.html">wsMed()</a></code> function automates the full workflow for two-condition within-subject mediation analysis. Its main steps are:</p>
-<ol style="list-style-type: decimal">
-<li><p><strong>Validate inputs</strong> – check dataset structure, mediation model type (<code>form</code>), and missing-data settings.</p></li>
-<li><p><strong>Prepare data</strong> – compute difference scores (<code>Mdiff</code>, <code>Ydiff</code>) and centered averages (<code>Mavg</code>) from the two-condition variables.</p></li>
-<li>
-<p><strong>Build the model</strong> – generate SEM syntax according to the chosen structure:</p>
-<ul>
-<li>
-<code>"P"</code>: Parallel mediation
-<p align="center">
-<img src="reference/figures/Wa.png" alt="parallel within-subject mediation model" width="60%"></p>
-</li>
-<li>
-<code>"CN"</code>: Chained / serial mediation
-<p align="center">
-<img src="reference/figures/Wb.png" alt="serial within-subject mediation model" width="60%"></p>
-</li>
-<li>
-<code>"CP"</code>: Chained + Parallel
-<p align="center">
-<img src="reference/figures/Wc.png" alt="serial-parallel within-subject mediation model" width="60%"></p>
-</li>
-<li>
-<code>"PC"</code>: Parallel + Chained
-<p align="center">
-<img src="reference/figures/Wd.png" alt="parallel-serial within-subject mediation model" width="60%"></p>
-</li>
-</ul>
-</li>
-<li>
-<p><strong>Fit the model</strong> – estimate parameters while handling missing data:</p>
-<ul>
-<li>
-<code>"DE"</code>: listwise deletion</li>
-<li>
-<code>"FIML"</code>: full-information ML</li>
-<li>
-<code>"MI"</code>: multiple imputation</li>
-</ul>
-</li>
-<li>
-<p><strong>Compute inference</strong> – provide confidence intervals using:</p>
-<ul>
-<li>
-<strong>Bootstrap</strong> (<code>ci_method = "bootstrap"</code>)</li>
-<li>
-<strong>Monte Carlo</strong> (<code>ci_method = "mc"</code>)</li>
-</ul>
-</li>
-<li><p><strong>Optional: Standardization</strong> – if <code>standardized = TRUE</code>, return standardized effects with CIs.</p></li>
-<li>
-<p><strong>Optional: Covariates</strong> – automatically center and include:</p>
-<ul>
-<li>
-<strong>Between-subject covariates</strong> (<code>C</code>): mean-centered and added to all regressions.</li>
-<li>
-<strong>Within-subject covariates</strong> (<code>C_C1</code>, <code>C_C2</code>): difference scores and centered averages are computed and included.</li>
-</ul>
-</li>
-</ol>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr>
+<th>Task</th>
+<th>Guide</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Add serial pathways or a moderator</td>
+<td><a href="articles/AnalysisGuide.html">Choose an analysis</a></td>
+</tr>
+<tr>
+<td>Get standardized effects or export a table</td>
+<td><a href="articles/ResultsGuide.html">Read and export results</a></td>
+</tr>
+<tr>
+<td>Choose a forest plot, curve or group comparison</td>
+<td><a href="articles/PlottingEffects.html">Plot gallery</a></td>
+</tr>
+<tr>
+<td>Reuse a fit or check an analysis</td>
+<td>
+<a href="articles/ModularWorkflow.html">Staged workflow</a> · <a href="articles/WorkflowReliability.html">Diagnostics</a>
+</td>
+</tr>
+</tbody>
+</table>
+<p>See the <a href="reference/index.html">function reference</a> for arguments and return values, and <a href="articles/index.html">all articles</a> for equations, imputation and software comparisons.</p>
+<p>For the empirical manuscript data, use <code>data(wsmed_examples)</code> and read <code><a href="reference/wsmed_examples.html">help("wsmed_examples")</a></code> for the source, variable definitions and missingness. <a href="https://github.com/Yangzhen1999/wsMed/issues" class="external-link">Report an issue</a> or <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/.github/CONTRIBUTING.md" class="external-link">contribute to the package</a>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -191,6 +183,12 @@
 </ul>
 </div>
 
+<div class="community">
+<h2 data-toc-skip>Community</h2>
+<ul class="list-unstyled">
+<li><a href="CONTRIBUTING.html">Contributing guide</a></li>
+</ul>
+</div>
 
 <div class="citation">
 <h2 data-toc-skip>Citation</h2>

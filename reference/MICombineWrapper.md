@@ -1,4 +1,4 @@
-# Wrapper for Internal Multiple Imputation Combining Function
+# Wrapper for internal multiple imputation combining function
 
 A wrapper function for the internal `.MICombine()` function from the
 `semmcci` package. This function pools parameter estimates and

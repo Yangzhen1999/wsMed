@@ -1,4 +1,4 @@
-# Apply Standardization to Parameter Definitions
+# Apply standardization to parameter definitions
 
 Replaces parameters in expressions with their standardized versions.
 

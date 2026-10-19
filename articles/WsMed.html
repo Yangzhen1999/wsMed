@@ -5,12 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Using wsMed: A step-by-step tutorial • wsMed</title>
+<title>Analysis options: a complete walkthrough • wsMed</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Using wsMed: A step-by-step tutorial">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
+<meta property="og:title" content="Analysis options: a complete walkthrough">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -20,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">wsMed</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -29,26 +30,23 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../index.html">Home</a></li>
-<li class="nav-item"><a class="nav-link" href="../reference/index.html">Functions</a></li>
-<li class="active nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials">
-<li><a class="dropdown-item" href="../articles/WsMed.html">Using wsMed: A step-by-step tutorial</a></li>
-    <li><a class="dropdown-item" href="../articles/PlottingEffects.html">Plotting effects and contrasts</a></li>
-    <li><a class="dropdown-item" href="../articles/StandardizedModeratedMediation.html">Standardized moderated mediation</a></li>
-    <li><a class="dropdown-item" href="../articles/printGM.html">Using printGM() to Generate SEM Models</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelP.html">Parallel Mediation (P)</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelCN.html">Chained Mediation (CN)</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelCP.html">Combined Parallel and Chained (CP)</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelPC.html">Parallel + Chained (PC)</a></li>
-    <li><a class="dropdown-item" href="../articles/MEMORE_vs_wsMed.html">Comparison: MEMORE 3.0 vs wsMed</a></li>
-    <li><a class="dropdown-item" href="../articles/GenerateModelCustom.html">User-defined mediation models</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/GetStarted.html">Get started</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/AnalysisGuide.html">Analysis guides</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-results-plots" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Results &amp; plots</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-results-plots">
+<li><a class="dropdown-item" href="../articles/ResultsGuide.html">Read and export results</a></li>
+    <li><a class="dropdown-item" href="../articles/PlottingEffects.html">Plot gallery</a></li>
+    <li><a class="dropdown-item" href="../articles/StandardizedModeratedMediation.html">Standardized effects</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/Yangzhen1999/wsMed" aria-label="GitHub Repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -63,15 +61,18 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Using wsMed: A step-by-step tutorial</h1>
+      <h1>Analysis options: a complete walkthrough</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/master/vignettes/WsMed.Rmd" class="external-link"><code>vignettes/WsMed.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/vignettes/WsMed.Rmd" class="external-link"><code>vignettes/WsMed.Rmd</code></a></small>
       <div class="d-none name"><code>WsMed.Rmd</code></div>
     </div>
 
     
     
+<p><strong>Looking for a short first example?</strong> Start with <a href="GetStarted.html">Get started</a>. This longer guide explains
+analysis options and preserves historical full-report examples. Use <a href="ResultsGuide.html">Read and export results</a> for the current
+<code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> and <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> workflow.</p>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -87,12 +88,30 @@ only the arguments needed for the next part of the analysis.</p>
 <div class="section level2">
 <h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
+<p>The examples below use the artificial <code>example_data</code>
+dataset. The empirical manuscript data are also included as
+<code>wsmed_examples</code> (123 participants, 14 columns). Load them
+without an external data file:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">wsmed_examples</span>, package <span class="op">=</span> <span class="st">"wsMed"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">wsmed_examples</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 123  14</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colSums</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">wsmed_examples</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  TSRQ_T1  TSRQ_T2 WEMBS_T1 WEMBS_T2  SMUF_T1  SMUF_T2   ISI_T1   ISI_T2 </span></span>
+<span><span class="co">#&gt;        1       22        0       22        8       18        0       19 </span></span>
+<span><span class="co">#&gt; DASSS_T1 DASSS_T2   HES_T1   HES_T2      Age      BMI </span></span>
+<span><span class="co">#&gt;        0       23        0       20        0       13</span></span></code></pre></div>
+<p>See <code><a href="../reference/wsmed_examples.html">help("wsmed_examples")</a></code> for variable meanings, source
+and license, preprocessing, and missingness. These data retain the
+manuscript’s missing values. The <a href="CategoricalPredictors.html">categorical predictor tutorial</a>
+uses the separate simulated data to illustrate factor coding and group
+comparisons.</p>
 <p>The following example fits a parallel mediation model with two
 mediators. It uses <code>example_data</code>, which is included in the
 package.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"example_data"</span>, package <span class="op">=</span> <span class="st">"wsMed"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"example_data"</span>, package <span class="op">=</span> <span class="st">"wsMed"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">example_data</span>,</span>
 <span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>,</span>
@@ -106,7 +125,7 @@ package.</p>
 <span>  seed <span class="op">=</span> <span class="fl">123</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span>, detail <span class="op">=</span> <span class="st">"legacy"</span><span class="op">)</span></span></code></pre></div>
 <p>The arguments in this call answer four basic questions:</p>
 <ul>
 <li>Which data set should be analyzed?</li>
@@ -124,7 +143,7 @@ the two conditions?</li>
 and each repeated measure has a separate column for each condition.</p>
 <p>The mediator names are supplied through <code>M_C1</code> and
 <code>M_C2</code>. Their positions must match. For example:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">M_C1</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span></span>
 <span><span class="va">M_C2</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span><span class="op">)</span></span></code></pre></div>
 <p>This tells <code><a href="../reference/wsMed.html">wsMed()</a></code> that <code>A1</code> and
@@ -132,7 +151,7 @@ and each repeated measure has a separate column for each condition.</p>
 <code>B1</code> and <code>B2</code> are the two measurements of the
 second mediator. The outcome pair is supplied through <code>Y_C1</code>
 and <code>Y_C2</code>:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Y_C1</span> <span class="op">=</span> <span class="st">"C1"</span></span>
 <span><span class="va">Y_C2</span> <span class="op">=</span> <span class="st">"C2"</span></span></code></pre></div>
 <p>The variable mapping in the quick-start example is therefore:</p>
@@ -166,7 +185,7 @@ and <code>Y_C2</code>:</p>
 </table>
 <p>The internal mediator labels are determined by position. If three
 mediators are supplied as follows:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">M_C1</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span>, <span class="st">"C1"</span><span class="op">)</span></span>
 <span><span class="va">M_C2</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span>, <span class="st">"C2"</span><span class="op">)</span></span></code></pre></div>
 <p>then A, B, and C are labeled <code>M1</code>, <code>M2</code>, and
@@ -226,14 +245,14 @@ mediators.</td>
 <code>M_C2</code> determines their positions in the structure. To fit a
 different predefined structure, replace the value of <code>form</code>
 in the basic call:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">form</span> <span class="op">=</span> <span class="st">"P"</span></span>
 <span><span class="va">form</span> <span class="op">=</span> <span class="st">"CN"</span></span>
 <span><span class="va">form</span> <span class="op">=</span> <span class="st">"CP"</span></span>
 <span><span class="va">form</span> <span class="op">=</span> <span class="st">"PC"</span></span></code></pre></div>
 <p>For example, the following call fits a three-mediator chained
 model:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result_chained</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">example_data</span>,</span>
 <span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span>, <span class="st">"C1"</span><span class="op">)</span>,</span>
@@ -265,7 +284,7 @@ structure contains:</p>
 <li>a path from B (<code>M2</code>) to the outcome.</li>
 </ul>
 <p>The path vector is:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">custom_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"M1 -&gt; M3"</span>,</span>
 <span>  <span class="st">"M3 -&gt; Y"</span>,</span>
@@ -273,7 +292,7 @@ structure contains:</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Pass this vector to <code><a href="../reference/wsMed.html">wsMed()</a></code> together with
 <code>form = "UD"</code>:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result_custom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">example_data</span>,</span>
 <span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span>, <span class="st">"C1"</span><span class="op">)</span>,</span>
@@ -346,7 +365,7 @@ effects.</p>
 </table>
 <p>For a complete data analysis using Monte Carlo confidence intervals,
 use:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Na</span> <span class="op">=</span> <span class="st">"DE"</span></span>
 <span><span class="va">ci_method</span> <span class="op">=</span> <span class="st">"mc"</span></span>
 <span><span class="va">R</span> <span class="op">=</span> <span class="fl">5000</span></span>
@@ -354,7 +373,7 @@ use:</p>
 <p><code>R</code> controls the number of Monte Carlo draws, and
 <code>seed</code> makes the results reproducible.</p>
 <p>To use bootstrap confidence intervals instead, use:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Na</span> <span class="op">=</span> <span class="st">"DE"</span></span>
 <span><span class="va">ci_method</span> <span class="op">=</span> <span class="st">"bootstrap"</span></span>
 <span><span class="va">bootstrap</span> <span class="op">=</span> <span class="fl">2000</span></span>
@@ -366,7 +385,7 @@ Setting <code>ci_method = "both"</code> requests Monte Carlo and
 bootstrap intervals in the same analysis.</p>
 <p>The following code creates a copy of <code>example_data</code> with
 missing values for the FIML and multiple-imputation examples:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
 <span><span class="va">example_data_missing</span> <span class="op">&lt;-</span> <span class="va">example_data</span></span>
 <span><span class="va">analysis_variables</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"A2"</span>, <span class="st">"B1"</span>, <span class="st">"B2"</span>, <span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span></span>
@@ -380,7 +399,7 @@ missing values for the FIML and multiple-imputation examples:</p>
 <span><span class="op">}</span></span></code></pre></div>
 <p>For data with missing values, FIML can be requested by changing
 <code>Na</code>:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result_fiml</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">example_data_missing</span>,</span>
 <span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>,</span>
@@ -393,11 +412,12 @@ missing values for the FIML and multiple-imputation examples:</p>
 <span>  R <span class="op">=</span> <span class="fl">5000</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">123</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>For FIML with Monte Carlo intervals, <code>MCmethod</code> can be set
-to <code>"mc"</code> or <code>"bootSD"</code>.</p>
+<p>For FIML with Monte Carlo intervals, use the default
+<code>MCmethod = "mc"</code>. The current fitting pipeline does not
+activate a separate <code>"bootSD"</code> correction.</p>
 <p>Multiple imputation is requested with <code>Na = "MI"</code>. Its
 controls are supplied through <code>mi_args</code>:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result_mi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">example_data_missing</span>,</span>
 <span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>,</span>
@@ -423,7 +443,7 @@ multiple-imputation procedure.</p>
 </h3>
 <p>Set <code>standardized = TRUE</code> when standardized path
 coefficients and effects are needed:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result_standardized</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">example_data</span>,</span>
 <span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>,</span>
@@ -437,6 +457,16 @@ coefficients and effects are needed:</p>
 <span>  standardized <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">123</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<p>Standardization uses marginal model-implied SDs of the difference and
+average components; differences are not recentered. A full indirect
+effect is divided by the outcome-difference SD, including in serial
+models. With a moderator, <code>standardized = TRUE</code> also adds
+<code>moderation_std</code> while preserving raw conditional results in
+<code>moderation</code>. The parameter table alone does not describe
+effects at all moderator values.</p>
+<p>See <a href="StandardizedModeratedMediation.html">Standardized
+moderated mediation</a> for the scale definitions, executable examples
+and inference conventions.</p>
 </div>
 </div>
 <div class="section level2">
@@ -447,19 +477,19 @@ call. They do not require a separate analysis workflow.</p>
 <div class="section level3">
 <h3 id="moderators">Moderators<a class="anchor" aria-label="anchor" href="#moderators"></a>
 </h3>
-<p>A moderated mediation analysis requires three arguments:</p>
+<p>Three arguments control a moderated mediation analysis:</p>
 <ul>
 <li>
 <code>W</code> identifies the moderator variable;</li>
 <li>
-<code>W_type</code> specifies whether it is
-<code>"continuous"</code> or <code>"categorical"</code>; and</li>
+<code>W_type</code> optionally specifies <code>"continuous"</code>
+or <code>"categorical"</code>; and</li>
 <li>
 <code>MP</code> identifies the paths moderated by
 <code>W</code>.</li>
 </ul>
 <p>For example:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result_moderated</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">example_data</span>,</span>
 <span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>,</span>
@@ -473,6 +503,7 @@ call. They do not require a separate analysis workflow.</p>
 <span>  Na <span class="op">=</span> <span class="st">"DE"</span>,</span>
 <span>  ci_method <span class="op">=</span> <span class="st">"mc"</span>,</span>
 <span>  R <span class="op">=</span> <span class="fl">5000</span>,</span>
+<span>  standardized <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">123</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>In this chained model, <code>a1</code> is the
@@ -487,13 +518,23 @@ example, the user-defined model in Step 2 contains the labels
 <code>b_1_3</code>, <code>b2</code>, and <code>b3</code>, but it does
 not contain <code>b1</code> because <code>"M1 -&gt; Y"</code> was not
 specified.</p>
-<p>For a categorical moderator, change the relevant arguments:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">W</span> <span class="op">=</span> <span class="st">"Group"</span></span>
-<span><span class="va">W_type</span> <span class="op">=</span> <span class="st">"categorical"</span></span></code></pre></div>
+<p>Declare categorical covariates and moderators as unordered factors
+before using either interface. Set factor levels explicitly; the first
+level is the reference group. For example:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">example_data</span><span class="op">$</span><span class="va">Group</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">Group</span>,</span>
+<span>                             levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"low"</span>, <span class="st">"med"</span>, <span class="st">"high"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Then use the factor column as the moderator:</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">W</span> <span class="op">=</span> <span class="st">"Group"</span></span></code></pre></div>
+<p><code>W_type = "categorical"</code> remains available, but is not
+needed for a factor. The same factor declaration applies to categorical
+between-subject covariates selected through <code>C</code>. The <a href="CategoricalPredictors.html">categorical predictor guide</a>
+explains binary coding, reference groups, and compatibility defaults for
+numeric 0/1 columns.</p>
 <p>After fitting a moderated model, <code><a href="../reference/plot_moderation_curve.html">plot_moderation_curve()</a></code>
 can be used to display conditional effects:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_moderation_curve.html">plot_moderation_curve</a></span><span class="op">(</span></span>
 <span>  <span class="va">result_moderated</span>,</span>
 <span>  <span class="st">"indirect_effect_1_2"</span></span>
@@ -515,7 +556,7 @@ the generated SEM syntax is named <code>indirect_1_2</code>.</p>
 <code>C_C1</code> and <code>C_C2</code>. Between-subject covariates are
 supplied through <code>C</code>, with their type identified by
 <code>C_type</code>.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result_covariates</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">example_data</span>,</span>
 <span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>,</span>
@@ -542,8 +583,8 @@ the mediator and outcome regressions.</p>
 <h2 id="step-5-inspect-the-results">Step 5: Inspect the results<a class="anchor" aria-label="anchor" href="#step-5-inspect-the-results"></a>
 </h2>
 <p>Print the fitted object to obtain the main analysis summary:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span>, detail <span class="op">=</span> <span class="st">"legacy"</span><span class="op">)</span></span></code></pre></div>
 <p>Depending on the selected options, the printed output includes:</p>
 <ul>
 <li>the variables included in the analysis;</li>
@@ -558,11 +599,11 @@ the mediator and outcome regressions.</p>
 </ul>
 <p>Use <code><a href="../reference/printGM.html">printGM()</a></code> to display the generated model
 equations:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/printGM.html">printGM</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
 <p>Frequently used components of the fitted object can also be accessed
 directly:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span><span class="op">$</span><span class="va">sem_model</span>       <span class="co"># generated lavaan syntax</span></span>
 <span><span class="va">result</span><span class="op">$</span><span class="va">mc</span><span class="op">$</span><span class="va">fit</span>          <span class="co"># fitted lavaan object</span></span>
 <span><span class="va">result</span><span class="op">$</span><span class="va">moderation</span>      <span class="co"># moderation results, when requested</span></span>
@@ -588,7 +629,7 @@ of the example data.</p>
 imputation and Monte Carlo confidence intervals. Standardized results
 are also requested so that all principal output sections are
 illustrated.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result4_mi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">example_data_missing</span>,</span>
 <span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>,</span>
@@ -607,7 +648,7 @@ illustrated.</p>
 <span>  seed <span class="op">=</span> <span class="fl">123</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result4_mi</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result4_mi</span>, detail <span class="op">=</span> <span class="st">"legacy"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; *************** VARIABLES ***************</span></span>
@@ -646,7 +687,7 @@ illustrated.</p>
 <span><span class="co">#&gt; |Label          | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span></span>
 <span><span class="co">#&gt; |:--------------|--------:|-----:|---------:|----------:|</span></span>
 <span><span class="co">#&gt; |Total effect   |    0.026| 0.018|    -0.009|      0.060|</span></span>
-<span><span class="co">#&gt; |Direct effect  |    0.022| 0.017|    -0.012|      0.056|</span></span>
+<span><span class="co">#&gt; |Direct effect  |    0.022| 0.017|    -0.013|      0.056|</span></span>
 <span><span class="co">#&gt; |Total indirect |    0.004| 0.005|    -0.005|      0.015|</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Indirect effects:</span></span>
@@ -671,8 +712,8 @@ illustrated.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; |Coefficient | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span></span>
 <span><span class="co">#&gt; |:-----------|--------:|-----:|---------:|----------:|</span></span>
-<span><span class="co">#&gt; |d1          |    0.031| 0.105|    -0.172|      0.239|</span></span>
-<span><span class="co">#&gt; |d2          |   -0.096| 0.089|    -0.271|      0.081|</span></span>
+<span><span class="co">#&gt; |d1          |    0.031| 0.105|    -0.175|      0.235|</span></span>
+<span><span class="co">#&gt; |d2          |   -0.096| 0.089|    -0.269|      0.076|</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; *************** MODERATION KEY (d-paths) ***************</span></span>
@@ -682,6 +723,9 @@ illustrated.</p>
 <span><span class="co">#&gt; |:-----------|:--------------|:---------------|</span></span>
 <span><span class="co">#&gt; |d1          |M1avg -&gt; Ydiff |M1diff -&gt; Ydiff |</span></span>
 <span><span class="co">#&gt; |d2          |M2avg -&gt; Ydiff |M2diff -&gt; Ydiff |</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; UNSTANDARDIZED CONDITIONAL EFFECTS (mc)</span></span>
+<span><span class="co">#&gt; Percentile intervals; moderator probes and centering references are held fixed.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; *************** CONTRAST INDIRECT EFFECTS (No Moderator) ***************</span></span>
@@ -697,10 +741,10 @@ illustrated.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; |Coeff | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span></span>
 <span><span class="co">#&gt; |:-----|--------:|-----:|---------:|----------:|</span></span>
-<span><span class="co">#&gt; |X1_b1 |   -0.147| 0.105|    -0.347|      0.062|</span></span>
-<span><span class="co">#&gt; |X0_b1 |   -0.179| 0.109|    -0.396|      0.033|</span></span>
-<span><span class="co">#&gt; |X1_b2 |   -0.090| 0.105|    -0.297|      0.114|</span></span>
-<span><span class="co">#&gt; |X0_b2 |    0.004| 0.102|    -0.191|      0.207|</span></span>
+<span><span class="co">#&gt; |X1_b1 |   -0.147| 0.106|    -0.354|      0.057|</span></span>
+<span><span class="co">#&gt; |X0_b1 |   -0.178| 0.109|    -0.386|      0.037|</span></span>
+<span><span class="co">#&gt; |X1_b2 |   -0.091| 0.106|    -0.304|      0.119|</span></span>
+<span><span class="co">#&gt; |X0_b2 |    0.005| 0.101|    -0.190|      0.205|</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; *************** REGRESSION PATHS (MC) ***************</span></span>
@@ -708,10 +752,10 @@ illustrated.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; |Path           |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span></span>
 <span><span class="co">#&gt; |:--------------|:-----|--------:|-----:|---------:|----------:|</span></span>
-<span><span class="co">#&gt; |Ydiff ~ M1diff |b1    |   -0.162| 0.094|    -0.344|      0.022|</span></span>
-<span><span class="co">#&gt; |Ydiff ~ M1avg  |d1    |    0.031| 0.105|    -0.172|      0.239|</span></span>
-<span><span class="co">#&gt; |Ydiff ~ M2diff |b2    |   -0.043| 0.094|    -0.224|      0.144|</span></span>
-<span><span class="co">#&gt; |Ydiff ~ M2avg  |d2    |   -0.096| 0.089|    -0.271|      0.081|</span></span>
+<span><span class="co">#&gt; |Ydiff ~ M1diff |b1    |   -0.162| 0.094|    -0.346|      0.020|</span></span>
+<span><span class="co">#&gt; |Ydiff ~ M1avg  |d1    |    0.031| 0.105|    -0.175|      0.235|</span></span>
+<span><span class="co">#&gt; |Ydiff ~ M2diff |b2    |   -0.043| 0.094|    -0.225|      0.142|</span></span>
+<span><span class="co">#&gt; |Ydiff ~ M2avg  |d2    |   -0.096| 0.089|    -0.269|      0.076|</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; *************** INTERCEPTS (MC) ***************</span></span>
@@ -719,11 +763,11 @@ illustrated.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; |Intercept |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span></span>
 <span><span class="co">#&gt; |:---------|:-----|--------:|-----:|---------:|----------:|</span></span>
-<span><span class="co">#&gt; |Ydiff~1   |cp    |    0.022| 0.017|    -0.012|      0.056|</span></span>
-<span><span class="co">#&gt; |M1diff~1  |a1    |   -0.025| 0.020|    -0.063|      0.014|</span></span>
+<span><span class="co">#&gt; |Ydiff~1   |cp    |    0.022| 0.017|    -0.013|      0.056|</span></span>
+<span><span class="co">#&gt; |M1diff~1  |a1    |   -0.025| 0.020|    -0.064|      0.013|</span></span>
 <span><span class="co">#&gt; |M2diff~1  |a2    |    0.006| 0.020|    -0.033|      0.045|</span></span>
-<span><span class="co">#&gt; |M1avg~1   |      |   -0.000| 0.000|    -0.000|     -0.000|</span></span>
-<span><span class="co">#&gt; |M2avg~1   |      |   -0.000| 0.000|    -0.000|     -0.000|</span></span>
+<span><span class="co">#&gt; |M1avg~1   |      |   -0.000| 0.018|    -0.036|      0.034|</span></span>
+<span><span class="co">#&gt; |M2avg~1   |      |   -0.000| 0.020|    -0.039|      0.039|</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; *************** VARIANCES (MC) ***************</span></span>
@@ -731,11 +775,11 @@ illustrated.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; |Variance       |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span></span>
 <span><span class="co">#&gt; |:--------------|:-----|--------:|-----:|---------:|----------:|</span></span>
-<span><span class="co">#&gt; |Ydiff~~Ydiff   |      |    0.024| 0.004|     0.017|      0.032|</span></span>
-<span><span class="co">#&gt; |M1diff~~M1diff |      |    0.033| 0.006|     0.021|      0.045|</span></span>
+<span><span class="co">#&gt; |Ydiff~~Ydiff   |      |    0.024| 0.004|     0.017|      0.031|</span></span>
+<span><span class="co">#&gt; |M1diff~~M1diff |      |    0.033| 0.006|     0.022|      0.045|</span></span>
 <span><span class="co">#&gt; |M2diff~~M2diff |      |    0.033| 0.005|     0.023|      0.044|</span></span>
-<span><span class="co">#&gt; |M1avg~~M1avg   |      |    0.033| 0.000|     0.033|      0.033|</span></span>
-<span><span class="co">#&gt; |M2avg~~M2avg   |      |    0.040| 0.000|     0.040|      0.040|</span></span>
+<span><span class="co">#&gt; |M1avg~~M1avg   |      |    0.033| 0.005|     0.024|      0.043|</span></span>
+<span><span class="co">#&gt; |M2avg~~M2avg   |      |    0.040| 0.006|     0.028|      0.052|</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; *************** STANDARDIZED (MC) ***************</span></span>
@@ -743,25 +787,25 @@ illustrated.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; |Parameter      | Estimate|    SE|        R|   2.5%| 97.5%|</span></span>
 <span><span class="co">#&gt; |:--------------|--------:|-----:|--------:|------:|-----:|</span></span>
-<span><span class="co">#&gt; |cp             |    0.136| 0.108| 5000.000| -0.073| 0.346|</span></span>
-<span><span class="co">#&gt; |b1             |   -0.185| 0.103| 5000.000| -0.379| 0.023|</span></span>
-<span><span class="co">#&gt; |d1             |    0.035| 0.115| 5000.000| -0.188| 0.256|</span></span>
-<span><span class="co">#&gt; |b2             |   -0.049| 0.105| 5000.000| -0.250| 0.159|</span></span>
-<span><span class="co">#&gt; |d2             |   -0.125| 0.111| 5000.000| -0.330| 0.103|</span></span>
-<span><span class="co">#&gt; |a1             |   -0.138| 0.113| 5000.000| -0.367| 0.078|</span></span>
-<span><span class="co">#&gt; |a2             |    0.032| 0.112| 5000.000| -0.182| 0.253|</span></span>
-<span><span class="co">#&gt; |Ydiff~~Ydiff   |    0.949| 0.052| 5000.000|  0.783| 0.984|</span></span>
+<span><span class="co">#&gt; |cp             |    0.136| 0.108| 5000.000| -0.078| 0.350|</span></span>
+<span><span class="co">#&gt; |b1             |   -0.185| 0.103| 5000.000| -0.377| 0.022|</span></span>
+<span><span class="co">#&gt; |d1             |    0.035| 0.117| 5000.000| -0.197| 0.254|</span></span>
+<span><span class="co">#&gt; |b2             |   -0.049| 0.105| 5000.000| -0.255| 0.158|</span></span>
+<span><span class="co">#&gt; |d2             |   -0.121| 0.108| 5000.000| -0.326| 0.095|</span></span>
+<span><span class="co">#&gt; |a1             |   -0.138| 0.112| 5000.000| -0.367| 0.071|</span></span>
+<span><span class="co">#&gt; |a2             |    0.032| 0.111| 5000.000| -0.182| 0.253|</span></span>
+<span><span class="co">#&gt; |Ydiff~~Ydiff   |    0.950| 0.053| 5000.000|  0.784| 0.983|</span></span>
 <span><span class="co">#&gt; |M1diff~~M1diff |    1.000| 0.000| 5000.000|  1.000| 1.000|</span></span>
 <span><span class="co">#&gt; |M2diff~~M2diff |    1.000| 0.000| 5000.000|  1.000| 1.000|</span></span>
 <span><span class="co">#&gt; |M1avg~~M1avg   |    1.000| 0.000| 5000.000|  1.000| 1.000|</span></span>
-<span><span class="co">#&gt; |M1avg~~M2avg   |    0.254| 0.000| 5000.000|  0.254| 0.254|</span></span>
+<span><span class="co">#&gt; |M1avg~~M2avg   |    0.274| 0.098| 5000.000|  0.075| 0.458|</span></span>
 <span><span class="co">#&gt; |M2avg~~M2avg   |    1.000| 0.000| 5000.000|  1.000| 1.000|</span></span>
-<span><span class="co">#&gt; |M1avg~1        |    0.000| 0.000| 5000.000|  0.000| 0.000|</span></span>
-<span><span class="co">#&gt; |M2avg~1        |    0.000| 0.000| 5000.000|  0.000| 0.000|</span></span>
-<span><span class="co">#&gt; |indirect_1     |    0.026| 0.026| 5000.000| -0.016| 0.085|</span></span>
-<span><span class="co">#&gt; |indirect_2     |   -0.002| 0.013| 5000.000| -0.030| 0.027|</span></span>
-<span><span class="co">#&gt; |total_indirect |    0.024| 0.029| 5000.000| -0.028| 0.089|</span></span>
-<span><span class="co">#&gt; |total_effect   |    0.160| 0.110| 5000.000| -0.055| 0.383|</span></span></code></pre></div>
+<span><span class="co">#&gt; |M1avg~1        |   -0.000| 0.099| 5000.000| -0.199| 0.188|</span></span>
+<span><span class="co">#&gt; |M2avg~1        |   -0.000| 0.102| 5000.000| -0.203| 0.199|</span></span>
+<span><span class="co">#&gt; |indirect_1     |    0.026| 0.026| 5000.000| -0.015| 0.085|</span></span>
+<span><span class="co">#&gt; |indirect_2     |   -0.002| 0.013| 5000.000| -0.031| 0.027|</span></span>
+<span><span class="co">#&gt; |total_indirect |    0.024| 0.029| 5000.000| -0.028| 0.091|</span></span>
+<span><span class="co">#&gt; |total_effect   |    0.160| 0.110| 5000.000| -0.054| 0.374|</span></span></code></pre></div>
 <p>The output sections and their main purposes are:</p>
 <table class="table">
 <colgroup>
@@ -988,10 +1032,10 @@ standardized confidence interval.</p>
 </h4>
 <p>Use <code><a href="../reference/printGM.html">printGM()</a></code> to connect the printed labels to the
 generated model:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/printGM.html">printGM</a></span><span class="op">(</span><span class="va">result4_mi</span><span class="op">)</span></span></code></pre></div>
 <p>The returned object can also be inspected programmatically:</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">result4_mi</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">result4_mi</span><span class="op">$</span><span class="va">input_vars</span>    <span class="co"># variables supplied to wsMed()</span></span>
@@ -999,9 +1043,9 @@ generated model:</p>
 <span><span class="va">result4_mi</span><span class="op">$</span><span class="va">mc</span><span class="op">$</span><span class="va">fit</span>        <span class="co"># fitted lavaan model</span></span>
 <span><span class="va">result4_mi</span><span class="op">$</span><span class="va">mc</span><span class="op">$</span><span class="va">result</span>     <span class="co"># Monte Carlo results</span></span>
 <span><span class="va">result4_mi</span><span class="op">$</span><span class="va">mc</span><span class="op">$</span><span class="va">std_mc</span>     <span class="co"># standardized Monte Carlo results</span></span></code></pre></div>
-<p><code>print(result4_mi)</code> is intended for reading the analysis
-summary, whereas the stored components are intended for inspection or
-downstream programming.</p>
+<p><code>print(result4_mi, detail = "legacy")</code> is intended for
+reading the analysis summary, whereas the stored components are intended
+for inspection or downstream programming.</p>
 </div>
 </div>
 <div class="section level3">
@@ -1010,7 +1054,7 @@ downstream programming.</p>
 <p>The second example fits a chained–parallel model and adds
 <code>D3</code> as a continuous moderator. The paths listed in
 <code>MP</code> are allowed to vary with the moderator.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">example_data_missing</span>,</span>
 <span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span>, <span class="st">"C1"</span><span class="op">)</span>,</span>
@@ -1024,10 +1068,11 @@ downstream programming.</p>
 <span>  Na <span class="op">=</span> <span class="st">"DE"</span>,</span>
 <span>  ci_method <span class="op">=</span> <span class="st">"mc"</span>,</span>
 <span>  R <span class="op">=</span> <span class="fl">5000</span>,</span>
+<span>  standardized <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">123</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result5</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result5</span>, detail <span class="op">=</span> <span class="st">"legacy"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; *************** VARIABLES ***************</span></span>
@@ -1054,15 +1099,15 @@ downstream programming.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; |Measure   |  Value|</span></span>
 <span><span class="co">#&gt; |:---------|------:|</span></span>
-<span><span class="co">#&gt; |Chi-Sq    | 14.576|</span></span>
-<span><span class="co">#&gt; |df        | 16.000|</span></span>
-<span><span class="co">#&gt; |p         |  0.556|</span></span>
-<span><span class="co">#&gt; |CFI       |  1.000|</span></span>
-<span><span class="co">#&gt; |TLI       | -2.294|</span></span>
-<span><span class="co">#&gt; |RMSEA     |  0.000|</span></span>
+<span><span class="co">#&gt; |Chi-Sq    | 14.158|</span></span>
+<span><span class="co">#&gt; |df        | 13.000|</span></span>
+<span><span class="co">#&gt; |p         |  0.363|</span></span>
+<span><span class="co">#&gt; |CFI       |  0.000|</span></span>
+<span><span class="co">#&gt; |TLI       |  5.128|</span></span>
+<span><span class="co">#&gt; |RMSEA     |  0.039|</span></span>
 <span><span class="co">#&gt; |RMSEA Low |  0.000|</span></span>
-<span><span class="co">#&gt; |RMSEA Up  |  0.111|</span></span>
-<span><span class="co">#&gt; |SRMR      |  0.048|</span></span>
+<span><span class="co">#&gt; |RMSEA Up  |  0.139|</span></span>
+<span><span class="co">#&gt; |SRMR      |  0.046|</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ************* TOTAL / DIRECT / TOTAL-IND (MC) *************</span></span>
@@ -1070,19 +1115,19 @@ downstream programming.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; |Label          | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span></span>
 <span><span class="co">#&gt; |:--------------|--------:|-----:|---------:|----------:|</span></span>
-<span><span class="co">#&gt; |Total effect   |   -0.032| 0.024|    -0.076|      0.016|</span></span>
-<span><span class="co">#&gt; |Direct effect  |   -0.029| 0.023|    -0.074|      0.016|</span></span>
-<span><span class="co">#&gt; |Total indirect |   -0.003| 0.008|    -0.019|      0.013|</span></span>
+<span><span class="co">#&gt; |Total effect   |   -0.032| 0.023|    -0.078|      0.013|</span></span>
+<span><span class="co">#&gt; |Direct effect  |   -0.029| 0.023|    -0.073|      0.016|</span></span>
+<span><span class="co">#&gt; |Total indirect |   -0.003| 0.008|    -0.021|      0.013|</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Indirect effects:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; |Label   | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span></span>
 <span><span class="co">#&gt; |:-------|--------:|-----:|---------:|----------:|</span></span>
-<span><span class="co">#&gt; |ind_1   |    0.002| 0.005|    -0.007|      0.014|</span></span>
+<span><span class="co">#&gt; |ind_1   |    0.002| 0.005|    -0.007|      0.016|</span></span>
 <span><span class="co">#&gt; |ind_2   |    0.000| 0.004|    -0.008|      0.008|</span></span>
-<span><span class="co">#&gt; |ind_1_2 |   -0.000| 0.002|    -0.003|      0.004|</span></span>
-<span><span class="co">#&gt; |ind_3   |   -0.004| 0.006|    -0.018|      0.005|</span></span>
+<span><span class="co">#&gt; |ind_1_2 |   -0.000| 0.002|    -0.004|      0.003|</span></span>
+<span><span class="co">#&gt; |ind_3   |   -0.004| 0.006|    -0.019|      0.005|</span></span>
 <span><span class="co">#&gt; |ind_1_3 |   -0.001| 0.001|    -0.004|      0.001|</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Indirect-effect key:</span></span>
@@ -1102,11 +1147,11 @@ downstream programming.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; |Coefficient | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span></span>
 <span><span class="co">#&gt; |:-----------|--------:|-----:|---------:|----------:|</span></span>
-<span><span class="co">#&gt; |d1          |   -0.040| 0.124|    -0.290|      0.202|</span></span>
-<span><span class="co">#&gt; |d2          |   -0.000| 0.129|    -0.249|      0.256|</span></span>
-<span><span class="co">#&gt; |d3          |   -0.160| 0.142|    -0.434|      0.122|</span></span>
-<span><span class="co">#&gt; |d_1_2       |   -0.044| 0.107|    -0.251|      0.167|</span></span>
-<span><span class="co">#&gt; |d_1_3       |    0.088| 0.115|    -0.134|      0.312|</span></span>
+<span><span class="co">#&gt; |d1          |   -0.040| 0.124|    -0.276|      0.208|</span></span>
+<span><span class="co">#&gt; |d2          |   -0.000| 0.129|    -0.254|      0.258|</span></span>
+<span><span class="co">#&gt; |d3          |   -0.160| 0.142|    -0.431|      0.111|</span></span>
+<span><span class="co">#&gt; |d_1_2       |   -0.044| 0.108|    -0.258|      0.167|</span></span>
+<span><span class="co">#&gt; |d_1_3       |    0.088| 0.114|    -0.128|      0.311|</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; *************** MODERATION KEY (d-paths) ***************</span></span>
@@ -1120,6 +1165,9 @@ downstream programming.</p>
 <span><span class="co">#&gt; |d_1_2       |M1avg -&gt; M2diff |M1diff -&gt; M2diff |</span></span>
 <span><span class="co">#&gt; |d_1_3       |M1avg -&gt; M3diff |M1diff -&gt; M3diff |</span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; UNSTANDARDIZED CONDITIONAL EFFECTS (mc)</span></span>
+<span><span class="co">#&gt; Percentile intervals; moderator probes and centering references are held fixed.</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; *************** MODERATION RESULTS (Continuous Moderator) ***************</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1128,133 +1176,298 @@ downstream programming.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; |Path      |BaseCoef |W_dummy | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|Sig |</span></span>
 <span><span class="co">#&gt; |:---------|:--------|:-------|--------:|-----:|---------:|----------:|:---|</span></span>
-<span><span class="co">#&gt; |cpw_W1    |cp       |D3      |   -0.172| 0.101|    -0.369|      0.022|    |</span></span>
-<span><span class="co">#&gt; |dw1_W1    |d1       |D3      |   -0.103| 0.666|    -1.402|      1.204|    |</span></span>
-<span><span class="co">#&gt; |bw2_W1    |b2       |D3      |   -0.520| 0.667|    -1.856|      0.781|    |</span></span>
-<span><span class="co">#&gt; |aw1_W1    |a1       |D3      |    0.057| 0.098|    -0.134|      0.258|    |</span></span>
-<span><span class="co">#&gt; |bw_1_2_W1 |b_1_2    |D3      |   -0.296| 0.545|    -1.373|      0.721|    |</span></span>
-<span><span class="co">#&gt; |dw_1_2_W1 |d_1_2    |D3      |    0.592| 0.601|    -0.596|      1.755|    |</span></span>
+<span><span class="co">#&gt; |cpw_W1    |cp       |D3      |   -0.173| 0.097|    -0.368|      0.017|    |</span></span>
+<span><span class="co">#&gt; |dw1_W1    |d1       |D3      |   -0.114| 0.657|    -1.413|      1.196|    |</span></span>
+<span><span class="co">#&gt; |bw2_W1    |b2       |D3      |   -0.514| 0.662|    -1.821|      0.770|    |</span></span>
+<span><span class="co">#&gt; |aw1_W1    |a1       |D3      |    0.056| 0.099|    -0.143|      0.246|    |</span></span>
+<span><span class="co">#&gt; |aw2_W1    |a2       |D3      |    0.007| 0.099|    -0.187|      0.202|    |</span></span>
+<span><span class="co">#&gt; |bw_1_2_W1 |b_1_2    |D3      |   -0.300| 0.552|    -1.388|      0.796|    |</span></span>
+<span><span class="co">#&gt; |dw_1_2_W1 |d_1_2    |D3      |    0.594| 0.603|    -0.585|      1.765|    |</span></span>
+<span><span class="co">#&gt; |aw3_W1    |a3       |D3      |   -0.081| 0.095|    -0.268|      0.104|    |</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- Conditional Indirect Effects ---</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; |Path                |Mediators | Level| W_value| Estimate|    SE| 2.5.%CI.Lo| 97.5.%CI.Up|Sig |</span></span>
 <span><span class="co">#&gt; |:-------------------|:---------|-----:|-------:|--------:|-----:|----------:|-----------:|:---|</span></span>
-<span><span class="co">#&gt; |indirect_effect_1   |1         | -1 SD|   0.223|    0.003| 0.007|     -0.010|       0.021|    |</span></span>
-<span><span class="co">#&gt; |indirect_effect_1   |1         |  0 SD|   0.452|    0.002| 0.005|     -0.007|       0.014|    |</span></span>
-<span><span class="co">#&gt; |indirect_effect_1   |1         | +1 SD|   0.681|    0.001| 0.005|     -0.009|       0.014|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1   |1         | -1 SD|   0.223|    0.003| 0.007|     -0.009|       0.021|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1   |1         |  0 SD|   0.452|    0.002| 0.005|     -0.007|       0.016|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1   |1         | +1 SD|   0.681|    0.001| 0.006|     -0.009|       0.015|    |</span></span>
 <span><span class="co">#&gt; |indirect_effect_1_2 |1 2       | -1 SD|   0.223|   -0.002| 0.005|     -0.013|       0.006|    |</span></span>
-<span><span class="co">#&gt; |indirect_effect_1_2 |1 2       |  0 SD|   0.452|    0.000| 0.002|     -0.003|       0.004|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1_2 |1 2       |  0 SD|   0.452|   -0.000| 0.002|     -0.004|       0.003|    |</span></span>
 <span><span class="co">#&gt; |indirect_effect_1_2 |1 2       | +1 SD|   0.681|    0.000| 0.002|     -0.004|       0.006|    |</span></span>
 <span><span class="co">#&gt; |indirect_effect_1_3 |1 3       | -1 SD|   0.223|   -0.001| 0.002|     -0.006|       0.001|    |</span></span>
 <span><span class="co">#&gt; |indirect_effect_1_3 |1 3       |  0 SD|   0.452|   -0.001| 0.001|     -0.004|       0.001|    |</span></span>
 <span><span class="co">#&gt; |indirect_effect_1_3 |1 3       | +1 SD|   0.681|   -0.000| 0.001|     -0.004|       0.002|    |</span></span>
-<span><span class="co">#&gt; |indirect_effect_2   |2         | -1 SD|   0.223|    0.002| 0.006|     -0.009|       0.016|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_2   |2         | -1 SD|   0.223|    0.001| 0.008|     -0.014|       0.020|    |</span></span>
 <span><span class="co">#&gt; |indirect_effect_2   |2         |  0 SD|   0.452|    0.000| 0.004|     -0.008|       0.008|    |</span></span>
-<span><span class="co">#&gt; |indirect_effect_2   |2         | +1 SD|   0.681|   -0.002| 0.006|     -0.016|       0.009|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_2   |2         | +1 SD|   0.681|   -0.002| 0.008|     -0.020|       0.012|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_3   |3         | -1 SD|   0.223|   -0.008| 0.009|     -0.030|       0.006|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_3   |3         |  0 SD|   0.452|   -0.004| 0.006|     -0.019|       0.005|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_3   |3         | +1 SD|   0.681|   -0.001| 0.007|     -0.016|       0.013|    |</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- Indirect Effect Contrasts ---</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; |Path                |            Contrast| Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|Sig |</span></span>
 <span><span class="co">#&gt; |:-------------------|-------------------:|--------:|-----:|---------:|----------:|:---|</span></span>
-<span><span class="co">#&gt; |indirect_effect_1   | (0 SD)   -  (-1 SD)|    0.001| 0.004|    -0.006|      0.011|    |</span></span>
-<span><span class="co">#&gt; |indirect_effect_1   | (+1 SD)  -  (-1 SD)|    0.002| 0.008|    -0.012|      0.023|    |</span></span>
-<span><span class="co">#&gt; |indirect_effect_1   | (+1 SD)  -   (0 SD)|    0.001| 0.004|    -0.006|      0.011|    |</span></span>
-<span><span class="co">#&gt; |indirect_effect_1_2 | (0 SD)   -  (-1 SD)|   -0.002| 0.004|    -0.012|      0.004|    |</span></span>
-<span><span class="co">#&gt; |indirect_effect_1_2 | (+1 SD)  -  (-1 SD)|   -0.002| 0.005|    -0.015|      0.007|    |</span></span>
-<span><span class="co">#&gt; |indirect_effect_1_2 | (+1 SD)  -   (0 SD)|   -0.000| 0.002|    -0.005|      0.004|    |</span></span>
-<span><span class="co">#&gt; |indirect_effect_1_3 | (0 SD)   -  (-1 SD)|   -0.000| 0.001|    -0.003|      0.001|    |</span></span>
-<span><span class="co">#&gt; |indirect_effect_1_3 | (+1 SD)  -  (-1 SD)|   -0.001| 0.002|    -0.006|      0.003|    |</span></span>
-<span><span class="co">#&gt; |indirect_effect_1_3 | (+1 SD)  -   (0 SD)|   -0.000| 0.001|    -0.003|      0.001|    |</span></span>
-<span><span class="co">#&gt; |indirect_effect_2   | (0 SD)   -  (-1 SD)|    0.002| 0.005|    -0.006|      0.013|    |</span></span>
-<span><span class="co">#&gt; |indirect_effect_2   | (+1 SD)  -  (-1 SD)|    0.003| 0.009|    -0.013|      0.027|    |</span></span>
-<span><span class="co">#&gt; |indirect_effect_2   | (+1 SD)  -   (0 SD)|    0.002| 0.005|    -0.006|      0.013|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1   | (0 SD)   -  (-1 SD)|   -0.001| 0.004|    -0.011|      0.006|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1   | (+1 SD)  -  (-1 SD)|   -0.002| 0.008|    -0.021|      0.012|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1   | (+1 SD)  -   (0 SD)|   -0.001| 0.004|    -0.011|      0.006|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1_2 | (0 SD)   -  (-1 SD)|    0.002| 0.004|    -0.005|      0.012|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1_2 | (+1 SD)  -  (-1 SD)|    0.002| 0.005|    -0.007|      0.015|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1_2 | (+1 SD)  -   (0 SD)|    0.000| 0.002|    -0.004|      0.006|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1_3 | (0 SD)   -  (-1 SD)|    0.000| 0.001|    -0.001|      0.003|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1_3 | (+1 SD)  -  (-1 SD)|    0.001| 0.002|    -0.003|      0.006|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1_3 | (+1 SD)  -   (0 SD)|    0.000| 0.001|    -0.001|      0.003|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_2   | (0 SD)   -  (-1 SD)|   -0.001| 0.007|    -0.018|      0.013|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_2   | (+1 SD)  -  (-1 SD)|   -0.003| 0.011|    -0.028|      0.018|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_2   | (+1 SD)  -   (0 SD)|   -0.002| 0.007|    -0.018|      0.011|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_3   | (0 SD)   -  (-1 SD)|    0.003| 0.006|    -0.006|      0.017|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_3   | (+1 SD)  -  (-1 SD)|    0.007| 0.011|    -0.012|      0.033|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_3   | (+1 SD)  -   (0 SD)|    0.003| 0.006|    -0.006|      0.017|    |</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- Moderated Path Coefficients ---</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; |Path  | Level| W_value| Estimate|    SE| 2.5.%CI.Lo| 97.5.%CI.Up|Sig |</span></span>
 <span><span class="co">#&gt; |:-----|-----:|-------:|--------:|-----:|----------:|-----------:|:---|</span></span>
-<span><span class="co">#&gt; |a1    | -1 SD|   0.223|   -0.039| 0.033|     -0.104|       0.022|    |</span></span>
-<span><span class="co">#&gt; |a1    |  0 SD|   0.452|   -0.026| 0.023|     -0.070|       0.018|    |</span></span>
-<span><span class="co">#&gt; |a1    | +1 SD|   0.681|   -0.013| 0.032|     -0.076|       0.047|    |</span></span>
-<span><span class="co">#&gt; |b2    | -1 SD|   0.223|    0.119| 0.205|     -0.281|       0.518|    |</span></span>
-<span><span class="co">#&gt; |b2    |  0 SD|   0.452|    0.000| 0.138|     -0.271|       0.275|    |</span></span>
-<span><span class="co">#&gt; |b2    | +1 SD|   0.681|   -0.119| 0.207|     -0.523|       0.288|    |</span></span>
-<span><span class="co">#&gt; |d1    | -1 SD|   0.223|   -0.020| 0.205|     -0.440|       0.372|    |</span></span>
-<span><span class="co">#&gt; |d1    |  0 SD|   0.452|   -0.044| 0.124|     -0.290|       0.202|    |</span></span>
-<span><span class="co">#&gt; |d1    | +1 SD|   0.681|   -0.067| 0.188|     -0.437|       0.298|    |</span></span>
-<span><span class="co">#&gt; |cp    | -1 SD|   0.223|   -0.022| 0.018|     -0.057|       0.012|    |</span></span>
-<span><span class="co">#&gt; |cp    |  0 SD|   0.452|   -0.029| 0.023|     -0.074|       0.016|    |</span></span>
-<span><span class="co">#&gt; |cp    | +1 SD|   0.681|   -0.036| 0.029|     -0.091|       0.019|    |</span></span>
-<span><span class="co">#&gt; |b_1_2 | -1 SD|   0.223|    0.372| 0.169|      0.046|       0.701|*   |</span></span>
-<span><span class="co">#&gt; |b_1_2 |  0 SD|   0.452|    0.304| 0.116|      0.076|       0.531|*   |</span></span>
-<span><span class="co">#&gt; |b_1_2 | +1 SD|   0.681|    0.236| 0.172|     -0.093|       0.569|    |</span></span>
-<span><span class="co">#&gt; |d_1_2 | -1 SD|   0.223|   -0.180| 0.172|     -0.515|       0.155|    |</span></span>
-<span><span class="co">#&gt; |d_1_2 |  0 SD|   0.452|   -0.044| 0.107|     -0.251|       0.167|    |</span></span>
-<span><span class="co">#&gt; |d_1_2 | +1 SD|   0.681|    0.091| 0.177|     -0.252|       0.446|    |</span></span>
+<span><span class="co">#&gt; |a1    | -1 SD|   0.223|   -0.039| 0.033|     -0.101|       0.026|    |</span></span>
+<span><span class="co">#&gt; |a1    |  0 SD|   0.452|   -0.026| 0.024|     -0.072|       0.021|    |</span></span>
+<span><span class="co">#&gt; |a1    | +1 SD|   0.681|   -0.013| 0.033|     -0.078|       0.050|    |</span></span>
+<span><span class="co">#&gt; |b2    | -1 SD|   0.223|    0.119| 0.208|     -0.302|       0.520|    |</span></span>
+<span><span class="co">#&gt; |b2    |  0 SD|   0.452|    0.002| 0.137|     -0.274|       0.270|    |</span></span>
+<span><span class="co">#&gt; |b2    | +1 SD|   0.681|   -0.116| 0.201|     -0.513|       0.276|    |</span></span>
+<span><span class="co">#&gt; |d1    | -1 SD|   0.223|   -0.014| 0.204|     -0.406|       0.398|    |</span></span>
+<span><span class="co">#&gt; |d1    |  0 SD|   0.452|   -0.040| 0.124|     -0.276|       0.208|    |</span></span>
+<span><span class="co">#&gt; |d1    | +1 SD|   0.681|   -0.066| 0.185|     -0.420|       0.296|    |</span></span>
+<span><span class="co">#&gt; |cp    | -1 SD|   0.223|    0.010| 0.032|     -0.053|       0.073|    |</span></span>
+<span><span class="co">#&gt; |cp    |  0 SD|   0.452|   -0.029| 0.023|     -0.073|       0.016|    |</span></span>
+<span><span class="co">#&gt; |cp    | +1 SD|   0.681|   -0.069| 0.032|     -0.132|      -0.006|*   |</span></span>
+<span><span class="co">#&gt; |b_1_2 | -1 SD|   0.223|    0.375| 0.177|      0.028|       0.731|*   |</span></span>
+<span><span class="co">#&gt; |b_1_2 |  0 SD|   0.452|    0.306| 0.119|      0.079|       0.543|*   |</span></span>
+<span><span class="co">#&gt; |b_1_2 | +1 SD|   0.681|    0.237| 0.171|     -0.098|       0.579|    |</span></span>
+<span><span class="co">#&gt; |d_1_2 | -1 SD|   0.223|   -0.180| 0.170|     -0.532|       0.143|    |</span></span>
+<span><span class="co">#&gt; |d_1_2 |  0 SD|   0.452|   -0.044| 0.108|     -0.258|       0.167|    |</span></span>
+<span><span class="co">#&gt; |d_1_2 | +1 SD|   0.681|    0.092| 0.181|     -0.263|       0.443|    |</span></span>
+<span><span class="co">#&gt; |a2    | -1 SD|   0.223|    0.012| 0.033|     -0.051|       0.076|    |</span></span>
+<span><span class="co">#&gt; |a2    |  0 SD|   0.452|    0.014| 0.022|     -0.031|       0.056|    |</span></span>
+<span><span class="co">#&gt; |a2    | +1 SD|   0.681|    0.015| 0.030|     -0.045|       0.072|    |</span></span>
+<span><span class="co">#&gt; |a3    | -1 SD|   0.223|    0.041| 0.032|     -0.021|       0.105|    |</span></span>
+<span><span class="co">#&gt; |a3    |  0 SD|   0.452|    0.023| 0.022|     -0.022|       0.065|    |</span></span>
+<span><span class="co">#&gt; |a3    | +1 SD|   0.681|    0.004| 0.030|     -0.054|       0.063|    |</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- Path Coefficient Contrasts ---</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; |Path  |            Contrast| Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|Sig |</span></span>
 <span><span class="co">#&gt; |:-----|-------------------:|--------:|-----:|---------:|----------:|:---|</span></span>
-<span><span class="co">#&gt; |a1    | (0 SD)   -  (-1 SD)|   -0.013| 0.023|    -0.059|      0.031|    |</span></span>
-<span><span class="co">#&gt; |a1    | (+1 SD)  -  (-1 SD)|   -0.026| 0.045|    -0.118|      0.061|    |</span></span>
-<span><span class="co">#&gt; |a1    | (+1 SD)  -   (0 SD)|   -0.013| 0.023|    -0.059|      0.031|    |</span></span>
-<span><span class="co">#&gt; |b_1_2 | (0 SD)   -  (-1 SD)|    0.068| 0.125|    -0.165|      0.315|    |</span></span>
-<span><span class="co">#&gt; |b_1_2 | (+1 SD)  -  (-1 SD)|    0.136| 0.250|    -0.331|      0.630|    |</span></span>
-<span><span class="co">#&gt; |b_1_2 | (+1 SD)  -   (0 SD)|    0.068| 0.125|    -0.165|      0.315|    |</span></span>
-<span><span class="co">#&gt; |b2    | (0 SD)   -  (-1 SD)|    0.119| 0.153|    -0.179|      0.425|    |</span></span>
-<span><span class="co">#&gt; |b2    | (+1 SD)  -  (-1 SD)|    0.238| 0.306|    -0.358|      0.851|    |</span></span>
-<span><span class="co">#&gt; |b2    | (+1 SD)  -   (0 SD)|    0.119| 0.153|    -0.179|      0.425|    |</span></span>
-<span><span class="co">#&gt; |cp    | (0 SD)   -  (-1 SD)|    0.007| 0.005|    -0.004|      0.017|    |</span></span>
-<span><span class="co">#&gt; |cp    | (+1 SD)  -  (-1 SD)|    0.013| 0.011|    -0.007|      0.034|    |</span></span>
-<span><span class="co">#&gt; |cp    | (+1 SD)  -   (0 SD)|    0.007| 0.005|    -0.004|      0.017|    |</span></span>
-<span><span class="co">#&gt; |d_1_2 | (0 SD)   -  (-1 SD)|   -0.136| 0.138|    -0.402|      0.137|    |</span></span>
-<span><span class="co">#&gt; |d_1_2 | (+1 SD)  -  (-1 SD)|   -0.271| 0.275|    -0.805|      0.273|    |</span></span>
-<span><span class="co">#&gt; |d_1_2 | (+1 SD)  -   (0 SD)|   -0.136| 0.138|    -0.402|      0.137|    |</span></span>
-<span><span class="co">#&gt; |d1    | (0 SD)   -  (-1 SD)|    0.024| 0.153|    -0.276|      0.321|    |</span></span>
-<span><span class="co">#&gt; |d1    | (+1 SD)  -  (-1 SD)|    0.047| 0.305|    -0.552|      0.643|    |</span></span>
-<span><span class="co">#&gt; |d1    | (+1 SD)  -   (0 SD)|    0.024| 0.153|    -0.276|      0.321|    |</span></span>
+<span><span class="co">#&gt; |a1    | (0 SD)   -  (-1 SD)|    0.013| 0.023|    -0.033|      0.056|    |</span></span>
+<span><span class="co">#&gt; |a1    | (+1 SD)  -  (-1 SD)|    0.025| 0.046|    -0.066|      0.113|    |</span></span>
+<span><span class="co">#&gt; |a1    | (+1 SD)  -   (0 SD)|    0.013| 0.023|    -0.033|      0.056|    |</span></span>
+<span><span class="co">#&gt; |a2    | (0 SD)   -  (-1 SD)|    0.002| 0.023|    -0.043|      0.046|    |</span></span>
+<span><span class="co">#&gt; |a2    | (+1 SD)  -  (-1 SD)|    0.003| 0.045|    -0.086|      0.092|    |</span></span>
+<span><span class="co">#&gt; |a2    | (+1 SD)  -   (0 SD)|    0.002| 0.023|    -0.043|      0.046|    |</span></span>
+<span><span class="co">#&gt; |a3    | (0 SD)   -  (-1 SD)|   -0.019| 0.022|    -0.061|      0.024|    |</span></span>
+<span><span class="co">#&gt; |a3    | (+1 SD)  -  (-1 SD)|   -0.037| 0.044|    -0.123|      0.048|    |</span></span>
+<span><span class="co">#&gt; |a3    | (+1 SD)  -   (0 SD)|   -0.019| 0.022|    -0.061|      0.024|    |</span></span>
+<span><span class="co">#&gt; |b_1_2 | (0 SD)   -  (-1 SD)|   -0.069| 0.127|    -0.318|      0.183|    |</span></span>
+<span><span class="co">#&gt; |b_1_2 | (+1 SD)  -  (-1 SD)|   -0.138| 0.253|    -0.636|      0.365|    |</span></span>
+<span><span class="co">#&gt; |b_1_2 | (+1 SD)  -   (0 SD)|   -0.069| 0.127|    -0.318|      0.183|    |</span></span>
+<span><span class="co">#&gt; |b2    | (0 SD)   -  (-1 SD)|   -0.118| 0.152|    -0.418|      0.176|    |</span></span>
+<span><span class="co">#&gt; |b2    | (+1 SD)  -  (-1 SD)|   -0.236| 0.303|    -0.835|      0.353|    |</span></span>
+<span><span class="co">#&gt; |b2    | (+1 SD)  -   (0 SD)|   -0.118| 0.152|    -0.418|      0.176|    |</span></span>
+<span><span class="co">#&gt; |cp    | (0 SD)   -  (-1 SD)|   -0.040| 0.022|    -0.084|      0.004|    |</span></span>
+<span><span class="co">#&gt; |cp    | (+1 SD)  -  (-1 SD)|   -0.079| 0.045|    -0.169|      0.008|    |</span></span>
+<span><span class="co">#&gt; |cp    | (+1 SD)  -   (0 SD)|   -0.040| 0.022|    -0.084|      0.004|    |</span></span>
+<span><span class="co">#&gt; |d_1_2 | (0 SD)   -  (-1 SD)|    0.136| 0.138|    -0.134|      0.405|    |</span></span>
+<span><span class="co">#&gt; |d_1_2 | (+1 SD)  -  (-1 SD)|    0.272| 0.277|    -0.268|      0.809|    |</span></span>
+<span><span class="co">#&gt; |d_1_2 | (+1 SD)  -   (0 SD)|    0.136| 0.138|    -0.134|      0.405|    |</span></span>
+<span><span class="co">#&gt; |d1    | (0 SD)   -  (-1 SD)|   -0.026| 0.151|    -0.324|      0.274|    |</span></span>
+<span><span class="co">#&gt; |d1    | (+1 SD)  -  (-1 SD)|   -0.052| 0.301|    -0.648|      0.549|    |</span></span>
+<span><span class="co">#&gt; |d1    | (+1 SD)  -   (0 SD)|   -0.026| 0.151|    -0.324|      0.274|    |</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; --- Conditional Total Effect and Total Indirect Effect ---</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; |Effect         | Level| W_value| Estimate|    SE| 2.5.%CI.Lo| 97.5.%CI.Up|Sig |</span></span>
 <span><span class="co">#&gt; |:--------------|-----:|-------:|--------:|-----:|----------:|-----------:|:---|</span></span>
-<span><span class="co">#&gt; |total_indirect | -1 SD|   0.223|    0.002| 0.009|     -0.016|       0.022|    |</span></span>
-<span><span class="co">#&gt; |total_indirect |  0 SD|   0.452|    0.002| 0.006|     -0.010|       0.015|    |</span></span>
-<span><span class="co">#&gt; |total_indirect | +1 SD|   0.681|   -0.000| 0.008|     -0.017|       0.016|    |</span></span>
-<span><span class="co">#&gt; |total_effect   | -1 SD|   0.223|    0.012| 0.034|     -0.053|       0.077|    |</span></span>
-<span><span class="co">#&gt; |total_effect   |  0 SD|   0.452|   -0.028| 0.024|     -0.074|       0.018|    |</span></span>
-<span><span class="co">#&gt; |total_effect   | +1 SD|   0.681|   -0.069| 0.033|     -0.132|      -0.005|*   |</span></span>
+<span><span class="co">#&gt; |total_indirect | -1 SD|   0.223|   -0.006| 0.014|     -0.035|       0.021|    |</span></span>
+<span><span class="co">#&gt; |total_indirect |  0 SD|   0.452|   -0.003| 0.008|     -0.021|       0.013|    |</span></span>
+<span><span class="co">#&gt; |total_indirect | +1 SD|   0.681|   -0.001| 0.012|     -0.026|       0.021|    |</span></span>
+<span><span class="co">#&gt; |total_effect   | -1 SD|   0.223|    0.005| 0.034|     -0.061|       0.070|    |</span></span>
+<span><span class="co">#&gt; |total_effect   |  0 SD|   0.452|   -0.032| 0.023|     -0.078|       0.013|    |</span></span>
+<span><span class="co">#&gt; |total_effect   | +1 SD|   0.681|   -0.071| 0.033|     -0.137|      -0.006|*   |</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; STANDARDIZED CONDITIONAL EFFECTS (mc)</span></span>
+<span><span class="co">#&gt; Marginal endpoint scales; fixed raw W probes; percentile intervals.</span></span>
+<span><span class="co">#&gt; Moderation coefficients: per SD of continuous W; categorical contrasts keep 0/1 units.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; *************** MODERATION RESULTS (Continuous Moderator) ***************</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Moderated Coefficients ---</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; |Path      |BaseCoef |W_dummy | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|Sig |</span></span>
+<span><span class="co">#&gt; |:---------|:--------|:-------|--------:|-----:|---------:|----------:|:---|</span></span>
+<span><span class="co">#&gt; |cpw_W1    |cp       |D3      |   -0.225| 0.116|    -0.431|      0.020|    |</span></span>
+<span><span class="co">#&gt; |dw1_W1    |d1       |D3      |   -0.029| 0.157|    -0.336|      0.285|    |</span></span>
+<span><span class="co">#&gt; |bw2_W1    |b2       |D3      |   -0.113| 0.141|    -0.384|      0.166|    |</span></span>
+<span><span class="co">#&gt; |aw1_W1    |a1       |D3      |    0.073| 0.130|    -0.190|      0.320|    |</span></span>
+<span><span class="co">#&gt; |aw2_W1    |a2       |D3      |    0.010| 0.130|    -0.245|      0.263|    |</span></span>
+<span><span class="co">#&gt; |bw_1_2_W1 |b_1_2    |D3      |   -0.073| 0.129|    -0.329|      0.185|    |</span></span>
+<span><span class="co">#&gt; |dw_1_2_W1 |d_1_2    |D3      |    0.160| 0.156|    -0.151|      0.459|    |</span></span>
+<span><span class="co">#&gt; |aw3_W1    |a3       |D3      |   -0.111| 0.127|    -0.362|      0.141|    |</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Conditional Indirect Effects ---</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; |Path                |Mediators | Level| W_value| Estimate|    SE| 2.5.%CI.Lo| 97.5.%CI.Up|Sig |</span></span>
+<span><span class="co">#&gt; |:-------------------|:---------|-----:|-------:|--------:|-----:|----------:|-----------:|:---|</span></span>
+<span><span class="co">#&gt; |indirect_effect_1   |1         | -1 SD|   0.223|    0.019| 0.039|     -0.047|       0.110|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1   |1         |  0 SD|   0.452|    0.012| 0.027|     -0.035|       0.080|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1   |1         | +1 SD|   0.681|    0.006| 0.029|     -0.048|       0.077|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1_2 |1 2       | -1 SD|   0.223|   -0.010| 0.025|     -0.069|       0.030|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1_2 |1 2       |  0 SD|   0.452|   -0.000| 0.008|     -0.018|       0.018|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1_2 |1 2       | +1 SD|   0.681|    0.002| 0.012|     -0.021|       0.032|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1_3 |1 3       | -1 SD|   0.223|   -0.006| 0.010|     -0.032|       0.007|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1_3 |1 3       |  0 SD|   0.452|   -0.004| 0.007|     -0.022|       0.006|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1_3 |1 3       | +1 SD|   0.681|   -0.002| 0.008|     -0.021|       0.012|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_2   |2         | -1 SD|   0.223|    0.008| 0.043|     -0.076|       0.108|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_2   |2         |  0 SD|   0.452|    0.000| 0.019|     -0.043|       0.041|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_2   |2         | +1 SD|   0.681|   -0.010| 0.039|     -0.105|       0.064|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_3   |3         | -1 SD|   0.223|   -0.042| 0.048|     -0.159|       0.032|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_3   |3         |  0 SD|   0.452|   -0.023| 0.031|     -0.096|       0.025|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_3   |3         | +1 SD|   0.681|   -0.004| 0.035|     -0.083|       0.069|    |</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Indirect Effect Contrasts ---</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; |Path                |            Contrast| Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|Sig |</span></span>
+<span><span class="co">#&gt; |:-------------------|-------------------:|--------:|-----:|---------:|----------:|:---|</span></span>
+<span><span class="co">#&gt; |indirect_effect_1   | (0 SD)   -  (-1 SD)|   -0.006| 0.021|    -0.055|      0.033|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1   | (+1 SD)  -  (-1 SD)|   -0.012| 0.042|    -0.110|      0.066|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1   | (+1 SD)  -   (0 SD)|   -0.006| 0.021|    -0.055|      0.033|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1_2 | (0 SD)   -  (-1 SD)|    0.010| 0.022|    -0.024|      0.063|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1_2 | (+1 SD)  -  (-1 SD)|    0.012| 0.028|    -0.034|      0.079|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1_2 | (+1 SD)  -   (0 SD)|    0.002| 0.012|    -0.021|      0.029|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1_3 | (0 SD)   -  (-1 SD)|    0.002| 0.005|    -0.007|      0.015|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1_3 | (+1 SD)  -  (-1 SD)|    0.004| 0.011|    -0.014|      0.030|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_1_3 | (+1 SD)  -   (0 SD)|    0.002| 0.005|    -0.007|      0.015|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_2   | (0 SD)   -  (-1 SD)|   -0.008| 0.037|    -0.092|      0.067|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_2   | (+1 SD)  -  (-1 SD)|   -0.018| 0.058|    -0.150|      0.093|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_2   | (+1 SD)  -   (0 SD)|   -0.010| 0.036|    -0.093|      0.058|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_3   | (0 SD)   -  (-1 SD)|    0.019| 0.029|    -0.030|      0.088|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_3   | (+1 SD)  -  (-1 SD)|    0.038| 0.058|    -0.060|      0.175|    |</span></span>
+<span><span class="co">#&gt; |indirect_effect_3   | (+1 SD)  -   (0 SD)|    0.019| 0.029|    -0.030|      0.088|    |</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Moderated Path Coefficients ---</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; |Path  | Level| W_value| Estimate|    SE| 2.5.%CI.Lo| 97.5.%CI.Up|Sig |</span></span>
+<span><span class="co">#&gt; |:-----|-----:|-------:|--------:|-----:|----------:|-----------:|:---|</span></span>
+<span><span class="co">#&gt; |a1    | -1 SD|   0.223|   -0.220| 0.187|     -0.572|       0.152|    |</span></span>
+<span><span class="co">#&gt; |a1    |  0 SD|   0.452|   -0.148| 0.137|     -0.423|       0.119|    |</span></span>
+<span><span class="co">#&gt; |a1    | +1 SD|   0.681|   -0.075| 0.189|     -0.451|       0.287|    |</span></span>
+<span><span class="co">#&gt; |b2    | -1 SD|   0.223|    0.113| 0.191|     -0.282|       0.474|    |</span></span>
+<span><span class="co">#&gt; |b2    |  0 SD|   0.452|    0.001| 0.126|     -0.250|       0.247|    |</span></span>
+<span><span class="co">#&gt; |b2    | +1 SD|   0.681|   -0.110| 0.185|     -0.474|       0.258|    |</span></span>
+<span><span class="co">#&gt; |d1    | -1 SD|   0.223|   -0.016| 0.210|     -0.416|       0.401|    |</span></span>
+<span><span class="co">#&gt; |d1    |  0 SD|   0.452|   -0.044| 0.127|     -0.287|       0.212|    |</span></span>
+<span><span class="co">#&gt; |d1    | +1 SD|   0.681|   -0.073| 0.191|     -0.433|       0.310|    |</span></span>
+<span><span class="co">#&gt; |cp    | -1 SD|   0.223|    0.057| 0.170|     -0.283|       0.375|    |</span></span>
+<span><span class="co">#&gt; |cp    |  0 SD|   0.452|   -0.165| 0.123|     -0.393|       0.082|    |</span></span>
+<span><span class="co">#&gt; |cp    | +1 SD|   0.681|   -0.387| 0.166|     -0.685|      -0.035|*   |</span></span>
+<span><span class="co">#&gt; |b_1_2 | -1 SD|   0.223|    0.392| 0.174|      0.030|       0.716|*   |</span></span>
+<span><span class="co">#&gt; |b_1_2 |  0 SD|   0.452|    0.320| 0.115|      0.083|       0.530|*   |</span></span>
+<span><span class="co">#&gt; |b_1_2 | +1 SD|   0.681|    0.248| 0.170|     -0.100|       0.573|    |</span></span>
+<span><span class="co">#&gt; |d_1_2 | -1 SD|   0.223|   -0.209| 0.189|     -0.584|       0.166|    |</span></span>
+<span><span class="co">#&gt; |d_1_2 |  0 SD|   0.452|   -0.051| 0.121|     -0.288|       0.187|    |</span></span>
+<span><span class="co">#&gt; |d_1_2 | +1 SD|   0.681|    0.107| 0.201|     -0.297|       0.491|    |</span></span>
+<span><span class="co">#&gt; |a2    | -1 SD|   0.223|    0.071| 0.187|     -0.300|       0.444|    |</span></span>
+<span><span class="co">#&gt; |a2    |  0 SD|   0.452|    0.081| 0.127|     -0.176|       0.326|    |</span></span>
+<span><span class="co">#&gt; |a2    | +1 SD|   0.681|    0.091| 0.175|     -0.265|       0.426|    |</span></span>
+<span><span class="co">#&gt; |a3    | -1 SD|   0.223|    0.246| 0.188|     -0.123|       0.604|    |</span></span>
+<span><span class="co">#&gt; |a3    |  0 SD|   0.452|    0.136| 0.132|     -0.130|       0.392|    |</span></span>
+<span><span class="co">#&gt; |a3    | +1 SD|   0.681|    0.026| 0.176|     -0.308|       0.377|    |</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Path Coefficient Contrasts ---</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; |Path  |            Contrast| Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|Sig |</span></span>
+<span><span class="co">#&gt; |:-----|-------------------:|--------:|-----:|---------:|----------:|:---|</span></span>
+<span><span class="co">#&gt; |a1    | (0 SD)   -  (-1 SD)|    0.072| 0.129|    -0.186|      0.314|    |</span></span>
+<span><span class="co">#&gt; |a1    | (+1 SD)  -  (-1 SD)|    0.145| 0.257|    -0.373|      0.628|    |</span></span>
+<span><span class="co">#&gt; |a1    | (+1 SD)  -   (0 SD)|    0.072| 0.129|    -0.186|      0.314|    |</span></span>
+<span><span class="co">#&gt; |a2    | (0 SD)   -  (-1 SD)|    0.010| 0.129|    -0.247|      0.263|    |</span></span>
+<span><span class="co">#&gt; |a2    | (+1 SD)  -  (-1 SD)|    0.020| 0.258|    -0.495|      0.526|    |</span></span>
+<span><span class="co">#&gt; |a2    | (+1 SD)  -   (0 SD)|    0.010| 0.129|    -0.247|      0.263|    |</span></span>
+<span><span class="co">#&gt; |a3    | (0 SD)   -  (-1 SD)|   -0.110| 0.125|    -0.350|      0.139|    |</span></span>
+<span><span class="co">#&gt; |a3    | (+1 SD)  -  (-1 SD)|   -0.220| 0.250|    -0.701|      0.277|    |</span></span>
+<span><span class="co">#&gt; |a3    | (+1 SD)  -   (0 SD)|   -0.110| 0.125|    -0.350|      0.139|    |</span></span>
+<span><span class="co">#&gt; |b_1_2 | (0 SD)   -  (-1 SD)|   -0.072| 0.128|    -0.319|      0.185|    |</span></span>
+<span><span class="co">#&gt; |b_1_2 | (+1 SD)  -  (-1 SD)|   -0.144| 0.256|    -0.638|      0.369|    |</span></span>
+<span><span class="co">#&gt; |b_1_2 | (+1 SD)  -   (0 SD)|   -0.072| 0.128|    -0.319|      0.185|    |</span></span>
+<span><span class="co">#&gt; |b2    | (0 SD)   -  (-1 SD)|   -0.111| 0.139|    -0.379|      0.166|    |</span></span>
+<span><span class="co">#&gt; |b2    | (+1 SD)  -  (-1 SD)|   -0.223| 0.279|    -0.759|      0.332|    |</span></span>
+<span><span class="co">#&gt; |b2    | (+1 SD)  -   (0 SD)|   -0.111| 0.139|    -0.379|      0.166|    |</span></span>
+<span><span class="co">#&gt; |cp    | (0 SD)   -  (-1 SD)|   -0.222| 0.115|    -0.427|      0.020|    |</span></span>
+<span><span class="co">#&gt; |cp    | (+1 SD)  -  (-1 SD)|   -0.444| 0.229|    -0.855|      0.040|    |</span></span>
+<span><span class="co">#&gt; |cp    | (+1 SD)  -   (0 SD)|   -0.222| 0.115|    -0.427|      0.020|    |</span></span>
+<span><span class="co">#&gt; |d_1_2 | (0 SD)   -  (-1 SD)|    0.158| 0.153|    -0.154|      0.446|    |</span></span>
+<span><span class="co">#&gt; |d_1_2 | (+1 SD)  -  (-1 SD)|    0.316| 0.307|    -0.307|      0.892|    |</span></span>
+<span><span class="co">#&gt; |d_1_2 | (+1 SD)  -   (0 SD)|    0.158| 0.153|    -0.154|      0.446|    |</span></span>
+<span><span class="co">#&gt; |d1    | (0 SD)   -  (-1 SD)|   -0.029| 0.156|    -0.335|      0.287|    |</span></span>
+<span><span class="co">#&gt; |d1    | (+1 SD)  -  (-1 SD)|   -0.057| 0.312|    -0.671|      0.575|    |</span></span>
+<span><span class="co">#&gt; |d1    | (+1 SD)  -   (0 SD)|   -0.029| 0.156|    -0.335|      0.287|    |</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Conditional Total Effect and Total Indirect Effect ---</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; |Effect         | Level| W_value| Estimate|    SE| 2.5.%CI.Lo| 97.5.%CI.Up|Sig |</span></span>
+<span><span class="co">#&gt; |:--------------|-----:|-------:|--------:|-----:|----------:|-----------:|:---|</span></span>
+<span><span class="co">#&gt; |total_indirect | -1 SD|   0.223|   -0.031| 0.071|     -0.183|       0.108|    |</span></span>
+<span><span class="co">#&gt; |total_indirect |  0 SD|   0.452|   -0.015| 0.043|     -0.109|       0.069|    |</span></span>
+<span><span class="co">#&gt; |total_indirect | +1 SD|   0.681|   -0.008| 0.060|     -0.132|       0.111|    |</span></span>
+<span><span class="co">#&gt; |total_effect   | -1 SD|   0.223|    0.026| 0.178|     -0.332|       0.359|    |</span></span>
+<span><span class="co">#&gt; |total_effect   |  0 SD|   0.452|   -0.180| 0.126|     -0.421|       0.073|    |</span></span>
+<span><span class="co">#&gt; |total_effect   | +1 SD|   0.681|   -0.395| 0.173|     -0.708|      -0.033|*   |</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; *************** REGRESSION PATHS (MC) ***************</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; |Path                   |Label     | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span></span>
-<span><span class="co">#&gt; |:----------------------|:---------|--------:|-----:|---------:|----------:|</span></span>
-<span><span class="co">#&gt; |Ydiff ~ M1diff         |b1        |   -0.085| 0.133|    -0.346|      0.175|</span></span>
-<span><span class="co">#&gt; |Ydiff ~ M1avg          |d1        |   -0.040| 0.124|    -0.290|      0.202|</span></span>
-<span><span class="co">#&gt; |Ydiff ~ M2diff         |b2        |    0.002| 0.138|    -0.271|      0.275|</span></span>
-<span><span class="co">#&gt; |Ydiff ~ M2avg          |d2        |   -0.000| 0.129|    -0.249|      0.256|</span></span>
-<span><span class="co">#&gt; |Ydiff ~ M3diff         |b3        |   -0.182| 0.130|    -0.438|      0.076|</span></span>
-<span><span class="co">#&gt; |Ydiff ~ M3avg          |d3        |   -0.160| 0.142|    -0.434|      0.122|</span></span>
-<span><span class="co">#&gt; |Ydiff ~ W1             |cpw_W1    |   -0.173| 0.101|    -0.369|      0.022|</span></span>
-<span><span class="co">#&gt; |Ydiff ~ int_M1avg_W1   |dw1_W1    |   -0.114| 0.666|    -1.402|      1.204|</span></span>
-<span><span class="co">#&gt; |Ydiff ~ int_M2diff_W1  |bw2_W1    |   -0.514| 0.667|    -1.856|      0.781|</span></span>
-<span><span class="co">#&gt; |M1diff ~ W1            |aw1_W1    |    0.056| 0.098|    -0.134|      0.258|</span></span>
-<span><span class="co">#&gt; |M2diff ~ M1diff        |b_1_2     |    0.306| 0.116|     0.076|      0.531|</span></span>
-<span><span class="co">#&gt; |M2diff ~ M1avg         |d_1_2     |   -0.044| 0.107|    -0.251|      0.167|</span></span>
-<span><span class="co">#&gt; |M2diff ~ W1            |          |    0.007| 0.097|    -0.182|      0.193|</span></span>
-<span><span class="co">#&gt; |M2diff ~ int_M1diff_W1 |bw_1_2_W1 |   -0.300| 0.545|    -1.373|      0.721|</span></span>
-<span><span class="co">#&gt; |M2diff ~ int_M1avg_W1  |dw_1_2_W1 |    0.593| 0.601|    -0.596|      1.755|</span></span>
-<span><span class="co">#&gt; |M3diff ~ M1diff        |b_1_3     |   -0.147| 0.121|    -0.385|      0.094|</span></span>
-<span><span class="co">#&gt; |M3diff ~ M1avg         |d_1_3     |    0.088| 0.115|    -0.134|      0.312|</span></span>
-<span><span class="co">#&gt; |M3diff ~ W1            |          |   -0.081| 0.096|    -0.268|      0.102|</span></span>
+<span><span class="co">#&gt; |Path                         |Label     | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span></span>
+<span><span class="co">#&gt; |:----------------------------|:---------|--------:|-----:|---------:|----------:|</span></span>
+<span><span class="co">#&gt; |Ydiff ~ M1diff               |b1        |   -0.085| 0.131|    -0.338|      0.172|</span></span>
+<span><span class="co">#&gt; |Ydiff ~ M1avg                |d1        |   -0.040| 0.124|    -0.276|      0.208|</span></span>
+<span><span class="co">#&gt; |Ydiff ~ M2diff               |b2        |    0.002| 0.137|    -0.274|      0.270|</span></span>
+<span><span class="co">#&gt; |Ydiff ~ M2avg                |d2        |   -0.000| 0.129|    -0.254|      0.258|</span></span>
+<span><span class="co">#&gt; |Ydiff ~ M3diff               |b3        |   -0.182| 0.132|    -0.439|      0.079|</span></span>
+<span><span class="co">#&gt; |Ydiff ~ M3avg                |d3        |   -0.160| 0.142|    -0.431|      0.111|</span></span>
+<span><span class="co">#&gt; |Ydiff ~ W1                   |cpw_W1    |   -0.173| 0.097|    -0.368|      0.017|</span></span>
+<span><span class="co">#&gt; |Ydiff ~ int_M1avg_W1         |dw1_W1    |   -0.114| 0.657|    -1.413|      1.196|</span></span>
+<span><span class="co">#&gt; |Ydiff ~ int_M2diff_W1        |bw2_W1    |   -0.514| 0.662|    -1.821|      0.770|</span></span>
+<span><span class="co">#&gt; |M1diff ~ W1                  |aw1_W1    |    0.056| 0.099|    -0.143|      0.246|</span></span>
+<span><span class="co">#&gt; |M2diff ~ M1diff              |b_1_2     |    0.306| 0.119|     0.079|      0.543|</span></span>
+<span><span class="co">#&gt; |M2diff ~ M1avg               |d_1_2     |   -0.044| 0.108|    -0.258|      0.167|</span></span>
+<span><span class="co">#&gt; |M2diff ~ W1                  |aw2_W1    |    0.007| 0.099|    -0.187|      0.202|</span></span>
+<span><span class="co">#&gt; |M2diff ~ int_M1diff_W1       |bw_1_2_W1 |   -0.300| 0.552|    -1.388|      0.796|</span></span>
+<span><span class="co">#&gt; |M2diff ~ int_M1avg_W1        |dw_1_2_W1 |    0.594| 0.603|    -0.585|      1.765|</span></span>
+<span><span class="co">#&gt; |M3diff ~ M1diff              |b_1_3     |   -0.147| 0.124|    -0.389|      0.103|</span></span>
+<span><span class="co">#&gt; |M3diff ~ M1avg               |d_1_3     |    0.088| 0.114|    -0.128|      0.311|</span></span>
+<span><span class="co">#&gt; |M3diff ~ W1                  |aw3_W1    |   -0.081| 0.095|    -0.268|      0.104|</span></span>
+<span><span class="co">#&gt; |int_M1diff_W1 ~ int_M1avg_W1 |          |    0.038| 0.147|    -0.248|      0.327|</span></span>
+<span><span class="co">#&gt; |int_M1diff_W1 ~ M1avg        |          |   -0.008| 0.028|    -0.064|      0.048|</span></span>
+<span><span class="co">#&gt; |int_M1diff_W1 ~ M2avg        |          |   -0.002| 0.028|    -0.059|      0.053|</span></span>
+<span><span class="co">#&gt; |int_M1diff_W1 ~ M3avg        |          |   -0.013| 0.032|    -0.077|      0.050|</span></span>
+<span><span class="co">#&gt; |int_M1diff_W1 ~ W1           |          |   -0.062| 0.022|    -0.104|     -0.017|</span></span>
+<span><span class="co">#&gt; |int_M2diff_W1 ~ int_M1avg_W1 |          |   -0.077| 0.130|    -0.340|      0.175|</span></span>
+<span><span class="co">#&gt; |int_M2diff_W1 ~ M1avg        |          |    0.006| 0.025|    -0.043|      0.055|</span></span>
+<span><span class="co">#&gt; |int_M2diff_W1 ~ M2avg        |          |   -0.003| 0.025|    -0.052|      0.048|</span></span>
+<span><span class="co">#&gt; |int_M2diff_W1 ~ M3avg        |          |    0.021| 0.028|    -0.034|      0.075|</span></span>
+<span><span class="co">#&gt; |int_M2diff_W1 ~ W1           |          |    0.006| 0.019|    -0.032|      0.044|</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; *************** INTERCEPTS (MC) ***************</span></span>
@@ -1262,17 +1475,17 @@ downstream programming.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; |Intercept       |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span></span>
 <span><span class="co">#&gt; |:---------------|:-----|--------:|-----:|---------:|----------:|</span></span>
-<span><span class="co">#&gt; |Ydiff~1         |cp    |   -0.029| 0.023|    -0.074|      0.016|</span></span>
-<span><span class="co">#&gt; |M1diff~1        |a1    |   -0.026| 0.023|    -0.070|      0.018|</span></span>
-<span><span class="co">#&gt; |M2diff~1        |a2    |    0.014| 0.022|    -0.028|      0.056|</span></span>
-<span><span class="co">#&gt; |M3diff~1        |a3    |    0.023| 0.022|    -0.021|      0.066|</span></span>
-<span><span class="co">#&gt; |M1avg~1         |      |   -0.014| 0.026|    -0.067|      0.035|</span></span>
-<span><span class="co">#&gt; |M2avg~1         |      |    0.001| 0.025|    -0.049|      0.050|</span></span>
-<span><span class="co">#&gt; |M3avg~1         |      |   -0.012| 0.023|    -0.060|      0.033|</span></span>
-<span><span class="co">#&gt; |W1~1            |      |    0.004| 0.031|    -0.056|      0.064|</span></span>
-<span><span class="co">#&gt; |int_M1avg_W1~1  |      |    0.009| 0.005|    -0.000|      0.017|</span></span>
-<span><span class="co">#&gt; |int_M2diff_W1~1 |      |    0.002| 0.004|    -0.007|      0.011|</span></span>
-<span><span class="co">#&gt; |int_M1diff_W1~1 |      |    0.003| 0.005|    -0.008|      0.013|</span></span>
+<span><span class="co">#&gt; |Ydiff~1         |cp    |   -0.029| 0.023|    -0.073|      0.016|</span></span>
+<span><span class="co">#&gt; |M1diff~1        |a1    |   -0.026| 0.024|    -0.072|      0.021|</span></span>
+<span><span class="co">#&gt; |M2diff~1        |a2    |    0.014| 0.022|    -0.031|      0.056|</span></span>
+<span><span class="co">#&gt; |M3diff~1        |a3    |    0.023| 0.022|    -0.022|      0.065|</span></span>
+<span><span class="co">#&gt; |int_M1diff_W1~1 |      |    0.003| 0.005|    -0.007|      0.012|</span></span>
+<span><span class="co">#&gt; |int_M2diff_W1~1 |      |    0.003| 0.004|    -0.006|      0.012|</span></span>
+<span><span class="co">#&gt; |M1avg~1         |      |   -0.014| 0.026|    -0.063|      0.037|</span></span>
+<span><span class="co">#&gt; |M2avg~1         |      |    0.001| 0.026|    -0.050|      0.051|</span></span>
+<span><span class="co">#&gt; |M3avg~1         |      |   -0.012| 0.023|    -0.057|      0.033|</span></span>
+<span><span class="co">#&gt; |W1~1            |      |    0.004| 0.031|    -0.058|      0.066|</span></span>
+<span><span class="co">#&gt; |int_M1avg_W1~1  |      |    0.009| 0.005|    -0.000|      0.018|</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; *************** VARIANCES (MC) ***************</span></span>
@@ -1280,17 +1493,95 @@ downstream programming.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; |Variance                     |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|</span></span>
 <span><span class="co">#&gt; |:----------------------------|:-----|--------:|-----:|---------:|----------:|</span></span>
+<span><span class="co">#&gt; |int_M1diff_W1~~int_M1diff_W1 |      |    0.001| 0.000|     0.001|      0.002|</span></span>
+<span><span class="co">#&gt; |int_M2diff_W1~~int_M2diff_W1 |      |    0.001| 0.000|     0.001|      0.001|</span></span>
 <span><span class="co">#&gt; |Ydiff~~Ydiff                 |      |    0.027| 0.005|     0.018|      0.037|</span></span>
-<span><span class="co">#&gt; |M1diff~~M1diff               |      |    0.031| 0.006|     0.020|      0.042|</span></span>
+<span><span class="co">#&gt; |M1diff~~M1diff               |      |    0.031| 0.006|     0.019|      0.042|</span></span>
 <span><span class="co">#&gt; |M2diff~~M2diff               |      |    0.025| 0.005|     0.016|      0.034|</span></span>
 <span><span class="co">#&gt; |M3diff~~M3diff               |      |    0.027| 0.005|     0.017|      0.037|</span></span>
 <span><span class="co">#&gt; |M1avg~~M1avg                 |      |    0.038| 0.007|     0.024|      0.053|</span></span>
 <span><span class="co">#&gt; |M2avg~~M2avg                 |      |    0.038| 0.007|     0.024|      0.051|</span></span>
 <span><span class="co">#&gt; |M3avg~~M3avg                 |      |    0.031| 0.006|     0.020|      0.043|</span></span>
-<span><span class="co">#&gt; |W1~~W1                       |      |    0.054| 0.010|     0.034|      0.074|</span></span>
+<span><span class="co">#&gt; |W1~~W1                       |      |    0.054| 0.010|     0.034|      0.073|</span></span>
 <span><span class="co">#&gt; |int_M1avg_W1~~int_M1avg_W1   |      |    0.001| 0.000|     0.001|      0.002|</span></span>
-<span><span class="co">#&gt; |int_M2diff_W1~~int_M2diff_W1 |      |    0.001| 0.000|     0.001|      0.002|</span></span>
-<span><span class="co">#&gt; |int_M1diff_W1~~int_M1diff_W1 |      |    0.002| 0.000|     0.001|      0.002|</span></span></code></pre></div>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; *************** STANDARDIZED (MC) ***************</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; |Parameter                    | Estimate|    SE|        R|   2.5%|  97.5%|</span></span>
+<span><span class="co">#&gt; |:----------------------------|--------:|-----:|--------:|------:|------:|</span></span>
+<span><span class="co">#&gt; |cp                           |   -0.165| 0.123| 5000.000| -0.393|  0.082|</span></span>
+<span><span class="co">#&gt; |b1                           |   -0.084| 0.122| 5000.000| -0.314|  0.168|</span></span>
+<span><span class="co">#&gt; |d1                           |   -0.044| 0.127| 5000.000| -0.287|  0.212|</span></span>
+<span><span class="co">#&gt; |b2                           |    0.001| 0.126| 5000.000| -0.250|  0.247|</span></span>
+<span><span class="co">#&gt; |d2                           |   -0.000| 0.131| 5000.000| -0.268|  0.263|</span></span>
+<span><span class="co">#&gt; |b3                           |   -0.172| 0.118| 5000.000| -0.388|  0.075|</span></span>
+<span><span class="co">#&gt; |d3                           |   -0.159| 0.132| 5000.000| -0.399|  0.101|</span></span>
+<span><span class="co">#&gt; |cpw_W1                       |   -0.225| 0.116| 5000.000| -0.431|  0.020|</span></span>
+<span><span class="co">#&gt; |dw1_W1                       |   -0.029| 0.157| 5000.000| -0.336|  0.285|</span></span>
+<span><span class="co">#&gt; |bw2_W1                       |   -0.113| 0.141| 5000.000| -0.384|  0.166|</span></span>
+<span><span class="co">#&gt; |a1                           |   -0.148| 0.137| 5000.000| -0.423|  0.119|</span></span>
+<span><span class="co">#&gt; |aw1_W1                       |    0.073| 0.130| 5000.000| -0.190|  0.320|</span></span>
+<span><span class="co">#&gt; |a2                           |    0.081| 0.127| 5000.000| -0.176|  0.326|</span></span>
+<span><span class="co">#&gt; |b_1_2                        |    0.320| 0.115| 5000.000|  0.083|  0.530|</span></span>
+<span><span class="co">#&gt; |d_1_2                        |   -0.051| 0.121| 5000.000| -0.288|  0.187|</span></span>
+<span><span class="co">#&gt; |aw2_W1                       |    0.010| 0.130| 5000.000| -0.245|  0.263|</span></span>
+<span><span class="co">#&gt; |bw_1_2_W1                    |   -0.073| 0.129| 5000.000| -0.329|  0.185|</span></span>
+<span><span class="co">#&gt; |dw_1_2_W1                    |    0.160| 0.156| 5000.000| -0.151|  0.459|</span></span>
+<span><span class="co">#&gt; |a3                           |    0.136| 0.132| 5000.000| -0.130|  0.392|</span></span>
+<span><span class="co">#&gt; |b_1_3                        |   -0.154| 0.127| 5000.000| -0.389|  0.107|</span></span>
+<span><span class="co">#&gt; |d_1_3                        |    0.102| 0.129| 5000.000| -0.151|  0.348|</span></span>
+<span><span class="co">#&gt; |aw3_W1                       |   -0.111| 0.127| 5000.000| -0.362|  0.141|</span></span>
+<span><span class="co">#&gt; |int_M1diff_W1~int_M1avg_W1   |    0.042| 0.166| 5000.000| -0.280|  0.373|</span></span>
+<span><span class="co">#&gt; |int_M1diff_W1~M1avg          |   -0.038| 0.140| 5000.000| -0.321|  0.232|</span></span>
+<span><span class="co">#&gt; |int_M1diff_W1~M2avg          |   -0.011| 0.139| 5000.000| -0.291|  0.260|</span></span>
+<span><span class="co">#&gt; |int_M1diff_W1~M3avg          |   -0.058| 0.145| 5000.000| -0.345|  0.228|</span></span>
+<span><span class="co">#&gt; |int_M1diff_W1~W1             |   -0.349| 0.133| 5000.000| -0.620| -0.096|</span></span>
+<span><span class="co">#&gt; |int_M2diff_W1~int_M1avg_W1   |   -0.089| 0.148| 5000.000| -0.390|  0.198|</span></span>
+<span><span class="co">#&gt; |int_M2diff_W1~M1avg          |    0.032| 0.124| 5000.000| -0.215|  0.277|</span></span>
+<span><span class="co">#&gt; |int_M2diff_W1~M2avg          |   -0.016| 0.124| 5000.000| -0.258|  0.235|</span></span>
+<span><span class="co">#&gt; |int_M2diff_W1~M3avg          |    0.096| 0.126| 5000.000| -0.147|  0.347|</span></span>
+<span><span class="co">#&gt; |int_M2diff_W1~W1             |    0.035| 0.110| 5000.000| -0.183|  0.252|</span></span>
+<span><span class="co">#&gt; |int_M1diff_W1~~int_M1diff_W1 |    0.839| 0.341| 5000.000|  0.436|  1.713|</span></span>
+<span><span class="co">#&gt; |int_M1diff_W1~~int_M2diff_W1 |    0.007| 0.109| 5000.000| -0.210|  0.219|</span></span>
+<span><span class="co">#&gt; |int_M2diff_W1~~int_M2diff_W1 |    0.708| 0.251| 5000.000|  0.345|  1.292|</span></span>
+<span><span class="co">#&gt; |M1diff~~int_M1diff_W1        |    0.048| 0.127| 5000.000| -0.195|  0.300|</span></span>
+<span><span class="co">#&gt; |M1diff~~int_M2diff_W1        |   -0.055| 0.112| 5000.000| -0.284|  0.166|</span></span>
+<span><span class="co">#&gt; |M2diff~~int_M2diff_W1        |    0.013| 0.103| 5000.000| -0.187|  0.218|</span></span>
+<span><span class="co">#&gt; |Ydiff~~Ydiff                 |    0.856| 0.085| 5000.000|  0.576|  0.905|</span></span>
+<span><span class="co">#&gt; |M1diff~~M1diff               |    0.995| 0.029| 5000.000|  0.897|  1.000|</span></span>
+<span><span class="co">#&gt; |M2diff~~M2diff               |    0.877| 0.085| 5000.000|  0.626|  0.949|</span></span>
+<span><span class="co">#&gt; |M3diff~~M3diff               |    0.956| 0.061| 5000.000|  0.762|  0.990|</span></span>
+<span><span class="co">#&gt; |M1avg~~M1avg                 |    1.000| 0.000| 5000.000|  1.000|  1.000|</span></span>
+<span><span class="co">#&gt; |M1avg~~M2avg                 |    0.344| 0.121| 5000.000|  0.087|  0.561|</span></span>
+<span><span class="co">#&gt; |M1avg~~M3avg                 |    0.390| 0.117| 5000.000|  0.131|  0.602|</span></span>
+<span><span class="co">#&gt; |M1avg~~W1                    |    0.192| 0.133| 5000.000| -0.091|  0.437|</span></span>
+<span><span class="co">#&gt; |M1avg~~int_M1avg_W1          |   -0.027| 0.110| 5000.000| -0.245|  0.193|</span></span>
+<span><span class="co">#&gt; |M2avg~~M2avg                 |    1.000| 0.000| 5000.000|  1.000|  1.000|</span></span>
+<span><span class="co">#&gt; |M2avg~~M3avg                 |    0.363| 0.118| 5000.000|  0.115|  0.578|</span></span>
+<span><span class="co">#&gt; |M2avg~~W1                    |    0.263| 0.128| 5000.000| -0.006|  0.506|</span></span>
+<span><span class="co">#&gt; |M2avg~~int_M1avg_W1          |   -0.163| 0.109| 5000.000| -0.387|  0.040|</span></span>
+<span><span class="co">#&gt; |M3avg~~M3avg                 |    1.000| 0.000| 5000.000|  1.000|  1.000|</span></span>
+<span><span class="co">#&gt; |M3avg~~W1                    |    0.176| 0.133| 5000.000| -0.105|  0.420|</span></span>
+<span><span class="co">#&gt; |M3avg~~int_M1avg_W1          |   -0.165| 0.108| 5000.000| -0.393|  0.043|</span></span>
+<span><span class="co">#&gt; |W1~~W1                       |    1.000| 0.000| 5000.000|  1.000|  1.000|</span></span>
+<span><span class="co">#&gt; |W1~~int_M1avg_W1             |   -0.001| 0.107| 5000.000| -0.215|  0.211|</span></span>
+<span><span class="co">#&gt; |int_M1avg_W1~~int_M1avg_W1   |    0.581| 0.231| 5000.000|  0.303|  1.202|</span></span>
+<span><span class="co">#&gt; |int_M1diff_W1~1              |    0.062| 0.127| 5000.000| -0.187|  0.318|</span></span>
+<span><span class="co">#&gt; |int_M2diff_W1~1              |    0.077| 0.116| 5000.000| -0.145|  0.308|</span></span>
+<span><span class="co">#&gt; |M1avg~1                      |   -0.070| 0.133| 5000.000| -0.334|  0.199|</span></span>
+<span><span class="co">#&gt; |M2avg~1                      |    0.004| 0.135| 5000.000| -0.264|  0.269|</span></span>
+<span><span class="co">#&gt; |M3avg~1                      |   -0.070| 0.134| 5000.000| -0.325|  0.192|</span></span>
+<span><span class="co">#&gt; |W1~1                         |    0.017| 0.137| 5000.000| -0.253|  0.293|</span></span>
+<span><span class="co">#&gt; |int_M1avg_W1~1               |    0.191| 0.110| 5000.000| -0.011|  0.422|</span></span>
+<span><span class="co">#&gt; |indirect_1                   |    0.012| 0.027| 5000.000| -0.035|  0.080|</span></span>
+<span><span class="co">#&gt; |indirect_2                   |    0.000| 0.019| 5000.000| -0.043|  0.041|</span></span>
+<span><span class="co">#&gt; |indirect_1_2                 |   -0.000| 0.008| 5000.000| -0.018|  0.018|</span></span>
+<span><span class="co">#&gt; |indirect_3                   |   -0.023| 0.031| 5000.000| -0.096|  0.025|</span></span>
+<span><span class="co">#&gt; |indirect_1_3                 |   -0.004| 0.007| 5000.000| -0.022|  0.006|</span></span>
+<span><span class="co">#&gt; |total_indirect               |   -0.015| 0.043| 5000.000| -0.109|  0.069|</span></span>
+<span><span class="co">#&gt; |total_effect                 |   -0.180| 0.126| 5000.000| -0.421|  0.073|</span></span></code></pre></div>
 <p>Most printed sections have the same interpretation as in Example 1.
 The important additions are:</p>
 <table class="table">
@@ -1311,8 +1602,8 @@ label, such as <code>W1</code>.</td>
 </tr>
 <tr class="even">
 <td align="left"><code>Moderated Coefficients</code></td>
-<td align="left">Interaction terms for the paths named in
-<code>MP</code>.</td>
+<td align="left">Moderator coefficients, including already-fitted
+moderator main effects.</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>Conditional Indirect Effects</code></td>
@@ -1343,17 +1634,18 @@ moderator value.</td>
 <div class="section level4">
 <h4 id="moderated-coefficients">Moderated coefficients<a class="anchor" aria-label="anchor" href="#moderated-coefficients"></a>
 </h4>
-<p>The <code>Moderated Coefficients</code> table reports the interaction
-term associated with each path in <code>MP</code>. The
-<code>BaseCoef</code> column links the interaction to the original path.
-For example, a row whose base coefficient is <code>a1</code> indicates
-whether the condition-to-<code>M1</code> path changes with
-<code>D3</code>.</p>
-<p>The interaction estimate describes the expected change in the base
-path for a one-unit increase in the moderator. Its confidence interval
-evaluates whether that change differs from zero. This table should be
-consulted before interpreting the pattern of conditional path
-coefficients.</p>
+<p>The <code>Moderated Coefficients</code> table reports requested
+interactions and already-fitted moderator main effects used in
+conditional intercepts. The <code>BaseCoef</code> column links the
+interaction to the original path. For example, a row whose base
+coefficient is <code>a1</code> indicates whether the
+condition-to-<code>M1</code> path changes with <code>D3</code>.</p>
+<p>In the unstandardized table, the interaction estimate describes the
+expected change in the base path for a one-unit increase in the
+moderator. In the standardized <code>mod_coeff</code> table, it is per
+SD of the continuous moderator. Its confidence interval evaluates
+whether that change differs from zero. This table should be consulted
+before interpreting the pattern of conditional path coefficients.</p>
 <p>Because the continuous moderator is centered during data preparation,
 the ordinary path estimates in the main output refer to the value
 represented by centered
@@ -1419,7 +1711,7 @@ contrast table rather than comparing the two significance markers.</p>
 <p><code><a href="../reference/plot_moderation_curve.html">plot_moderation_curve()</a></code> displays a conditional indirect
 effect, an individual path coefficient, or a total effect across the
 observed range of a continuous moderator:</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_moderation_curve.html">plot_moderation_curve</a></span><span class="op">(</span></span>
 <span>  <span class="va">result5</span>,</span>
 <span>  <span class="st">"indirect_effect_1_2"</span></span>
@@ -1443,7 +1735,7 @@ the confidence band shows its uncertainty, and the zero reference line
 indicates where the interval changes from including to excluding
 zero.</p>
 <p>Available curve labels can be checked before plotting:</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">result5</span><span class="op">$</span><span class="va">moderation</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">result5</span><span class="op">$</span><span class="va">moderation</span><span class="op">$</span><span class="va">theta_curve</span><span class="op">$</span><span class="va">Path</span><span class="op">)</span></span>
@@ -1451,7 +1743,7 @@ zero.</p>
 <p>When <code>ci_method = "both"</code>, the Monte Carlo and bootstrap
 moderation results are stored separately. Select the desired branch
 before accessing its curve data:</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result_both</span><span class="op">$</span><span class="va">moderation</span><span class="op">$</span><span class="va">mc</span><span class="op">$</span><span class="va">theta_curve</span></span>
 <span><span class="va">result_both</span><span class="op">$</span><span class="va">moderation</span><span class="op">$</span><span class="va">boot</span><span class="op">$</span><span class="va">theta_curve</span></span></code></pre></div>
 </div>
@@ -1526,6 +1818,116 @@ arguments needed for the intended analysis have to be added or changed.
 The returned object can be read through <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, connected
 to the generated model with <code><a href="../reference/printGM.html">printGM()</a></code>, and accessed
 directly for further analysis or reporting.</p>
+</div>
+<div class="section level2">
+<h2 id="reading-standardized-conditional-results">Reading standardized conditional results<a class="anchor" aria-label="anchor" href="#reading-standardized-conditional-results"></a>
+</h2>
+<p>The moderated example above provides both scales:</p>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result5</span><span class="op">$</span><span class="va">moderation_std</span><span class="op">$</span><span class="va">beta_coef</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                  Path Mediators Level W_value    Estimate         SE</span></span>
+<span><span class="co">#&gt; 1   indirect_effect_1         1 -1 SD   0.223  0.01851179 0.03853350</span></span>
+<span><span class="co">#&gt; 2   indirect_effect_1         1  0 SD   0.452  0.01241918 0.02706592</span></span>
+<span><span class="co">#&gt; 3   indirect_effect_1         1 +1 SD   0.681  0.00632657 0.02901303</span></span>
+<span><span class="co">#&gt; 4 indirect_effect_1_2       1 2 -1 SD   0.223 -0.00971447 0.02474938</span></span>
+<span><span class="co">#&gt; 5 indirect_effect_1_2       1 2  0 SD   0.452 -0.00006888 0.00847441</span></span>
+<span><span class="co">#&gt; 6 indirect_effect_1_2       1 2 +1 SD   0.681  0.00204660 0.01230367</span></span>
+<span><span class="co">#&gt;    2.5.%CI.Lo 97.5.%CI.Up Sig</span></span>
+<span><span class="co">#&gt; 1 -0.04693503  0.10957838    </span></span>
+<span><span class="co">#&gt; 2 -0.03504596  0.08017097    </span></span>
+<span><span class="co">#&gt; 3 -0.04849223  0.07675749    </span></span>
+<span><span class="co">#&gt; 4 -0.06941232  0.03039126    </span></span>
+<span><span class="co">#&gt; 5 -0.01807556  0.01809927    </span></span>
+<span><span class="co">#&gt; 6 -0.02053757  0.03233936</span></span>
+<span><span class="va">result5</span><span class="op">$</span><span class="va">moderation_std</span><span class="op">$</span><span class="va">conditional_overall</span></span>
+<span><span class="co">#&gt;           Effect Level W_value    Estimate         SE 2.5.%CI.Lo 97.5.%CI.Up</span></span>
+<span><span class="co">#&gt; 1 total_indirect -1 SD   0.223 -0.03128198 0.07109154 -0.1834272  0.10758593</span></span>
+<span><span class="co">#&gt; 3 total_indirect  0 SD   0.452 -0.01476742 0.04345483 -0.1090928  0.06944515</span></span>
+<span><span class="co">#&gt; 5 total_indirect +1 SD   0.681 -0.00803368 0.06021063 -0.1321828  0.11074425</span></span>
+<span><span class="co">#&gt; 2   total_effect -1 SD   0.223  0.02585195 0.17818896 -0.3322253  0.35900195</span></span>
+<span><span class="co">#&gt; 4   total_effect  0 SD   0.452 -0.17968841 0.12585504 -0.4208829  0.07261438</span></span>
+<span><span class="co">#&gt; 6   total_effect +1 SD   0.681 -0.39500959 0.17258286 -0.7076863 -0.03309498</span></span>
+<span><span class="co">#&gt;   Sig</span></span>
+<span><span class="co">#&gt; 1    </span></span>
+<span><span class="co">#&gt; 3    </span></span>
+<span><span class="co">#&gt; 5    </span></span>
+<span><span class="co">#&gt; 2    </span></span>
+<span><span class="co">#&gt; 4    </span></span>
+<span><span class="co">#&gt; 6   *</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">result5</span><span class="op">$</span><span class="va">moderation_std</span>, <span class="st">"standardization"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $effect_scale</span></span>
+<span><span class="co">#&gt; [1] "marginal model-implied endpoint scales; IE / SD(Ydiff)"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $moderator_units</span></span>
+<span><span class="co">#&gt; [1] "raw; fixed numerical probes; dummy coding unchanged"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $mod_coeff_units</span></span>
+<span><span class="co">#&gt; [1] "per SD of continuous W; per 0/1 dummy contrast"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $interval</span></span>
+<span><span class="co">#&gt; [1] "percentile"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $engine</span></span>
+<span><span class="co">#&gt; [1] "mc"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $fixed.x</span></span>
+<span><span class="co">#&gt; [1] FALSE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $MI_reference</span></span>
+<span><span class="co">#&gt; NULL</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $diagnostics</span></span>
+<span><span class="co">#&gt; $diagnostics$requested</span></span>
+<span><span class="co">#&gt; [1] 5000</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $diagnostics$valid</span></span>
+<span><span class="co">#&gt; [1] 5000</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $diagnostics$invalid</span></span>
+<span><span class="co">#&gt; [1] 0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $diagnostics$invalid_indices</span></span>
+<span><span class="co">#&gt; integer(0)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $diagnostics$reasons</span></span>
+<span><span class="co">#&gt; &lt; table of extent 0 &gt;</span></span></code></pre></div>
+<p>Continuous interaction coefficients in <code>mod_coeff</code> are per
+SD of the moderator. Conditional effects and curves are evaluated at
+fixed numerical values in the original moderator units, using a common
+marginal endpoint scale. These are different reporting quantities.
+Existing moderator main effects enter conditional intercepts whether or
+not <code>a</code>/<code>cp</code> is listed in <code>MP</code>; totals
+include all model-implied indirect paths.</p>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_moderation_curve.html">plot_moderation_curve</a></span><span class="op">(</span><span class="va">result5</span>, <span class="st">"total_indirect"</span>, standardized <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<div class="float">
+<img src="figures/WsMed-standardized-conditional-plot-1.png" alt="plot of chunk standardized-conditional-plot"><div class="figcaption">plot of chunk
+standardized-conditional-plot</div>
+</div>
+<p>Conditional intervals are percentile intervals from jointly
+transformed draws, including uncertainty in the SDs when those moments
+are estimated. Do not divide raw interval limits by a single fitted SD.
+Point estimates evaluate the effect at fitted (or pooled primitive)
+parameters, rather than averaging the nonlinear effect over draws.
+Report the raw moderator probes, the marginal scale definition,
+<code>fixed.x</code>, and the interval engine.</p>
+<p>For <code>ci_method = "both"</code>, extract
+<code>moderation_std$mc</code> or <code>moderation_std$boot</code>;
+choose <code>engine = "mc"</code> or <code>engine = "boot"</code> in the
+plotting call. The <a href="StandardizedModeratedMediation.html">dedicated tutorial</a> also
+covers categorical moderators, post-fit conversion, FIML and MI.</p>
+</div>
+<div class="section level2">
+<h2 id="more-plots-for-reporting">More plots for reporting<a class="anchor" aria-label="anchor" href="#more-plots-for-reporting"></a>
+</h2>
+<p>Use <code><a href="../reference/plot_effects.html">plot_effects()</a></code> for an effect forest,
+<code><a href="../reference/plot_conditional_effects.html">plot_conditional_effects()</a></code> for group or reference-level
+point intervals, and <code><a href="../reference/plot_contrasts.html">plot_contrasts()</a></code> for effect
+differences with their own confidence intervals. All three support
+<code>standardized</code> and the MC/bootstrap <code>engine</code>
+selection. See <a href="PlottingEffects.html">Plotting mediation effects
+and contrasts</a> for executed examples, selection of paths and labels,
+and export to PDF or PNG.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

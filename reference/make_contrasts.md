@@ -1,6 +1,6 @@
-# make_contrasts
+# Compare indirect effects across moderator levels
 
-make_contrasts
+Compare indirect effects across moderator levels
 
 ## Usage
 

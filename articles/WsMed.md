@@ -1,4 +1,12 @@
-# Using wsMed: A step-by-step tutorial
+# Analysis options: a complete walkthrough
+
+**Looking for a short first example?** Start with [Get
+started](https://yangzhen1999.github.io/wsMed/articles/GetStarted.md).
+This longer guide explains analysis options and preserves historical
+full-report examples. Use [Read and export
+results](https://yangzhen1999.github.io/wsMed/articles/ResultsGuide.md)
+for the current [`print()`](https://rdrr.io/r/base/print.html) and
+[`summary()`](https://rdrr.io/r/base/summary.html) workflow.
 
 ## Introduction
 
@@ -14,6 +22,31 @@ call one step at a time. Each section begins with the same basic call
 and changes only the arguments needed for the next part of the analysis.
 
 ## Quick start
+
+The examples below use the artificial `example_data` dataset. The
+empirical manuscript data are also included as `wsmed_examples` (123
+participants, 14 columns). Load them without an external data file:
+
+``` r
+
+data(wsmed_examples, package = "wsMed")
+dim(wsmed_examples)
+#> [1] 123  14
+colSums(is.na(wsmed_examples))
+#>  TSRQ_T1  TSRQ_T2 WEMBS_T1 WEMBS_T2  SMUF_T1  SMUF_T2   ISI_T1   ISI_T2 
+#>        1       22        0       22        8       18        0       19 
+#> DASSS_T1 DASSS_T2   HES_T1   HES_T2      Age      BMI 
+#>        0       23        0       20        0       13
+```
+
+See
+[`help("wsmed_examples")`](https://yangzhen1999.github.io/wsMed/reference/wsmed_examples.md)
+for variable meanings, source and license, preprocessing, and
+missingness. These data retain the manuscript’s missing values. The
+[categorical predictor
+tutorial](https://yangzhen1999.github.io/wsMed/articles/CategoricalPredictors.md)
+uses the separate simulated data to illustrate factor coding and group
+comparisons.
 
 The following example fits a parallel mediation model with two
 mediators. It uses `example_data`, which is included in the package.
@@ -38,7 +71,7 @@ result <- wsMed(
   seed = 123
 )
 
-print(result)
+print(result, detail = "legacy")
 ```
 
 The arguments in this call answer four basic questions:
@@ -292,8 +325,9 @@ result_fiml <- wsMed(
 )
 ```
 
-For FIML with Monte Carlo intervals, `MCmethod` can be set to `"mc"` or
-`"bootSD"`.
+For FIML with Monte Carlo intervals, use the default `MCmethod = "mc"`.
+The current fitting pipeline does not activate a separate `"bootSD"`
+correction.
 
 Multiple imputation is requested with `Na = "MI"`. Its controls are
 supplied through `mi_args`:
@@ -343,6 +377,19 @@ result_standardized <- wsMed(
 )
 ```
 
+Standardization uses marginal model-implied SDs of the difference and
+average components; differences are not recentered. A full indirect
+effect is divided by the outcome-difference SD, including in serial
+models. With a moderator, `standardized = TRUE` also adds
+`moderation_std` while preserving raw conditional results in
+`moderation`. The parameter table alone does not describe effects at all
+moderator values.
+
+See [Standardized moderated
+mediation](https://yangzhen1999.github.io/wsMed/articles/StandardizedModeratedMediation.md)
+for the scale definitions, executable examples and inference
+conventions.
+
 ## Step 4: Add optional model components
 
 Moderators and covariates are added to the same
@@ -351,11 +398,10 @@ call. They do not require a separate analysis workflow.
 
 ### Moderators
 
-A moderated mediation analysis requires three arguments:
+Three arguments control a moderated mediation analysis:
 
 - `W` identifies the moderator variable;
-- `W_type` specifies whether it is `"continuous"` or `"categorical"`;
-  and
+- `W_type` optionally specifies `"continuous"` or `"categorical"`; and
 - `MP` identifies the paths moderated by `W`.
 
 For example:
@@ -375,6 +421,7 @@ result_moderated <- wsMed(
   Na = "DE",
   ci_method = "mc",
   R = 5000,
+  standardized = TRUE,
   seed = 123
 )
 ```
@@ -389,13 +436,30 @@ user-defined model in Step 2 contains the labels `b_1_3`, `b2`, and
 `b3`, but it does not contain `b1` because `"M1 -> Y"` was not
 specified.
 
-For a categorical moderator, change the relevant arguments:
+Declare categorical covariates and moderators as unordered factors
+before using either interface. Set factor levels explicitly; the first
+level is the reference group. For example:
+
+``` r
+
+example_data$Group <- factor(example_data$Group,
+                             levels = c("low", "med", "high"))
+```
+
+Then use the factor column as the moderator:
 
 ``` r
 
 W = "Group"
-W_type = "categorical"
 ```
+
+`W_type = "categorical"` remains available, but is not needed for a
+factor. The same factor declaration applies to categorical
+between-subject covariates selected through `C`. The [categorical
+predictor
+guide](https://yangzhen1999.github.io/wsMed/articles/CategoricalPredictors.md)
+explains binary coding, reference groups, and compatibility defaults for
+numeric 0/1 columns.
 
 After fitting a moderated model,
 [`plot_moderation_curve()`](https://yangzhen1999.github.io/wsMed/reference/plot_moderation_curve.md)
@@ -455,7 +519,7 @@ Print the fitted object to obtain the main analysis summary:
 
 ``` r
 
-print(result)
+print(result, detail = "legacy")
 ```
 
 Depending on the selected options, the printed output includes:
@@ -533,7 +597,7 @@ result4_mi <- wsMed(
   seed = 123
 )
 
-print(result4_mi)
+print(result4_mi, detail = "legacy")
 #> 
 #> 
 #> *************** VARIABLES ***************
@@ -572,7 +636,7 @@ print(result4_mi)
 #> |Label          | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
 #> |:--------------|--------:|-----:|---------:|----------:|
 #> |Total effect   |    0.026| 0.018|    -0.009|      0.060|
-#> |Direct effect  |    0.022| 0.017|    -0.012|      0.056|
+#> |Direct effect  |    0.022| 0.017|    -0.013|      0.056|
 #> |Total indirect |    0.004| 0.005|    -0.005|      0.015|
 #> 
 #> Indirect effects:
@@ -597,8 +661,8 @@ print(result4_mi)
 #> 
 #> |Coefficient | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
 #> |:-----------|--------:|-----:|---------:|----------:|
-#> |d1          |    0.031| 0.105|    -0.172|      0.239|
-#> |d2          |   -0.096| 0.089|    -0.271|      0.081|
+#> |d1          |    0.031| 0.105|    -0.175|      0.235|
+#> |d2          |   -0.096| 0.089|    -0.269|      0.076|
 #> 
 #> 
 #> *************** MODERATION KEY (d-paths) ***************
@@ -608,6 +672,9 @@ print(result4_mi)
 #> |:-----------|:--------------|:---------------|
 #> |d1          |M1avg -> Ydiff |M1diff -> Ydiff |
 #> |d2          |M2avg -> Ydiff |M2diff -> Ydiff |
+#> 
+#> UNSTANDARDIZED CONDITIONAL EFFECTS (mc)
+#> Percentile intervals; moderator probes and centering references are held fixed.
 #> 
 #> 
 #> *************** CONTRAST INDIRECT EFFECTS (No Moderator) ***************
@@ -623,10 +690,10 @@ print(result4_mi)
 #> 
 #> |Coeff | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
 #> |:-----|--------:|-----:|---------:|----------:|
-#> |X1_b1 |   -0.147| 0.105|    -0.347|      0.062|
-#> |X0_b1 |   -0.179| 0.109|    -0.396|      0.033|
-#> |X1_b2 |   -0.090| 0.105|    -0.297|      0.114|
-#> |X0_b2 |    0.004| 0.102|    -0.191|      0.207|
+#> |X1_b1 |   -0.147| 0.106|    -0.354|      0.057|
+#> |X0_b1 |   -0.178| 0.109|    -0.386|      0.037|
+#> |X1_b2 |   -0.091| 0.106|    -0.304|      0.119|
+#> |X0_b2 |    0.005| 0.101|    -0.190|      0.205|
 #> 
 #> 
 #> *************** REGRESSION PATHS (MC) ***************
@@ -634,10 +701,10 @@ print(result4_mi)
 #> 
 #> |Path           |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
 #> |:--------------|:-----|--------:|-----:|---------:|----------:|
-#> |Ydiff ~ M1diff |b1    |   -0.162| 0.094|    -0.344|      0.022|
-#> |Ydiff ~ M1avg  |d1    |    0.031| 0.105|    -0.172|      0.239|
-#> |Ydiff ~ M2diff |b2    |   -0.043| 0.094|    -0.224|      0.144|
-#> |Ydiff ~ M2avg  |d2    |   -0.096| 0.089|    -0.271|      0.081|
+#> |Ydiff ~ M1diff |b1    |   -0.162| 0.094|    -0.346|      0.020|
+#> |Ydiff ~ M1avg  |d1    |    0.031| 0.105|    -0.175|      0.235|
+#> |Ydiff ~ M2diff |b2    |   -0.043| 0.094|    -0.225|      0.142|
+#> |Ydiff ~ M2avg  |d2    |   -0.096| 0.089|    -0.269|      0.076|
 #> 
 #> 
 #> *************** INTERCEPTS (MC) ***************
@@ -645,11 +712,11 @@ print(result4_mi)
 #> 
 #> |Intercept |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
 #> |:---------|:-----|--------:|-----:|---------:|----------:|
-#> |Ydiff~1   |cp    |    0.022| 0.017|    -0.012|      0.056|
-#> |M1diff~1  |a1    |   -0.025| 0.020|    -0.063|      0.014|
+#> |Ydiff~1   |cp    |    0.022| 0.017|    -0.013|      0.056|
+#> |M1diff~1  |a1    |   -0.025| 0.020|    -0.064|      0.013|
 #> |M2diff~1  |a2    |    0.006| 0.020|    -0.033|      0.045|
-#> |M1avg~1   |      |   -0.000| 0.000|    -0.000|     -0.000|
-#> |M2avg~1   |      |   -0.000| 0.000|    -0.000|     -0.000|
+#> |M1avg~1   |      |   -0.000| 0.018|    -0.036|      0.034|
+#> |M2avg~1   |      |   -0.000| 0.020|    -0.039|      0.039|
 #> 
 #> 
 #> *************** VARIANCES (MC) ***************
@@ -657,11 +724,11 @@ print(result4_mi)
 #> 
 #> |Variance       |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
 #> |:--------------|:-----|--------:|-----:|---------:|----------:|
-#> |Ydiff~~Ydiff   |      |    0.024| 0.004|     0.017|      0.032|
-#> |M1diff~~M1diff |      |    0.033| 0.006|     0.021|      0.045|
+#> |Ydiff~~Ydiff   |      |    0.024| 0.004|     0.017|      0.031|
+#> |M1diff~~M1diff |      |    0.033| 0.006|     0.022|      0.045|
 #> |M2diff~~M2diff |      |    0.033| 0.005|     0.023|      0.044|
-#> |M1avg~~M1avg   |      |    0.033| 0.000|     0.033|      0.033|
-#> |M2avg~~M2avg   |      |    0.040| 0.000|     0.040|      0.040|
+#> |M1avg~~M1avg   |      |    0.033| 0.005|     0.024|      0.043|
+#> |M2avg~~M2avg   |      |    0.040| 0.006|     0.028|      0.052|
 #> 
 #> 
 #> *************** STANDARDIZED (MC) ***************
@@ -669,25 +736,25 @@ print(result4_mi)
 #> 
 #> |Parameter      | Estimate|    SE|        R|   2.5%| 97.5%|
 #> |:--------------|--------:|-----:|--------:|------:|-----:|
-#> |cp             |    0.136| 0.108| 5000.000| -0.073| 0.346|
-#> |b1             |   -0.185| 0.103| 5000.000| -0.379| 0.023|
-#> |d1             |    0.035| 0.115| 5000.000| -0.188| 0.256|
-#> |b2             |   -0.049| 0.105| 5000.000| -0.250| 0.159|
-#> |d2             |   -0.125| 0.111| 5000.000| -0.330| 0.103|
-#> |a1             |   -0.138| 0.113| 5000.000| -0.367| 0.078|
-#> |a2             |    0.032| 0.112| 5000.000| -0.182| 0.253|
-#> |Ydiff~~Ydiff   |    0.949| 0.052| 5000.000|  0.783| 0.984|
+#> |cp             |    0.136| 0.108| 5000.000| -0.078| 0.350|
+#> |b1             |   -0.185| 0.103| 5000.000| -0.377| 0.022|
+#> |d1             |    0.035| 0.117| 5000.000| -0.197| 0.254|
+#> |b2             |   -0.049| 0.105| 5000.000| -0.255| 0.158|
+#> |d2             |   -0.121| 0.108| 5000.000| -0.326| 0.095|
+#> |a1             |   -0.138| 0.112| 5000.000| -0.367| 0.071|
+#> |a2             |    0.032| 0.111| 5000.000| -0.182| 0.253|
+#> |Ydiff~~Ydiff   |    0.950| 0.053| 5000.000|  0.784| 0.983|
 #> |M1diff~~M1diff |    1.000| 0.000| 5000.000|  1.000| 1.000|
 #> |M2diff~~M2diff |    1.000| 0.000| 5000.000|  1.000| 1.000|
 #> |M1avg~~M1avg   |    1.000| 0.000| 5000.000|  1.000| 1.000|
-#> |M1avg~~M2avg   |    0.254| 0.000| 5000.000|  0.254| 0.254|
+#> |M1avg~~M2avg   |    0.274| 0.098| 5000.000|  0.075| 0.458|
 #> |M2avg~~M2avg   |    1.000| 0.000| 5000.000|  1.000| 1.000|
-#> |M1avg~1        |    0.000| 0.000| 5000.000|  0.000| 0.000|
-#> |M2avg~1        |    0.000| 0.000| 5000.000|  0.000| 0.000|
-#> |indirect_1     |    0.026| 0.026| 5000.000| -0.016| 0.085|
-#> |indirect_2     |   -0.002| 0.013| 5000.000| -0.030| 0.027|
-#> |total_indirect |    0.024| 0.029| 5000.000| -0.028| 0.089|
-#> |total_effect   |    0.160| 0.110| 5000.000| -0.055| 0.383|
+#> |M1avg~1        |   -0.000| 0.099| 5000.000| -0.199| 0.188|
+#> |M2avg~1        |   -0.000| 0.102| 5000.000| -0.203| 0.199|
+#> |indirect_1     |    0.026| 0.026| 5000.000| -0.015| 0.085|
+#> |indirect_2     |   -0.002| 0.013| 5000.000| -0.031| 0.027|
+#> |total_indirect |    0.024| 0.029| 5000.000| -0.028| 0.091|
+#> |total_effect   |    0.160| 0.110| 5000.000| -0.054| 0.374|
 ```
 
 The output sections and their main purposes are:
@@ -873,9 +940,9 @@ result4_mi$mc$result     # Monte Carlo results
 result4_mi$mc$std_mc     # standardized Monte Carlo results
 ```
 
-`print(result4_mi)` is intended for reading the analysis summary,
-whereas the stored components are intended for inspection or downstream
-programming.
+`print(result4_mi, detail = "legacy")` is intended for reading the
+analysis summary, whereas the stored components are intended for
+inspection or downstream programming.
 
 ### Example 2: A model with a continuous moderator
 
@@ -898,10 +965,11 @@ result5 <- wsMed(
   Na = "DE",
   ci_method = "mc",
   R = 5000,
+  standardized = TRUE,
   seed = 123
 )
 
-print(result5)
+print(result5, detail = "legacy")
 #> 
 #> 
 #> *************** VARIABLES ***************
@@ -928,15 +996,15 @@ print(result5)
 #> 
 #> |Measure   |  Value|
 #> |:---------|------:|
-#> |Chi-Sq    | 14.576|
-#> |df        | 16.000|
-#> |p         |  0.556|
-#> |CFI       |  1.000|
-#> |TLI       | -2.294|
-#> |RMSEA     |  0.000|
+#> |Chi-Sq    | 14.158|
+#> |df        | 13.000|
+#> |p         |  0.363|
+#> |CFI       |  0.000|
+#> |TLI       |  5.128|
+#> |RMSEA     |  0.039|
 #> |RMSEA Low |  0.000|
-#> |RMSEA Up  |  0.111|
-#> |SRMR      |  0.048|
+#> |RMSEA Up  |  0.139|
+#> |SRMR      |  0.046|
 #> 
 #> 
 #> ************* TOTAL / DIRECT / TOTAL-IND (MC) *************
@@ -944,19 +1012,19 @@ print(result5)
 #> 
 #> |Label          | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
 #> |:--------------|--------:|-----:|---------:|----------:|
-#> |Total effect   |   -0.032| 0.024|    -0.076|      0.016|
-#> |Direct effect  |   -0.029| 0.023|    -0.074|      0.016|
-#> |Total indirect |   -0.003| 0.008|    -0.019|      0.013|
+#> |Total effect   |   -0.032| 0.023|    -0.078|      0.013|
+#> |Direct effect  |   -0.029| 0.023|    -0.073|      0.016|
+#> |Total indirect |   -0.003| 0.008|    -0.021|      0.013|
 #> 
 #> Indirect effects:
 #> 
 #> 
 #> |Label   | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
 #> |:-------|--------:|-----:|---------:|----------:|
-#> |ind_1   |    0.002| 0.005|    -0.007|      0.014|
+#> |ind_1   |    0.002| 0.005|    -0.007|      0.016|
 #> |ind_2   |    0.000| 0.004|    -0.008|      0.008|
-#> |ind_1_2 |   -0.000| 0.002|    -0.003|      0.004|
-#> |ind_3   |   -0.004| 0.006|    -0.018|      0.005|
+#> |ind_1_2 |   -0.000| 0.002|    -0.004|      0.003|
+#> |ind_3   |   -0.004| 0.006|    -0.019|      0.005|
 #> |ind_1_3 |   -0.001| 0.001|    -0.004|      0.001|
 #> 
 #> Indirect-effect key:
@@ -976,11 +1044,11 @@ print(result5)
 #> 
 #> |Coefficient | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
 #> |:-----------|--------:|-----:|---------:|----------:|
-#> |d1          |   -0.040| 0.124|    -0.290|      0.202|
-#> |d2          |   -0.000| 0.129|    -0.249|      0.256|
-#> |d3          |   -0.160| 0.142|    -0.434|      0.122|
-#> |d_1_2       |   -0.044| 0.107|    -0.251|      0.167|
-#> |d_1_3       |    0.088| 0.115|    -0.134|      0.312|
+#> |d1          |   -0.040| 0.124|    -0.276|      0.208|
+#> |d2          |   -0.000| 0.129|    -0.254|      0.258|
+#> |d3          |   -0.160| 0.142|    -0.431|      0.111|
+#> |d_1_2       |   -0.044| 0.108|    -0.258|      0.167|
+#> |d_1_3       |    0.088| 0.114|    -0.128|      0.311|
 #> 
 #> 
 #> *************** MODERATION KEY (d-paths) ***************
@@ -994,6 +1062,9 @@ print(result5)
 #> |d_1_2       |M1avg -> M2diff |M1diff -> M2diff |
 #> |d_1_3       |M1avg -> M3diff |M1diff -> M3diff |
 #> 
+#> UNSTANDARDIZED CONDITIONAL EFFECTS (mc)
+#> Percentile intervals; moderator probes and centering references are held fixed.
+#> 
 #> 
 #> *************** MODERATION RESULTS (Continuous Moderator) ***************
 #> 
@@ -1002,133 +1073,298 @@ print(result5)
 #> 
 #> |Path      |BaseCoef |W_dummy | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|Sig |
 #> |:---------|:--------|:-------|--------:|-----:|---------:|----------:|:---|
-#> |cpw_W1    |cp       |D3      |   -0.172| 0.101|    -0.369|      0.022|    |
-#> |dw1_W1    |d1       |D3      |   -0.103| 0.666|    -1.402|      1.204|    |
-#> |bw2_W1    |b2       |D3      |   -0.520| 0.667|    -1.856|      0.781|    |
-#> |aw1_W1    |a1       |D3      |    0.057| 0.098|    -0.134|      0.258|    |
-#> |bw_1_2_W1 |b_1_2    |D3      |   -0.296| 0.545|    -1.373|      0.721|    |
-#> |dw_1_2_W1 |d_1_2    |D3      |    0.592| 0.601|    -0.596|      1.755|    |
+#> |cpw_W1    |cp       |D3      |   -0.173| 0.097|    -0.368|      0.017|    |
+#> |dw1_W1    |d1       |D3      |   -0.114| 0.657|    -1.413|      1.196|    |
+#> |bw2_W1    |b2       |D3      |   -0.514| 0.662|    -1.821|      0.770|    |
+#> |aw1_W1    |a1       |D3      |    0.056| 0.099|    -0.143|      0.246|    |
+#> |aw2_W1    |a2       |D3      |    0.007| 0.099|    -0.187|      0.202|    |
+#> |bw_1_2_W1 |b_1_2    |D3      |   -0.300| 0.552|    -1.388|      0.796|    |
+#> |dw_1_2_W1 |d_1_2    |D3      |    0.594| 0.603|    -0.585|      1.765|    |
+#> |aw3_W1    |a3       |D3      |   -0.081| 0.095|    -0.268|      0.104|    |
 #> 
 #> --- Conditional Indirect Effects ---
 #> 
 #> 
 #> |Path                |Mediators | Level| W_value| Estimate|    SE| 2.5.%CI.Lo| 97.5.%CI.Up|Sig |
 #> |:-------------------|:---------|-----:|-------:|--------:|-----:|----------:|-----------:|:---|
-#> |indirect_effect_1   |1         | -1 SD|   0.223|    0.003| 0.007|     -0.010|       0.021|    |
-#> |indirect_effect_1   |1         |  0 SD|   0.452|    0.002| 0.005|     -0.007|       0.014|    |
-#> |indirect_effect_1   |1         | +1 SD|   0.681|    0.001| 0.005|     -0.009|       0.014|    |
+#> |indirect_effect_1   |1         | -1 SD|   0.223|    0.003| 0.007|     -0.009|       0.021|    |
+#> |indirect_effect_1   |1         |  0 SD|   0.452|    0.002| 0.005|     -0.007|       0.016|    |
+#> |indirect_effect_1   |1         | +1 SD|   0.681|    0.001| 0.006|     -0.009|       0.015|    |
 #> |indirect_effect_1_2 |1 2       | -1 SD|   0.223|   -0.002| 0.005|     -0.013|       0.006|    |
-#> |indirect_effect_1_2 |1 2       |  0 SD|   0.452|    0.000| 0.002|     -0.003|       0.004|    |
+#> |indirect_effect_1_2 |1 2       |  0 SD|   0.452|   -0.000| 0.002|     -0.004|       0.003|    |
 #> |indirect_effect_1_2 |1 2       | +1 SD|   0.681|    0.000| 0.002|     -0.004|       0.006|    |
 #> |indirect_effect_1_3 |1 3       | -1 SD|   0.223|   -0.001| 0.002|     -0.006|       0.001|    |
 #> |indirect_effect_1_3 |1 3       |  0 SD|   0.452|   -0.001| 0.001|     -0.004|       0.001|    |
 #> |indirect_effect_1_3 |1 3       | +1 SD|   0.681|   -0.000| 0.001|     -0.004|       0.002|    |
-#> |indirect_effect_2   |2         | -1 SD|   0.223|    0.002| 0.006|     -0.009|       0.016|    |
+#> |indirect_effect_2   |2         | -1 SD|   0.223|    0.001| 0.008|     -0.014|       0.020|    |
 #> |indirect_effect_2   |2         |  0 SD|   0.452|    0.000| 0.004|     -0.008|       0.008|    |
-#> |indirect_effect_2   |2         | +1 SD|   0.681|   -0.002| 0.006|     -0.016|       0.009|    |
+#> |indirect_effect_2   |2         | +1 SD|   0.681|   -0.002| 0.008|     -0.020|       0.012|    |
+#> |indirect_effect_3   |3         | -1 SD|   0.223|   -0.008| 0.009|     -0.030|       0.006|    |
+#> |indirect_effect_3   |3         |  0 SD|   0.452|   -0.004| 0.006|     -0.019|       0.005|    |
+#> |indirect_effect_3   |3         | +1 SD|   0.681|   -0.001| 0.007|     -0.016|       0.013|    |
 #> 
 #> --- Indirect Effect Contrasts ---
 #> 
 #> 
 #> |Path                |            Contrast| Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|Sig |
 #> |:-------------------|-------------------:|--------:|-----:|---------:|----------:|:---|
-#> |indirect_effect_1   | (0 SD)   -  (-1 SD)|    0.001| 0.004|    -0.006|      0.011|    |
-#> |indirect_effect_1   | (+1 SD)  -  (-1 SD)|    0.002| 0.008|    -0.012|      0.023|    |
-#> |indirect_effect_1   | (+1 SD)  -   (0 SD)|    0.001| 0.004|    -0.006|      0.011|    |
-#> |indirect_effect_1_2 | (0 SD)   -  (-1 SD)|   -0.002| 0.004|    -0.012|      0.004|    |
-#> |indirect_effect_1_2 | (+1 SD)  -  (-1 SD)|   -0.002| 0.005|    -0.015|      0.007|    |
-#> |indirect_effect_1_2 | (+1 SD)  -   (0 SD)|   -0.000| 0.002|    -0.005|      0.004|    |
-#> |indirect_effect_1_3 | (0 SD)   -  (-1 SD)|   -0.000| 0.001|    -0.003|      0.001|    |
-#> |indirect_effect_1_3 | (+1 SD)  -  (-1 SD)|   -0.001| 0.002|    -0.006|      0.003|    |
-#> |indirect_effect_1_3 | (+1 SD)  -   (0 SD)|   -0.000| 0.001|    -0.003|      0.001|    |
-#> |indirect_effect_2   | (0 SD)   -  (-1 SD)|    0.002| 0.005|    -0.006|      0.013|    |
-#> |indirect_effect_2   | (+1 SD)  -  (-1 SD)|    0.003| 0.009|    -0.013|      0.027|    |
-#> |indirect_effect_2   | (+1 SD)  -   (0 SD)|    0.002| 0.005|    -0.006|      0.013|    |
+#> |indirect_effect_1   | (0 SD)   -  (-1 SD)|   -0.001| 0.004|    -0.011|      0.006|    |
+#> |indirect_effect_1   | (+1 SD)  -  (-1 SD)|   -0.002| 0.008|    -0.021|      0.012|    |
+#> |indirect_effect_1   | (+1 SD)  -   (0 SD)|   -0.001| 0.004|    -0.011|      0.006|    |
+#> |indirect_effect_1_2 | (0 SD)   -  (-1 SD)|    0.002| 0.004|    -0.005|      0.012|    |
+#> |indirect_effect_1_2 | (+1 SD)  -  (-1 SD)|    0.002| 0.005|    -0.007|      0.015|    |
+#> |indirect_effect_1_2 | (+1 SD)  -   (0 SD)|    0.000| 0.002|    -0.004|      0.006|    |
+#> |indirect_effect_1_3 | (0 SD)   -  (-1 SD)|    0.000| 0.001|    -0.001|      0.003|    |
+#> |indirect_effect_1_3 | (+1 SD)  -  (-1 SD)|    0.001| 0.002|    -0.003|      0.006|    |
+#> |indirect_effect_1_3 | (+1 SD)  -   (0 SD)|    0.000| 0.001|    -0.001|      0.003|    |
+#> |indirect_effect_2   | (0 SD)   -  (-1 SD)|   -0.001| 0.007|    -0.018|      0.013|    |
+#> |indirect_effect_2   | (+1 SD)  -  (-1 SD)|   -0.003| 0.011|    -0.028|      0.018|    |
+#> |indirect_effect_2   | (+1 SD)  -   (0 SD)|   -0.002| 0.007|    -0.018|      0.011|    |
+#> |indirect_effect_3   | (0 SD)   -  (-1 SD)|    0.003| 0.006|    -0.006|      0.017|    |
+#> |indirect_effect_3   | (+1 SD)  -  (-1 SD)|    0.007| 0.011|    -0.012|      0.033|    |
+#> |indirect_effect_3   | (+1 SD)  -   (0 SD)|    0.003| 0.006|    -0.006|      0.017|    |
 #> 
 #> --- Moderated Path Coefficients ---
 #> 
 #> 
 #> |Path  | Level| W_value| Estimate|    SE| 2.5.%CI.Lo| 97.5.%CI.Up|Sig |
 #> |:-----|-----:|-------:|--------:|-----:|----------:|-----------:|:---|
-#> |a1    | -1 SD|   0.223|   -0.039| 0.033|     -0.104|       0.022|    |
-#> |a1    |  0 SD|   0.452|   -0.026| 0.023|     -0.070|       0.018|    |
-#> |a1    | +1 SD|   0.681|   -0.013| 0.032|     -0.076|       0.047|    |
-#> |b2    | -1 SD|   0.223|    0.119| 0.205|     -0.281|       0.518|    |
-#> |b2    |  0 SD|   0.452|    0.000| 0.138|     -0.271|       0.275|    |
-#> |b2    | +1 SD|   0.681|   -0.119| 0.207|     -0.523|       0.288|    |
-#> |d1    | -1 SD|   0.223|   -0.020| 0.205|     -0.440|       0.372|    |
-#> |d1    |  0 SD|   0.452|   -0.044| 0.124|     -0.290|       0.202|    |
-#> |d1    | +1 SD|   0.681|   -0.067| 0.188|     -0.437|       0.298|    |
-#> |cp    | -1 SD|   0.223|   -0.022| 0.018|     -0.057|       0.012|    |
-#> |cp    |  0 SD|   0.452|   -0.029| 0.023|     -0.074|       0.016|    |
-#> |cp    | +1 SD|   0.681|   -0.036| 0.029|     -0.091|       0.019|    |
-#> |b_1_2 | -1 SD|   0.223|    0.372| 0.169|      0.046|       0.701|*   |
-#> |b_1_2 |  0 SD|   0.452|    0.304| 0.116|      0.076|       0.531|*   |
-#> |b_1_2 | +1 SD|   0.681|    0.236| 0.172|     -0.093|       0.569|    |
-#> |d_1_2 | -1 SD|   0.223|   -0.180| 0.172|     -0.515|       0.155|    |
-#> |d_1_2 |  0 SD|   0.452|   -0.044| 0.107|     -0.251|       0.167|    |
-#> |d_1_2 | +1 SD|   0.681|    0.091| 0.177|     -0.252|       0.446|    |
+#> |a1    | -1 SD|   0.223|   -0.039| 0.033|     -0.101|       0.026|    |
+#> |a1    |  0 SD|   0.452|   -0.026| 0.024|     -0.072|       0.021|    |
+#> |a1    | +1 SD|   0.681|   -0.013| 0.033|     -0.078|       0.050|    |
+#> |b2    | -1 SD|   0.223|    0.119| 0.208|     -0.302|       0.520|    |
+#> |b2    |  0 SD|   0.452|    0.002| 0.137|     -0.274|       0.270|    |
+#> |b2    | +1 SD|   0.681|   -0.116| 0.201|     -0.513|       0.276|    |
+#> |d1    | -1 SD|   0.223|   -0.014| 0.204|     -0.406|       0.398|    |
+#> |d1    |  0 SD|   0.452|   -0.040| 0.124|     -0.276|       0.208|    |
+#> |d1    | +1 SD|   0.681|   -0.066| 0.185|     -0.420|       0.296|    |
+#> |cp    | -1 SD|   0.223|    0.010| 0.032|     -0.053|       0.073|    |
+#> |cp    |  0 SD|   0.452|   -0.029| 0.023|     -0.073|       0.016|    |
+#> |cp    | +1 SD|   0.681|   -0.069| 0.032|     -0.132|      -0.006|*   |
+#> |b_1_2 | -1 SD|   0.223|    0.375| 0.177|      0.028|       0.731|*   |
+#> |b_1_2 |  0 SD|   0.452|    0.306| 0.119|      0.079|       0.543|*   |
+#> |b_1_2 | +1 SD|   0.681|    0.237| 0.171|     -0.098|       0.579|    |
+#> |d_1_2 | -1 SD|   0.223|   -0.180| 0.170|     -0.532|       0.143|    |
+#> |d_1_2 |  0 SD|   0.452|   -0.044| 0.108|     -0.258|       0.167|    |
+#> |d_1_2 | +1 SD|   0.681|    0.092| 0.181|     -0.263|       0.443|    |
+#> |a2    | -1 SD|   0.223|    0.012| 0.033|     -0.051|       0.076|    |
+#> |a2    |  0 SD|   0.452|    0.014| 0.022|     -0.031|       0.056|    |
+#> |a2    | +1 SD|   0.681|    0.015| 0.030|     -0.045|       0.072|    |
+#> |a3    | -1 SD|   0.223|    0.041| 0.032|     -0.021|       0.105|    |
+#> |a3    |  0 SD|   0.452|    0.023| 0.022|     -0.022|       0.065|    |
+#> |a3    | +1 SD|   0.681|    0.004| 0.030|     -0.054|       0.063|    |
 #> 
 #> --- Path Coefficient Contrasts ---
 #> 
 #> 
 #> |Path  |            Contrast| Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|Sig |
 #> |:-----|-------------------:|--------:|-----:|---------:|----------:|:---|
-#> |a1    | (0 SD)   -  (-1 SD)|   -0.013| 0.023|    -0.059|      0.031|    |
-#> |a1    | (+1 SD)  -  (-1 SD)|   -0.026| 0.045|    -0.118|      0.061|    |
-#> |a1    | (+1 SD)  -   (0 SD)|   -0.013| 0.023|    -0.059|      0.031|    |
-#> |b_1_2 | (0 SD)   -  (-1 SD)|    0.068| 0.125|    -0.165|      0.315|    |
-#> |b_1_2 | (+1 SD)  -  (-1 SD)|    0.136| 0.250|    -0.331|      0.630|    |
-#> |b_1_2 | (+1 SD)  -   (0 SD)|    0.068| 0.125|    -0.165|      0.315|    |
-#> |b2    | (0 SD)   -  (-1 SD)|    0.119| 0.153|    -0.179|      0.425|    |
-#> |b2    | (+1 SD)  -  (-1 SD)|    0.238| 0.306|    -0.358|      0.851|    |
-#> |b2    | (+1 SD)  -   (0 SD)|    0.119| 0.153|    -0.179|      0.425|    |
-#> |cp    | (0 SD)   -  (-1 SD)|    0.007| 0.005|    -0.004|      0.017|    |
-#> |cp    | (+1 SD)  -  (-1 SD)|    0.013| 0.011|    -0.007|      0.034|    |
-#> |cp    | (+1 SD)  -   (0 SD)|    0.007| 0.005|    -0.004|      0.017|    |
-#> |d_1_2 | (0 SD)   -  (-1 SD)|   -0.136| 0.138|    -0.402|      0.137|    |
-#> |d_1_2 | (+1 SD)  -  (-1 SD)|   -0.271| 0.275|    -0.805|      0.273|    |
-#> |d_1_2 | (+1 SD)  -   (0 SD)|   -0.136| 0.138|    -0.402|      0.137|    |
-#> |d1    | (0 SD)   -  (-1 SD)|    0.024| 0.153|    -0.276|      0.321|    |
-#> |d1    | (+1 SD)  -  (-1 SD)|    0.047| 0.305|    -0.552|      0.643|    |
-#> |d1    | (+1 SD)  -   (0 SD)|    0.024| 0.153|    -0.276|      0.321|    |
+#> |a1    | (0 SD)   -  (-1 SD)|    0.013| 0.023|    -0.033|      0.056|    |
+#> |a1    | (+1 SD)  -  (-1 SD)|    0.025| 0.046|    -0.066|      0.113|    |
+#> |a1    | (+1 SD)  -   (0 SD)|    0.013| 0.023|    -0.033|      0.056|    |
+#> |a2    | (0 SD)   -  (-1 SD)|    0.002| 0.023|    -0.043|      0.046|    |
+#> |a2    | (+1 SD)  -  (-1 SD)|    0.003| 0.045|    -0.086|      0.092|    |
+#> |a2    | (+1 SD)  -   (0 SD)|    0.002| 0.023|    -0.043|      0.046|    |
+#> |a3    | (0 SD)   -  (-1 SD)|   -0.019| 0.022|    -0.061|      0.024|    |
+#> |a3    | (+1 SD)  -  (-1 SD)|   -0.037| 0.044|    -0.123|      0.048|    |
+#> |a3    | (+1 SD)  -   (0 SD)|   -0.019| 0.022|    -0.061|      0.024|    |
+#> |b_1_2 | (0 SD)   -  (-1 SD)|   -0.069| 0.127|    -0.318|      0.183|    |
+#> |b_1_2 | (+1 SD)  -  (-1 SD)|   -0.138| 0.253|    -0.636|      0.365|    |
+#> |b_1_2 | (+1 SD)  -   (0 SD)|   -0.069| 0.127|    -0.318|      0.183|    |
+#> |b2    | (0 SD)   -  (-1 SD)|   -0.118| 0.152|    -0.418|      0.176|    |
+#> |b2    | (+1 SD)  -  (-1 SD)|   -0.236| 0.303|    -0.835|      0.353|    |
+#> |b2    | (+1 SD)  -   (0 SD)|   -0.118| 0.152|    -0.418|      0.176|    |
+#> |cp    | (0 SD)   -  (-1 SD)|   -0.040| 0.022|    -0.084|      0.004|    |
+#> |cp    | (+1 SD)  -  (-1 SD)|   -0.079| 0.045|    -0.169|      0.008|    |
+#> |cp    | (+1 SD)  -   (0 SD)|   -0.040| 0.022|    -0.084|      0.004|    |
+#> |d_1_2 | (0 SD)   -  (-1 SD)|    0.136| 0.138|    -0.134|      0.405|    |
+#> |d_1_2 | (+1 SD)  -  (-1 SD)|    0.272| 0.277|    -0.268|      0.809|    |
+#> |d_1_2 | (+1 SD)  -   (0 SD)|    0.136| 0.138|    -0.134|      0.405|    |
+#> |d1    | (0 SD)   -  (-1 SD)|   -0.026| 0.151|    -0.324|      0.274|    |
+#> |d1    | (+1 SD)  -  (-1 SD)|   -0.052| 0.301|    -0.648|      0.549|    |
+#> |d1    | (+1 SD)  -   (0 SD)|   -0.026| 0.151|    -0.324|      0.274|    |
 #> 
 #> --- Conditional Total Effect and Total Indirect Effect ---
 #> 
 #> 
 #> |Effect         | Level| W_value| Estimate|    SE| 2.5.%CI.Lo| 97.5.%CI.Up|Sig |
 #> |:--------------|-----:|-------:|--------:|-----:|----------:|-----------:|:---|
-#> |total_indirect | -1 SD|   0.223|    0.002| 0.009|     -0.016|       0.022|    |
-#> |total_indirect |  0 SD|   0.452|    0.002| 0.006|     -0.010|       0.015|    |
-#> |total_indirect | +1 SD|   0.681|   -0.000| 0.008|     -0.017|       0.016|    |
-#> |total_effect   | -1 SD|   0.223|    0.012| 0.034|     -0.053|       0.077|    |
-#> |total_effect   |  0 SD|   0.452|   -0.028| 0.024|     -0.074|       0.018|    |
-#> |total_effect   | +1 SD|   0.681|   -0.069| 0.033|     -0.132|      -0.005|*   |
+#> |total_indirect | -1 SD|   0.223|   -0.006| 0.014|     -0.035|       0.021|    |
+#> |total_indirect |  0 SD|   0.452|   -0.003| 0.008|     -0.021|       0.013|    |
+#> |total_indirect | +1 SD|   0.681|   -0.001| 0.012|     -0.026|       0.021|    |
+#> |total_effect   | -1 SD|   0.223|    0.005| 0.034|     -0.061|       0.070|    |
+#> |total_effect   |  0 SD|   0.452|   -0.032| 0.023|     -0.078|       0.013|    |
+#> |total_effect   | +1 SD|   0.681|   -0.071| 0.033|     -0.137|      -0.006|*   |
+#> 
+#> STANDARDIZED CONDITIONAL EFFECTS (mc)
+#> Marginal endpoint scales; fixed raw W probes; percentile intervals.
+#> Moderation coefficients: per SD of continuous W; categorical contrasts keep 0/1 units.
+#> 
+#> 
+#> *************** MODERATION RESULTS (Continuous Moderator) ***************
+#> 
+#> --- Moderated Coefficients ---
+#> 
+#> 
+#> |Path      |BaseCoef |W_dummy | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|Sig |
+#> |:---------|:--------|:-------|--------:|-----:|---------:|----------:|:---|
+#> |cpw_W1    |cp       |D3      |   -0.225| 0.116|    -0.431|      0.020|    |
+#> |dw1_W1    |d1       |D3      |   -0.029| 0.157|    -0.336|      0.285|    |
+#> |bw2_W1    |b2       |D3      |   -0.113| 0.141|    -0.384|      0.166|    |
+#> |aw1_W1    |a1       |D3      |    0.073| 0.130|    -0.190|      0.320|    |
+#> |aw2_W1    |a2       |D3      |    0.010| 0.130|    -0.245|      0.263|    |
+#> |bw_1_2_W1 |b_1_2    |D3      |   -0.073| 0.129|    -0.329|      0.185|    |
+#> |dw_1_2_W1 |d_1_2    |D3      |    0.160| 0.156|    -0.151|      0.459|    |
+#> |aw3_W1    |a3       |D3      |   -0.111| 0.127|    -0.362|      0.141|    |
+#> 
+#> --- Conditional Indirect Effects ---
+#> 
+#> 
+#> |Path                |Mediators | Level| W_value| Estimate|    SE| 2.5.%CI.Lo| 97.5.%CI.Up|Sig |
+#> |:-------------------|:---------|-----:|-------:|--------:|-----:|----------:|-----------:|:---|
+#> |indirect_effect_1   |1         | -1 SD|   0.223|    0.019| 0.039|     -0.047|       0.110|    |
+#> |indirect_effect_1   |1         |  0 SD|   0.452|    0.012| 0.027|     -0.035|       0.080|    |
+#> |indirect_effect_1   |1         | +1 SD|   0.681|    0.006| 0.029|     -0.048|       0.077|    |
+#> |indirect_effect_1_2 |1 2       | -1 SD|   0.223|   -0.010| 0.025|     -0.069|       0.030|    |
+#> |indirect_effect_1_2 |1 2       |  0 SD|   0.452|   -0.000| 0.008|     -0.018|       0.018|    |
+#> |indirect_effect_1_2 |1 2       | +1 SD|   0.681|    0.002| 0.012|     -0.021|       0.032|    |
+#> |indirect_effect_1_3 |1 3       | -1 SD|   0.223|   -0.006| 0.010|     -0.032|       0.007|    |
+#> |indirect_effect_1_3 |1 3       |  0 SD|   0.452|   -0.004| 0.007|     -0.022|       0.006|    |
+#> |indirect_effect_1_3 |1 3       | +1 SD|   0.681|   -0.002| 0.008|     -0.021|       0.012|    |
+#> |indirect_effect_2   |2         | -1 SD|   0.223|    0.008| 0.043|     -0.076|       0.108|    |
+#> |indirect_effect_2   |2         |  0 SD|   0.452|    0.000| 0.019|     -0.043|       0.041|    |
+#> |indirect_effect_2   |2         | +1 SD|   0.681|   -0.010| 0.039|     -0.105|       0.064|    |
+#> |indirect_effect_3   |3         | -1 SD|   0.223|   -0.042| 0.048|     -0.159|       0.032|    |
+#> |indirect_effect_3   |3         |  0 SD|   0.452|   -0.023| 0.031|     -0.096|       0.025|    |
+#> |indirect_effect_3   |3         | +1 SD|   0.681|   -0.004| 0.035|     -0.083|       0.069|    |
+#> 
+#> --- Indirect Effect Contrasts ---
+#> 
+#> 
+#> |Path                |            Contrast| Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|Sig |
+#> |:-------------------|-------------------:|--------:|-----:|---------:|----------:|:---|
+#> |indirect_effect_1   | (0 SD)   -  (-1 SD)|   -0.006| 0.021|    -0.055|      0.033|    |
+#> |indirect_effect_1   | (+1 SD)  -  (-1 SD)|   -0.012| 0.042|    -0.110|      0.066|    |
+#> |indirect_effect_1   | (+1 SD)  -   (0 SD)|   -0.006| 0.021|    -0.055|      0.033|    |
+#> |indirect_effect_1_2 | (0 SD)   -  (-1 SD)|    0.010| 0.022|    -0.024|      0.063|    |
+#> |indirect_effect_1_2 | (+1 SD)  -  (-1 SD)|    0.012| 0.028|    -0.034|      0.079|    |
+#> |indirect_effect_1_2 | (+1 SD)  -   (0 SD)|    0.002| 0.012|    -0.021|      0.029|    |
+#> |indirect_effect_1_3 | (0 SD)   -  (-1 SD)|    0.002| 0.005|    -0.007|      0.015|    |
+#> |indirect_effect_1_3 | (+1 SD)  -  (-1 SD)|    0.004| 0.011|    -0.014|      0.030|    |
+#> |indirect_effect_1_3 | (+1 SD)  -   (0 SD)|    0.002| 0.005|    -0.007|      0.015|    |
+#> |indirect_effect_2   | (0 SD)   -  (-1 SD)|   -0.008| 0.037|    -0.092|      0.067|    |
+#> |indirect_effect_2   | (+1 SD)  -  (-1 SD)|   -0.018| 0.058|    -0.150|      0.093|    |
+#> |indirect_effect_2   | (+1 SD)  -   (0 SD)|   -0.010| 0.036|    -0.093|      0.058|    |
+#> |indirect_effect_3   | (0 SD)   -  (-1 SD)|    0.019| 0.029|    -0.030|      0.088|    |
+#> |indirect_effect_3   | (+1 SD)  -  (-1 SD)|    0.038| 0.058|    -0.060|      0.175|    |
+#> |indirect_effect_3   | (+1 SD)  -   (0 SD)|    0.019| 0.029|    -0.030|      0.088|    |
+#> 
+#> --- Moderated Path Coefficients ---
+#> 
+#> 
+#> |Path  | Level| W_value| Estimate|    SE| 2.5.%CI.Lo| 97.5.%CI.Up|Sig |
+#> |:-----|-----:|-------:|--------:|-----:|----------:|-----------:|:---|
+#> |a1    | -1 SD|   0.223|   -0.220| 0.187|     -0.572|       0.152|    |
+#> |a1    |  0 SD|   0.452|   -0.148| 0.137|     -0.423|       0.119|    |
+#> |a1    | +1 SD|   0.681|   -0.075| 0.189|     -0.451|       0.287|    |
+#> |b2    | -1 SD|   0.223|    0.113| 0.191|     -0.282|       0.474|    |
+#> |b2    |  0 SD|   0.452|    0.001| 0.126|     -0.250|       0.247|    |
+#> |b2    | +1 SD|   0.681|   -0.110| 0.185|     -0.474|       0.258|    |
+#> |d1    | -1 SD|   0.223|   -0.016| 0.210|     -0.416|       0.401|    |
+#> |d1    |  0 SD|   0.452|   -0.044| 0.127|     -0.287|       0.212|    |
+#> |d1    | +1 SD|   0.681|   -0.073| 0.191|     -0.433|       0.310|    |
+#> |cp    | -1 SD|   0.223|    0.057| 0.170|     -0.283|       0.375|    |
+#> |cp    |  0 SD|   0.452|   -0.165| 0.123|     -0.393|       0.082|    |
+#> |cp    | +1 SD|   0.681|   -0.387| 0.166|     -0.685|      -0.035|*   |
+#> |b_1_2 | -1 SD|   0.223|    0.392| 0.174|      0.030|       0.716|*   |
+#> |b_1_2 |  0 SD|   0.452|    0.320| 0.115|      0.083|       0.530|*   |
+#> |b_1_2 | +1 SD|   0.681|    0.248| 0.170|     -0.100|       0.573|    |
+#> |d_1_2 | -1 SD|   0.223|   -0.209| 0.189|     -0.584|       0.166|    |
+#> |d_1_2 |  0 SD|   0.452|   -0.051| 0.121|     -0.288|       0.187|    |
+#> |d_1_2 | +1 SD|   0.681|    0.107| 0.201|     -0.297|       0.491|    |
+#> |a2    | -1 SD|   0.223|    0.071| 0.187|     -0.300|       0.444|    |
+#> |a2    |  0 SD|   0.452|    0.081| 0.127|     -0.176|       0.326|    |
+#> |a2    | +1 SD|   0.681|    0.091| 0.175|     -0.265|       0.426|    |
+#> |a3    | -1 SD|   0.223|    0.246| 0.188|     -0.123|       0.604|    |
+#> |a3    |  0 SD|   0.452|    0.136| 0.132|     -0.130|       0.392|    |
+#> |a3    | +1 SD|   0.681|    0.026| 0.176|     -0.308|       0.377|    |
+#> 
+#> --- Path Coefficient Contrasts ---
+#> 
+#> 
+#> |Path  |            Contrast| Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|Sig |
+#> |:-----|-------------------:|--------:|-----:|---------:|----------:|:---|
+#> |a1    | (0 SD)   -  (-1 SD)|    0.072| 0.129|    -0.186|      0.314|    |
+#> |a1    | (+1 SD)  -  (-1 SD)|    0.145| 0.257|    -0.373|      0.628|    |
+#> |a1    | (+1 SD)  -   (0 SD)|    0.072| 0.129|    -0.186|      0.314|    |
+#> |a2    | (0 SD)   -  (-1 SD)|    0.010| 0.129|    -0.247|      0.263|    |
+#> |a2    | (+1 SD)  -  (-1 SD)|    0.020| 0.258|    -0.495|      0.526|    |
+#> |a2    | (+1 SD)  -   (0 SD)|    0.010| 0.129|    -0.247|      0.263|    |
+#> |a3    | (0 SD)   -  (-1 SD)|   -0.110| 0.125|    -0.350|      0.139|    |
+#> |a3    | (+1 SD)  -  (-1 SD)|   -0.220| 0.250|    -0.701|      0.277|    |
+#> |a3    | (+1 SD)  -   (0 SD)|   -0.110| 0.125|    -0.350|      0.139|    |
+#> |b_1_2 | (0 SD)   -  (-1 SD)|   -0.072| 0.128|    -0.319|      0.185|    |
+#> |b_1_2 | (+1 SD)  -  (-1 SD)|   -0.144| 0.256|    -0.638|      0.369|    |
+#> |b_1_2 | (+1 SD)  -   (0 SD)|   -0.072| 0.128|    -0.319|      0.185|    |
+#> |b2    | (0 SD)   -  (-1 SD)|   -0.111| 0.139|    -0.379|      0.166|    |
+#> |b2    | (+1 SD)  -  (-1 SD)|   -0.223| 0.279|    -0.759|      0.332|    |
+#> |b2    | (+1 SD)  -   (0 SD)|   -0.111| 0.139|    -0.379|      0.166|    |
+#> |cp    | (0 SD)   -  (-1 SD)|   -0.222| 0.115|    -0.427|      0.020|    |
+#> |cp    | (+1 SD)  -  (-1 SD)|   -0.444| 0.229|    -0.855|      0.040|    |
+#> |cp    | (+1 SD)  -   (0 SD)|   -0.222| 0.115|    -0.427|      0.020|    |
+#> |d_1_2 | (0 SD)   -  (-1 SD)|    0.158| 0.153|    -0.154|      0.446|    |
+#> |d_1_2 | (+1 SD)  -  (-1 SD)|    0.316| 0.307|    -0.307|      0.892|    |
+#> |d_1_2 | (+1 SD)  -   (0 SD)|    0.158| 0.153|    -0.154|      0.446|    |
+#> |d1    | (0 SD)   -  (-1 SD)|   -0.029| 0.156|    -0.335|      0.287|    |
+#> |d1    | (+1 SD)  -  (-1 SD)|   -0.057| 0.312|    -0.671|      0.575|    |
+#> |d1    | (+1 SD)  -   (0 SD)|   -0.029| 0.156|    -0.335|      0.287|    |
+#> 
+#> --- Conditional Total Effect and Total Indirect Effect ---
+#> 
+#> 
+#> |Effect         | Level| W_value| Estimate|    SE| 2.5.%CI.Lo| 97.5.%CI.Up|Sig |
+#> |:--------------|-----:|-------:|--------:|-----:|----------:|-----------:|:---|
+#> |total_indirect | -1 SD|   0.223|   -0.031| 0.071|     -0.183|       0.108|    |
+#> |total_indirect |  0 SD|   0.452|   -0.015| 0.043|     -0.109|       0.069|    |
+#> |total_indirect | +1 SD|   0.681|   -0.008| 0.060|     -0.132|       0.111|    |
+#> |total_effect   | -1 SD|   0.223|    0.026| 0.178|     -0.332|       0.359|    |
+#> |total_effect   |  0 SD|   0.452|   -0.180| 0.126|     -0.421|       0.073|    |
+#> |total_effect   | +1 SD|   0.681|   -0.395| 0.173|     -0.708|      -0.033|*   |
 #> 
 #> 
 #> *************** REGRESSION PATHS (MC) ***************
 #> 
 #> 
-#> |Path                   |Label     | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:----------------------|:---------|--------:|-----:|---------:|----------:|
-#> |Ydiff ~ M1diff         |b1        |   -0.085| 0.133|    -0.346|      0.175|
-#> |Ydiff ~ M1avg          |d1        |   -0.040| 0.124|    -0.290|      0.202|
-#> |Ydiff ~ M2diff         |b2        |    0.002| 0.138|    -0.271|      0.275|
-#> |Ydiff ~ M2avg          |d2        |   -0.000| 0.129|    -0.249|      0.256|
-#> |Ydiff ~ M3diff         |b3        |   -0.182| 0.130|    -0.438|      0.076|
-#> |Ydiff ~ M3avg          |d3        |   -0.160| 0.142|    -0.434|      0.122|
-#> |Ydiff ~ W1             |cpw_W1    |   -0.173| 0.101|    -0.369|      0.022|
-#> |Ydiff ~ int_M1avg_W1   |dw1_W1    |   -0.114| 0.666|    -1.402|      1.204|
-#> |Ydiff ~ int_M2diff_W1  |bw2_W1    |   -0.514| 0.667|    -1.856|      0.781|
-#> |M1diff ~ W1            |aw1_W1    |    0.056| 0.098|    -0.134|      0.258|
-#> |M2diff ~ M1diff        |b_1_2     |    0.306| 0.116|     0.076|      0.531|
-#> |M2diff ~ M1avg         |d_1_2     |   -0.044| 0.107|    -0.251|      0.167|
-#> |M2diff ~ W1            |          |    0.007| 0.097|    -0.182|      0.193|
-#> |M2diff ~ int_M1diff_W1 |bw_1_2_W1 |   -0.300| 0.545|    -1.373|      0.721|
-#> |M2diff ~ int_M1avg_W1  |dw_1_2_W1 |    0.593| 0.601|    -0.596|      1.755|
-#> |M3diff ~ M1diff        |b_1_3     |   -0.147| 0.121|    -0.385|      0.094|
-#> |M3diff ~ M1avg         |d_1_3     |    0.088| 0.115|    -0.134|      0.312|
-#> |M3diff ~ W1            |          |   -0.081| 0.096|    -0.268|      0.102|
+#> |Path                         |Label     | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
+#> |:----------------------------|:---------|--------:|-----:|---------:|----------:|
+#> |Ydiff ~ M1diff               |b1        |   -0.085| 0.131|    -0.338|      0.172|
+#> |Ydiff ~ M1avg                |d1        |   -0.040| 0.124|    -0.276|      0.208|
+#> |Ydiff ~ M2diff               |b2        |    0.002| 0.137|    -0.274|      0.270|
+#> |Ydiff ~ M2avg                |d2        |   -0.000| 0.129|    -0.254|      0.258|
+#> |Ydiff ~ M3diff               |b3        |   -0.182| 0.132|    -0.439|      0.079|
+#> |Ydiff ~ M3avg                |d3        |   -0.160| 0.142|    -0.431|      0.111|
+#> |Ydiff ~ W1                   |cpw_W1    |   -0.173| 0.097|    -0.368|      0.017|
+#> |Ydiff ~ int_M1avg_W1         |dw1_W1    |   -0.114| 0.657|    -1.413|      1.196|
+#> |Ydiff ~ int_M2diff_W1        |bw2_W1    |   -0.514| 0.662|    -1.821|      0.770|
+#> |M1diff ~ W1                  |aw1_W1    |    0.056| 0.099|    -0.143|      0.246|
+#> |M2diff ~ M1diff              |b_1_2     |    0.306| 0.119|     0.079|      0.543|
+#> |M2diff ~ M1avg               |d_1_2     |   -0.044| 0.108|    -0.258|      0.167|
+#> |M2diff ~ W1                  |aw2_W1    |    0.007| 0.099|    -0.187|      0.202|
+#> |M2diff ~ int_M1diff_W1       |bw_1_2_W1 |   -0.300| 0.552|    -1.388|      0.796|
+#> |M2diff ~ int_M1avg_W1        |dw_1_2_W1 |    0.594| 0.603|    -0.585|      1.765|
+#> |M3diff ~ M1diff              |b_1_3     |   -0.147| 0.124|    -0.389|      0.103|
+#> |M3diff ~ M1avg               |d_1_3     |    0.088| 0.114|    -0.128|      0.311|
+#> |M3diff ~ W1                  |aw3_W1    |   -0.081| 0.095|    -0.268|      0.104|
+#> |int_M1diff_W1 ~ int_M1avg_W1 |          |    0.038| 0.147|    -0.248|      0.327|
+#> |int_M1diff_W1 ~ M1avg        |          |   -0.008| 0.028|    -0.064|      0.048|
+#> |int_M1diff_W1 ~ M2avg        |          |   -0.002| 0.028|    -0.059|      0.053|
+#> |int_M1diff_W1 ~ M3avg        |          |   -0.013| 0.032|    -0.077|      0.050|
+#> |int_M1diff_W1 ~ W1           |          |   -0.062| 0.022|    -0.104|     -0.017|
+#> |int_M2diff_W1 ~ int_M1avg_W1 |          |   -0.077| 0.130|    -0.340|      0.175|
+#> |int_M2diff_W1 ~ M1avg        |          |    0.006| 0.025|    -0.043|      0.055|
+#> |int_M2diff_W1 ~ M2avg        |          |   -0.003| 0.025|    -0.052|      0.048|
+#> |int_M2diff_W1 ~ M3avg        |          |    0.021| 0.028|    -0.034|      0.075|
+#> |int_M2diff_W1 ~ W1           |          |    0.006| 0.019|    -0.032|      0.044|
 #> 
 #> 
 #> *************** INTERCEPTS (MC) ***************
@@ -1136,17 +1372,17 @@ print(result5)
 #> 
 #> |Intercept       |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
 #> |:---------------|:-----|--------:|-----:|---------:|----------:|
-#> |Ydiff~1         |cp    |   -0.029| 0.023|    -0.074|      0.016|
-#> |M1diff~1        |a1    |   -0.026| 0.023|    -0.070|      0.018|
-#> |M2diff~1        |a2    |    0.014| 0.022|    -0.028|      0.056|
-#> |M3diff~1        |a3    |    0.023| 0.022|    -0.021|      0.066|
-#> |M1avg~1         |      |   -0.014| 0.026|    -0.067|      0.035|
-#> |M2avg~1         |      |    0.001| 0.025|    -0.049|      0.050|
-#> |M3avg~1         |      |   -0.012| 0.023|    -0.060|      0.033|
-#> |W1~1            |      |    0.004| 0.031|    -0.056|      0.064|
-#> |int_M1avg_W1~1  |      |    0.009| 0.005|    -0.000|      0.017|
-#> |int_M2diff_W1~1 |      |    0.002| 0.004|    -0.007|      0.011|
-#> |int_M1diff_W1~1 |      |    0.003| 0.005|    -0.008|      0.013|
+#> |Ydiff~1         |cp    |   -0.029| 0.023|    -0.073|      0.016|
+#> |M1diff~1        |a1    |   -0.026| 0.024|    -0.072|      0.021|
+#> |M2diff~1        |a2    |    0.014| 0.022|    -0.031|      0.056|
+#> |M3diff~1        |a3    |    0.023| 0.022|    -0.022|      0.065|
+#> |int_M1diff_W1~1 |      |    0.003| 0.005|    -0.007|      0.012|
+#> |int_M2diff_W1~1 |      |    0.003| 0.004|    -0.006|      0.012|
+#> |M1avg~1         |      |   -0.014| 0.026|    -0.063|      0.037|
+#> |M2avg~1         |      |    0.001| 0.026|    -0.050|      0.051|
+#> |M3avg~1         |      |   -0.012| 0.023|    -0.057|      0.033|
+#> |W1~1            |      |    0.004| 0.031|    -0.058|      0.066|
+#> |int_M1avg_W1~1  |      |    0.009| 0.005|    -0.000|      0.018|
 #> 
 #> 
 #> *************** VARIANCES (MC) ***************
@@ -1154,17 +1390,95 @@ print(result5)
 #> 
 #> |Variance                     |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
 #> |:----------------------------|:-----|--------:|-----:|---------:|----------:|
+#> |int_M1diff_W1~~int_M1diff_W1 |      |    0.001| 0.000|     0.001|      0.002|
+#> |int_M2diff_W1~~int_M2diff_W1 |      |    0.001| 0.000|     0.001|      0.001|
 #> |Ydiff~~Ydiff                 |      |    0.027| 0.005|     0.018|      0.037|
-#> |M1diff~~M1diff               |      |    0.031| 0.006|     0.020|      0.042|
+#> |M1diff~~M1diff               |      |    0.031| 0.006|     0.019|      0.042|
 #> |M2diff~~M2diff               |      |    0.025| 0.005|     0.016|      0.034|
 #> |M3diff~~M3diff               |      |    0.027| 0.005|     0.017|      0.037|
 #> |M1avg~~M1avg                 |      |    0.038| 0.007|     0.024|      0.053|
 #> |M2avg~~M2avg                 |      |    0.038| 0.007|     0.024|      0.051|
 #> |M3avg~~M3avg                 |      |    0.031| 0.006|     0.020|      0.043|
-#> |W1~~W1                       |      |    0.054| 0.010|     0.034|      0.074|
+#> |W1~~W1                       |      |    0.054| 0.010|     0.034|      0.073|
 #> |int_M1avg_W1~~int_M1avg_W1   |      |    0.001| 0.000|     0.001|      0.002|
-#> |int_M2diff_W1~~int_M2diff_W1 |      |    0.001| 0.000|     0.001|      0.002|
-#> |int_M1diff_W1~~int_M1diff_W1 |      |    0.002| 0.000|     0.001|      0.002|
+#> 
+#> 
+#> *************** STANDARDIZED (MC) ***************
+#> 
+#> 
+#> |Parameter                    | Estimate|    SE|        R|   2.5%|  97.5%|
+#> |:----------------------------|--------:|-----:|--------:|------:|------:|
+#> |cp                           |   -0.165| 0.123| 5000.000| -0.393|  0.082|
+#> |b1                           |   -0.084| 0.122| 5000.000| -0.314|  0.168|
+#> |d1                           |   -0.044| 0.127| 5000.000| -0.287|  0.212|
+#> |b2                           |    0.001| 0.126| 5000.000| -0.250|  0.247|
+#> |d2                           |   -0.000| 0.131| 5000.000| -0.268|  0.263|
+#> |b3                           |   -0.172| 0.118| 5000.000| -0.388|  0.075|
+#> |d3                           |   -0.159| 0.132| 5000.000| -0.399|  0.101|
+#> |cpw_W1                       |   -0.225| 0.116| 5000.000| -0.431|  0.020|
+#> |dw1_W1                       |   -0.029| 0.157| 5000.000| -0.336|  0.285|
+#> |bw2_W1                       |   -0.113| 0.141| 5000.000| -0.384|  0.166|
+#> |a1                           |   -0.148| 0.137| 5000.000| -0.423|  0.119|
+#> |aw1_W1                       |    0.073| 0.130| 5000.000| -0.190|  0.320|
+#> |a2                           |    0.081| 0.127| 5000.000| -0.176|  0.326|
+#> |b_1_2                        |    0.320| 0.115| 5000.000|  0.083|  0.530|
+#> |d_1_2                        |   -0.051| 0.121| 5000.000| -0.288|  0.187|
+#> |aw2_W1                       |    0.010| 0.130| 5000.000| -0.245|  0.263|
+#> |bw_1_2_W1                    |   -0.073| 0.129| 5000.000| -0.329|  0.185|
+#> |dw_1_2_W1                    |    0.160| 0.156| 5000.000| -0.151|  0.459|
+#> |a3                           |    0.136| 0.132| 5000.000| -0.130|  0.392|
+#> |b_1_3                        |   -0.154| 0.127| 5000.000| -0.389|  0.107|
+#> |d_1_3                        |    0.102| 0.129| 5000.000| -0.151|  0.348|
+#> |aw3_W1                       |   -0.111| 0.127| 5000.000| -0.362|  0.141|
+#> |int_M1diff_W1~int_M1avg_W1   |    0.042| 0.166| 5000.000| -0.280|  0.373|
+#> |int_M1diff_W1~M1avg          |   -0.038| 0.140| 5000.000| -0.321|  0.232|
+#> |int_M1diff_W1~M2avg          |   -0.011| 0.139| 5000.000| -0.291|  0.260|
+#> |int_M1diff_W1~M3avg          |   -0.058| 0.145| 5000.000| -0.345|  0.228|
+#> |int_M1diff_W1~W1             |   -0.349| 0.133| 5000.000| -0.620| -0.096|
+#> |int_M2diff_W1~int_M1avg_W1   |   -0.089| 0.148| 5000.000| -0.390|  0.198|
+#> |int_M2diff_W1~M1avg          |    0.032| 0.124| 5000.000| -0.215|  0.277|
+#> |int_M2diff_W1~M2avg          |   -0.016| 0.124| 5000.000| -0.258|  0.235|
+#> |int_M2diff_W1~M3avg          |    0.096| 0.126| 5000.000| -0.147|  0.347|
+#> |int_M2diff_W1~W1             |    0.035| 0.110| 5000.000| -0.183|  0.252|
+#> |int_M1diff_W1~~int_M1diff_W1 |    0.839| 0.341| 5000.000|  0.436|  1.713|
+#> |int_M1diff_W1~~int_M2diff_W1 |    0.007| 0.109| 5000.000| -0.210|  0.219|
+#> |int_M2diff_W1~~int_M2diff_W1 |    0.708| 0.251| 5000.000|  0.345|  1.292|
+#> |M1diff~~int_M1diff_W1        |    0.048| 0.127| 5000.000| -0.195|  0.300|
+#> |M1diff~~int_M2diff_W1        |   -0.055| 0.112| 5000.000| -0.284|  0.166|
+#> |M2diff~~int_M2diff_W1        |    0.013| 0.103| 5000.000| -0.187|  0.218|
+#> |Ydiff~~Ydiff                 |    0.856| 0.085| 5000.000|  0.576|  0.905|
+#> |M1diff~~M1diff               |    0.995| 0.029| 5000.000|  0.897|  1.000|
+#> |M2diff~~M2diff               |    0.877| 0.085| 5000.000|  0.626|  0.949|
+#> |M3diff~~M3diff               |    0.956| 0.061| 5000.000|  0.762|  0.990|
+#> |M1avg~~M1avg                 |    1.000| 0.000| 5000.000|  1.000|  1.000|
+#> |M1avg~~M2avg                 |    0.344| 0.121| 5000.000|  0.087|  0.561|
+#> |M1avg~~M3avg                 |    0.390| 0.117| 5000.000|  0.131|  0.602|
+#> |M1avg~~W1                    |    0.192| 0.133| 5000.000| -0.091|  0.437|
+#> |M1avg~~int_M1avg_W1          |   -0.027| 0.110| 5000.000| -0.245|  0.193|
+#> |M2avg~~M2avg                 |    1.000| 0.000| 5000.000|  1.000|  1.000|
+#> |M2avg~~M3avg                 |    0.363| 0.118| 5000.000|  0.115|  0.578|
+#> |M2avg~~W1                    |    0.263| 0.128| 5000.000| -0.006|  0.506|
+#> |M2avg~~int_M1avg_W1          |   -0.163| 0.109| 5000.000| -0.387|  0.040|
+#> |M3avg~~M3avg                 |    1.000| 0.000| 5000.000|  1.000|  1.000|
+#> |M3avg~~W1                    |    0.176| 0.133| 5000.000| -0.105|  0.420|
+#> |M3avg~~int_M1avg_W1          |   -0.165| 0.108| 5000.000| -0.393|  0.043|
+#> |W1~~W1                       |    1.000| 0.000| 5000.000|  1.000|  1.000|
+#> |W1~~int_M1avg_W1             |   -0.001| 0.107| 5000.000| -0.215|  0.211|
+#> |int_M1avg_W1~~int_M1avg_W1   |    0.581| 0.231| 5000.000|  0.303|  1.202|
+#> |int_M1diff_W1~1              |    0.062| 0.127| 5000.000| -0.187|  0.318|
+#> |int_M2diff_W1~1              |    0.077| 0.116| 5000.000| -0.145|  0.308|
+#> |M1avg~1                      |   -0.070| 0.133| 5000.000| -0.334|  0.199|
+#> |M2avg~1                      |    0.004| 0.135| 5000.000| -0.264|  0.269|
+#> |M3avg~1                      |   -0.070| 0.134| 5000.000| -0.325|  0.192|
+#> |W1~1                         |    0.017| 0.137| 5000.000| -0.253|  0.293|
+#> |int_M1avg_W1~1               |    0.191| 0.110| 5000.000| -0.011|  0.422|
+#> |indirect_1                   |    0.012| 0.027| 5000.000| -0.035|  0.080|
+#> |indirect_2                   |    0.000| 0.019| 5000.000| -0.043|  0.041|
+#> |indirect_1_2                 |   -0.000| 0.008| 5000.000| -0.018|  0.018|
+#> |indirect_3                   |   -0.023| 0.031| 5000.000| -0.096|  0.025|
+#> |indirect_1_3                 |   -0.004| 0.007| 5000.000| -0.022|  0.006|
+#> |total_indirect               |   -0.015| 0.043| 5000.000| -0.109|  0.069|
+#> |total_effect                 |   -0.180| 0.126| 5000.000| -0.421|  0.073|
 ```
 
 Most printed sections have the same interpretation as in Example 1. The
@@ -1173,7 +1487,7 @@ important additions are:
 | Additional output | What it contains |
 |:---|:---|
 | Moderator in `VARIABLES` | The observed variable mapped to the internal moderator label, such as `W1`. |
-| `Moderated Coefficients` | Interaction terms for the paths named in `MP`. |
+| `Moderated Coefficients` | Moderator coefficients, including already-fitted moderator main effects. |
 | `Conditional Indirect Effects` | Indirect effects evaluated at selected moderator values. |
 | `Indirect Effect Contrasts` | Differences between conditional indirect effects at those values. |
 | `Moderated Path Coefficients` | The selected path coefficients evaluated at each moderator value. |
@@ -1182,17 +1496,18 @@ important additions are:
 
 #### Moderated coefficients
 
-The `Moderated Coefficients` table reports the interaction term
-associated with each path in `MP`. The `BaseCoef` column links the
-interaction to the original path. For example, a row whose base
-coefficient is `a1` indicates whether the condition-to-`M1` path changes
-with `D3`.
+The `Moderated Coefficients` table reports requested interactions and
+already-fitted moderator main effects used in conditional intercepts.
+The `BaseCoef` column links the interaction to the original path. For
+example, a row whose base coefficient is `a1` indicates whether the
+condition-to-`M1` path changes with `D3`.
 
-The interaction estimate describes the expected change in the base path
-for a one-unit increase in the moderator. Its confidence interval
-evaluates whether that change differs from zero. This table should be
-consulted before interpreting the pattern of conditional path
-coefficients.
+In the unstandardized table, the interaction estimate describes the
+expected change in the base path for a one-unit increase in the
+moderator. In the standardized `mod_coeff` table, it is per SD of the
+continuous moderator. Its confidence interval evaluates whether that
+change differs from zero. This table should be consulted before
+interpreting the pattern of conditional path coefficients.
 
 Because the continuous moderator is centered during data preparation,
 the ordinary path estimates in the main output refer to the value
@@ -1374,3 +1689,125 @@ The returned object can be read through
 generated model with
 [`printGM()`](https://yangzhen1999.github.io/wsMed/reference/printGM.md),
 and accessed directly for further analysis or reporting.
+
+## Reading standardized conditional results
+
+The moderated example above provides both scales:
+
+``` r
+
+head(result5$moderation_std$beta_coef)
+#>                  Path Mediators Level W_value    Estimate         SE
+#> 1   indirect_effect_1         1 -1 SD   0.223  0.01851179 0.03853350
+#> 2   indirect_effect_1         1  0 SD   0.452  0.01241918 0.02706592
+#> 3   indirect_effect_1         1 +1 SD   0.681  0.00632657 0.02901303
+#> 4 indirect_effect_1_2       1 2 -1 SD   0.223 -0.00971447 0.02474938
+#> 5 indirect_effect_1_2       1 2  0 SD   0.452 -0.00006888 0.00847441
+#> 6 indirect_effect_1_2       1 2 +1 SD   0.681  0.00204660 0.01230367
+#>    2.5.%CI.Lo 97.5.%CI.Up Sig
+#> 1 -0.04693503  0.10957838    
+#> 2 -0.03504596  0.08017097    
+#> 3 -0.04849223  0.07675749    
+#> 4 -0.06941232  0.03039126    
+#> 5 -0.01807556  0.01809927    
+#> 6 -0.02053757  0.03233936
+result5$moderation_std$conditional_overall
+#>           Effect Level W_value    Estimate         SE 2.5.%CI.Lo 97.5.%CI.Up
+#> 1 total_indirect -1 SD   0.223 -0.03128198 0.07109154 -0.1834272  0.10758593
+#> 3 total_indirect  0 SD   0.452 -0.01476742 0.04345483 -0.1090928  0.06944515
+#> 5 total_indirect +1 SD   0.681 -0.00803368 0.06021063 -0.1321828  0.11074425
+#> 2   total_effect -1 SD   0.223  0.02585195 0.17818896 -0.3322253  0.35900195
+#> 4   total_effect  0 SD   0.452 -0.17968841 0.12585504 -0.4208829  0.07261438
+#> 6   total_effect +1 SD   0.681 -0.39500959 0.17258286 -0.7076863 -0.03309498
+#>   Sig
+#> 1    
+#> 3    
+#> 5    
+#> 2    
+#> 4    
+#> 6   *
+attr(result5$moderation_std, "standardization")
+#> $effect_scale
+#> [1] "marginal model-implied endpoint scales; IE / SD(Ydiff)"
+#> 
+#> $moderator_units
+#> [1] "raw; fixed numerical probes; dummy coding unchanged"
+#> 
+#> $mod_coeff_units
+#> [1] "per SD of continuous W; per 0/1 dummy contrast"
+#> 
+#> $interval
+#> [1] "percentile"
+#> 
+#> $engine
+#> [1] "mc"
+#> 
+#> $fixed.x
+#> [1] FALSE
+#> 
+#> $MI_reference
+#> NULL
+#> 
+#> $diagnostics
+#> $diagnostics$requested
+#> [1] 5000
+#> 
+#> $diagnostics$valid
+#> [1] 5000
+#> 
+#> $diagnostics$invalid
+#> [1] 0
+#> 
+#> $diagnostics$invalid_indices
+#> integer(0)
+#> 
+#> $diagnostics$reasons
+#> < table of extent 0 >
+```
+
+Continuous interaction coefficients in `mod_coeff` are per SD of the
+moderator. Conditional effects and curves are evaluated at fixed
+numerical values in the original moderator units, using a common
+marginal endpoint scale. These are different reporting quantities.
+Existing moderator main effects enter conditional intercepts whether or
+not `a`/`cp` is listed in `MP`; totals include all model-implied
+indirect paths.
+
+``` r
+
+plot_moderation_curve(result5, "total_indirect", standardized = TRUE)
+```
+
+![plot of chunk
+standardized-conditional-plot](figures/WsMed-standardized-conditional-plot-1.png)
+
+plot of chunk standardized-conditional-plot
+
+Conditional intervals are percentile intervals from jointly transformed
+draws, including uncertainty in the SDs when those moments are
+estimated. Do not divide raw interval limits by a single fitted SD.
+Point estimates evaluate the effect at fitted (or pooled primitive)
+parameters, rather than averaging the nonlinear effect over draws.
+Report the raw moderator probes, the marginal scale definition,
+`fixed.x`, and the interval engine.
+
+For `ci_method = "both"`, extract `moderation_std$mc` or
+`moderation_std$boot`; choose `engine = "mc"` or `engine = "boot"` in
+the plotting call. The [dedicated
+tutorial](https://yangzhen1999.github.io/wsMed/articles/StandardizedModeratedMediation.md)
+also covers categorical moderators, post-fit conversion, FIML and MI.
+
+## More plots for reporting
+
+Use
+[`plot_effects()`](https://yangzhen1999.github.io/wsMed/reference/plot_effects.md)
+for an effect forest,
+[`plot_conditional_effects()`](https://yangzhen1999.github.io/wsMed/reference/plot_conditional_effects.md)
+for group or reference-level point intervals, and
+[`plot_contrasts()`](https://yangzhen1999.github.io/wsMed/reference/plot_contrasts.md)
+for effect differences with their own confidence intervals. All three
+support `standardized` and the MC/bootstrap `engine` selection. See
+[Plotting mediation effects and
+contrasts](https://yangzhen1999.github.io/wsMed/articles/PlottingEffects.md)
+for executed examples, selection of paths and labels, and export to PDF
+or PNG.

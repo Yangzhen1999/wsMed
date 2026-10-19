@@ -1,4 +1,4 @@
-# Apply PrepareData to Imputed Datasets and Return New MIDS Object
+# Apply PrepareData to imputed datasets and return new mids object
 
 This function applies the
 [`PrepareData()`](https://yangzhen1999.github.io/wsMed/reference/PrepareData.md)

@@ -1,6 +1,6 @@
-# Adjusted Total Sampling Covariance Matrix
+# Adjusted total sampling covariance matrix
 
-Adjusted Total Sampling Covariance Matrix
+Adjusted total sampling covariance matrix
 
 ## Usage
 

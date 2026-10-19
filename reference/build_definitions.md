@@ -1,4 +1,4 @@
-# Build Unstandardized Parameter Definitions
+# Build unstandardized parameter definitions
 
 Extracts parameter definition expressions from a fitted model.
 

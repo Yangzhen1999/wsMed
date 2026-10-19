@@ -2,15 +2,24 @@ pandoc: 3.8.3
 pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
+  AnalysisGuide: AnalysisGuide.html
+  CategoricalPredictors: CategoricalPredictors.html
+  CompatibleImputation: CompatibleImputation.html
   GenerateModelCN: GenerateModelCN.html
   GenerateModelCP: GenerateModelCP.html
   GenerateModelCustom: GenerateModelCustom.html
   GenerateModelP: GenerateModelP.html
   GenerateModelPC: GenerateModelPC.html
+  GetStarted: GetStarted.html
   MEMORE_vs_wsMed: MEMORE_vs_wsMed.html
+  ModularWorkflow: ModularWorkflow.html
+  PlottingEffects: PlottingEffects.html
   printGM: printGM.html
+  ResultsGuide: ResultsGuide.html
+  StandardizedModeratedMediation: StandardizedModeratedMediation.html
+  WorkflowReliability: WorkflowReliability.html
   WsMed: WsMed.html
-last_built: 2026-09-18T03:16Z
+last_built: 2026-10-19T22:44Z
 urls:
   reference: https://yangzhen1999.github.io/wsMed/reference
   article: https://yangzhen1999.github.io/wsMed/articles

@@ -1,6 +1,6 @@
-# Monte Carlo SEM with Multiple Imputation (WsMed Workflow)
+# Monte Carlo SEM with multiple imputation (wsMed workflow)
 
-\`RunMCMIAnalysis()\` is a helper that:
+`RunMCMIAnalysis()` is a helper that:
 
 1.  imputes missing data via
     [`PrepareMissingData`](https://yangzhen1999.github.io/wsMed/reference/PrepareMissingData.md);

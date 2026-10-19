@@ -1,4 +1,4 @@
-# Standardize RAM Matrices
+# Standardize RAM matrices
 
 Performs standardization of RAM matrices by rescaling path and variance
 structures using the implied covariance matrix. Intercepts are also
@@ -7,19 +7,23 @@ standardized.
 ## Usage
 
 ``` r
-StdRAM2(ram_est, roles = NULL)
+StdRAM2(ram_est, roles = NULL, marginal_variances = NULL)
 ```
 
 ## Arguments
 
 - ram_est:
 
-  A RAM object list with matrices \`A\`, \`S\`, \`F\`, and \`M\` as
-  returned by \`Lav2RAM2()\`.
+  A RAM object list with matrices `A`, `S`, `F`, and `M` as returned by
+  [`Lav2RAM2()`](https://yangzhen1999.github.io/wsMed/reference/Lav2RAM2.md).
 
 - roles:
 
   Internal list of dummy variable names and interaction components.
+
+- marginal_variances:
+
+  Optional jointly pooled MI marginal variances.
 
 ## Value
 

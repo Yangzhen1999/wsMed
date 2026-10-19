@@ -1,4 +1,4 @@
-# Convert Standardized RAM Back to Lavaan Matrices
+# Convert standardized RAM back to lavaan matrices
 
 Converts a standardized RAM object back to lavaan-style matrix
 structure. Preserves residual covariances on their transformed scales.
@@ -13,8 +13,7 @@ RAM2Lav2(ram, lav_mod, standardized = FALSE)
 
 - ram:
 
-  A RAM list containing standardized matrices (\`A\`, \`S\`, \`F\`, and
-  \`M\`).
+  A RAM list containing standardized matrices (`A`, `S`, `F`, and `M`).
 
 - lav_mod:
 
@@ -26,8 +25,8 @@ RAM2Lav2(ram, lav_mod, standardized = FALSE)
 
 ## Value
 
-A modified lavaan-style matrix list with updated \`lambda\`, \`beta\`,
-\`theta\`, \`psi\`, and \`alpha\`.
+A modified lavaan-style matrix list with updated `lambda`, `beta`,
+`theta`, `psi`, and `alpha`.
 
 ## Details
 

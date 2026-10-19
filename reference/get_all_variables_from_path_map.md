@@ -1,4 +1,4 @@
-# Extract All Variables Needed for Standardization
+# Extract all variables needed for standardization
 
 Extracts predictor and outcome variable names from a path
 standardization map.

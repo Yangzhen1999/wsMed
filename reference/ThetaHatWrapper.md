@@ -1,4 +1,4 @@
-# Compute Updated Parameter Estimates for SEM Models
+# Compute updated parameter estimates for SEM models
 
 A wrapper for the internal `.ThetaHat()` function from the `semmcci`
 package. This function computes updated parameter estimates for

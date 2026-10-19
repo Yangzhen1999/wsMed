@@ -1,4 +1,4 @@
-# Summarize Monte Carlo Simulation Results
+# Summarize Monte Carlo simulation results
 
 Computes summary statistics for Monte Carlo simulation results,
 including the mean estimate, standard error (SE), and confidence

@@ -1,6 +1,6 @@
-# Average Relative Increase in Variance
+# Average relative increase in variance
 
-Average Relative Increase in Variance
+Average relative increase in variance
 
 ## Usage
 

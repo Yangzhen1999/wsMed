@@ -78,7 +78,12 @@ to export it.
 
 MC intervals come from the parameter draws (or the stored standardized
 parameter table). Bootstrap plots use the bootstrap limits, not the
-normal-theory limits that may also be present in the table.
+normal-theory limits that may also be present in the table. New workflow
+objects use
+[wsmed_plots](https://yangzhen1999.github.io/wsMed/reference/wsmed_plots.md).
+Both interfaces expose full-precision `estimate`, `conf.low`, and
+`conf.high` columns in the plotted data; legacy column names remain
+available. Interval conventions are not silently changed.
 
 ## See also
 

@@ -1,8 +1,8 @@
-# Monte Carlo Sampling for Parameter Estimates
+# Monte Carlo sampling for parameter estimates
 
 Generates Monte Carlo samples for parameter estimates using a covariance
-matrix and a location vector. This function is a wrapper for the
-internal `.ThetaHatStar()` function from the `semmcci` package.
+matrix and a location vector. With eigen decomposition, sampling uses
+the principal symmetric square root of the covariance matrix.
 
 ## Usage
 
@@ -55,6 +55,15 @@ A list containing:
   dimensions `R x length(location)`.
 
 - `decomposition`: The decomposition method used.
+
+## Details
+
+The eigen sampler is invariant to eigenvector signs and to rotations
+within eigenspaces with repeated eigenvalues, up to numerical precision.
+This changes fixed-seed draws relative to wsMed 1.1.0, while preserving
+their target distribution. It does not guarantee identical results
+across different fitted inputs, imputation algorithms, or software
+environments.
 
 ## See also
 

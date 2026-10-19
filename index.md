@@ -1,117 +1,94 @@
 # wsMed
 
-The `wsMed` function is designed for two condition within-subject
-mediation analysis, incorporating SEM models through the `lavaan`
-package and Monte Carlo simulation methods. This document provides a
-detailed description of the function’s parameters, workflow, and usage,
-along with an example demonstration.
+Analyze mediation and moderated mediation in **two-condition
+within-subject designs**. Fit a model, read an organized effect table,
+and plot the results in R.
 
-## Installation
+**Development documentation · 1.1.0.9000**  
+These tutorials use `feature/modular-api`. The published CRAN version
+has a different reporting interface.
 
-You can install the development version of wsMed from
-[GitHub](https://github.com/) with:
+## Start here
+
+Step 1: Run your first analysis
+
+Use paired data and one call to obtain a mediation model.
+
+[Get started
+→](https://yangzhen1999.github.io/wsMed/articles/GetStarted.md)
+
+Step 2: Choose your model
+
+Find the guide for your pathways, moderator and missing data.
+
+[Choose an analysis
+→](https://yangzhen1999.github.io/wsMed/articles/AnalysisGuide.md)
+
+Step 3: Read and present results
+
+Extract all core effects, export tables and choose a figure.
+
+[Read the results
+→](https://yangzhen1999.github.io/wsMed/articles/ResultsGuide.md)
+
+## Install the version used here
 
 ``` r
 
 # install.packages("pak")
-pak::pak("Yangzhen1999/wsMed")
+pak::pak("Yangzhen1999/wsMed@feature/modular-api")
 ```
 
-Alternatively, if you prefer using devtools, you can install wsMed as
-follows:
+Restart R after updating. For the published release, use
+`install.packages("wsMed")`. These development features require the
+branch above.
 
-``` r
+## A complete first example
 
-# install.packages("devtools")
-devtools::install_github("Yangzhen1999/wsMed")
-```
-
-## Example
-
-This is a basic example which shows you how to solve a common problem:
+Each row is one participant. `A1` / `A2` and `B1` / `B2` are the two
+mediator measurements; `D1` / `D2` are the outcome measurements. The
+condition contrast is **condition 2 minus condition 1**.
 
 ``` r
 
 library(wsMed)
-
-# Load example data
 data(example_data)
-set.seed(123)
-example_dataN <- mice::ampute(
-data = example_data,
-prop = 0.1,
-)$amp
-
-# Perform within-subject mediation analysis (Parallel mediation model)
 result <- wsMed(
-data = example_dataN,   #dataset
-M_C1 = c("A1","B1"),    # A1/B1 is A/B mediator variable in condition 1
-M_C2 = c("A2","B2"),    # A2/B2 is A/B mediator variable in condition 2
-Y_C1 = "C1",            # C1 is outcome variable in condition 1
-Y_C2 = "C2",            # C2 is outcome variable in condition 2
-form = "P",             # Parallel mediation
-C_C1 = "D1",            # within-subject covariate (e.g., measured under D1)
-C_C2 = "D2",            # within-subject covariate (e.g., measured under C2)
-C = "D3",               # between-subject covariates
-Na = "MI",              # Use multiple imputation for missing data
-standardized = TRUE,    # Request standardized path coefficients and effects
+  data = example_data,
+  M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"),
+  Y_C1 = "D1", Y_C2 = "D2",
+  form = "P", Na = "DE", ci_method = "mc",
+  R = 2000, seed = 123, verbose = FALSE
 )
-
-# Print summary results
-print(result)
+s <- summary(result)
+s$effects
+plot(s)
 ```
 
-## Main Function Overview
+This complete simulated dataset needs no imputation. The example uses
+2,000 Monte Carlo draws for speed; assess interval stability with more
+draws for a final analysis. The [quick
+start](https://yangzhen1999.github.io/wsMed/articles/GetStarted.md)
+walks through the actual table and its interpretation.
 
-The [`wsMed()`](https://yangzhen1999.github.io/wsMed/reference/wsMed.md)
-function automates the full workflow for two-condition within-subject
-mediation analysis. Its main steps are:
+## What would you like to do next?
 
-1.  **Validate inputs** – check dataset structure, mediation model type
-    (`form`), and missing-data settings.
+| Task | Guide |
+|----|----|
+| Add serial pathways or a moderator | [Choose an analysis](https://yangzhen1999.github.io/wsMed/articles/AnalysisGuide.md) |
+| Get standardized effects or export a table | [Read and export results](https://yangzhen1999.github.io/wsMed/articles/ResultsGuide.md) |
+| Choose a forest plot, curve or group comparison | [Plot gallery](https://yangzhen1999.github.io/wsMed/articles/PlottingEffects.md) |
+| Reuse a fit or check an analysis | [Staged workflow](https://yangzhen1999.github.io/wsMed/articles/ModularWorkflow.md) · [Diagnostics](https://yangzhen1999.github.io/wsMed/articles/WorkflowReliability.md) |
 
-2.  **Prepare data** – compute difference scores (`Mdiff`, `Ydiff`) and
-    centered averages (`Mavg`) from the two-condition variables.
+See the [function
+reference](https://yangzhen1999.github.io/wsMed/reference/index.md) for
+arguments and return values, and [all
+articles](https://yangzhen1999.github.io/wsMed/articles/index.md) for
+equations, imputation and software comparisons.
 
-3.  **Build the model** – generate SEM syntax according to the chosen
-    structure:
-
-    - `"P"`: Parallel mediation
-
-      ![parallel within-subject mediation
-      model](reference/figures/Wa.png)
-
-    - `"CN"`: Chained / serial mediation
-
-      ![serial within-subject mediation model](reference/figures/Wb.png)
-
-    - `"CP"`: Chained + Parallel
-
-      ![serial-parallel within-subject mediation
-      model](reference/figures/Wc.png)
-
-    - `"PC"`: Parallel + Chained
-
-      ![parallel-serial within-subject mediation
-      model](reference/figures/Wd.png)
-
-4.  **Fit the model** – estimate parameters while handling missing data:
-
-    - `"DE"`: listwise deletion
-    - `"FIML"`: full-information ML
-    - `"MI"`: multiple imputation
-
-5.  **Compute inference** – provide confidence intervals using:
-
-    - **Bootstrap** (`ci_method = "bootstrap"`)
-    - **Monte Carlo** (`ci_method = "mc"`)
-
-6.  **Optional: Standardization** – if `standardized = TRUE`, return
-    standardized effects with CIs.
-
-7.  **Optional: Covariates** – automatically center and include:
-
-    - **Between-subject covariates** (`C`): mean-centered and added to
-      all regressions.
-    - **Within-subject covariates** (`C_C1`, `C_C2`): difference scores
-      and centered averages are computed and included.
+For the empirical manuscript data, use `data(wsmed_examples)` and read
+[`help("wsmed_examples")`](https://yangzhen1999.github.io/wsMed/reference/wsmed_examples.md)
+for the source, variable definitions and missingness. [Report an
+issue](https://github.com/Yangzhen1999/wsMed/issues) or [contribute to
+the
+package](https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/.github/CONTRIBUTING.md).

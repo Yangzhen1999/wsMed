@@ -1,4 +1,4 @@
-# Prepare Data with Missing Values for Mediation Analysis
+# Prepare data with missing values for mediation analysis
 
 Handles missing values in the dataset through multiple imputation and
 prepares the imputed datasets for within-subject mediation analysis. The
@@ -92,7 +92,10 @@ PrepareMissingData(
 
 - W:
 
-  Optional character vector: moderator names (at most J).
+  A character vector specifying the names of moderator variables that
+  are used to generate interaction terms with mediators. These variables
+  will be included in the imputation model and passed to `PrepareData`.
+  Default is `NULL`.
 
 - W_type:
 

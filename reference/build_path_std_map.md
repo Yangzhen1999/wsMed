@@ -1,4 +1,4 @@
-# Build Standardization Maps PATH
+# Build path-specific standardization maps
 
 Constructs mapping of parameter labels to variables for standardization.
 

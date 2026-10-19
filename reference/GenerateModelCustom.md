@@ -1,4 +1,4 @@
-# Generate a User-Defined Within-Subject Mediation Model
+# Generate a user-defined mediation model
 
 Generates lavaan model syntax for a user-defined within-subject
 mediation model. Users specify directed paths among mediators and from
@@ -16,19 +16,20 @@ GenerateModelCustom(prepared_data, paths, MP = character(0))
 
 - prepared_data:
 
-  A data frame returned by \[PrepareData()\]. It must contain
-  \`M1diff\`, \`M1avg\`, ..., and \`Ydiff\`.
+  A data frame returned by
+  [`PrepareData()`](https://yangzhen1999.github.io/wsMed/reference/PrepareData.md).
+  It must contain `M1diff`, `M1avg`, ..., and `Ydiff`.
 
 - paths:
 
   A character vector defining directed paths among mediators and from
-  mediators to the outcome. For example: \`c("M1 -\> M2", "M2 -\> Y")\`.
+  mediators to the outcome. For example: `c("M1 -> M2", "M2 -> Y")`.
 
 - MP:
 
   A character vector identifying moderated paths. Supported labels
-  follow the existing wsMed convention: \`a1\`, \`b1\`, \`d1\`,
-  \`b_1_2\`, \`d_1_2\`, and \`cp\`.
+  follow the existing wsMed convention: `a1`, `b1`, `d1`, `b_1_2`,
+  `d_1_2`, and `cp`.
 
   Main effects of W are always labeled and used for conditional
   intercepts, including when a/cp is not explicitly listed in MP.
@@ -36,6 +37,15 @@ GenerateModelCustom(prepared_data, paths, MP = character(0))
 ## Value
 
 A character string containing lavaan model syntax.
+
+## Product moments
+
+When a moderated path starts at an endogenous mediator, auxiliary
+product moment equations and covariances with its upstream disturbances
+preserve the joint predictor moment structure under reference recoding.
+These equations are not additional mediation paths. Genuine exogenous
+moments follow the fitting function's `fixed.x` setting; endogenous
+product moments are estimated.
 
 ## Examples
 

@@ -1,4 +1,4 @@
-# Parse All Possible Indirect Paths from Column Names
+# Parse indirect paths from coefficient names
 
 Infers every unique mediation chain that can be constructed from a set
 of coefficient names following the WsMed naming convention (e.g., `a1`,

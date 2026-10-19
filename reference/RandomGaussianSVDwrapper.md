@@ -1,7 +1,6 @@
-# Generate Random Variates from the Gaussian Distribution (Singular Value Decomposition)
+# Generate Gaussian random variates using singular value decomposition
 
-Generate Random Variates from the Gaussian Distribution (Singular Value
-Decomposition)
+Generate Gaussian random variates using singular value decomposition
 
 ## Usage
 

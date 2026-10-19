@@ -1,4 +1,4 @@
-# Compute Monte Carlo Estimates, Standard Errors, and CIs (with Percent Labels)
+# Compute Monte Carlo estimates, standard errors, and CIs (with percent labels)
 
 `mc_summary_pct()` summarizes a numeric vector of Monte Carlo samples
 `x` by computing its mean, standard deviation, and percentile-based

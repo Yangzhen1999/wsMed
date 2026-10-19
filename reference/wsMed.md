@@ -1,4 +1,4 @@
-# Within-Subject Mediation Analysis (Two-Condition)
+# Analyze two-condition within-subject mediation
 
 `wsMed()` fits a structural equation model (SEM) for two-condition
 within-subject mediation. It can handle missing data (DE, FIML, MI) and
@@ -72,7 +72,11 @@ wsMed(
 
 - W_type:
 
-  Character; `"continuous"` or `"categorical"`.
+  Character; `"continuous"` or `"categorical"`. Automatic numeric 0/1
+  moderator detection emits a message and is recorded in
+  `fit$diagnostics$input_notes`. Use an explicit type or factor for
+  consistency with
+  [`wsmed_fit()`](https://yangzhen1999.github.io/wsMed/reference/wsmed_fit.md).
 
 - MP:
 
@@ -107,9 +111,21 @@ wsMed(
 
   :   Imputation method for `mice()`.
 
+  `completed`
+
+  :   Optional list of completed wide data frames or a `mice` mids
+      object. Observed values, rows and factor levels must be preserved.
+      The number of imputations is inferred; supplied m must match. Omit
+      method_num. With external imputations, seed still controls MC
+      only. See
+      [`wsmed_fit`](https://yangzhen1999.github.io/wsMed/reference/wsmed_fit.md)
+      for model-compatible imputation guidance.
+
   `decomposition`
 
   :   Covariance-decomposition method (`"eigen"`, `"chol"`, `"svd"`).
+      The default `"eigen"` uses the principal symmetric covariance
+      square root; fixed-seed MI draws differ from wsMed 1.1.0.
 
   `pd`
 
@@ -147,15 +163,19 @@ wsMed(
 
 - MCmethod:
 
-  If `Na = "FIML"` and `ci_method = "mc"`, choose `"mc"` (default) or
-  `"bootSD"`.
+  NULL or `"mc"`. The unimplemented `"bootSD"` option is rejected
+  explicitly.
 
 - standardized:
 
   Logical; if `TRUE`, return standardized parameter tables (including
   defined effects at the reference moderator value). Raw conditional
   results remain in moderation; standardized conditional tables and
-  curves are added in moderation_std. Default FALSE.
+  curves are added in moderation_std. Default FALSE. This choice is
+  saved as the default for print, summary, wsmed_effects and generic
+  plot; standardized = TRUE or FALSE on those methods overrides it for
+  one query. Raw fitting parameters remain available through coef and
+  vcov.
 
 - verbose:
 
@@ -207,6 +227,11 @@ An object of class `"wsMed"` with elements:
 
   Names of all user-supplied variables.
 
+- model,fit,inference:
+
+  Structured specification, reusable fit (including all imputation
+  fits), and named stored inference objects.
+
 ## Details
 
 Model structures:
@@ -235,8 +260,10 @@ Confidence-interval engines:
 
 - Monte Carlo: draws via semmcci (all `Na` options)
 
-For `Na = "FIML"`, you may choose `MCmethod = "mc"` (default) or
-`"bootSD"` to add a finite-sample SD correction.
+Monte Carlo inference uses the existing joint-parameter sampler. The
+legacy `MCmethod = "bootSD"` option was accepted but never applied; it
+now produces an explicit error rather than silently returning ordinary
+MC results.
 
 Standardization divides differences by their marginal model-implied SDs,
 without recentering them. Dummy variables retain 0/1 units; interaction
@@ -252,11 +279,35 @@ With fixed.x=TRUE, scale transformations condition on the fitted
 external moments rather than adding sampling uncertainty for those
 moments. In MI, probes/centering references use the first completed data
 set; fixed.x=TRUE also conditions on its external moments in the pooled
-transform. No new population-relative probing or imputation method is
-implemented here.
+transform. In moderated MI models, marginal variances are pooled jointly
+with primitive coefficients, including their delta-method
+within-imputation and Rubin between-imputation covariance. MC propagates
+this joint uncertainty. Endogenous product moments are estimated even
+with fixed.x=TRUE.
 
 Workflow: (1) preprocess -\> (2) generate SEM syntax -\> (3) fit -\> (4)
 compute confidence intervals -\> (5) optional: standardize estimates.
+See
+[wsmed_categorical](https://yangzhen1999.github.io/wsMed/reference/wsmed_categorical.md)
+for supported categorical predictors, reference coding, and missing-data
+restrictions. In both interfaces, declare categorical covariates and
+moderators as unordered factors with explicit levels before fitting. The
+first factor level is the reference group. Existing automatic
+recognition of numeric 0/1 predictors is retained in this one-call
+interface. The empirical manuscript dataset is available as
+[`wsmed_examples()`](https://yangzhen1999.github.io/wsMed/reference/wsmed_examples.md);
+[`example_data()`](https://yangzhen1999.github.io/wsMed/reference/example_data.md)
+is simulated tutorial data.
+
+The one-call interface uses the same fitting and inference engines as
+[`wsmed_model()`](https://yangzhen1999.github.io/wsMed/reference/wsmed_model.md),
+[`wsmed_fit()`](https://yangzhen1999.github.io/wsMed/reference/wsmed_fit.md),
+and
+[`wsmed_infer()`](https://yangzhen1999.github.io/wsMed/reference/wsmed_infer.md).
+Default printing is concise; use `print(result, detail = "full")` for
+the original tables. Use
+[`wsmed_effects()`](https://yangzhen1999.github.io/wsMed/reference/wsmed_effects.md)
+to query stored draws without rerunning the analysis.
 
 ## Examples
 
@@ -271,135 +322,19 @@ result <- wsMed(
   form = "P", Na = "DE"
 )
 print(result)
-#> 
-#> 
-#> *************** VARIABLES ***************
-#> Outcome (Y):
-#>    Condition 1: C1 
-#>    Condition 2: C2 
-#> Mediators (M):
-#>   M1:
-#>     Condition 1: A2
-#>     Condition 2: A1
-#>   M2:
-#>     Condition 1: B2
-#>     Condition 2: B1
-#> Sample size (rows kept): 100 
-#> 
-#> 
-#> *************** MODEL FIT ***************
-#> 
-#> 
-#> |Measure   |  Value|
-#> |:---------|------:|
-#> |Chi-Sq    | 11.436|
-#> |df        |  5.000|
-#> |p         |  0.043|
-#> |CFI       |  0.000|
-#> |TLI       | -1.130|
-#> |RMSEA     |  0.113|
-#> |RMSEA Low |  0.018|
-#> |RMSEA Up  |  0.202|
-#> |SRMR      |  0.076|
-#> 
-#> 
-#> ************* TOTAL / DIRECT / TOTAL-IND (MC) *************
-#> 
-#> 
-#> |Label          | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:--------------|--------:|-----:|---------:|----------:|
-#> |Total effect   |    0.015| 0.016|    -0.017|      0.047|
-#> |Direct effect  |    0.016| 0.016|    -0.016|      0.048|
-#> |Total indirect |   -0.001| 0.004|    -0.009|      0.008|
-#> 
-#> Indirect effects:
-#> 
-#> 
-#> |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:-----|--------:|-----:|---------:|----------:|
-#> |ind_1 |    0.001| 0.003|    -0.005|      0.008|
-#> |ind_2 |   -0.002| 0.003|    -0.009|      0.003|
-#> 
-#> Indirect-effect key:
-#> 
-#> 
-#> |Ind   |Path                 |
-#> |:-----|:--------------------|
-#> |ind_1 |X -> M1diff -> Ydiff |
-#> |ind_2 |X -> M2diff -> Ydiff |
-#> 
-#> 
-#> *************** MODERATION EFFECTS (d-paths, MC) ***************
-#> 
-#> 
-#> |Coefficient | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:-----------|--------:|-----:|---------:|----------:|
-#> |d1          |   -0.062| 0.091|    -0.238|      0.115|
-#> |d2          |   -0.073| 0.083|    -0.238|      0.089|
-#> 
-#> 
-#> *************** MODERATION KEY (d-paths) ***************
-#> 
-#> 
-#> |Coefficient |Path           |Moderated       |
-#> |:-----------|:--------------|:---------------|
-#> |d1          |M1avg -> Ydiff |M1diff -> Ydiff |
-#> |d2          |M2avg -> Ydiff |M2diff -> Ydiff |
-#> 
-#> UNSTANDARDIZED CONDITIONAL EFFECTS (mc)
-#> Percentile intervals; moderator probes and centering references are held fixed.
-#> 
-#> 
-#> *************** CONTRAST INDIRECT EFFECTS (No Moderator) ***************
-#> 
-#> 
-#> |Contrast                  | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:-------------------------|--------:|-----:|---------:|----------:|
-#> |indirect_2  -  indirect_1 |   -0.003| 0.004|    -0.012|      0.005|
-#> 
-#> 
-#> *************** C1-C2 COEFFICIENTS (No Moderator) ***************
-#> 
-#> 
-#> |Coeff | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:-----|--------:|-----:|---------:|----------:|
-#> |X1_b1 |    0.005| 0.102|    -0.196|      0.205|
-#> |X0_b1 |    0.067| 0.102|    -0.129|      0.267|
-#> |X1_b2 |    0.076| 0.099|    -0.119|      0.271|
-#> |X0_b2 |    0.149| 0.099|    -0.041|      0.345|
-#> 
-#> 
-#> *************** REGRESSION PATHS (MC) ***************
-#> 
-#> 
-#> |Path           |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:--------------|:-----|--------:|-----:|---------:|----------:|
-#> |Ydiff ~ M1diff |b1    |    0.036| 0.091|    -0.141|      0.215|
-#> |Ydiff ~ M1avg  |d1    |   -0.062| 0.091|    -0.238|      0.115|
-#> |Ydiff ~ M2diff |b2    |    0.112| 0.090|    -0.061|      0.291|
-#> |Ydiff ~ M2avg  |d2    |   -0.073| 0.083|    -0.238|      0.089|
-#> 
-#> 
-#> *************** INTERCEPTS (MC) ***************
-#> 
-#> 
-#> |Intercept |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:---------|:-----|--------:|-----:|---------:|----------:|
-#> |Ydiff~1   |cp    |    0.016| 0.016|    -0.016|      0.048|
-#> |M1diff~1  |a1    |    0.027| 0.018|    -0.007|      0.062|
-#> |M2diff~1  |a2    |   -0.014| 0.018|    -0.049|      0.020|
-#> |M1avg~1   |      |   -0.000| 0.018|    -0.035|      0.036|
-#> |M2avg~1   |      |    0.000| 0.020|    -0.040|      0.040|
-#> 
-#> 
-#> *************** VARIANCES (MC) ***************
-#> 
-#> 
-#> |Variance       |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:--------------|:-----|--------:|-----:|---------:|----------:|
-#> |Ydiff~~Ydiff   |      |    0.026| 0.004|     0.019|      0.033|
-#> |M1diff~~M1diff |      |    0.031| 0.004|     0.022|      0.039|
-#> |M2diff~~M2diff |      |    0.032| 0.005|     0.023|      0.041|
-#> |M1avg~~M1avg   |      |    0.034| 0.005|     0.024|      0.043|
-#> |M2avg~~M2avg   |      |    0.041| 0.006|     0.030|      0.052|
+#> wsMed analysis
+#> Model: P | DE | Observations: 100 
+#> Effects:
+#> wsMed all | raw scale | mc 
+#> 95% percentile intervals; 20000 joint draws; SE from effect draws
+#> Condition contrast: C2 - C1 
+#>                                        Estimate Std. Error  CI lower  CI upper
+#> cp: Direct effect                      0.015995   0.016235 -0.016037  0.047686
+#> indirect_1: M1                         0.000977   0.003002 -0.004805  0.007940
+#> indirect_2: M2                        -0.001626   0.002900 -0.008681  0.003040
+#> total_indirect: Total indirect effect -0.000650   0.004151 -0.009492  0.007664
+#> total: Total effect                    0.015346   0.016328 -0.016597  0.047203
+#> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
+#> Use as.data.frame() for the full-precision table and metadata.
+#> Post-fit admissibility: 1 of 1 ; excluded rows: 0 
 ```

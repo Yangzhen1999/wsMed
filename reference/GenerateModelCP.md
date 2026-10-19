@@ -1,4 +1,4 @@
-# Generate Combined Parallel and Chained Mediation Model
+# Generate a serial-parallel mediation model
 
 Dynamically generates a structural equation modeling (SEM) syntax for
 combined parallel and chained mediation analysis based on the prepared
@@ -76,6 +76,15 @@ including:
 
 This model is suitable for designs where mediators include both a
 sequential chain (chained mediation) and independent parallel mediators.
+
+## Product moments
+
+When a moderated path starts at an endogenous mediator, auxiliary
+product moment equations and covariances with its upstream disturbances
+preserve the joint predictor moment structure under reference recoding.
+These equations are not additional mediation paths. Genuine exogenous
+moments follow the fitting function's `fixed.x` setting; endogenous
+product moments are estimated.
 
 ## See also
 

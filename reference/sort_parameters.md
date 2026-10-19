@@ -1,4 +1,4 @@
-# Sort Parameters for Printing in SEM Output
+# Sort parameters for printing in SEM output
 
 Sorts a parameter table by conceptual priority for presentation
 purposes. This function is designed to support formatted output of
