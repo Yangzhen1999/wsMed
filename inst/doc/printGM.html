@@ -348,19 +348,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <code>sem_model</code>. <code>printGM()</code> can automatically extract
 and format the model equations.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(wsMed)</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>result1 <span class="ot">&lt;-</span> <span class="fu">wsMed</span>(</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>  <span class="at">data =</span> example_data,</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>  <span class="at">M_C1 =</span> <span class="fu">c</span>(<span class="st">&quot;A1&quot;</span>,<span class="st">&quot;B1&quot;</span>,<span class="st">&quot;C1&quot;</span>),</span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>  <span class="at">M_C2 =</span> <span class="fu">c</span>(<span class="st">&quot;A2&quot;</span>,<span class="st">&quot;B2&quot;</span>,<span class="st">&quot;C2&quot;</span>),</span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>  <span class="at">Y_C1 =</span> <span class="st">&quot;D1&quot;</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>  <span class="at">Y_C2 =</span> <span class="st">&quot;D2&quot;</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>  <span class="at">form =</span> <span class="st">&quot;P&quot;</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>  <span class="at">Na =</span> <span class="st">&quot;DE&quot;</span>,</span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>  <span class="at">standardized =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>  <span class="at">ci_method =</span> <span class="st">&quot;mc&quot;</span>, <span class="at">R =</span> <span class="dv">1000</span>,</span>
-<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">123</span></span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>)</span>
-<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="fu">printGM</span>(result1)</span></code></pre></div>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">data</span>(example_data)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>result1 <span class="ot">&lt;-</span> <span class="fu">wsMed</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>  <span class="at">data =</span> example_data,</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>  <span class="at">M_C1 =</span> <span class="fu">c</span>(<span class="st">&quot;A1&quot;</span>, <span class="st">&quot;B1&quot;</span>, <span class="st">&quot;C1&quot;</span>),</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>  <span class="at">M_C2 =</span> <span class="fu">c</span>(<span class="st">&quot;A2&quot;</span>, <span class="st">&quot;B2&quot;</span>, <span class="st">&quot;C2&quot;</span>),</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>  <span class="at">Y_C1 =</span> <span class="st">&quot;D1&quot;</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>  <span class="at">Y_C2 =</span> <span class="st">&quot;D2&quot;</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>)</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="fu">printGM</span>(result1)</span></code></pre></div>
 <pre><code>## 
 ## Outcome Difference Model (Ydiff):
 ##  Ydiff ~ cp*1 + b1*M1diff + d1*M1avg + b2*M2diff + d2*M2avg + b3*M3diff + d3*M3avg 
@@ -432,10 +428,10 @@ functions.</p>
 ##  total_effect := cp + total_indirect</code></pre>
 <p><code>printGM()</code> displays the unstandardized model equations;
 requesting standardized estimates does not rewrite the SEM syntax. For
-standardized conditional estimates and plots, use
-<code>moderation_std</code> and
-<code>plot_moderation_curve(..., standardized = TRUE)</code>, as shown
-in <a href="StandardizedModeratedMediation.html">Standardized moderated
+standardized estimates and plots, use
+<code>summary(result1, standardized = TRUE)</code> and
+<code>plot(result1, standardized = TRUE)</code>. The same methods also
+support conditional results when a moderator is present; see <a href="StandardizedModeratedMediation.html">Standardized moderated
 mediation</a>.</p>
 </div>
 </div>

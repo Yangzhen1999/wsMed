@@ -1,118 +1,118 @@
 Article: AnalysisGuide
 Title: Choose an analysis
-Source: 570c5040465f4d6aad63f86510a2d884
-Rendered: 9ae49a74ff84f59cbd422952c2fd6f56
-HTML: adbbb9ea11f3c803f8249fb202c8eedb
-Code: 3dbec1c11f265b542b67278cb733ac8a
+Source: c0f7b35c9dec763626d1cacfd77e7cc7
+Rendered: 5eecc26c550dfbc999d077d51be3cc5b
+HTML: e0d170b2d45fc146ae481118274ffc64
+Code: 20b08bd6bb44b351424c6c0f2830bf01
 
 Article: CategoricalPredictors
 Title: Working with categorical predictors
-Source: 7d01749c6a60457c7bf01b4739cb2eda
-Rendered: d759e416d84a7a9b6da7ddac78fb2adc
-HTML: ce31cf959316f917374c918cb902f2e7
-Code: 3dbec1c11f265b542b67278cb733ac8a
+Source: 426a816ad60df32ff003f0f7f932df46
+Rendered: ecc6335f98f2968e4421555db5a22476
+HTML: 3d1e851784fb679f7893be07fe5cb756
+Code: 20b08bd6bb44b351424c6c0f2830bf01
 
 Article: CompatibleImputation
 Title: Model-compatible multiple imputation
-Source: ff3352e91ac9857eede6d3be661ed774
-Rendered: 3f8ac15c0ab969e113c4a48803106f71
-HTML: 9116f2463dbdad440a902c694564dc7b
-Code: 3dbec1c11f265b542b67278cb733ac8a
+Source: 8062d84afae1a1cb0e26090fcdf4a393
+Rendered: 2d5970de07100a1d391c78d9b989b795
+HTML: fb7c4cf8b4bbfe414de9403a3a67a458
+Code: 20b08bd6bb44b351424c6c0f2830bf01
 
 Article: GenerateModelCN
 Title: Model equations: serial mediation
-Source: 6af6e5037a7673cb7ef62a095b509c4e
-Rendered: 5420f513eca817aeab58fdca801f4c42
-HTML: 88906816d1b98874e586c1bed76a86f0
-Code: 3dbec1c11f265b542b67278cb733ac8a
+Source: c5faef1723eac4665a9b70836129f5bd
+Rendered: 950162fce4092001f43262c6506d7f18
+HTML: 4ec2aaf126932cf373f1ca4802af9042
+Code: 20b08bd6bb44b351424c6c0f2830bf01
 
 Article: GenerateModelCP
 Title: Model equations: serial-parallel mediation
-Source: 49b0ceeaf439c2865322c08f1fec866b
-Rendered: 534eaace9316468da7b22c189593dbc3
-HTML: a5fac64df4a68030dfe20ce540aae458
-Code: 3dbec1c11f265b542b67278cb733ac8a
+Source: 1aa21b12fcb737dd3304d53efb6e2f41
+Rendered: 005a96b0e4c0b5b484e19ca0e7bf735b
+HTML: 5eea6edfff241a9597e7739a03b9a480
+Code: 20b08bd6bb44b351424c6c0f2830bf01
 
 Article: GenerateModelCustom
 Title: Specifying user-defined mediation models
-Source: 6619c4bc1e6a43ac4921db8b7c5f6165
-Rendered: 32a6d7e1098487f0802466eee04ec8d2
-HTML: 1ec8364a394f0e819e28e61f3afa8cc5
-Code: 3dbec1c11f265b542b67278cb733ac8a
+Source: fcddc9c24f7f9863783d9a65cefc6bcf
+Rendered: dff7158471c63f2e3e2a9beb510a45f4
+HTML: d7a3e11aa97efddc7c1bcd008cb334b5
+Code: 20b08bd6bb44b351424c6c0f2830bf01
 
 Article: GenerateModelP
 Title: Model equations: parallel mediation
-Source: 146adf99ddbb0783ecc0776de133ba6b
-Rendered: 39a4f576a4fe99addc8bc81a0e16e533
-HTML: cfd449c5fef0483a1f1e5565e4613b9a
-Code: 3dbec1c11f265b542b67278cb733ac8a
+Source: b03f9c269c48f795a9e8f7a6298d5534
+Rendered: f954d77852d732b883e37b355be7c6c5
+HTML: 501563f1ae2a14aa78edacd12c6f1b39
+Code: 20b08bd6bb44b351424c6c0f2830bf01
 
 Article: GenerateModelPC
 Title: Model equations: parallel-serial mediation
-Source: a3c0978b138ae94040a46a8ea563d8e5
-Rendered: a0b755b563d609f70fb84b77f2d9481c
-HTML: f051e485432e755a2749c6934b8d89e8
-Code: 3dbec1c11f265b542b67278cb733ac8a
+Source: beb315bdcf827d558e5d1b6d8b6bad15
+Rendered: 99d4e79697ede9bb5ee7ab45faf10f84
+HTML: 83eadce332da02c4b8afa6a7074a5ad7
+Code: 20b08bd6bb44b351424c6c0f2830bf01
 
 Article: GetStarted
-Title: Get started: your first mediation analysis
-Source: e50d32a7b8b0c36b09574d59b89d407c
-Rendered: 68549495d344fcb29567346784262628
-HTML: 9a4e0da2a0d197bbf1fa10370d8f8127
-Code: 3dbec1c11f265b542b67278cb733ac8a
+Title: Get started: two mediation examples
+Source: aa449bb8109a178f97e505842a461966
+Rendered: 99b5d1aeb4046943db01a3f76b8f7e8f
+HTML: 49e8245d4d31f10ba562733b4a09e843
+Code: 20b08bd6bb44b351424c6c0f2830bf01
 
 Article: MEMORE_vs_wsMed
 Title: Comparing wsMed and MEMORE
-Source: 129a6afcaa79836d3aa519eca031d7c5
-Rendered: 94553388addbac857539bb2ab8abb327
-HTML: 07f9e1359ad6188216092267694a1fa3
-Code: 3dbec1c11f265b542b67278cb733ac8a
+Source: 37308a321745b3749d991b24f9a6d2ca
+Rendered: f440eb953b90b59d601d1eab8e213a8f
+HTML: f5498885c1c24937622b7b21bacc2f5b
+Code: 20b08bd6bb44b351424c6c0f2830bf01
 
 Article: ModularWorkflow
 Title: Reuse a fit: the staged workflow
-Source: c47c937d8f93d43602b9e8251ac71745
-Rendered: 1200f1c855ae911099fd0308abcf6fa2
-HTML: 5794daa55abdbe2d6a9dadc703aa866f
-Code: 3dbec1c11f265b542b67278cb733ac8a
+Source: 8926a5ea6c20c37a9d8652e13a8d7e11
+Rendered: 9ff131ba0d60b41d62414f67f0461a92
+HTML: a16f2aceb41a70412a52e8ccf8c9d8bf
+Code: 20b08bd6bb44b351424c6c0f2830bf01
 
 Article: PlottingEffects
 Title: Plotting mediation effects and contrasts
-Source: e58558e7ea898cb738bc86139331fca5
-Rendered: 71a14b41be3501b00be6d6b316ca716a
-HTML: 24c6fd7fac1b22e01da9a7e3aecfeb08
-Code: 3dbec1c11f265b542b67278cb733ac8a
+Source: 1675a2a1b230bb79746d308d82b51974
+Rendered: 0c4f2f6cdd43d70c6e9cb60b36a44417
+HTML: dcb4e10cdc6106af1e60f70cc0262f3e
+Code: 20b08bd6bb44b351424c6c0f2830bf01
 
 Article: ResultsGuide
 Title: Read and export results
-Source: 2fe59db7fbfe2cbe5a8c2df428d0123e
-Rendered: d185019f8a188e93ec34647708788a3b
-HTML: 5ff12baaf943f0ddd5eded237922dc50
-Code: 3dbec1c11f265b542b67278cb733ac8a
+Source: aedc00a482d1a852463675f8bed43e52
+Rendered: 753866cce202a369cd345c805e29a0d3
+HTML: 9115000f889428e0f90e7540a1ea2b41
+Code: 20b08bd6bb44b351424c6c0f2830bf01
 
 Article: StandardizedModeratedMediation
 Title: Standardized effects
-Source: e4669c3202b298f59e23483e8364ccba
-Rendered: c0fcfce2e0a0d25844e0e72051537680
-HTML: 51220433dbcf25e1b34a3fae31602fa7
-Code: 3dbec1c11f265b542b67278cb733ac8a
+Source: 7e57e355ff980709a3230948df31bdf4
+Rendered: 4058e70e628371db3949de3269d76674
+HTML: 884829d61fc6aa38e233c4725de4314c
+Code: 20b08bd6bb44b351424c6c0f2830bf01
 
 Article: WorkflowReliability
 Title: Diagnostics, reproducibility, and migration
-Source: 13e8d42cac42f06b19a2e569fbe107df
-Rendered: 6dc8e7b854f267a845fffc5d1240fb6e
-HTML: a2534f8f1f38b5bb75a7852b550faae3
-Code: 3dbec1c11f265b542b67278cb733ac8a
+Source: d937c12f3f42c905f3eb7cbdaee953b0
+Rendered: 6f91f8dbd76ed8bed63a0b23227e6129
+HTML: bb33929948464171529435223ef0d1ed
+Code: 20b08bd6bb44b351424c6c0f2830bf01
 
 Article: WsMed
 Title: Analysis options: a complete walkthrough
-Source: ed8c8312629b90b73fa312b03ab10e21
-Rendered: b5b1998af5f5cd88f04876a7db08c942
-HTML: ebddd8fce5840cacb52a52181555971c
-Code: 3dbec1c11f265b542b67278cb733ac8a
+Source: 99962a022a303d294227b822c001c4a6
+Rendered: 4440566a87baac557bd364b58a0d76eb
+HTML: a5749f0b77702bc0fece31743ffa03cb
+Code: 20b08bd6bb44b351424c6c0f2830bf01
 
 Article: printGM
 Title: Inspecting generated SEM syntax
-Source: 99de4e4828ff25b589f6a26503088bff
-Rendered: 4772f988726449f32b698a71be433180
-HTML: febc61ff8e1533dded5fa7c0ac06c580
-Code: 3dbec1c11f265b542b67278cb733ac8a
+Source: eb7c002295ddb38e3a91835a5e3ef535
+Rendered: 1bf94ef3f0c0ac687beb7bbe3d22e131
+HTML: 00648e7f797721c47cbb35fa93eecafc
+Code: 20b08bd6bb44b351424c6c0f2830bf01

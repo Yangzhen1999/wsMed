@@ -1,5 +1,8 @@
 url: https://yangzhen1999.github.io/wsMed
 
+repo:
+  branch: master
+
 template:
   bootstrap: 5
   bootswatch: flatly

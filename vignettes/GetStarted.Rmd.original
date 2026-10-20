@@ -1,133 +1,211 @@
 ---
-title: "Get started: your first mediation analysis"
+title: "Get started: two mediation examples"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Get started: your first mediation analysis}
+  %\VignetteIndexEntry{Get started: two mediation examples}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
 library(wsMed)
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>", cache = FALSE,
-                     fig.width = 7, fig.height = 4.5)
+options(width = 80)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  cache = FALSE,
+  fig.width = 7,
+  fig.height = 4.5
+)
 ```
 
-Fit a two-condition parallel mediation model, read its effects, and draw a
-forest plot. This example uses complete simulated data and the one-call
-`wsMed()` interface. No external data file is needed.
+Learn the basic workflow through two examples: parallel mediation, followed
+by moderated mediation. Both use the package's complete simulated data and
+start with the default analysis, report and plot. No external data file is needed.
 
-**Documentation version:** the reporting interfaces on this site require the
-`feature/modular-api` development build (`1.2.0`). Install it once:
+## Install wsMed
 
-```{r install, eval=FALSE}
+These tutorials describe **wsMed 1.2.0**. Install the released package from CRAN:
+
+```{r installation-cran, eval=FALSE}
+install.packages("wsMed")
+```
+
+Or install the version on the GitHub `master` branch:
+
+```{r installation-github, eval=FALSE}
 # install.packages("pak")
-pak::pak("Yangzhen1999/wsMed@feature/modular-api")
+pak::pak("Yangzhen1999/wsMed@master")
 ```
 
-Restart R after updating the package, then follow the steps below.
-For the published CRAN version, use `install.packages("wsMed")`; its reporting
-interface differs from this development tutorial.
+Restart R after updating. `packageVersion("wsMed")` shows the installed version.
 
-## 1. Match your columns to the two conditions
+## Match your columns to the two conditions
 
-Use **one row per participant**, with a separate column for each measurement.
-Here, `A` and `B` are mediators and `D` is the outcome:
+Use **one row per participant**, with separate columns for the two conditions.
+In this dataset, A and B are mediators and D is the outcome:
 
 | Role | Condition 1 | Condition 2 |
 |---|---|---|
 | Mediator A | `A1` | `A2` |
 | Mediator B | `B1` | `B2` |
-| Outcome | `D1` | `D2` |
+| Outcome D | `D1` | `D2` |
 
 ```{r data}
 library(wsMed)
 data(example_data)
-head(example_data[c("A1", "A2", "B1", "B2", "D1", "D2")], 3)
 ```
 
-The direction is **condition 2 minus condition 1**. Put the mediator columns
-in the same order in `M_C1` and `M_C2`. Replace the column names when using your
-data; wsMed constructs the differences internally.
+The analysis uses **condition 2 minus condition 1**. List the mediators in the
+same order in `M_C1` and `M_C2`; wsMed constructs the difference scores internally.
+These simulated variables illustrate the interface.
 
-## 2. Run the analysis
+## Example 1: parallel mediation
+
+### Run the analysis
+
+Only the dataset and paired mediator and outcome columns are required:
 
 ```{r fit}
 result <- wsMed(
   data = example_data,
-  M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"),
-  Y_C1 = "D1", Y_C2 = "D2",
-  form = "P", Na = "DE", ci_method = "mc",
-  R = 2000, seed = 123, verbose = FALSE
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2"
 )
 ```
 
-`form = "P"` requests parallel mediation. `Na = "DE"` removes incomplete
-analysis rows; this dataset is complete. `R = 2000` keeps this teaching example
-quick, and `seed` makes its Monte Carlo draws repeatable in the same environment.
-For a final analysis, assess interval stability with more draws.
+The omitted arguments use the package defaults:
 
-## 3. Read the core effects
+| Setting | Default |
+|---|---|
+| Mediator structure | Parallel mediation (`form = "P"`) |
+| Missing data | Listwise deletion (`Na = "DE"`); this dataset is complete |
+| Inference | Monte Carlo (`ci_method = "mc"`) with 20,000 draws |
+| Confidence level | 95% (`alpha = 0.05`) |
+| Reporting scale | Unstandardized (`standardized = FALSE`) |
+| Random seed | `seed = 123` |
+
+### Read the results
 
 ```{r effects}
-s <- summary(result)
-knitr::kable(s$effects[c("label", "estimate", "std.error", "conf.low", "conf.high")],
-  digits = 4, col.names = c("Effect / pathway", "Estimate", "SE", "CI lower", "CI upper"))
+print(result)
 ```
 
-Read the table in three steps:
+The report includes the direct effect, the indirect pathways through A (`M1`)
+and B (`M2`), their total indirect effect, and the total effect. Read each estimate
+together with its SE and CI. The total effect is the direct effect plus the total
+indirect effect. An interval containing zero does not establish a zero effect.
 
-- The specific indirect rows describe the pathways through A (`M1`) and B (`M2`),
-  in the order supplied to `M_C1` and `M_C2`. Their sum
-  is the **total indirect effect**.
-- The **total effect** is the direct effect plus the total indirect effect.
-- The estimates above are **unstandardized**. The interval columns are 95%
-  percentile Monte Carlo intervals. An interval containing zero does not
-  establish that the effect is exactly zero.
+To see the effect and path-coefficient tables in a statistical summary, use:
 
-The synthetic variable names describe roles, not substantive constructs.
-Use study-specific names when reporting your own analysis, and distinguish
-statistical mediation from a causal interpretation.
+```{r first-summary}
+summary(result)
+```
 
-For the console report, use `print(result)`. For additional path coefficients,
-use `print(result, detail = "full")`. The [results guide](ResultsGuide.html)
-explains the report, structured tables and export options.
+These calls use the stored analysis; they do not fit the model again. You do not
+need to select table columns or write formatting code to read the results.
 
-## 4. Draw the effects
+### Plot the indirect effects
 
 ```{r first-plot}
-plot(s, title = "Core mediation effects")
+plot(result)
 ```
 
-Each point is an effect estimate and each line is its confidence interval.
-This graph uses the same rows as `s$effects`.
+The default plot shows the specific indirect effects and their CIs. A point is
+an estimate and a horizontal line is its interval.
 
-## 5. Make one change at a time
+## Example 2: add a continuous moderator
 
-| Your next task | Where to go |
-|---|---|
-| Choose serial, mixed or custom pathways | [Choose an analysis](AnalysisGuide.html#choose-your-model) |
-| Read, standardize or export tables | [Read and export results](ResultsGuide.html) |
-| Add a continuous or categorical moderator | [Add moderation](AnalysisGuide.html#add-moderation) |
-| Handle incomplete data | [Missing data](AnalysisGuide.html#handle-missing-data) |
-| Choose another figure | [Plot gallery](PlottingEffects.html) |
+Keep the same mediator and outcome columns, and add `D3` as the moderator.
+Here `MP` allows both mediator-to-outcome difference slopes (`b1` and `b2`)
+to vary with the moderator. Moderator main effects are included automatically.
 
-<details>
-<summary>Copy the complete example</summary>
+```{r moderated-fit}
+moderated <- wsMed(
+  data = example_data,
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2",
+  W = "D3",
+  MP = c("b1", "b2")
+)
+```
 
-```{r complete-script, eval=FALSE}
-library(wsMed)
-data(example_data)
+### Read the conditional effects
+
+```{r moderated-report}
+print(moderated)
+```
+
+With a continuous moderator, the default report evaluates effects at its
+centering reference, the fitted-sample mean for this complete dataset. The
+report identifies that value. These are effects at that reference, not averages
+of effects across participants.
+
+### Plot how the indirect effects change
+
+```{r moderated-plot, fig.height=5.5}
+plot(moderated)
+```
+
+The default plot now shows conditional indirect-effect curves across the observed
+moderator range. The horizontal axis uses the moderator's original units, and
+the bands are pointwise CIs. No additional plotting settings are required.
+
+## Specify more only when you need it
+
+The first call can also be written with its settings explicitly stated:
+
+```{r explicit-settings, eval=FALSE}
 result <- wsMed(
   data = example_data,
-  M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"),
-  Y_C1 = "D1", Y_C2 = "D2",
-  form = "P", Na = "DE", ci_method = "mc",
-  R = 2000, seed = 123, verbose = FALSE
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2",
+  form = "P",
+  Na = "DE",
+  ci_method = "mc",
+  R = 20000,
+  alpha = 0.05,
+  seed = 123,
+  standardized = FALSE
 )
-s <- summary(result)
-s$effects
-plot(s, title = "Core mediation effects")
 ```
 
-</details>
+This is equivalent to the minimal call in Example 1. Change an argument when
+your analysis needs a different model, missing-data strategy or inference method.
+The [analysis guide](AnalysisGuide.html) explains those choices.
+
+For a particular reporting question, add an option to the default report:
+
+```{r optional-reporting, eval=FALSE}
+# Request standardized results without fitting again.
+summary(
+  result,
+  standardized = TRUE
+)
+
+# Evaluate the moderated model at a chosen raw moderator value.
+print(
+  moderated,
+  at = list(D3 = mean(example_data$D3))
+)
+```
+
+## Continue with your own analysis
+
+| Your next task | Guide |
+|---|---|
+| Choose serial or user-defined pathways | [Choose an analysis](AnalysisGuide.html#choose-your-model) |
+| Add covariates or handle missing data | [Analysis options](WsMed.html) |
+| Work with categorical predictors | [Categorical predictors](CategoricalPredictors.html) |
+| Select effects, standardize or export results | [Read and export results](ResultsGuide.html) |
+| Customize a figure | [Plot gallery](PlottingEffects.html) |
+| Specify, fit and inspect a model in separate steps | [Staged workflow](ModularWorkflow.html) |
+
+The empirical data used in the manuscript are also available as `wsmed_examples`;
+see `help("wsmed_examples")` for their source and variable definitions.

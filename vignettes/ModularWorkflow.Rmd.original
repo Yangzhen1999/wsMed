@@ -9,215 +9,555 @@ vignette: >
 
 ```{r setup, include=FALSE}
 library(wsMed)
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>", cache = FALSE,
-                     fig.width = 7, fig.height = 5)
+options(width = 80)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  cache = FALSE,
+  fig.width = 7,
+  fig.height = 4.5
+)
 ```
 
-**Use this guide when you want to reuse a fitted model or change inference without refitting.**
-For a first analysis, use [Get started](GetStarted.html). For everyday tables,
-use [Read and export results](ResultsGuide.html).
+The staged interface separates model specification, fitting, and inference.
+You can inspect the output after each stage and reuse it in the next one.
+This guide follows one parallel-mediation example through those three stages,
+then shows how to read and extract the results. `wsMed()` remains available
+for completing the analysis in one call, as shown in [Get started](GetStarted.html).
 
-## One call remains available
+## The workflow at a glance
 
-`wsMed()` specifies, fits, and performs inference in one call. It uses the same
-engines as the staged interface below. Existing arguments and result fields
-remain available. Default printing shows the core effect report;
-`print(result, detail = "full")` also displays path coefficients.
-`summary()` creates a structured statistical summary with full-precision tables.
-`print(result, detail = "legacy")` retains the original stored report.
+| Stage and call | Returned object | What is available |
+|---|---|---|
+| **1. Specify**<br>`wsmed_model()` | `model`: a `wsmed_model` | Variable pairs, condition order, mediator structure, covariates and moderator settings. |
+| **2. Fit**<br>`wsmed_fit(model, data)` | `fit`: a `wsmed_fit` | Fitted parameters and native SEs, prepared data, model syntax, backend fits and diagnostics. |
+| **3. Infer**<br>`wsmed_infer(fit)` | `inference`: a `wsmed_inference` | The original fit, joint draws, inference settings and draw diagnostics. |
+| **4. Read or extract**<br>`summary(inference)` or `wsmed_effects(inference)` | A summary or `wsmed_results` | Effect estimates, SEs, CIs, effect draws and reporting settings. |
 
-```{r one-call}
+The first three steps create the analysis objects. The fourth uses those
+objects to produce tables, plots and contrasts; it does not fit or sample again.
+At each step below, start with the default display and use the extraction
+examples only when you need the underlying values.
+
+```{r data}
 data(example_data)
-result <- wsMed(example_data,
-  M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"),
-  Y_C1 = "D1", Y_C2 = "D2", R = 2000, seed = 123)
-result
-summary(result)
 ```
 
-## Read reports or extract tables
+These simulated data are complete and in wide format, with one row per
+participant. A1/A2 and B1/B2 are the mediator pairs; D1/D2 are the outcome pair.
 
-The same effect calculations power both outputs. `print()` is for reading a
-report; `summary()` returns a structured object whose display uses ordinary R
-coefficient tables. The default summary includes the direct effect, each
-specific indirect effect, the total indirect effect and the total effect.
-The total indirect effect equals the specific indirect effect in a one-mediator
-model; both named rows are retained for a stable extraction schema.
+## 1. Specify the model
 
-```{r report-tables}
-s <- summary(result)
-s$effects[, c("effect", "label", "estimate", "std.error", "conf.low", "conf.high")]
-s$coefficients
-s$info$standardized
-print(result, detail = "full")
-```
+Use `wsmed_model()` to describe the analysis before supplying data. Name each
+pair with the same two conditions. Here, every difference is **after minus
+before**. The names A and B identify the mediator roles in paths and output.
 
-`as.data.frame(s)`, `coef(s)`, `confint(s)`, `vcov(s)` and `plot(s)` concern the
-selected effects. `$coefficients` contains conditional path slopes; select
-`type = "parameters"` for primitive model parameters. `summary(s, level = .90)`
-updates intervals and both summary tables from the saved draws.
-
-Use `wsMed(..., standardized = TRUE)` to save the reporting preference, or
-`wsmed_fit(..., standardized = TRUE)` in the staged workflow. Printing,
-summaries, effect extraction and generic plotting inherit it, with or without
-moderation. The parameter changes the output scale, not the fitted model.
-Explicit `standardized = FALSE` or `TRUE` overrides it for one query. The older
-`scale = "raw"` / `"marginal"` spelling remains supported; conflicting arguments
-are rejected. Marginal endpoint standardization has the same definition as in
-the [standardization tutorial](StandardizedModeratedMediation.html).
-
-```{r report-standardized}
-standardized_summary <- summary(result, standardized = TRUE)
-standardized_summary$effects
-summary(result, type = "indirect", terms = "indirect_1")
-```
-
-For moderation, `at` contains **raw** moderator values or category labels.
-Continuous moderators default to the centering reference; categorical moderators
-default to all observed levels. This reports conditional effects, not an average
-over the moderator. `method` selects a saved inference engine, and `level`
-selects the confidence level. A report prints both engines separately when
-both are stored; `summary(result, method = "mc")` or `method = "bootstrap"`
-selects one coherent summary. No fitting or resampling is performed.
-
-
-The examples use 2,000 draws for speed. The Monte Carlo default remains 20,000.
-
-## Separate specification, fitting, and inference
-
-Pairs are named by condition; every difference is `after - before`. Mediator
-role names make custom edges and displayed pathways readable. Data remain wide,
-with one row per participant. Fitting alone does not generate simulation draws.
-
-```{r stages}
+```{r specify}
 model <- wsmed_model(
   outcome = c(before = "D1", after = "D2"),
-  mediators = list(A = c(before = "A1", after = "A2"),
-                   B = c(before = "B1", after = "B2")))
-fit <- wsmed_fit(model, example_data)
-inference <- wsmed_infer(fit, method = "mc", draws = 2000, seed = 123)
-fit
-inference
-stopifnot(isTRUE(all.equal(inference$draws, result$mc$result$thetahatstar)))
+  mediators = list(
+    A = c(before = "A1", after = "A2"),
+    B = c(before = "B1", after = "B2")
+  )
+)
+print(model)
 ```
 
-`coef(fit)` and `vcov(fit)` return fitted primitive parameters and their covariance.
-For MI these are Rubin-pooled quantities. `vcov(inference)` instead returns the
-empirical covariance of its stored parameter draws. `summary(fit)` displays
-native fitted parameters; `summary(inference)` collects all core effects
-and conditional path coefficients. A fit-only summary retains native parameter
-standard errors; obtain inference before requesting standardized effect intervals. `confint(fit)` asks
-you to run inference first. `wsmed_inspect(fit, "syntax")` exposes the generated
-SEM syntax, while `wsmed_inspect(fit, "fits")` returns all backend fits.
+Parallel mediation is the default. The main specification arguments are:
 
-## Query results without rerunning the analysis
+| Argument | What it specifies |
+|---|---|
+| `outcome` | A named pair of outcome columns. Its order defines the condition contrast. |
+| `mediators` | A named list of mediator pairs. Order determines mediator numbering. |
+| `structure` | `"parallel"`, `"serial"`, `"serial_parallel"`, `"parallel_serial"`, or `"custom"`. |
+| `paths` | For custom models, arrows using mediator role names and `Y`, such as `"A -> B"` and `"B -> Y"`. |
+| `covariates` | A list with `between` column names and/or `within` named pairs. |
+| `moderator` | A list specifying the moderator column and the paths with interactions. |
 
-```{r queries}
+### What can you inspect now?
+
+```{r inspect-model}
+specification <- wsmed_inspect(model, "model")
+specification$conditions
+specification$mediator_names
+column_map <- specification$input_vars
+```
+
+| Item | Access |
+|---|---|
+| Complete specification | `wsmed_inspect(model, "model")` |
+| Condition names and order | `model$conditions` |
+| Mediator role names | `model$mediator_names` |
+| Paired columns and predictor settings | `model$input_vars` |
+| Model-form code and custom edges | `model$form`, `model$paths` |
+
+This object contains no observations, fitted estimates or CIs. Model syntax,
+transformed data and fit diagnostics become available after fitting.
+
+## 2. Fit the model
+
+Pass the specification and the wide dataset to `wsmed_fit()`:
+
+```{r fit}
+fit <- wsmed_fit(
+  model,
+  data = example_data
+)
+print(fit)
+```
+
+`print(fit)` reports the sample size, convergence and diagnostic summary.
+The fitting default is `missing = "error"`, so missing analysis values require
+an explicit choice of `"listwise"`, `"fiml"`, or `"mi"`. This differs from
+the listwise-deletion default of `wsMed()`; it makes no difference for the
+complete data used here. Missing-data examples appear below.
+
+For the fitted parameter estimates and their native SEs:
+
+```{r fit-summary}
+fit_summary <- summary(fit)
+print(fit_summary)
+```
+
+These are the SEM's fitted parameters, including regression coefficients,
+intercepts and variances. Their SEs come from the fitted parameter covariance
+matrix, or Rubin pooling after MI. They are available before simulation.
+
+### What can you extract from the fit?
+
+| Item | Access | Returned value |
+|---|---|---|
+| Parameter estimates | `coef(fit)` | Named numeric vector. |
+| Parameter estimates and native SEs | `fit_summary$coefficients` | Numeric matrix. |
+| Parameter covariance | `vcov(fit)` | Covariance matrix; Rubin-pooled after MI. |
+| Number of fitted observations | `nobs(fit)` | One count per fitted dataset. |
+| Generated model syntax | `wsmed_inspect(fit, "syntax")` | Character string. |
+| Prepared analysis variables | `wsmed_inspect(fit, "data")` | Data frame of differences, centered averages and other required variables. |
+| Backend models | `wsmed_inspect(fit, "fits")` | List of lavaan fits; one per imputation for MI. |
+| Fit checks and warnings | `wsmed_inspect(fit, "diagnostics")` | Diagnostic list, including a `by_dataset` table. |
+| Recorded fitting information | `wsmed_inspect(fit, "provenance")` | Recorded software and fitting metadata. |
+
+For example, save the estimates, covariance and prepared data for further work:
+
+```{r fit-extract}
+parameter_estimates <- coef(fit)
+parameter_covariance <- vcov(fit)
+prepared_data <- wsmed_inspect(fit, "data")
+nobs(fit)
+head(prepared_data)
+```
+
+Inspect the generated equations and check the fitted datasets:
+
+```{r fit-inspect}
+cat(wsmed_inspect(fit, "syntax"))
+fit_checks <- wsmed_inspect(fit, "diagnostics")
+fit_checks$by_dataset[c("dataset", "n.used", "converged", "admissible", "warnings")]
+fit_checks$warnings
+```
+
+`converged` records whether estimation converged; `admissible` records the
+backend post-fit check. Review warnings and failed checks before proceeding.
+Convergence alone does not establish that the model or missing-data assumptions
+are appropriate. For additional backend diagnostics, retrieve the fits with
+`wsmed_inspect(fit, "fits")` and inspect the relevant fitted dataset.
+
+You can also obtain effect **point estimates** before inference:
+
+```{r fit-point-effects}
+point_effects <- wsmed_effects(fit)
+print(point_effects)
+```
+
+This defaults to the specific indirect effects. No simulation-based effect
+SEs or CIs are available yet. `confint(fit)` therefore asks you to run
+`wsmed_infer()` first; `plot(fit)` likewise shows point estimates only.
+
+## 3. Perform inference
+
+Pass the existing fit to `wsmed_infer()`:
+
+```{r inference}
+inference <- wsmed_infer(
+  fit,
+  seed = 123
+)
+print(inference)
+```
+
+The defaults are Monte Carlo inference, 20,000 draws and 95% CIs. The seed
+is specified for reproducibility; the staged default is `seed = NULL`.
+`print(inference)` reports the inference method and the number of retained
+draws. It does not display the effect table; use `summary(inference)` next.
+
+### What can you extract from inference?
+
+| Item | Access | Meaning |
+|---|---|---|
+| Original fitted model | `inference$fit` | The `wsmed_fit` supplied to this stage. |
+| Joint draws | `inference$draws` | One draw per row; columns contain parameters and generated effect definitions. |
+| Draw identities | `inference$draw_ids` | Original identities of retained draws. |
+| Method and settings | `inference$method`, `inference$controls` | Draw count, seed, confidence level and other inference controls. |
+| Inference checks | `wsmed_inspect(inference, "diagnostics")` | Requested, retained and invalid draws, plus recorded warnings. |
+| Parameter point estimates | `coef(inference)` | The same fitted parameter estimates as `coef(fit)`. |
+| Empirical parameter covariance | `vcov(inference)` | Covariance of stored draws for the model parameters. |
+| Parameter CIs | `confint(inference)` | Percentile CIs for model parameters. |
+
+For a compact view of the stored joint draws:
+
+```{r inference-extract}
+joint_draws <- inference$draws
+dim(joint_draws)
+head(
+  joint_draws[, c("a1", "b1", "indirect_1")],
+  n = 3
+)
+inference_checks <- wsmed_inspect(inference, "diagnostics")
+inference_checks[c("requested", "valid", "invalid")]
+```
+
+The coefficients within a row belong to the same draw. Keeping that pairing
+is necessary when forming products or contrasts. Point estimates remain those
+computed from the fitted model; they are not replaced by averages of the draws.
+For conditional or standardized effect draws, use the result object in step 4,
+which applies the requested transformations and records any additional exclusions.
+
+`wsmed_inspect(inference, "diagnostics")` describes inference. To recover
+the fitting checks, use `wsmed_inspect(inference$fit, "diagnostics")`.
+
+## 4. Read and extract effect results
+
+Start with the default statistical summary and plot:
+
+```{r default-results}
+s <- summary(inference)
+print(s)
+```
+
+```{r default-plot}
+plot(inference)
+```
+
+The summary displays the direct effect, specific indirect effects, total
+indirect effect and total effect, followed by path coefficients. The default
+plot displays the specific indirect effects. Each effect SE is the sample SD
+of its draws, and its CI is a percentile interval from those draws.
+
+### What can you extract from the summary?
+
+| Item | Access |
+|---|---|
+| Effect table: estimates, SEs, CIs and metadata | `s$effects` or `as.data.frame(s)` |
+| Path-coefficient table | `s$coefficients` |
+| Reporting settings: method, scale, confidence level and probes | `s$info` |
+| Selected effect estimates | `coef(s)` |
+| Selected effect CIs | `confint(s)` |
+| Covariance of selected effect draws | `vcov(s)` |
+| Joint draws for the selected effects | `s$draws` |
+| Draw identities and effect-level exclusions | `s$draw_ids`, `s$diagnostics` |
+| Fitting diagnostics retained in the summary | `s$fit_diagnostics` |
+
+For example, retain just the effect name, estimate, SE and CI columns:
+
+```{r selected-columns}
+effect_table <- as.data.frame(s)
+columns <- c(
+  "label",
+  "estimate",
+  "std.error",
+  "conf.low",
+  "conf.high"
+)
+effect_table[, columns]
+```
+
+Remove names from `columns` to omit them, or reorder them to change the display.
+The same selection works on `s$coefficients`. Tables retain full precision;
+the `digits` argument to `print()` changes only the display.
+
+The object passed to an accessor determines what it returns:
+
+| Call | Quantity |
+|---|---|
+| `coef(fit)` or `coef(inference)` | Fitted SEM parameters. |
+| `vcov(fit)` | Native fitted parameter covariance. |
+| `vcov(inference)` | Empirical covariance of model-parameter draws. |
+| `confint(inference)` | CIs for model parameters. |
+| `coef(s)`, `vcov(s)`, `confint(s)` | Estimates, draw covariance and CIs for the effects selected in the summary. |
+
+For indirect-effect CIs, use a summary or an effect result object, rather
+than `confint(inference)`. For example:
+
+```{r indirect-results}
 effects <- wsmed_effects(inference)
-as.data.frame(effects)
-confint(effects, level = .90)
-wsmed_effects(inference, type = "total", scale = "marginal")
+print(effects)
+confint(effects)
 ```
 
-These operations reuse stored joint draws. Tables retain full precision;
-`digits` controls printing only. Effect and contrast intervals are percentile
-intervals. This convention also applies if a bootstrap inference object stores
-bias-corrected legacy parameter tables. It is recorded in `effects$query` and
-the printed/plot labels. When `wsMed(ci_method = "both")` stores two inference
-engines, specify `method = "mc"` or `method = "bootstrap"` in effect queries.
+`wsmed_effects()` defaults to specific indirect effects. Its `wsmed_results`
+object stores `$table`, `$point`, `$draws`, `$draw_ids`, `$query`, and
+`$diagnostics`. `$query` records the requested effect family, reporting scale,
+moderator values and confidence level. In contrast, `summary()` defaults to
+all core effects and adds the path-coefficient table and `$info`.
+
+To compare the two indirect effects, use the same joint draws:
 
 ```{r contrasts}
-contrast <- wsmed_contrasts(effects,
-  list(B_minus_A = c(indirect_2 = 1, indirect_1 = -1)))
-contrast
-plot(effects)
+contrast <- wsmed_contrasts(
+  effects,
+  list(B_minus_A = c(indirect_2 = 1, indirect_1 = -1))
+)
+print(contrast)
 ```
 
-The contrast is evaluated within each joint draw. Its interval is not obtained
-by subtracting the endpoints of two separate intervals.
+The contrast CI comes from the draw-by-draw difference, not from subtracting
+the endpoints of two separate CIs. See [Read and export results](ResultsGuide.html)
+for further selection and export examples.
 
-## Moderated mediation
+## Decide where to restart after a change
 
-The moderator specification states which difference slopes have interactions.
-Moderator main effects remain in **all difference equations**, consistent with
-the existing model generators. Average-component slope interactions can be
-requested separately through `average_interactions`.
+| What changed? | Where to continue |
+|---|---|
+| Variable roles, mediator structure, covariates or moderated paths | Specify a new model, then fit and infer. |
+| Dataset, missing-data strategy or imputation settings | Run `wsmed_fit()` with the relevant model, then infer. |
+| Monte Carlo versus bootstrap, number of draws, or inference seed | Run `wsmed_infer()` on the existing fit. |
+| Selected effects, moderator probes, confidence level or reporting scale | Query the existing inference or result object. |
+| Labels, rounding or plot appearance | Reprint or replot existing results. |
+
+For example, the following queries reuse the same inference draws:
+
+```{r reporting-options}
+summary(
+  effects,
+  level = 0.90
+)
+summary(
+  inference,
+  standardized = TRUE
+)
+```
+
+Alternatively, set `standardized = TRUE` in `wsmed_fit()` to save standardized
+reporting as the default. This does not change model fitting. Standardized
+effects use the model-implied scales and propagate their uncertainty across
+the joint draws; see [standardized effects](StandardizedModeratedMediation.html).
+
+To create a separate bootstrap inference from the same fit:
+
+```{r bootstrap, eval=FALSE}
+bootstrap_inference <- wsmed_infer(
+  fit,
+  method = "bootstrap",
+  seed = 123
+)
+summary(bootstrap_inference)
+```
+
+This uses the default 2,000 bootstrap replicates. Bootstrap necessarily fits
+the resampled datasets; it retains the original fitted object. The `interval`
+argument controls the stored legacy parameter table. Effect and `confint()`
+methods use percentile intervals, including when that parameter table uses
+a bias-corrected convention.
+
+## Add a custom structure and moderator
+
+Changes to the model belong in step 1. In the staged interface, custom arrows
+and moderated slopes use the **mediator role names**, rather than the
+`M1`/`M2` and `MP` labels used by `wsMed()`. The following model has A to C,
+C to the outcome, and B to the outcome, with moderation of the first two slopes:
 
 ```{r moderation}
-moderated <- wsmed_model(
+moderated_model <- wsmed_model(
   outcome = c(before = "D1", after = "D2"),
-  mediators = list(A = c(before = "A1", after = "A2"),
-                   B = c(before = "B1", after = "B2")),
-  moderator = list(variable = "D3", main_effects = "all_equations",
-                   interactions = c("A -> Y", "B -> Y")))
-mod_fit <- wsmed_fit(moderated, example_data)
-mod_inference <- wsmed_infer(mod_fit, draws = 2000, seed = 123)
-conditional <- wsmed_effects(mod_inference, at = list(D3 = c(.2, .4, .6)),
-                              scale = "marginal")
-conditional
-plot(conditional)
+  mediators = list(
+    A = c(before = "A1", after = "A2"),
+    B = c(before = "B1", after = "B2"),
+    C = c(before = "C1", after = "C2")
+  ),
+  structure = "custom",
+  paths = c("A -> C", "C -> Y", "B -> Y"),
+  moderator = list(
+    variable = "D3",
+    interactions = c("A -> C", "C -> Y")
+  )
+)
+mod_fit <- wsmed_fit(
+  moderated_model,
+  data = example_data
+)
+mod_inference <- wsmed_infer(
+  mod_fit,
+  seed = 123
+)
+summary(mod_inference)
 ```
 
-`plot(mod_inference)` automatically uses a continuous grid over fitted raw
-moderator values. `plot(mod_inference, view = "forest")` instead displays the
-reference-value effects. Use `title`, `x_label`, `y_label`, `labels`, and `ncol`
-to customize the plot. For a fit without inference, `plot(mod_fit)` displays
-only point estimates. See the [plotting tutorial](PlottingEffects.html) for
-the shared interface and the legacy helpers' interval conventions.
+`interactions` selects difference-component slopes. To moderate an
+average-component slope, use `average_interactions` in the moderator list.
+Moderator main effects enter all difference equations by default.
+This example corresponds to `form = "UD"` with
+`paths = c("M1 -> M3", "M3 -> Y", "M2 -> Y")` and
+`MP = c("b_1_3", "b3")` in the [one-call UD tutorial](GenerateModelCustom.html#add-a-moderator).
 
-Probes remain fixed in the moderator's raw units. For marginal standardization,
-conditional indirect effects are divided by the marginal model-implied SD of
-the outcome difference. Coefficients and scales vary jointly across draws.
-Invalid standardized draws are excluded together across effects; their original
-identities are in `conditional$diagnostics$invalid_draw_ids`. Plot bands are
-pointwise intervals, not simultaneous confidence bands.
+The same extraction functions remain available at each stage. For example,
+`wsmed_inspect(mod_fit, "syntax")` shows the fitted interaction terms, and
+`summary(mod_inference)$coefficients` contains conditional path coefficients.
+The default continuous-moderator summary uses the centering reference shown
+in the output; the default plot displays indirect effects across its range:
 
-Use unordered factors with explicit levels for categorical covariates and
-moderators in both interfaces; the first level is the reference group. The
-staged interface treats numeric predictors, including 0/1 columns, as continuous
-unless converted to factors. Default categorical probes include every observed factor level.
-The [categorical predictor tutorial](CategoricalPredictors.html) demonstrates
-reference coding, conditional effects, group contrasts, and missing data.
-
-## Missing data and repeated inference
-
-The staged fitting default rejects missing analysis values. Choose `missing =
-"listwise"`, `"fiml"`, or `"mi"` explicitly. MI stores every completed dataset,
-every SEM fit, and the pooled estimates/covariance. Its imputation seed is separate
-from the inference seed. A new inference can reuse the fit without reimputing.
-
-```{r mi, eval=FALSE}
-mi_fit <- wsmed_fit(model, incomplete_data, missing = "mi",
-                    mi = list(m = 5, method = "pmm", seed = 123))
-mi_inference <- wsmed_infer(mi_fit, draws = 20000, seed = 604)
-summary(mi_inference)
+```{r moderated-plot}
+plot(mod_inference)
 ```
 
-This interface preserves the existing per-imputation centering and
-first-imputation moderator reference; it does not introduce a different MI
-estimand. MI with nonparametric bootstrap remains unsupported. Non-MI bootstrap
-necessarily refits resampled datasets, but does not refit the original dataset.
-Seeded workflow calls restore the caller's random state. With `seed = NULL`,
-the current random stream advances normally.
+To choose raw moderator values and retain a conditional-effect table:
 
-New results can be saved with `saveRDS()` and queried later. Saved objects from
-older versions continue to support the existing fields, full printing, and
-plotting helpers; the new methods do not silently refit them to construct missing
-modular metadata.
+```{r conditional-effects}
+conditional <- wsmed_effects(
+  mod_inference,
+  at = list(D3 = c(0.2, 0.4, 0.6))
+)
+print(conditional)
+```
 
-`confint()` now keeps the confidence level saved in the selected inference or
-results object, just like effect summaries and plots. Supply `level` to override
-it without drawing new samples. Primitive-parameter intervals and indirect-effect
-intervals concern different quantities: use `confint(wsmed_effects(inference))`
-for indirect effects. See [diagnostics and migration](WorkflowReliability.html)
-for dataset-level checks, reproducibility reports, and changes from wsMed 1.1.0.
+`conditional$table` contains the estimates and CIs at those values;
+`conditional$draws` contains the corresponding joint effect draws.
+Supply raw values even when requesting standardized output. Invalid
+standardized draws are excluded jointly, with original identities recorded
+in `$diagnostics$invalid_draw_ids`. Plot bands are pointwise, not simultaneous.
 
-## Externally generated imputations
+For categorical covariates and moderators, use unordered factors with explicit
+levels; the first level is the reference group. Numeric 0/1 columns remain
+continuous in the staged interface unless converted to factors. Default
+categorical probes include all observed levels. See
+[categorical predictors](CategoricalPredictors.html) for coding and group contrasts.
 
-For an imputation model chosen to match substantive interactions, supply
-`mi = list(completed = completed)` to `wsmed_fit()` (with `missing = "mi"`).
-`completed` can be a list of wide datasets or a `mice` mids object. The number of
-imputations is inferred; omit internal imputation method and seed controls.
-Both this interface and `wsMed(..., mi_args = list(completed = completed))` reuse
-the existing fitting, Rubin pooling and effect inference. See the
-[model-compatible imputation tutorial](CompatibleImputation.html).
+## Handle missing data at the fitting stage
+
+The model specification can be reused with incomplete data. To demonstrate,
+remove a few measurements from a copy of the simulated data:
+
+```{r incomplete-data}
+incomplete_data <- example_data
+incomplete_data$A2[1:5] <- NA
+incomplete_data$D2[6:10] <- NA
+```
+
+| `missing` | What fitting does | Inference methods |
+|---|---|---|
+| `"error"` (default) | Requires complete analysis variables. | Monte Carlo or bootstrap. |
+| `"listwise"` | Uses complete cases for the analysis variables. | Monte Carlo or bootstrap. |
+| `"fiml"` | Handles missing analysis variables during model fitting. | Monte Carlo or bootstrap. |
+| `"mi"` | Imputes original measurements, constructs variables within each completed dataset, fits and pools. | Monte Carlo only. |
+
+For FIML, use `wsmed_fit(model, incomplete_data, missing = "fiml")`.
+Categorical predictors must be fully observed under FIML. For MI, set its
+controls at fitting and the inference seed separately:
+
+```{r mi}
+mi_fit <- wsmed_fit(
+  model,
+  data = incomplete_data,
+  missing = "mi",
+  mi = list(seed = 123)
+)
+mi_inference <- wsmed_infer(
+  mi_fit,
+  seed = 604
+)
+print(mi_fit)
+print(mi_inference)
+```
+
+This uses the default five imputations and numeric imputation method. Choose
+appropriate settings for an actual analysis; for example,
+`mi = list(m = 20, method = "pmm", seed = 123)` explicitly requests 20
+predictive-mean-matching imputations. A new `wsmed_infer(mi_fit, ...)` call
+reuses the fitted imputations and pooled quantities without reimputing.
+
+### What changes in extraction after MI?
+
+| Item | Access |
+|---|---|
+| Pooled parameter estimates and total covariance | `coef(mi_fit)`, `vcov(mi_fit)` |
+| All backend fits | `wsmed_inspect(mi_fit, "fits")` |
+| Counts and checks for every imputation | `nobs(mi_fit)`, `wsmed_inspect(mi_fit, "diagnostics")$by_dataset` |
+| Prepared data for the first imputation | `wsmed_inspect(mi_fit, "data")` |
+| Prepared data for all imputations | `mi_fit$mi$prepared$processed_data_list` |
+| Pooled effect summaries and their draws | `summary(mi_inference)`, `wsmed_effects(mi_inference)` |
+
+For example, retrieve the fitted models and transformed datasets:
+
+```{r mi-extract}
+imputation_fits <- wsmed_inspect(mi_fit, "fits")
+prepared_imputations <- mi_fit$mi$prepared$processed_data_list
+length(imputation_fits)
+length(prepared_imputations)
+nobs(mi_fit)
+```
+
+`wsmed_inspect(mi_fit, "data")` returns one data frame, not the complete list
+of imputations. Do not use the first imputation's backend fit as a substitute
+for pooled inference. The workflow retains per-imputation centering and the
+first-imputation moderator reference for reporting.
+
+For externally generated imputations, pass
+`mi = list(completed = completed)` with `missing = "mi"`. `completed` can be a
+list of completed wide datasets or a `mice` mids object. Their number is
+inferred; omit internal imputation-method and seed controls. With moderation,
+default main-effects imputation may not preserve the specified interactions.
+See [model-compatible imputation](CompatibleImputation.html) for choosing and
+supplying an appropriate imputation model.
+
+## Relate the stages to a one-call analysis
+
+For the original complete-data example, the equivalent one-call analysis is:
+
+```{r one-call}
+result <- wsMed(
+  data = example_data,
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2"
+)
+print(result)
+```
+
+Both analyses use 20,000 Monte Carlo draws and seed 123. The variable roles are
+named differently in the displays, but the numerical effects and draws match
+in this example. `wsMed()` uses the same fitting and inference engines.
+With missing data, align the missing-data strategy as well as the inference
+settings before comparing the interfaces.
+
+```{r verify-equivalence, include=FALSE}
+stopifnot(isTRUE(all.equal(inference$draws, result$mc$result$thetahatstar)))
+stopifnot(isTRUE(all.equal(unname(coef(s)), unname(coef(summary(result))))))
+```
+
+## Save a stage and continue later
+
+Save the inference object to retain both its fit and its draws:
+
+```{r save-results, eval=FALSE}
+saveRDS(
+  inference,
+  "mediation-inference.rds"
+)
+restored <- readRDS("mediation-inference.rds")
+summary(restored)
+```
+
+Saving `fit` instead retains the fitted model for a later `wsmed_infer()` call.
+An analysis manifest records settings, diagnostics and software versions:
+
+```{r manifest}
+manifest <- wsmed_reproducibility(inference)
+names(manifest)
+```
+
+The manifest does not contain observations or draws and does not replace the
+saved object, data and analysis script. Seeded workflow calls restore the
+caller's random state; `seed = NULL` advances the current random stream.
+For older saved objects, compatibility checks may require refitting or
+regenerating inference; the accessors do not silently reconstruct missing
+metadata. See [diagnostics and migration](WorkflowReliability.html).

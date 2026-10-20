@@ -89,8 +89,9 @@ fixed-seed MI draws differ from wsMed 1.1.0.}
 
 \item{bootstrap}{Integer; number of bootstrap replicates (DE and FIML only).}
 
-\item{boot_ci_type}{Character; bootstrap CI type: \code{"perc"}, \code{"bc"},
-or \code{"bca.simple"}.}
+\item{boot_ci_type}{Character; CI type for stored legacy bootstrap parameter
+tables: \code{"perc"}, \code{"bc"}, or \code{"bca.simple"} (zero acceleration).
+Current effect reports use percentile intervals regardless of this setting.}
 
 \item{iseed, seed}{Integer seeds for bootstrap and Monte Carlo, respectively.}
 
@@ -162,8 +163,9 @@ Missing-data strategies:
 
 Confidence-interval engines:
 \itemize{
-\item Bootstrap: percentile, BC, or BCa (DE and FIML only)
-\item Monte Carlo: draws via \pkg{semmcci} (all \code{Na} options)
+\item Bootstrap: participant resampling (DE and FIML only)
+\item Monte Carlo: joint parameter draws via \pkg{semmcci} for DE/FIML,
+or the package's pooled-parameter sampler for MI
 }
 Monte Carlo inference uses the existing joint-parameter sampler. The legacy
 \code{MCmethod = "bootSD"} option was accepted but never applied; it now
@@ -173,18 +175,23 @@ Standardization divides differences by their marginal model-implied SDs,
 without recentering them. Dummy variables retain 0/1 units; interaction
 terms use the product of their component scale factors, not the interaction
 column SD. MC and bootstrap draws are transformed jointly with their scales.
-Standardized bootstrap intervals use type-7 quantiles; bc and bca.simple
-apply bias correction with zero acceleration. P-values use inversion of
-that distribution and require at least 1000 valid replicates.
+Current effect reports from print, summary and wsmed_effects, and confint
+applied to extracted effects, use percentile intervals (type-7 quantiles),
+with or without moderation.
+The boot_ci_type argument controls stored legacy parameter-table intervals,
+not these effect reports. In standardized legacy tables, bc and bca.simple
+apply bias correction with zero acceleration, not full BCa. Their bootstrap
+p-values require at least 1000 valid replicates.
 
 Conditional tables use percentile intervals and fixed numerical probes.
 With fixed.x=TRUE, scale transformations condition on the fitted external
 moments rather than adding sampling uncertainty for those moments.
 In MI, probes/centering references use the first completed data set;
 fixed.x=TRUE also conditions on its external moments in the pooled transform.
-In moderated MI models, marginal variances are pooled jointly with primitive
-coefficients, including their delta-method within-imputation and Rubin
-between-imputation covariance. MC propagates this joint uncertainty.
+In MI models with products of mediator differences and the moderator,
+marginal variances are pooled jointly with primitive coefficients, including
+their delta-method within-imputation and Rubin between-imputation covariance.
+MC propagates this joint uncertainty.
 Endogenous product moments are estimated even with fixed.x=TRUE.
 
 Workflow: (1) preprocess -> (2) generate SEM syntax -> (3) fit
@@ -195,22 +202,23 @@ covariates and moderators as unordered factors with explicit levels before
 fitting. The first factor level is the reference group. Existing automatic
 recognition of numeric 0/1 predictors is retained in this one-call interface.
 The empirical manuscript dataset is
-available as \code{\link[=wsmed_examples]{wsmed_examples()}}; \code{\link[=example_data]{example_data()}} is simulated tutorial data.
+available as \link{wsmed_examples}; \link{example_data} is simulated tutorial data.
 
 The one-call interface uses the same fitting and inference engines
 as \code{\link[=wsmed_model]{wsmed_model()}}, \code{\link[=wsmed_fit]{wsmed_fit()}}, and \code{\link[=wsmed_infer]{wsmed_infer()}}. Default printing is
-concise; use \code{print(result, detail = "full")} for the original tables.
+concise; \code{print(result, detail = "full")} adds path coefficients to
+the structured effect report. Use \code{detail = "legacy"} for the original
+tables.
 Use \code{\link[=wsmed_effects]{wsmed_effects()}} to query stored draws without rerunning the analysis.
 }
 \examples{
 data("example_data", package = "wsMed")
-set.seed(123)
 result <- wsMed(
   data = example_data,
-  M_C1 = c("A2", "B2"),
-  M_C2 = c("A1", "B1"),
-  Y_C1 = "C1", Y_C2 = "C2",
-  form = "P", Na = "DE"
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2"
 )
 print(result)
 

@@ -7,78 +7,171 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-# introduction
-
-The MEMORE reports below are stored reference output, not rerun by this
-vignette. Compare estimates only after matching difference direction, model
-structure, missing-data handling and interval settings. Standardized results
-require matching the SD definition as well: wsMed uses marginal model-implied
-difference-component SDs. Matching raw estimates does not imply matching
-standardized estimates or confidence intervals.
-
-For moderation, see [Standardized moderated mediation](StandardizedModeratedMediation.html).
-This vignette does not establish agreement between the programs for moderated
-standardized effects.
-
-This document presents a comparison between the **MEMORE 3.0 (SPSS Plugin)** and **wsMed (R Package)** outputs.
-
-## parallel mediation
-
-We analyze a **three-mediator parallel mediation model**, comparing the results obtained from both methods.
-
-### MEMORE 3.0 Analysis Report
-
-```{r, echo=FALSE}
-path <- system.file("extdata", "OUTPUT.txt", package = "wsMed")
-txt_content <- readLines(path, warn = FALSE)
-cat("```\n", paste(txt_content, collapse = "\n"), "\n```")
-```
-
-### wsMed Analysis Report
-
-```{r, echo=FALSE}
-data("example_data", package = "wsMed")
-
+```{r setup, include=FALSE}
 library(wsMed)
+options(width = 80)
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", cache = FALSE)
+data(example_data)
+
+# Read the seven reported indirect effects/contrasts from each stored report.
+read_memore <- function(file) {
+  text <- readLines(system.file("extdata", file, package = "wsMed"), warn = FALSE)
+  rows <- grep("^(Ind[123]|Total|\\(C[123]\\)) +[-.0-9]", text, value = TRUE)
+  stopifnot(length(rows) == 7L)
+  tab <- read.table(text = rows, col.names = c("key", "estimate", "se", "low", "high"))
+  list(text = text, table = tab)
+}
+parallel_reference <- read_memore("OUTPUT.txt")
+serial_reference <- read_memore("OUTPUT2.txt")
+
+compare_indirect <- function(result, reference, ids, labels) {
+  effects <- wsmed_effects(result, type = "all")
+  tab <- as.data.frame(effects)
+  terms <- tab$term[match(ids, tab$effect)]
+  pairs <- list(c(1, 2), c(1, 3), c(2, 3))
+  contrasts <- lapply(pairs, function(pair) setNames(c(1, -1), terms[pair]))
+  names(contrasts) <- c("C1", "C2", "C3")
+  ct <- as.data.frame(wsmed_contrasts(effects, contrasts))
+  ordered <- tab[match(c(ids, "total_indirect"), tab$effect), ]
+  ws <- rbind(ordered[c("estimate", "std.error", "conf.low", "conf.high")],
+              ct[c("estimate", "std.error", "conf.low", "conf.high")])
+  ref <- reference$table
+  # The stored report rounds point estimates to four decimal places.
+  stopifnot(!anyNA(ws), max(abs(ref$estimate - ws$estimate)) < 0.000051,
+            all(tab$interval == "percentile"), all(tab$n.valid == 5000L))
+  ci <- function(lo, hi) sprintf("[%.4f, %.4f]", lo, hi)
+  data.frame(
+    Effect = c(labels, "Total indirect", "Ind1 - Ind2", "Ind1 - Ind3", "Ind2 - Ind3"),
+    `MEMORE estimate` = sprintf("%.4f", ref$estimate),
+    `wsMed estimate` = sprintf("%.4f", ws$estimate),
+    `MEMORE 95% CI` = ci(ref$low, ref$high),
+    `wsMed 95% CI` = ci(ws$conf.low, ws$conf.high),
+    check.names = FALSE
+  )
+}
+```
+
+## What is compared?
+
+These examples compare unstandardized indirect effects and their contrasts
+in a parallel and a serial model. They use the package's simulated
+`example_data`, not the empirical manuscript dataset. The MEMORE 3.0 reports
+are stored SPSS output; they are not rerun when this page is built. The wsMed
+analyses below are executed when the tutorial is rebuilt.
+
+| Setting | Matched choice |
+|---|---|
+| Data | The same 100 complete simulated participant rows |
+| Direction | Condition 2 minus condition 1 for every pair |
+| Model | The same mediator ordering and directed connections |
+| Covariates and moderator | None; MEMORE does not support covariates |
+| Scale | Unstandardized effects |
+| Indirect-effect inference | 5,000 participant bootstrap samples; 95% percentile CIs |
+
+The default wsMed analysis uses Monte Carlo inference. Here we explicitly
+request bootstrap inference and 5,000 replicates to match the method and sample
+count in the stored reports. The two programs do not use identical resamples,
+so matching settings does not imply identical CI endpoints.
+
+**Why focus on indirect effects?** In these MEMORE reports, total and direct
+effects use regression-based SEs and *t* intervals. The wsMed bootstrap report
+uses bootstrap SEs and percentile CIs for all effects. Thus the indirect-effect
+intervals below have a common interpretation; the total- and direct-effect
+intervals should not be treated as equivalent output. Contrasts are calculated
+within each bootstrap sample, retaining dependence between indirect effects.
+
+## Parallel mediation
+
+The three mediators are A, B and C; the outcome is D. There are no directed
+connections among mediators.
+
+```{r parallel}
 result1 <- wsMed(
-  data = example_data, #dataset
-  M_C1 = c("A1","B1","C1"), # A1/B1 is A/B mediator variable in condition 1
-  M_C2 = c("A2","B2","C2"), # A2/B2 is A/B mediator variable in condition 2
-  Y_C1 = "D1", # C1 is outcome variable in condition 1
-  Y_C2 = "D2", # C2 is outcome variable in condition 2
-  form = "P", # Parallel mediation
-  standardized = TRUE,
-  Na = "DE", ci_method = "mc", R = 5000, seed = 123
+  data = example_data,
+  M_C1 = c("A1", "B1", "C1"),
+  M_C2 = c("A2", "B2", "C2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2",
+  ci_method = "bootstrap",
+  bootstrap = 5000
 )
-print(result1,digits=4, detail = "legacy")
-printGM(result1)
+print(result1)
 ```
 
-## chained/serial mediation
+The table aligns specific pathways, their total, and the same signed contrasts:
 
-We analyze a **Serial Mediation (`Serial = 1`)**.
-
-### MEMORE 3.0 Analysis Report
-
-```{r, echo=FALSE}
-path2 <- system.file("extdata", "OUTPUT2.txt", package = "wsMed")
-txt_content2 <- readLines(path2, warn = FALSE)
-cat("```\n", paste(txt_content2, collapse = "\n"), "\n```")
+```{r parallel-comparison, echo=FALSE}
+parallel_comparison <- compare_indirect(
+  result1, parallel_reference,
+  c("indirect_1", "indirect_2", "indirect_3"),
+  c("Ind1: A -> D", "Ind2: B -> D", "Ind3: C -> D")
+)
+knitr::kable(parallel_comparison, align = c("l", "r", "r", "r", "r"))
 ```
 
-### wsMed Analysis Report
+<details>
+<summary>Full stored MEMORE 3.0 parallel-model report</summary>
 
-```{r}
+```{r parallel-report, echo=FALSE, results='asis'}
+cat("```text\n", paste(parallel_reference$text, collapse = "\n"), "\n```\n", sep = "")
+```
+
+</details>
+
+## Serial mediation
+
+The two mediators are A and B; the outcome is C. `form = "CN"` adds the
+A-to-B connection, matching the stored MEMORE serial specification. The
+third indirect effect now follows A → B → C.
+
+```{r serial}
 result2 <- wsMed(
-  data = example_data, #dataset
-  M_C1 = c("A1","B1"), # A1/B1 is A/B mediator variable in condition 1
-  M_C2 = c("A2","B2"), # A2/B2 is A/B mediator variable in condition 2
-  Y_C1 = "C1", # C1 is outcome variable in condition 1
-  Y_C2 = "C2", # C2 is outcome variable in condition 2
-  form = "CN", # Serial mediation
-  standardized = TRUE,
-  Na = "DE", ci_method = "mc", R = 5000, seed = 123
+  data = example_data,
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
+  Y_C1 = "C1",
+  Y_C2 = "C2",
+  form = "CN",
+  ci_method = "bootstrap",
+  bootstrap = 5000
 )
-print(result2,digits=4, detail = "legacy")
-printGM(result2)
+print(result2)
 ```
+
+```{r serial-comparison, echo=FALSE}
+serial_comparison <- compare_indirect(
+  result2, serial_reference,
+  c("indirect_1", "indirect_2", "indirect_1_2"),
+  c("Ind1: A -> C", "Ind2: B -> C", "Ind3: A -> B -> C")
+)
+knitr::kable(serial_comparison, align = c("l", "r", "r", "r", "r"))
+```
+
+<details>
+<summary>Full stored MEMORE 3.0 serial-model report</summary>
+
+```{r serial-report, echo=FALSE, results='asis'}
+cat("```text\n", paste(serial_reference$text, collapse = "\n"), "\n```\n", sep = "")
+```
+
+</details>
+
+## Reading the comparison
+
+The indirect-effect and contrast point estimates agree to the four decimal
+places available in the stored MEMORE reports. Percentile CI endpoints can
+differ because of the bootstrap resamples and quantile conventions.
+
+Centering also matters in the serial example. MEMORE recenters mediator
+averages in each bootstrap sample, while wsMed resamples variables centered
+during data preparation. This can change downstream-mediator intercepts and
+their indirect-effect draws, even with identical resamples. Interpret the
+serial intervals in light of this additional implementation difference.
+
+Matching point estimates establishes agreement for these fitted models; it does
+not by itself validate interval coverage or other model specifications.
+
+The comparison does not establish agreement for standardized or moderated
+effects. Their definitions and scale conventions need separate checks; see
+[Standardized effects](StandardizedModeratedMediation.html). For a first analysis
+with the default wsMed settings, use [Get started](GetStarted.html).

@@ -4,71 +4,60 @@ Mediation and moderated mediation for two-condition within-subject designs.
 
 ## Install
 
-The tutorials in this branch target **version 1.2.0**.
+These tutorials describe **wsMed 1.2.0**. Install the released package from CRAN:
+
+```r
+install.packages("wsMed")
+```
+
+Or install the version on the GitHub `master` branch:
 
 ```r
 # install.packages("pak")
-pak::pak("Yangzhen1999/wsMed@feature/modular-api")
+pak::pak("Yangzhen1999/wsMed@master")
 ```
 
-Restart R after updating. Use `install.packages("wsMed")` for the published
-CRAN release; its reporting interface differs from this development branch.
+Restart R after updating. `packageVersion("wsMed")` shows the installed version.
 
 ## First analysis
 
-
-Each row is one participant. `A1` / `A2` and `B1` / `B2` are the two mediator
-measurements; `D1` / `D2` are the outcome measurements. The condition contrast
-is **condition 2 minus condition 1**.
+Each row is one participant. The paired mediator columns are `A1` / `A2` and
+`B1` / `B2`; the paired outcome columns are `D1` / `D2`. The contrast is
+**condition 2 minus condition 1**.
 
 ```r
 library(wsMed)
 data(example_data)
+
 result <- wsMed(
   data = example_data,
-  M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"),
-  Y_C1 = "D1", Y_C2 = "D2",
-  form = "P", Na = "DE", ci_method = "mc",
-  R = 2000, seed = 123, verbose = FALSE
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2"
 )
-s <- summary(result)
-s$effects
-plot(s)
+
+print(result)
+summary(result)
+plot(result)
 ```
 
-This complete simulated dataset needs no imputation. The example uses 2,000
-Monte Carlo draws for speed; assess interval stability with more draws for a
-final analysis. The [quick start](vignettes/GetStarted.Rmd.original) walks through the
-actual table and its interpretation.
+This uses the defaults: parallel mediation, listwise deletion, Monte Carlo
+inference with 20,000 draws, 95% CIs and unstandardized output. The dataset is
+complete. The [Get started guide](https://yangzhen1999.github.io/wsMed/articles/GetStarted.html)
+explains the report and adds a moderator in a second example.
 
-## Categorical predictors
+## Learn more
 
-Use unordered factors for categorical between-subject covariates and moderators
-in both `wsMed()` and the staged workflow. Set levels explicitly; the first level
-is the reference group. For example:
+- [Choose an analysis](https://yangzhen1999.github.io/wsMed/articles/AnalysisGuide.html)
+- [Read and export results](https://yangzhen1999.github.io/wsMed/articles/ResultsGuide.html)
+- [Plot gallery](https://yangzhen1999.github.io/wsMed/articles/PlottingEffects.html)
+- [Analysis in separate steps](https://yangzhen1999.github.io/wsMed/articles/ModularWorkflow.html)
 
-```r
-example_data$Group <- factor(example_data$Group,
-                             levels = c("low", "med", "high"))
-```
+Use unordered factors for categorical between-subject covariates and moderators,
+with the first level as the reference. The
+[categorical predictor guide](https://yangzhen1999.github.io/wsMed/articles/CategoricalPredictors.html)
+explains coding and missing-data restrictions.
 
-For a binary predictor, use `factor(x, levels = c(0, 1))` to select 0 as the
-reference. Existing numeric 0/1 recognition defaults are retained for
-compatibility; the [categorical predictor guide](vignettes/CategoricalPredictors.Rmd.original)
-explains those defaults and missing-data restrictions.
-
-## Find a guide
-
-- [Get started](vignettes/GetStarted.Rmd.original): a complete analysis using paired example data.
-- [Choose an analysis](vignettes/AnalysisGuide.Rmd.original): models, moderators and missing data.
-- [Read and export results](vignettes/ResultsGuide.Rmd.original): core effect tables and reporting.
-- [Plot gallery](vignettes/PlottingEffects.Rmd.original): forests, curves, categories and differences.
-- [Standardized effects](vignettes/StandardizedModeratedMediation.Rmd.original): with or without moderation.
-
-These links point to the executable tutorial sources in this branch. The
-[published website](https://yangzhen1999.github.io/wsMed/) may still describe the
-CRAN version until the development website is released.
-
-For the empirical manuscript data, use `data(wsmed_examples)` and read
-`help("wsmed_examples")`. For code contributions and tutorial rebuilding,
-see [the maintainer guide](.github/CONTRIBUTING.md).
+The empirical manuscript data are included as `wsmed_examples`.
+For source editing and tutorial rebuilding, see the [maintainer guide](.github/CONTRIBUTING.md).

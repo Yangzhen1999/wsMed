@@ -11,6 +11,14 @@ convention. The neighboring frozen `.Rmd` files are generated output.
 Keep examples independently runnable, specify random seeds and show only the
 output needed to explain the task. Preserve meaningful statistical qualifications.
 
+Start user tutorials with the simplest call that demonstrates the task. Rely on
+the documented defaults of `wsMed()` (including its seed), and show `print()`,
+`summary()` and `plot()` before optional selectors or extraction code. Put each
+argument on its own line in multiline calls. Introduce explicit settings after
+the default workflow, explaining what they change. Installation examples use
+CRAN and GitHub `master`; historical validation records retain their audited
+versions and commits.
+
 ## Rebuild and check
 
 ```r

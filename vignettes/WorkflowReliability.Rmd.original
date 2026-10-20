@@ -20,9 +20,21 @@ data(example_data)
 model <- wsmed_model(
   outcome = c(before = "D1", after = "D2"),
   mediators = list(A = c(before = "A1", after = "A2")),
-  moderator = list(variable = "D3", interactions = "A -> Y"))
-fit <- wsmed_fit(model, example_data)
-inference <- wsmed_infer(fit, draws = 1000, seed = 604, level = .90)
+  moderator = list(
+    variable = "D3",
+    interactions = "A -> Y"
+  )
+)
+fit <- wsmed_fit(
+  model,
+  example_data
+)
+inference <- wsmed_infer(
+  fit,
+  draws = 1000,
+  seed = 604,
+  level = .90
+)
 ```
 
 This tutorial uses 1,000 draws for speed; the default is 20,000 MC draws.
@@ -31,12 +43,25 @@ An explicit `level` changes the quantiles computed from stored joint draws.
 It does not refit, reimpute, or draw new samples.
 
 ```{r levels}
-effects <- wsmed_effects(inference, at = list(D3 = c(.2, .5)), scale = "marginal")
+effects <- wsmed_effects(
+  inference,
+  at = list(D3 = c(.2, .5)),
+  scale = "marginal"
+)
 summary(effects)
 confint(effects)                 # stored 90% level
-confint(effects, level = .95)    # explicit override
-plot(effects, view = "conditional")
-stopifnot(identical(confint(effects, level = NULL), confint(effects)))
+confint(
+  effects,
+  level = .95
+)    # explicit override
+plot(
+  effects,
+  view = "conditional"
+)
+stopifnot(identical(confint(
+  effects,
+  level = NULL
+), confint(effects)))
 ```
 
 `confint(inference)` extracts primitive model-parameter intervals. Use
@@ -56,9 +81,15 @@ zero acceleration, not a full BCa acceleration estimate. See also the
 
 ```{r diagnostics}
 fit
-diagnostics <- wsmed_inspect(fit, "diagnostics")
+diagnostics <- wsmed_inspect(
+  fit,
+  "diagnostics"
+)
 diagnostics$by_dataset
-wsmed_inspect(inference, "diagnostics")
+wsmed_inspect(
+  inference,
+  "diagnostics"
+)
 ```
 
 For each dataset, the report records the cases used and excluded, optimizer
@@ -101,16 +132,37 @@ marginal standardizer and conditional effects, up to fitting precision.
 group_model <- wsmed_model(
   c(before = "D1", after = "D2"),
   list(A = c(before = "A1", after = "A2")),
-  moderator = list(variable = "Group", interactions = "A -> Y"))
-group_fit <- wsmed_fit(group_model, example_data)
+  moderator = list(
+    variable = "Group",
+    interactions = "A -> Y"
+  )
+)
+group_fit <- wsmed_fit(
+  group_model,
+  example_data
+)
 recoded_data <- example_data
 recoded_data$Group <- relevel(recoded_data$Group, "low")
-recoded_fit <- wsmed_fit(group_model, recoded_data)
+recoded_fit <- wsmed_fit(
+  group_model,
+  recoded_data
+)
 probes <- list(Group = c("high", "low", "med"))
-original_effects <- wsmed_effects(group_fit, at = probes, scale = "marginal")
-recoded_effects <- wsmed_effects(recoded_fit, at = probes, scale = "marginal")
-data.frame(group = probes$Group, original = coef(original_effects),
-           recoded = coef(recoded_effects))
+original_effects <- wsmed_effects(
+  group_fit,
+  at = probes,
+  scale = "marginal"
+)
+recoded_effects <- wsmed_effects(
+  recoded_fit,
+  at = probes,
+  scale = "marginal"
+)
+data.frame(
+  group = probes$Group,
+  original = coef(original_effects),
+  recoded = coef(recoded_effects)
+)
 stopifnot(isTRUE(all.equal(unname(coef(original_effects)),
   unname(coef(recoded_effects)), tolerance = 1e-6)))
 ```
@@ -136,7 +188,11 @@ If the fit is compatible but its stored MI sampler is outdated, reuse the fit:
 
 ```{r compatibility}
 group_fit$provenance$algorithms
-new_inference <- wsmed_infer(group_fit, draws = 100, seed = 190)
+new_inference <- wsmed_infer(
+  group_fit,
+  draws = 100,
+  seed = 190
+)
 new_inference$provenance$algorithms
 saved <- tempfile(fileext = ".rds")
 saveRDS(new_inference, saved)
@@ -167,7 +223,10 @@ report$analysis$reference$policy
 report$inference$mc$controls
 report$fitting_versions
 path <- tempfile(fileext = ".rds")
-wsmed_reproducibility(effects, file = path)
+wsmed_reproducibility(
+  effects,
+  file = path
+)
 stopifnot(identical(readRDS(path), report))
 unlink(path)
 ```
@@ -208,7 +267,7 @@ software checks does not establish nominal coverage for every model. The
 imputation model should preserve the substantive interaction structure; the
 study does not isolate the cause of the observed bias and undercoverage.
 See the development repository
-[simulation report](https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/.github/validation/RESULTS.md)
+[simulation report](https://github.com/Yangzhen1999/wsMed/blob/master/.github/validation/RESULTS.md)
 for the design, Monte Carlo uncertainty and retained results.
 
 A model-compatible external imputer can now supply its completed datasets via

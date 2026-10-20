@@ -379,12 +379,23 @@ validation.</p>
 <span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>M <span class="ot">&lt;-</span> .<span class="dv">4</span> <span class="sc">+</span> .<span class="dv">3</span><span class="sc">*</span>W <span class="sc">+</span> <span class="fu">rnorm</span>(n)</span>
 <span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>Y <span class="ot">&lt;-</span> .<span class="dv">2</span> <span class="sc">+</span> .<span class="dv">1</span><span class="sc">*</span>W <span class="sc">+</span> (.<span class="dv">4</span> <span class="sc">+</span> .<span class="dv">2</span><span class="sc">*</span>W)<span class="sc">*</span>M <span class="sc">+</span> .<span class="dv">2</span><span class="sc">*</span>A <span class="sc">+</span> <span class="fu">rnorm</span>(n)</span>
 <span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>y1 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(y1, <span class="at">y2 =</span> y1<span class="sc">+</span>Y, <span class="at">m1 =</span> A<span class="sc">-</span>M<span class="sc">/</span><span class="dv">2</span>, <span class="at">m2 =</span> A<span class="sc">+</span>M<span class="sc">/</span><span class="dv">2</span>, W)</span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>dat<span class="sc">$</span>m1[<span class="fu">runif</span>(n) <span class="sc">&lt;</span> .<span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>dat<span class="sc">$</span>y2[<span class="fu">runif</span>(n) <span class="sc">&lt;</span> .<span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">wsmed_model</span>(<span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;y1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;y2&quot;</span>),</span>
-<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">M =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;m1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;m2&quot;</span>)),</span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>  <span class="at">moderator =</span> <span class="fu">list</span>(<span class="at">variable =</span> <span class="st">&quot;W&quot;</span>, <span class="at">interactions =</span> <span class="st">&quot;M -&gt; Y&quot;</span>))</span></code></pre></div>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>  y1,</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>  <span class="at">y2 =</span> y1<span class="sc">+</span>Y,</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>  <span class="at">m1 =</span> A<span class="sc">-</span>M<span class="sc">/</span><span class="dv">2</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>  <span class="at">m2 =</span> A<span class="sc">+</span>M<span class="sc">/</span><span class="dv">2</span>,</span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>  W</span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>)</span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>dat<span class="sc">$</span>m1[<span class="fu">runif</span>(n) <span class="sc">&lt;</span> .<span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a>dat<span class="sc">$</span>y2[<span class="fu">runif</span>(n) <span class="sc">&lt;</span> .<span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">wsmed_model</span>(</span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a>  <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;y1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;y2&quot;</span>),</span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">M =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;m1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;m2&quot;</span>)),</span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a>  <span class="at">moderator =</span> <span class="fu">list</span>(</span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a>    <span class="at">variable =</span> <span class="st">&quot;W&quot;</span>,</span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a>    <span class="at">interactions =</span> <span class="st">&quot;M -&gt; Y&quot;</span></span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a>  )</span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="impute-using-the-outcome-interaction" class="section level2">
 <h2>Impute using the outcome interaction</h2>
@@ -396,36 +407,44 @@ when W is a factor. Product terms are evaluated within the substantive
 model, not imputed as independent variables. For this data-generating
 model, the imputation regression for m1 given m2 and W is normal and
 linear. These are model assumptions, not data-validation results.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>imp_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">yd =</span> dat<span class="sc">$</span>y2<span class="sc">-</span>dat<span class="sc">$</span>y1, <span class="at">m1 =</span> dat<span class="sc">$</span>m1, <span class="at">m2 =</span> dat<span class="sc">$</span>m2, <span class="at">W =</span> dat<span class="sc">$</span>W)</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>pred <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="fu">ncol</span>(imp_data), <span class="fu">ncol</span>(imp_data),</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="fu">names</span>(imp_data), <span class="fu">names</span>(imp_data)))</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>pred[<span class="st">&quot;m1&quot;</span>, <span class="fu">c</span>(<span class="st">&quot;m2&quot;</span>, <span class="st">&quot;W&quot;</span>)] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">721</span>)</span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>imp <span class="ot">&lt;-</span> <span class="fu">withCallingHandlers</span>(smcfcs<span class="sc">::</span><span class="fu">smcfcs</span>(imp_data, <span class="at">smtype =</span> <span class="st">&quot;lm&quot;</span>,</span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>  <span class="at">smformula =</span> <span class="st">&quot;yd ~ I(m2-m1)*W + I((m1+m2)/2)&quot;</span>,</span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  <span class="at">method =</span> <span class="fu">c</span>(<span class="st">&quot;&quot;</span>, <span class="st">&quot;norm&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;&quot;</span>), <span class="at">predictorMatrix =</span> pred,</span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  <span class="at">m =</span> <span class="dv">5</span>, <span class="at">numit =</span> <span class="dv">20</span>, <span class="at">rjlimit =</span> <span class="dv">5000</span>), <span class="at">warning =</span> <span class="cf">function</span>(w) {</span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">grepl</span>(<span class="st">&quot;Rejection sampling failed&quot;</span>, <span class="fu">conditionMessage</span>(w), <span class="at">fixed =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>      <span class="fu">stop</span>(<span class="st">&quot;Resolve the rejection-sampling warning before analysis: increase rjlimit, rerun imputation and review diagnostics.&quot;</span>, <span class="at">call. =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>  })</span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Outcome variable(s): yd&quot;</span></span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Passive variables: &quot;</span></span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Partially obs. variables: m1&quot;</span></span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Fully obs. substantive model variables: W&quot;</span></span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Imputation  1&quot;</span></span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Imputing missing outcomes using specified substantive model.&quot;</span></span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Imputing:  m1  using  m2,W  plus outcome&quot;</span></span>
-<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Imputation  2&quot;</span></span>
-<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Imputation  3&quot;</span></span>
-<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Imputation  4&quot;</span></span>
-<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Imputation  5&quot;</span></span>
-<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a>completed <span class="ot">&lt;-</span> <span class="fu">lapply</span>(imp<span class="sc">$</span>impDatasets, <span class="cf">function</span>(x) {</span>
-<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a>  d <span class="ot">&lt;-</span> dat</span>
-<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a>  d<span class="sc">$</span>m1 <span class="ot">&lt;-</span> x<span class="sc">$</span>m1</span>
-<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a>  missing_y <span class="ot">&lt;-</span> <span class="fu">is.na</span>(dat<span class="sc">$</span>y2)</span>
-<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a>  d<span class="sc">$</span>y2[missing_y] <span class="ot">&lt;-</span> dat<span class="sc">$</span>y1[missing_y]<span class="sc">+</span>x<span class="sc">$</span>yd[missing_y]</span>
-<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a>  d</span>
-<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>imp_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="at">yd =</span> dat<span class="sc">$</span>y2<span class="sc">-</span>dat<span class="sc">$</span>y1,</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="at">m1 =</span> dat<span class="sc">$</span>m1,</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="at">m2 =</span> dat<span class="sc">$</span>m2,</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  <span class="at">W =</span> dat<span class="sc">$</span>W</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>)</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>pred <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="fu">ncol</span>(imp_data), <span class="fu">ncol</span>(imp_data),</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  <span class="at">dimnames =</span> <span class="fu">list</span>(</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>    <span class="fu">names</span>(imp_data),</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>    <span class="fu">names</span>(imp_data)</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>  ))</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>pred[<span class="st">&quot;m1&quot;</span>, <span class="fu">c</span>(<span class="st">&quot;m2&quot;</span>, <span class="st">&quot;W&quot;</span>)] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">721</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>imp <span class="ot">&lt;-</span> <span class="fu">withCallingHandlers</span>(smcfcs<span class="sc">::</span><span class="fu">smcfcs</span>(imp_data, <span class="at">smtype =</span> <span class="st">&quot;lm&quot;</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>  <span class="at">smformula =</span> <span class="st">&quot;yd ~ I(m2-m1)*W + I((m1+m2)/2)&quot;</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>  <span class="at">method =</span> <span class="fu">c</span>(<span class="st">&quot;&quot;</span>, <span class="st">&quot;norm&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;&quot;</span>), <span class="at">predictorMatrix =</span> pred,</span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>  <span class="at">m =</span> <span class="dv">5</span>, <span class="at">numit =</span> <span class="dv">20</span>, <span class="at">rjlimit =</span> <span class="dv">5000</span>), <span class="at">warning =</span> <span class="cf">function</span>(w) {</span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">grepl</span>(<span class="st">&quot;Rejection sampling failed&quot;</span>, <span class="fu">conditionMessage</span>(w), <span class="at">fixed =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>      <span class="fu">stop</span>(<span class="st">&quot;Resolve the rejection-sampling warning before analysis: increase rjlimit, rerun imputation and review diagnostics.&quot;</span>, <span class="at">call. =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>  })</span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Outcome variable(s): yd&quot;</span></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Passive variables: &quot;</span></span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Partially obs. variables: m1&quot;</span></span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Fully obs. substantive model variables: W&quot;</span></span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Imputation  1&quot;</span></span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Imputing missing outcomes using specified substantive model.&quot;</span></span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Imputing:  m1  using  m2,W  plus outcome&quot;</span></span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Imputation  2&quot;</span></span>
+<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Imputation  3&quot;</span></span>
+<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Imputation  4&quot;</span></span>
+<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Imputation  5&quot;</span></span>
+<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a>completed <span class="ot">&lt;-</span> <span class="fu">lapply</span>(imp<span class="sc">$</span>impDatasets, <span class="cf">function</span>(x) {</span>
+<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a>  d <span class="ot">&lt;-</span> dat</span>
+<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a>  d<span class="sc">$</span>m1 <span class="ot">&lt;-</span> x<span class="sc">$</span>m1</span>
+<span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a>  missing_y <span class="ot">&lt;-</span> <span class="fu">is.na</span>(dat<span class="sc">$</span>y2)</span>
+<span id="cb2-36"><a href="#cb2-36" tabindex="-1"></a>  d<span class="sc">$</span>y2[missing_y] <span class="ot">&lt;-</span> dat<span class="sc">$</span>y1[missing_y]<span class="sc">+</span>x<span class="sc">$</span>yd[missing_y]</span>
+<span id="cb2-37"><a href="#cb2-37" tabindex="-1"></a>  d</span>
+<span id="cb2-38"><a href="#cb2-38" tabindex="-1"></a>})</span></code></pre></div>
 <p>Five imputations keep this tutorial short; choose the number of
 imputations and iterations for the actual missing-information fraction
 and required precision. Inspect <code>imp$smCoefIter</code> for
@@ -441,31 +460,57 @@ predictor matrix.</p>
 </div>
 <div id="use-either-wsmed-interface" class="section level2">
 <h2>Use either wsMed interface</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">wsmed_fit</span>(model, dat, <span class="at">missing =</span> <span class="st">&quot;mi&quot;</span>, <span class="at">mi =</span> <span class="fu">list</span>(<span class="at">completed =</span> completed))</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>inference <span class="ot">&lt;-</span> <span class="fu">wsmed_infer</span>(fit, <span class="at">draws =</span> <span class="dv">2000</span>, <span class="at">seed =</span> <span class="dv">722</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>effects <span class="ot">&lt;-</span> <span class="fu">wsmed_effects</span>(inference, <span class="at">at =</span> <span class="fu">list</span>(<span class="at">W =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>)), <span class="at">scale =</span> <span class="st">&quot;marginal&quot;</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>effects</span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; wsMed indirect | marginal scale | mc </span></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; Condition contrast: after - before </span></span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; Moderator: W in raw units; centering reference = 0.00106494 </span></span>
-<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt; MI: per-imputation centering; first-imputation reporting reference.</span></span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; External imputations: compatibility and convergence require the imputer&#39;s own checks. </span></span>
-<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; Standardization: effect / marginal model-implied SD(y2 - y1); condition contrast is unscaled.</span></span>
-<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; Plug-in marginal outcome-difference SD: 1.16987 </span></span>
-<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
-<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt;                          Estimate Std. Error CI lower CI upper</span></span>
-<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt; indirect_1@1: M [W = -1]  0.04352    0.02870  0.00287  0.10946</span></span>
-<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt; indirect_1@2: M [W = 0]   0.17787    0.03456  0.11559  0.25144</span></span>
-<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt; indirect_1@3: M [W = 1]   0.40188    0.06618  0.28050  0.54041</span></span>
-<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
-<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
-<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a></span>
-<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co"># The original one-call interface remains available.</span></span>
-<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a>one_call <span class="ot">&lt;-</span> <span class="fu">wsMed</span>(dat, <span class="st">&quot;m1&quot;</span>, <span class="st">&quot;m2&quot;</span>, <span class="st">&quot;y1&quot;</span>, <span class="st">&quot;y2&quot;</span>, <span class="at">W =</span> <span class="st">&quot;W&quot;</span>,</span>
-<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a>  <span class="at">MP =</span> <span class="fu">c</span>(<span class="st">&quot;a1&quot;</span>, <span class="st">&quot;b1&quot;</span>, <span class="st">&quot;cp&quot;</span>), <span class="at">Na =</span> <span class="st">&quot;MI&quot;</span>, <span class="at">R =</span> <span class="dv">2000</span>, <span class="at">standardized =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a>  <span class="at">mi_args =</span> <span class="fu">list</span>(<span class="at">completed =</span> completed, <span class="at">seed =</span> <span class="dv">722</span>))</span>
-<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">isTRUE</span>(<span class="fu">all.equal</span>(<span class="fu">coef</span>(fit), <span class="fu">coef</span>(one_call<span class="sc">$</span>fit))))</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">wsmed_fit</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  model,</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  dat,</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">missing =</span> <span class="st">&quot;mi&quot;</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="at">mi =</span> <span class="fu">list</span>(<span class="at">completed =</span> completed)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>)</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>inference <span class="ot">&lt;-</span> <span class="fu">wsmed_infer</span>(</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>  fit,</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>  <span class="at">draws =</span> <span class="dv">2000</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">722</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>)</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>effects <span class="ot">&lt;-</span> <span class="fu">wsmed_effects</span>(</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>  inference,</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>  <span class="at">at =</span> <span class="fu">list</span>(<span class="at">W =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>)),</span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>  <span class="at">scale =</span> <span class="st">&quot;marginal&quot;</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>)</span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a>effects</span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt; wsMed indirect | marginal scale | mc </span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt; Condition contrast: after - before </span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt; Moderator: W in raw units; centering reference = 0.00106494 </span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt; MI: per-imputation centering; first-imputation reporting reference.</span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt; External imputations: compatibility and convergence require the imputer&#39;s own checks. </span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt; Standardization: effect / marginal model-implied SD(y2 - y1); condition contrast is unscaled.</span></span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt; Plug-in marginal outcome-difference SD: 1.16987 </span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a><span class="co">#&gt;                          Estimate Std. Error CI lower CI upper</span></span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a><span class="co">#&gt; indirect_1@1: M [W = -1]  0.04352    0.02870  0.00287  0.10946</span></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a><span class="co">#&gt; indirect_1@2: M [W = 0]   0.17787    0.03456  0.11559  0.25144</span></span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a><span class="co">#&gt; indirect_1@3: M [W = 1]   0.40188    0.06618  0.28050  0.54041</span></span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a><span class="co"># The original one-call interface remains available.</span></span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a>one_call <span class="ot">&lt;-</span> <span class="fu">wsMed</span>(</span>
+<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a>  dat,</span>
+<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a>  <span class="st">&quot;m1&quot;</span>,</span>
+<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a>  <span class="st">&quot;m2&quot;</span>,</span>
+<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a>  <span class="st">&quot;y1&quot;</span>,</span>
+<span id="cb3-40"><a href="#cb3-40" tabindex="-1"></a>  <span class="st">&quot;y2&quot;</span>,</span>
+<span id="cb3-41"><a href="#cb3-41" tabindex="-1"></a>  <span class="at">W =</span> <span class="st">&quot;W&quot;</span>,</span>
+<span id="cb3-42"><a href="#cb3-42" tabindex="-1"></a>  <span class="at">MP =</span> <span class="fu">c</span>(<span class="st">&quot;a1&quot;</span>, <span class="st">&quot;b1&quot;</span>, <span class="st">&quot;cp&quot;</span>),</span>
+<span id="cb3-43"><a href="#cb3-43" tabindex="-1"></a>  <span class="at">Na =</span> <span class="st">&quot;MI&quot;</span>,</span>
+<span id="cb3-44"><a href="#cb3-44" tabindex="-1"></a>  <span class="at">R =</span> <span class="dv">2000</span>,</span>
+<span id="cb3-45"><a href="#cb3-45" tabindex="-1"></a>  <span class="at">standardized =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-46"><a href="#cb3-46" tabindex="-1"></a>  <span class="at">mi_args =</span> <span class="fu">list</span>(</span>
+<span id="cb3-47"><a href="#cb3-47" tabindex="-1"></a>    <span class="at">completed =</span> completed,</span>
+<span id="cb3-48"><a href="#cb3-48" tabindex="-1"></a>    <span class="at">seed =</span> <span class="dv">722</span></span>
+<span id="cb3-49"><a href="#cb3-49" tabindex="-1"></a>  )</span>
+<span id="cb3-50"><a href="#cb3-50" tabindex="-1"></a>)</span>
+<span id="cb3-51"><a href="#cb3-51" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">isTRUE</span>(<span class="fu">all.equal</span>(<span class="fu">coef</span>(fit), <span class="fu">coef</span>(one_call<span class="sc">$</span>fit))))</span></code></pre></div>
 <p>The staged interface also accepts a <code>mice</code> mids object as
 <code>mi$completed</code>. It infers m, validates row names/order,
 observed cells and factor levels, then regenerates all differences,
@@ -486,7 +531,7 @@ incomplete datasets analyzed with default PMM, SMC-FCS and the
 underlying complete data. It records raw and standardized effects,
 estimated standardization denominators, bias, coverage, simulation
 uncertainty, warnings and failures. This isolates the effect of changing
-the imputer while keeping pooling and effect inference fixed. See the <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/.github/validation/mi-comparison/RESULTS.md">paired
+the imputer while keeping pooling and effect inference fixed. See the <a href="https://github.com/Yangzhen1999/wsMed/blob/master/.github/validation/mi-comparison/RESULTS.md">paired
 study report</a>.</p>
 <p>The comparison is restricted to its stated scenarios; it is not proof
 of nominal coverage for arbitrary models, data distributions or
