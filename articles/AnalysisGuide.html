@@ -64,7 +64,7 @@
       <h1>Choose an analysis</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/vignettes/AnalysisGuide.Rmd" class="external-link"><code>vignettes/AnalysisGuide.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/master/vignettes/AnalysisGuide.Rmd" class="external-link"><code>vignettes/AnalysisGuide.Rmd</code></a></small>
       <div class="d-none name"><code>AnalysisGuide.Rmd</code></div>
     </div>
 
@@ -114,30 +114,109 @@ worked example</a>.</li>
 <tr class="even">
 <td>Serial pathways</td>
 <td><code>"CN"</code></td>
-<td>Mediators are connected in order; see <a href="WsMed.html#predefined-models">model selection</a>.</td>
+<td>Each mediator predicts every later mediator in the supplied
+order.</td>
 </tr>
 <tr class="odd">
 <td>Serial-parallel structure</td>
 <td><code>"CP"</code></td>
-<td>A serial component feeds parallel pathways; inspect the diagram in
-<a href="GenerateModelCP.html">the model description</a>.</td>
+<td>The first mediator (<code>M1</code>) predicts all remaining
+mediators.</td>
 </tr>
 <tr class="even">
 <td>Parallel-serial structure</td>
 <td><code>"PC"</code></td>
-<td>Parallel pathways feed a later mediator; inspect the diagram in <a href="GenerateModelPC.html">the model description</a>.</td>
+<td>All remaining mediators predict the first mediator
+(<code>M1</code>).</td>
 </tr>
 <tr class="odd">
 <td>User-defined pathways</td>
 <td><code>"UD"</code></td>
-<td>Specify the directed mediator connections; see <a href="GenerateModelCustom.html">custom models</a>.</td>
+<td>Set <code>form = "UD"</code> and list each mediator-to-mediator or
+mediator-to-outcome arrow in <code>paths</code>; see the example
+below.</td>
 </tr>
 </tbody>
 </table>
-<p>Choose the structure using your research design and substantive
-assumptions. Check mediator ordering against the diagram and generated
-equations; the two mixed structures are not interchangeable. Their <a href="index.html">equation articles</a> provide definitions rather than
-additional required steps for an ordinary fit.</p>
+<p>The four predefined models are shown below. Each includes paths from
+the condition to every mediator and to the outcome, and from every
+mediator to the outcome. Choose the structure and mediator order from
+your research design; <code>CP</code> and <code>PC</code> place
+<code>M1</code> at opposite ends of the mediator connections.</p>
+<div class="wsmed-plot-grid" style="grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));">
+<div class="wsmed-plot-card">
+<p>
+<strong>P: Parallel</strong>
+</p>
+<a href="Wa.png"><img src="Wa.png" alt="P model: parallel mediator pathways" width="100%"></a>
+<p>
+No directed connections among mediators.
+<a href="GenerateModelP.html">Model equations</a>.
+</p>
+</div>
+<div class="wsmed-plot-card">
+<p>
+<strong>CN: Serial</strong>
+</p>
+<a href="Wb.png"><img src="Wb.png" alt="CN model: earlier mediators predict later mediators" width="100%"></a>
+<p>
+Each earlier mediator predicts every later mediator.
+<a href="GenerateModelCN.html">Model equations</a>.
+</p>
+</div>
+<div class="wsmed-plot-card">
+<p>
+<strong>CP: Serial-parallel</strong>
+</p>
+<a href="Wc.png"><img src="Wc.png" alt="CP model: M1 predicts the remaining parallel mediators" width="100%"></a>
+<p>
+M1 predicts M2, M3, and so on. <a href="GenerateModelCP.html">Model
+equations</a>.
+</p>
+</div>
+<div class="wsmed-plot-card">
+<p>
+<strong>PC: Parallel-serial</strong>
+</p>
+<a href="Wd.png"><img src="Wd.png" alt="PC model: the parallel mediators predict M1" width="100%"></a>
+<p>
+M2, M3, and so on predict M1. <a href="GenerateModelPC.html">Model
+equations</a>.
+</p>
+</div>
+</div>
+<p>Click a diagram to enlarge it. In these difference-score diagrams,
+<code>diff</code> denotes condition 2 minus condition 1 and
+<code>avg</code> denotes the centered average; the triangle represents
+the constant used to estimate condition effects.</p>
+<p>For <strong>user-defined models</strong>, <code>M1</code>,
+<code>M2</code>, and so on refer to the positions in <code>M_C1</code>
+and <code>M_C2</code>; <code>Y</code> refers to the pair supplied
+through <code>Y_C1</code> and <code>Y_C2</code>. For example, with
+<code>M_C1 = c("A1", "B1", "C1")</code> and
+<code>M_C2 = c("A2", "B2", "C2")</code>, the following specifies A to C,
+C to the outcome, and B to the outcome:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">custom_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"M1 -&gt; M3"</span>,  <span class="co"># A to C</span></span>
+<span>  <span class="st">"M3 -&gt; Y"</span>,   <span class="co"># C to the outcome</span></span>
+<span>  <span class="st">"M2 -&gt; Y"</span>    <span class="co"># B to the outcome</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Pass this vector as <code>paths = custom_paths</code> together with
+<code>form = "UD"</code> in <code><a href="../reference/wsMed.html">wsMed()</a></code>. Write one arrow per
+string using these model labels, not the raw column names. Only the
+listed mediator connections are included: this example omits
+<code>M1 -&gt; Y</code>. Condition-to-mediator paths and the direct
+condition-to-outcome path are added automatically. The <a href="GenerateModelCustom.html">worked UD example</a> shows the complete
+call, input rules, and resulting indirect effects.</p>
+<p>To add a moderator to this UD model, keep <code>custom_paths</code>
+and add <code>W = "D3"</code> and <code>MP = c("b_1_3", "b3")</code> to
+the call. Here, D3 is the moderator column; <code>b_1_3</code> and
+<code>b3</code> select the M1-to-M3 and M3-to-outcome slopes. Use
+coefficient labels in <code>MP</code>, not the arrow strings used in
+<code>paths</code>. The <a href="GenerateModelCustom.html#add-a-moderator">UD moderation
+example</a> shows the complete call, how to choose other paths, and how
+to read conditional effects at selected moderator values.</p>
 </div>
 <div class="section level2">
 <h2 id="add-moderation">Add moderation<a class="anchor" aria-label="anchor" href="#add-moderation"></a>
@@ -248,7 +327,7 @@ curves, group effects and differences.</li>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>Fit once, then compare inference methods</td>
+<td>Specify, fit, infer, and inspect or extract at each stage</td>
 <td><a href="ModularWorkflow.html">Staged workflow</a></td>
 </tr>
 <tr class="even">

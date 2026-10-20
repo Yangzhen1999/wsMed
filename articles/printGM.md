@@ -12,17 +12,13 @@ can automatically extract and format the model equations.
 ``` r
 
 library(wsMed)
+data(example_data)
 result1 <- wsMed(
   data = example_data,
-  M_C1 = c("A1","B1","C1"),
-  M_C2 = c("A2","B2","C2"),
+  M_C1 = c("A1", "B1", "C1"),
+  M_C2 = c("A2", "B2", "C2"),
   Y_C1 = "D1",
-  Y_C2 = "D2",
-  form = "P",
-  Na = "DE",
-  standardized = FALSE,
-  ci_method = "mc", R = 1000,
-  seed = 123
+  Y_C2 = "D2"
 )
 printGM(result1)
 ```
@@ -104,8 +100,9 @@ printGM(sem_model)
 
 [`printGM()`](https://yangzhen1999.github.io/wsMed/reference/printGM.md)
 displays the unstandardized model equations; requesting standardized
-estimates does not rewrite the SEM syntax. For standardized conditional
-estimates and plots, use `moderation_std` and
-`plot_moderation_curve(..., standardized = TRUE)`, as shown in
-[Standardized moderated
+estimates does not rewrite the SEM syntax. For standardized estimates
+and plots, use `summary(result1, standardized = TRUE)` and
+`plot(result1, standardized = TRUE)`. The same methods also support
+conditional results when a moderator is present; see [Standardized
+moderated
 mediation](https://yangzhen1999.github.io/wsMed/articles/StandardizedModeratedMediation.md).

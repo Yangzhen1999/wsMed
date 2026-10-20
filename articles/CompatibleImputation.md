@@ -42,12 +42,23 @@ A <- rnorm(n)
 M <- .4 + .3*W + rnorm(n)
 Y <- .2 + .1*W + (.4 + .2*W)*M + .2*A + rnorm(n)
 y1 <- rnorm(n)
-dat <- data.frame(y1, y2 = y1+Y, m1 = A-M/2, m2 = A+M/2, W)
+dat <- data.frame(
+  y1,
+  y2 = y1+Y,
+  m1 = A-M/2,
+  m2 = A+M/2,
+  W
+)
 dat$m1[runif(n) < .2] <- NA
 dat$y2[runif(n) < .2] <- NA
-model <- wsmed_model(c(before = "y1", after = "y2"),
+model <- wsmed_model(
+  c(before = "y1", after = "y2"),
   list(M = c(before = "m1", after = "m2")),
-  moderator = list(variable = "W", interactions = "M -> Y"))
+  moderator = list(
+    variable = "W",
+    interactions = "M -> Y"
+  )
+)
 ```
 
 ## Impute using the outcome interaction
@@ -63,9 +74,17 @@ assumptions, not data-validation results.
 
 ``` r
 
-imp_data <- data.frame(yd = dat$y2-dat$y1, m1 = dat$m1, m2 = dat$m2, W = dat$W)
+imp_data <- data.frame(
+  yd = dat$y2-dat$y1,
+  m1 = dat$m1,
+  m2 = dat$m2,
+  W = dat$W
+)
 pred <- matrix(0, ncol(imp_data), ncol(imp_data),
-  dimnames = list(names(imp_data), names(imp_data)))
+  dimnames = list(
+    names(imp_data),
+    names(imp_data)
+  ))
 pred["m1", c("m2", "W")] <- 1
 set.seed(721)
 imp <- withCallingHandlers(smcfcs::smcfcs(imp_data, smtype = "lm",
@@ -112,9 +131,22 @@ substantive-model step and must not be added to that predictor matrix.
 
 ``` r
 
-fit <- wsmed_fit(model, dat, missing = "mi", mi = list(completed = completed))
-inference <- wsmed_infer(fit, draws = 2000, seed = 722)
-effects <- wsmed_effects(inference, at = list(W = c(-1, 0, 1)), scale = "marginal")
+fit <- wsmed_fit(
+  model,
+  dat,
+  missing = "mi",
+  mi = list(completed = completed)
+)
+inference <- wsmed_infer(
+  fit,
+  draws = 2000,
+  seed = 722
+)
+effects <- wsmed_effects(
+  inference,
+  at = list(W = c(-1, 0, 1)),
+  scale = "marginal"
+)
 effects
 #> wsMed indirect | marginal scale | mc 
 #> 95% percentile intervals; 2000 joint draws; SE from effect draws
@@ -123,19 +155,32 @@ effects
 #> MI: per-imputation centering; first-imputation reporting reference.
 #> External imputations: compatibility and convergence require the imputer's own checks. 
 #> Standardization: effect / marginal model-implied SD(y2 - y1); condition contrast is unscaled.
-#> Plug-in marginal outcome-difference SD: 1.17613 
+#> Plug-in marginal outcome-difference SD: 1.1661 
 #> The denominator is not a moderator-specific conditional SD.
 #>                          Estimate Std. Error CI lower CI upper
-#> indirect_1@1: M [W = -1]  0.04930    0.02899  0.00336  0.11215
-#> indirect_1@2: M [W = 0]   0.19798    0.03465  0.13400  0.27048
-#> indirect_1@3: M [W = 1]   0.44603    0.06805  0.31813  0.58572
+#> indirect_1@1: M [W = -1]   0.0382     0.0247   0.0016   0.0952
+#> indirect_1@2: M [W = 0]    0.1811     0.0328   0.1222   0.2516
+#> indirect_1@3: M [W = 1]    0.4296     0.0655   0.3066   0.5626
 #> Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 
 # The original one-call interface remains available.
-one_call <- wsMed(dat, "m1", "m2", "y1", "y2", W = "W",
-  MP = c("a1", "b1", "cp"), Na = "MI", R = 2000, standardized = TRUE,
-  mi_args = list(completed = completed, seed = 722))
+one_call <- wsMed(
+  dat,
+  "m1",
+  "m2",
+  "y1",
+  "y2",
+  W = "W",
+  MP = c("a1", "b1", "cp"),
+  Na = "MI",
+  R = 2000,
+  standardized = TRUE,
+  mi_args = list(
+    completed = completed,
+    seed = 722
+  )
+)
 stopifnot(isTRUE(all.equal(coef(fit), coef(one_call$fit))))
 ```
 
@@ -161,7 +206,7 @@ estimated standardization denominators, bias, coverage, simulation
 uncertainty, warnings and failures. This isolates the effect of changing
 the imputer while keeping pooling and effect inference fixed. See the
 [paired study
-report](https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/.github/validation/mi-comparison/RESULTS.md).
+report](https://github.com/Yangzhen1999/wsMed/blob/master/.github/validation/mi-comparison/RESULTS.md).
 
 The comparison is restricted to its stated scenarios; it is not proof of
 nominal coverage for arbitrary models, data distributions or missingness

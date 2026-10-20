@@ -8,9 +8,21 @@ data(example_data)
 model <- wsmed_model(
   outcome = c(before = "D1", after = "D2"),
   mediators = list(A = c(before = "A1", after = "A2")),
-  moderator = list(variable = "D3", interactions = "A -> Y"))
-fit <- wsmed_fit(model, example_data)
-inference <- wsmed_infer(fit, draws = 1000, seed = 604, level = .90)
+  moderator = list(
+    variable = "D3",
+    interactions = "A -> Y"
+  )
+)
+fit <- wsmed_fit(
+  model,
+  example_data
+)
+inference <- wsmed_infer(
+  fit,
+  draws = 1000,
+  seed = 604,
+  level = .90
+)
 ```
 
 This tutorial uses 1,000 draws for speed; the default is 20,000 MC
@@ -21,7 +33,11 @@ samples.
 
 ``` r
 
-effects <- wsmed_effects(inference, at = list(D3 = c(.2, .5)), scale = "marginal")
+effects <- wsmed_effects(
+  inference,
+  at = list(D3 = c(.2, .5)),
+  scale = "marginal"
+)
 summary(effects)
 #> wsMed indirect | marginal scale | mc 
 #> 90% percentile intervals; 1000 joint draws; SE from effect draws
@@ -31,19 +47,25 @@ summary(effects)
 #> Plug-in marginal outcome-difference SD: 0.169194 
 #> The denominator is not a moderator-specific conditional SD.
 #>                            Estimate Std. Error CI lower CI upper
-#> indirect_1@1: A [D3 = 0.2]  0.01950    0.03827 -0.03131  0.08929
-#> indirect_1@2: A [D3 = 0.5]  0.00886    0.02004 -0.01716  0.04920
+#> indirect_1@1: A [D3 = 0.2]  0.01950    0.03638 -0.03063  0.08758
+#> indirect_1@2: A [D3 = 0.5]  0.00886    0.01873 -0.02071  0.04337
 #> Inference draws: 1000 retained of 1000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 confint(effects)                 # stored 90% level
 #>                      5 %       95 %
-#> indirect_1@1 -0.03131131 0.08929332
-#> indirect_1@2 -0.01715745 0.04919549
-confint(effects, level = .95)    # explicit override
+#> indirect_1@1 -0.03062835 0.08758182
+#> indirect_1@2 -0.02071058 0.04336693
+confint(
+  effects,
+  level = .95
+)    # explicit override
 #>                    2.5 %     97.5 %
-#> indirect_1@1 -0.04363589 0.10756781
-#> indirect_1@2 -0.02753405 0.05928182
-plot(effects, view = "conditional")
+#> indirect_1@1 -0.04736114 0.10345303
+#> indirect_1@2 -0.02713894 0.05320883
+plot(
+  effects,
+  view = "conditional"
+)
 ```
 
 ![plot of chunk levels](figures/WorkflowReliability-levels-1.png)
@@ -52,7 +74,10 @@ plot of chunk levels
 
 ``` r
 
-stopifnot(identical(confint(effects, level = NULL), confint(effects)))
+stopifnot(identical(confint(
+  effects,
+  level = NULL
+), confint(effects)))
 ```
 
 `confint(inference)` extracts primitive model-parameter intervals. Use
@@ -83,7 +108,10 @@ fit
 #> Condition contrast: after - before 
 #> Moderator: D3 in raw units; centering reference = 0.452271 
 #> Post-fit admissibility: 1 of 1 ; excluded rows: 0
-diagnostics <- wsmed_inspect(fit, "diagnostics")
+diagnostics <- wsmed_inspect(
+  fit,
+  "diagnostics"
+)
 diagnostics$by_dataset
 #>   dataset n.used converged admissible covariance.finite
 #> 1       1    100      TRUE       TRUE              TRUE
@@ -91,7 +119,10 @@ diagnostics$by_dataset
 #> 1              3.988869e-08            100                  6
 #>   complete.case.columns warnings message n.excluded
 #> 1                     6        0                  0
-wsmed_inspect(inference, "diagnostics")
+wsmed_inspect(
+  inference,
+  "diagnostics"
+)
 #> $requested
 #> [1] 1000
 #> 
@@ -159,20 +190,41 @@ standardizer and conditional effects, up to fitting precision.
 group_model <- wsmed_model(
   c(before = "D1", after = "D2"),
   list(A = c(before = "A1", after = "A2")),
-  moderator = list(variable = "Group", interactions = "A -> Y"))
-group_fit <- wsmed_fit(group_model, example_data)
+  moderator = list(
+    variable = "Group",
+    interactions = "A -> Y"
+  )
+)
+group_fit <- wsmed_fit(
+  group_model,
+  example_data
+)
 recoded_data <- example_data
 recoded_data$Group <- relevel(recoded_data$Group, "low")
-recoded_fit <- wsmed_fit(group_model, recoded_data)
+recoded_fit <- wsmed_fit(
+  group_model,
+  recoded_data
+)
 probes <- list(Group = c("high", "low", "med"))
-original_effects <- wsmed_effects(group_fit, at = probes, scale = "marginal")
-recoded_effects <- wsmed_effects(recoded_fit, at = probes, scale = "marginal")
-data.frame(group = probes$Group, original = coef(original_effects),
-           recoded = coef(recoded_effects))
+original_effects <- wsmed_effects(
+  group_fit,
+  at = probes,
+  scale = "marginal"
+)
+recoded_effects <- wsmed_effects(
+  recoded_fit,
+  at = probes,
+  scale = "marginal"
+)
+data.frame(
+  group = probes$Group,
+  original = coef(original_effects),
+  recoded = coef(recoded_effects)
+)
 #>              group     original      recoded
-#> indirect_1@1  high -0.001614356 -0.001614354
-#> indirect_1@2   low  0.089299551  0.089299548
-#> indirect_1@3   med -0.003012101 -0.003012107
+#> indirect_1@1  high -0.001614355 -0.001614355
+#> indirect_1@2   low  0.089299551  0.089299550
+#> indirect_1@3   med -0.003012100 -0.003012105
 stopifnot(isTRUE(all.equal(unname(coef(original_effects)),
   unname(coef(recoded_effects)), tolerance = 1e-6)))
 ```
@@ -207,7 +259,11 @@ group_fit$provenance$algorithms
 #> 
 #> $mi_marginal_pooling
 #> [1] "joint-rubin-v1"
-new_inference <- wsmed_infer(group_fit, draws = 100, seed = 190)
+new_inference <- wsmed_infer(
+  group_fit,
+  draws = 100,
+  seed = 190
+)
 new_inference$provenance$algorithms
 #> $mi_variance_sampler
 #> [1] "symmetric-psd-v1"
@@ -296,7 +352,10 @@ report$fitting_versions
 #> $marginal_standardization
 #> [1] "Fitted model-implied marginal variances"
 path <- tempfile(fileext = ".rds")
-wsmed_reproducibility(effects, file = path)
+wsmed_reproducibility(
+  effects,
+  file = path
+)
 stopifnot(identical(readRDS(path), report))
 unlink(path)
 ```
@@ -341,7 +400,7 @@ every model. The imputation model should preserve the substantive
 interaction structure; the study does not isolate the cause of the
 observed bias and undercoverage. See the development repository
 [simulation
-report](https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/.github/validation/RESULTS.md)
+report](https://github.com/Yangzhen1999/wsMed/blob/master/.github/validation/RESULTS.md)
 for the design, Monte Carlo uncertainty and retained results.
 
 A model-compatible external imputer can now supply its completed

@@ -10,7 +10,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/Yangzhen1999/wsMed/blob/master/DESCRIPTION)
 
 Yang W, Cheung S (2026). *wsMed: Within-Subject Mediation Analysis Using
 Structural Equation Modeling*. R package version 1.2.0,

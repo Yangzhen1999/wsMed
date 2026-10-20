@@ -2,8 +2,8 @@
 
 ### Start here
 
-- [Get started: your first mediation
-  analysis](https://yangzhen1999.github.io/wsMed/articles/GetStarted.md):
+- [Get started: two mediation
+  examples](https://yangzhen1999.github.io/wsMed/articles/GetStarted.md):
 - [Choose an
   analysis](https://yangzhen1999.github.io/wsMed/articles/AnalysisGuide.md):
 

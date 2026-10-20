@@ -43,7 +43,7 @@ Monte Carlo confidence intervals."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Analyze two-condition within-subject mediation</h1>
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/R/WSMed.R" class="external-link"><code>R/WSMed.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/master/R/WSMed.R" class="external-link"><code>R/WSMed.R</code></a></small>
       <div class="d-none name"><code>wsMed.Rd</code></div>
     </div>
 
@@ -187,8 +187,9 @@ fixed-seed MI draws differ from wsMed 1.1.0.</p></dd>
 
 
 <dt id="arg-boot-ci-type">boot_ci_type<a class="anchor" aria-label="anchor" href="#arg-boot-ci-type"></a></dt>
-<dd><p>Character; bootstrap CI type: <code>"perc"</code>, <code>"bc"</code>,
-or <code>"bca.simple"</code>.</p></dd>
+<dd><p>Character; CI type for stored legacy bootstrap parameter
+tables: <code>"perc"</code>, <code>"bc"</code>, or <code>"bca.simple"</code> (zero acceleration).
+Current effect reports use percentile intervals regardless of this setting.</p></dd>
 
 
 <dt id="arg-iseed-seed">iseed, seed<a class="anchor" aria-label="anchor" href="#arg-iseed-seed"></a></dt>
@@ -277,8 +278,9 @@ all imputation fits), and named stored inference objects.</p></dd>
 </ul><p>Missing-data strategies:</p><ul><li><p><code>"DE"</code>: list-wise deletion</p></li>
 <li><p><code>"FIML"</code>: full-information maximum likelihood</p></li>
 <li><p><code>"MI"</code>: multiple imputation via <span class="pkg">mice</span></p></li>
-</ul><p>Confidence-interval engines:</p><ul><li><p>Bootstrap: percentile, BC, or BCa (DE and FIML only)</p></li>
-<li><p>Monte Carlo: draws via <span class="pkg">semmcci</span> (all <code>Na</code> options)</p></li>
+</ul><p>Confidence-interval engines:</p><ul><li><p>Bootstrap: participant resampling (DE and FIML only)</p></li>
+<li><p>Monte Carlo: joint parameter draws via <span class="pkg">semmcci</span> for DE/FIML,
+or the package's pooled-parameter sampler for MI</p></li>
 </ul><p>Monte Carlo inference uses the existing joint-parameter sampler. The legacy
 <code>MCmethod = "bootSD"</code> option was accepted but never applied; it now
 produces an explicit error rather than silently returning ordinary MC results.</p>
@@ -286,17 +288,22 @@ produces an explicit error rather than silently returning ordinary MC results.</
 without recentering them. Dummy variables retain 0/1 units; interaction
 terms use the product of their component scale factors, not the interaction
 column SD. MC and bootstrap draws are transformed jointly with their scales.
-Standardized bootstrap intervals use type-7 quantiles; bc and bca.simple
-apply bias correction with zero acceleration. P-values use inversion of
-that distribution and require at least 1000 valid replicates.</p>
+Current effect reports from print, summary and wsmed_effects, and confint
+applied to extracted effects, use percentile intervals (type-7 quantiles),
+with or without moderation.
+The boot_ci_type argument controls stored legacy parameter-table intervals,
+not these effect reports. In standardized legacy tables, bc and bca.simple
+apply bias correction with zero acceleration, not full BCa. Their bootstrap
+p-values require at least 1000 valid replicates.</p>
 <p>Conditional tables use percentile intervals and fixed numerical probes.
 With fixed.x=TRUE, scale transformations condition on the fitted external
 moments rather than adding sampling uncertainty for those moments.
 In MI, probes/centering references use the first completed data set;
 fixed.x=TRUE also conditions on its external moments in the pooled transform.
-In moderated MI models, marginal variances are pooled jointly with primitive
-coefficients, including their delta-method within-imputation and Rubin
-between-imputation covariance. MC propagates this joint uncertainty.
+In MI models with products of mediator differences and the moderator,
+marginal variances are pooled jointly with primitive coefficients, including
+their delta-method within-imputation and Rubin between-imputation covariance.
+MC propagates this joint uncertainty.
 Endogenous product moments are estimated even with fixed.x=TRUE.</p>
 <p>Workflow: (1) preprocess -&gt; (2) generate SEM syntax -&gt; (3) fit
 -&gt; (4) compute confidence intervals -&gt; (5) optional: standardize estimates.
@@ -306,23 +313,24 @@ covariates and moderators as unordered factors with explicit levels before
 fitting. The first factor level is the reference group. Existing automatic
 recognition of numeric 0/1 predictors is retained in this one-call interface.
 The empirical manuscript dataset is
-available as <code><a href="wsmed_examples.html">wsmed_examples()</a></code>; <code><a href="example_data.html">example_data()</a></code> is simulated tutorial data.</p>
+available as <a href="wsmed_examples.html">wsmed_examples</a>; <a href="example_data.html">example_data</a> is simulated tutorial data.</p>
 <p>The one-call interface uses the same fitting and inference engines
 as <code><a href="wsmed_model.html">wsmed_model()</a></code>, <code><a href="wsmed_fit.html">wsmed_fit()</a></code>, and <code><a href="wsmed_infer.html">wsmed_infer()</a></code>. Default printing is
-concise; use <code>print(result, detail = "full")</code> for the original tables.
+concise; <code>print(result, detail = "full")</code> adds path coefficients to
+the structured effect report. Use <code>detail = "legacy"</code> for the original
+tables.
 Use <code><a href="wsmed_effects.html">wsmed_effects()</a></code> to query stored draws without rerunning the analysis.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"example_data"</span>, package <span class="op">=</span> <span class="st">"wsMed"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">wsMed</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  data <span class="op">=</span> <span class="va">example_data</span>,</span></span>
-<span class="r-in"><span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  Y_C1 <span class="op">=</span> <span class="st">"C1"</span>, Y_C2 <span class="op">=</span> <span class="st">"C2"</span>,</span></span>
-<span class="r-in"><span>  form <span class="op">=</span> <span class="st">"P"</span>, Na <span class="op">=</span> <span class="st">"DE"</span></span></span>
+<span class="r-in"><span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  Y_C1 <span class="op">=</span> <span class="st">"D1"</span>,</span></span>
+<span class="r-in"><span>  Y_C2 <span class="op">=</span> <span class="st">"D2"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> wsMed analysis</span>
@@ -332,11 +340,11 @@ Use <code><a href="wsmed_effects.html">wsmed_effects()</a></code> to query store
 <span class="r-out co"><span class="r-pr">#&gt;</span> 95% percentile intervals; 20000 joint draws; SE from effect draws</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Condition contrast: C2 - C1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                        Estimate Std. Error  CI lower  CI upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> cp: Direct effect                      0.015995   0.016235 -0.016037  0.047686</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> indirect_1: M1                         0.000977   0.003002 -0.004805  0.007940</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> indirect_2: M2                        -0.001626   0.002900 -0.008681  0.003040</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> total_indirect: Total indirect effect -0.000650   0.004151 -0.009492  0.007664</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> total: Total effect                    0.015346   0.016328 -0.016597  0.047203</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cp: Direct effect                     -0.031795   0.017000 -0.064525  0.001864</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> indirect_1: M1                         0.001311   0.003208 -0.004586  0.008760</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> indirect_2: M2                        -0.001120   0.002587 -0.007507  0.003186</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> total_indirect: Total indirect effect  0.000191   0.004138 -0.008459  0.008723</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> total: Total effect                   -0.031604   0.017049 -0.064633  0.001895</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use as.data.frame() for the full-precision table and metadata.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span>

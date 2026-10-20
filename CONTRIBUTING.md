@@ -13,6 +13,19 @@ generated output. Keep examples independently runnable, specify random
 seeds and show only the output needed to explain the task. Preserve
 meaningful statistical qualifications.
 
+Start user tutorials with the simplest call that demonstrates the task.
+Rely on the documented defaults of
+[`wsMed()`](https://yangzhen1999.github.io/wsMed/reference/wsMed.md)
+(including its seed), and show
+[`print()`](https://rdrr.io/r/base/print.html),
+[`summary()`](https://rdrr.io/r/base/summary.html) and
+[`plot()`](https://rdrr.io/r/graphics/plot.default.html) before optional
+selectors or extraction code. Put each argument on its own line in
+multiline calls. Introduce explicit settings after the default workflow,
+explaining what they change. Installation examples use CRAN and GitHub
+`master`; historical validation records retain their audited versions
+and commits.
+
 ## Rebuild and check
 
 ``` r

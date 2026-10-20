@@ -64,7 +64,7 @@
       <h1>Diagnostics, reproducibility, and migration</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/vignettes/WorkflowReliability.Rmd" class="external-link"><code>vignettes/WorkflowReliability.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/master/vignettes/WorkflowReliability.Rmd" class="external-link"><code>vignettes/WorkflowReliability.Rmd</code></a></small>
       <div class="d-none name"><code>WorkflowReliability.Rmd</code></div>
     </div>
 
@@ -78,16 +78,32 @@
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_model.html">wsmed_model</a></span><span class="op">(</span></span>
 <span>  outcome <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>before <span class="op">=</span> <span class="st">"D1"</span>, after <span class="op">=</span> <span class="st">"D2"</span><span class="op">)</span>,</span>
 <span>  mediators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>A <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>before <span class="op">=</span> <span class="st">"A1"</span>, after <span class="op">=</span> <span class="st">"A2"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  moderator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"D3"</span>, interactions <span class="op">=</span> <span class="st">"A -&gt; Y"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_fit.html">wsmed_fit</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">example_data</span><span class="op">)</span></span>
-<span><span class="va">inference</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_infer.html">wsmed_infer</a></span><span class="op">(</span><span class="va">fit</span>, draws <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">604</span>, level <span class="op">=</span> <span class="fl">.90</span><span class="op">)</span></span></code></pre></div>
+<span>  moderator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    variable <span class="op">=</span> <span class="st">"D3"</span>,</span>
+<span>    interactions <span class="op">=</span> <span class="st">"A -&gt; Y"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_fit.html">wsmed_fit</a></span><span class="op">(</span></span>
+<span>  <span class="va">model</span>,</span>
+<span>  <span class="va">example_data</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">inference</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_infer.html">wsmed_infer</a></span><span class="op">(</span></span>
+<span>  <span class="va">fit</span>,</span>
+<span>  draws <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">604</span>,</span>
+<span>  level <span class="op">=</span> <span class="fl">.90</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>This tutorial uses 1,000 draws for speed; the default is 20,000 MC
 draws. Summary, interval extraction, and plotting keep the stored
 confidence level. An explicit <code>level</code> changes the quantiles
 computed from stored joint draws. It does not refit, reimpute, or draw
 new samples.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">effects</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_effects.html">wsmed_effects</a></span><span class="op">(</span><span class="va">inference</span>, at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>D3 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">.2</span>, <span class="fl">.5</span><span class="op">)</span><span class="op">)</span>, scale <span class="op">=</span> <span class="st">"marginal"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">effects</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_effects.html">wsmed_effects</a></span><span class="op">(</span></span>
+<span>  <span class="va">inference</span>,</span>
+<span>  at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>D3 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">.2</span>, <span class="fl">.5</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  scale <span class="op">=</span> <span class="st">"marginal"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">effects</span><span class="op">)</span></span>
 <span><span class="co">#&gt; wsMed indirect | marginal scale | mc </span></span>
 <span><span class="co">#&gt; 90% percentile intervals; 1000 joint draws; SE from effect draws</span></span>
@@ -97,24 +113,33 @@ new samples.</p>
 <span><span class="co">#&gt; Plug-in marginal outcome-difference SD: 0.169194 </span></span>
 <span><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
 <span><span class="co">#&gt;                            Estimate Std. Error CI lower CI upper</span></span>
-<span><span class="co">#&gt; indirect_1@1: A [D3 = 0.2]  0.01950    0.03827 -0.03131  0.08929</span></span>
-<span><span class="co">#&gt; indirect_1@2: A [D3 = 0.5]  0.00886    0.02004 -0.01716  0.04920</span></span>
+<span><span class="co">#&gt; indirect_1@1: A [D3 = 0.2]  0.01950    0.03638 -0.03063  0.08758</span></span>
+<span><span class="co">#&gt; indirect_1@2: A [D3 = 0.5]  0.00886    0.01873 -0.02071  0.04337</span></span>
 <span><span class="co">#&gt; Inference draws: 1000 retained of 1000 ; 0 excluded before effect extraction.</span></span>
 <span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">effects</span><span class="op">)</span>                 <span class="co"># stored 90% level</span></span>
 <span><span class="co">#&gt;                      5 %       95 %</span></span>
-<span><span class="co">#&gt; indirect_1@1 -0.03131131 0.08929332</span></span>
-<span><span class="co">#&gt; indirect_1@2 -0.01715745 0.04919549</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">effects</span>, level <span class="op">=</span> <span class="fl">.95</span><span class="op">)</span>    <span class="co"># explicit override</span></span>
+<span><span class="co">#&gt; indirect_1@1 -0.03062835 0.08758182</span></span>
+<span><span class="co">#&gt; indirect_1@2 -0.02071058 0.04336693</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span></span>
+<span>  <span class="va">effects</span>,</span>
+<span>  level <span class="op">=</span> <span class="fl">.95</span></span>
+<span><span class="op">)</span>    <span class="co"># explicit override</span></span>
 <span><span class="co">#&gt;                    2.5 %     97.5 %</span></span>
-<span><span class="co">#&gt; indirect_1@1 -0.04363589 0.10756781</span></span>
-<span><span class="co">#&gt; indirect_1@2 -0.02753405 0.05928182</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">effects</span>, view <span class="op">=</span> <span class="st">"conditional"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co">#&gt; indirect_1@1 -0.04736114 0.10345303</span></span>
+<span><span class="co">#&gt; indirect_1@2 -0.02713894 0.05320883</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">effects</span>,</span>
+<span>  view <span class="op">=</span> <span class="st">"conditional"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <div class="float">
 <img src="figures/WorkflowReliability-levels-1.png" alt="plot of chunk levels"><div class="figcaption">plot of chunk levels</div>
 </div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">effects</span>, level <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">effects</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span></span>
+<span>  <span class="va">effects</span>,</span>
+<span>  level <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">effects</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><code>confint(inference)</code> extracts primitive model-parameter
 intervals. Use <code>confint(effects)</code> for the selected indirect
 or conditional effects. When a one-call result contains both MC and
@@ -140,7 +165,10 @@ zero acceleration, not a full BCa acceleration estimate. See also the <a href="P
 <span><span class="co">#&gt; Condition contrast: after - before </span></span>
 <span><span class="co">#&gt; Moderator: D3 in raw units; centering reference = 0.452271 </span></span>
 <span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0</span></span>
-<span><span class="va">diagnostics</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_inspect.html">wsmed_inspect</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"diagnostics"</span><span class="op">)</span></span>
+<span><span class="va">diagnostics</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_inspect.html">wsmed_inspect</a></span><span class="op">(</span></span>
+<span>  <span class="va">fit</span>,</span>
+<span>  <span class="st">"diagnostics"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">diagnostics</span><span class="op">$</span><span class="va">by_dataset</span></span>
 <span><span class="co">#&gt;   dataset n.used converged admissible covariance.finite</span></span>
 <span><span class="co">#&gt; 1       1    100      TRUE       TRUE              TRUE</span></span>
@@ -148,7 +176,10 @@ zero acceleration, not a full BCa acceleration estimate. See also the <a href="P
 <span><span class="co">#&gt; 1              3.988869e-08            100                  6</span></span>
 <span><span class="co">#&gt;   complete.case.columns warnings message n.excluded</span></span>
 <span><span class="co">#&gt; 1                     6        0                  0</span></span>
-<span><span class="fu"><a href="../reference/wsmed_inspect.html">wsmed_inspect</a></span><span class="op">(</span><span class="va">inference</span>, <span class="st">"diagnostics"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/wsmed_inspect.html">wsmed_inspect</a></span><span class="op">(</span></span>
+<span>  <span class="va">inference</span>,</span>
+<span>  <span class="st">"diagnostics"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; $requested</span></span>
 <span><span class="co">#&gt; [1] 1000</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -209,20 +240,41 @@ standardizer and conditional effects, up to fitting precision.</p>
 <code class="sourceCode R"><span><span class="va">group_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_model.html">wsmed_model</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>before <span class="op">=</span> <span class="st">"D1"</span>, after <span class="op">=</span> <span class="st">"D2"</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>A <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>before <span class="op">=</span> <span class="st">"A1"</span>, after <span class="op">=</span> <span class="st">"A2"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  moderator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"Group"</span>, interactions <span class="op">=</span> <span class="st">"A -&gt; Y"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">group_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_fit.html">wsmed_fit</a></span><span class="op">(</span><span class="va">group_model</span>, <span class="va">example_data</span><span class="op">)</span></span>
+<span>  moderator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    variable <span class="op">=</span> <span class="st">"Group"</span>,</span>
+<span>    interactions <span class="op">=</span> <span class="st">"A -&gt; Y"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">group_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_fit.html">wsmed_fit</a></span><span class="op">(</span></span>
+<span>  <span class="va">group_model</span>,</span>
+<span>  <span class="va">example_data</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">recoded_data</span> <span class="op">&lt;-</span> <span class="va">example_data</span></span>
 <span><span class="va">recoded_data</span><span class="op">$</span><span class="va">Group</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/relevel.html" class="external-link">relevel</a></span><span class="op">(</span><span class="va">recoded_data</span><span class="op">$</span><span class="va">Group</span>, <span class="st">"low"</span><span class="op">)</span></span>
-<span><span class="va">recoded_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_fit.html">wsmed_fit</a></span><span class="op">(</span><span class="va">group_model</span>, <span class="va">recoded_data</span><span class="op">)</span></span>
+<span><span class="va">recoded_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_fit.html">wsmed_fit</a></span><span class="op">(</span></span>
+<span>  <span class="va">group_model</span>,</span>
+<span>  <span class="va">recoded_data</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">probes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"high"</span>, <span class="st">"low"</span>, <span class="st">"med"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">original_effects</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_effects.html">wsmed_effects</a></span><span class="op">(</span><span class="va">group_fit</span>, at <span class="op">=</span> <span class="va">probes</span>, scale <span class="op">=</span> <span class="st">"marginal"</span><span class="op">)</span></span>
-<span><span class="va">recoded_effects</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_effects.html">wsmed_effects</a></span><span class="op">(</span><span class="va">recoded_fit</span>, at <span class="op">=</span> <span class="va">probes</span>, scale <span class="op">=</span> <span class="st">"marginal"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>group <span class="op">=</span> <span class="va">probes</span><span class="op">$</span><span class="va">Group</span>, original <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">original_effects</span><span class="op">)</span>,</span>
-<span>           recoded <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">recoded_effects</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">original_effects</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_effects.html">wsmed_effects</a></span><span class="op">(</span></span>
+<span>  <span class="va">group_fit</span>,</span>
+<span>  at <span class="op">=</span> <span class="va">probes</span>,</span>
+<span>  scale <span class="op">=</span> <span class="st">"marginal"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">recoded_effects</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_effects.html">wsmed_effects</a></span><span class="op">(</span></span>
+<span>  <span class="va">recoded_fit</span>,</span>
+<span>  at <span class="op">=</span> <span class="va">probes</span>,</span>
+<span>  scale <span class="op">=</span> <span class="st">"marginal"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  group <span class="op">=</span> <span class="va">probes</span><span class="op">$</span><span class="va">Group</span>,</span>
+<span>  original <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">original_effects</span><span class="op">)</span>,</span>
+<span>  recoded <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">recoded_effects</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt;              group     original      recoded</span></span>
-<span><span class="co">#&gt; indirect_1@1  high -0.001614356 -0.001614354</span></span>
-<span><span class="co">#&gt; indirect_1@2   low  0.089299551  0.089299548</span></span>
-<span><span class="co">#&gt; indirect_1@3   med -0.003012101 -0.003012107</span></span>
+<span><span class="co">#&gt; indirect_1@1  high -0.001614355 -0.001614355</span></span>
+<span><span class="co">#&gt; indirect_1@2   low  0.089299551  0.089299550</span></span>
+<span><span class="co">#&gt; indirect_1@3   med -0.003012100 -0.003012105</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">original_effects</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">recoded_effects</span><span class="op">)</span><span class="op">)</span>, tolerance <span class="op">=</span> <span class="fl">1e-6</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>For MI moderated models, marginal variances are estimated in each
@@ -253,7 +305,11 @@ reuse the fit:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $mi_marginal_pooling</span></span>
 <span><span class="co">#&gt; [1] "joint-rubin-v1"</span></span>
-<span><span class="va">new_inference</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_infer.html">wsmed_infer</a></span><span class="op">(</span><span class="va">group_fit</span>, draws <span class="op">=</span> <span class="fl">100</span>, seed <span class="op">=</span> <span class="fl">190</span><span class="op">)</span></span>
+<span><span class="va">new_inference</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_infer.html">wsmed_infer</a></span><span class="op">(</span></span>
+<span>  <span class="va">group_fit</span>,</span>
+<span>  draws <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">190</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">new_inference</span><span class="op">$</span><span class="va">provenance</span><span class="op">$</span><span class="va">algorithms</span></span>
 <span><span class="co">#&gt; $mi_variance_sampler</span></span>
 <span><span class="co">#&gt; [1] "symmetric-psd-v1"</span></span>
@@ -343,7 +399,10 @@ model.</p>
 <span><span class="co">#&gt; $marginal_standardization</span></span>
 <span><span class="co">#&gt; [1] "Fitted model-implied marginal variances"</span></span>
 <span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".rds"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/wsmed_reproducibility.html">wsmed_reproducibility</a></span><span class="op">(</span><span class="va">effects</span>, file <span class="op">=</span> <span class="va">path</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/wsmed_reproducibility.html">wsmed_reproducibility</a></span><span class="op">(</span></span>
+<span>  <span class="va">effects</span>,</span>
+<span>  file <span class="op">=</span> <span class="va">path</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span>, <span class="va">report</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span></code></pre></div>
 <p>The manifest records the resolved model, variable roles and coding,
@@ -434,7 +493,7 @@ imputation (the lowest observed coverage of nominal 95% intervals was
 89.5%). Passing software checks does not establish nominal coverage for
 every model. The imputation model should preserve the substantive
 interaction structure; the study does not isolate the cause of the
-observed bias and undercoverage. See the development repository <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/.github/validation/RESULTS.md" class="external-link">simulation
+observed bias and undercoverage. See the development repository <a href="https://github.com/Yangzhen1999/wsMed/blob/master/.github/validation/RESULTS.md" class="external-link">simulation
 report</a> for the design, Monte Carlo uncertainty and retained
 results.</p>
 <p>A model-compatible external imputer can now supply its completed

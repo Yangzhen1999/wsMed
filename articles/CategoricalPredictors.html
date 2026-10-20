@@ -64,7 +64,7 @@
       <h1>Working with categorical predictors</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/vignettes/CategoricalPredictors.Rmd" class="external-link"><code>vignettes/CategoricalPredictors.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/master/vignettes/CategoricalPredictors.Rmd" class="external-link"><code>vignettes/CategoricalPredictors.Rmd</code></a></small>
       <div class="d-none name"><code>CategoricalPredictors.Rmd</code></div>
     </div>
 
@@ -121,7 +121,10 @@ reference.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">)</span></span>
 <span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="va">example_data</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">Group</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">Group</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"low"</span>, <span class="st">"med"</span>, <span class="st">"high"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">dat</span><span class="op">$</span><span class="va">Group</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span></span>
+<span>  <span class="va">dat</span><span class="op">$</span><span class="va">Group</span>,</span>
+<span>  levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"low"</span>, <span class="st">"med"</span>, <span class="st">"high"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">Group</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  low  med high </span></span>
@@ -154,19 +157,278 @@ coding.</p>
 <h2 id="fit-categorical-moderated-mediation">Fit categorical moderated mediation<a class="anchor" aria-label="anchor" href="#fit-categorical-moderated-mediation"></a>
 </h2>
 <p>This parallel model has two mediators. Group main effects enter every
-difference equation. <code>interactions = "A -&gt; Y"</code>
-additionally allows the A-to-Y difference slope to vary by group. The
-B-to-Y slope is constant, although the indirect effect through B can
-still vary because its condition effect varies by group.</p>
+difference equation. <code>MP = "b1"</code> additionally allows the
+A-to-Y difference slope to vary by group. The B-to-Y slope is constant,
+although the indirect effect through B can still vary because its
+condition effect varies by group.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">dat</span>,</span>
+<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>,</span>
+<span>  M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span><span class="op">)</span>,</span>
+<span>  Y_C1 <span class="op">=</span> <span class="st">"D1"</span>,</span>
+<span>  Y_C2 <span class="op">=</span> <span class="st">"D2"</span>,</span>
+<span>  W <span class="op">=</span> <span class="st">"Group"</span>,</span>
+<span>  MP <span class="op">=</span> <span class="st">"b1"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed analysis</span></span>
+<span><span class="co">#&gt; Model: P | DE | Observations: 100 </span></span>
+<span><span class="co">#&gt; Effects:</span></span>
+<span><span class="co">#&gt; wsMed all | raw scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt; Moderator: Group ; reference category = low </span></span>
+<span><span class="co">#&gt;                                                         Estimate Std. Error</span></span>
+<span><span class="co">#&gt; cp@1: Direct effect [Group = low]                      -0.089555   0.030978</span></span>
+<span><span class="co">#&gt; indirect_1@1: M1 [Group = low]                          0.013966   0.015565</span></span>
+<span><span class="co">#&gt; indirect_2@1: M2 [Group = low]                         -0.001067   0.003754</span></span>
+<span><span class="co">#&gt; total_indirect@1: Total indirect effect [Group = low]   0.012899   0.016008</span></span>
+<span><span class="co">#&gt; total@1: Total effect [Group = low]                    -0.076656   0.028663</span></span>
+<span><span class="co">#&gt; cp@2: Direct effect [Group = med]                       0.026977   0.027498</span></span>
+<span><span class="co">#&gt; indirect_1@2: M1 [Group = med]                         -0.000403   0.005514</span></span>
+<span><span class="co">#&gt; indirect_2@2: M2 [Group = med]                         -0.000513   0.003516</span></span>
+<span><span class="co">#&gt; total_indirect@2: Total indirect effect [Group = med]  -0.000916   0.006507</span></span>
+<span><span class="co">#&gt; total@2: Total effect [Group = med]                     0.026060   0.028145</span></span>
+<span><span class="co">#&gt; cp@3: Direct effect [Group = high]                     -0.043523   0.028476</span></span>
+<span><span class="co">#&gt; indirect_1@3: M1 [Group = high]                        -0.000226   0.005569</span></span>
+<span><span class="co">#&gt; indirect_2@3: M2 [Group = high]                        -0.001254   0.003977</span></span>
+<span><span class="co">#&gt; total_indirect@3: Total indirect effect [Group = high] -0.001481   0.006840</span></span>
+<span><span class="co">#&gt; total@3: Total effect [Group = high]                   -0.045004   0.029203</span></span>
+<span><span class="co">#&gt;                                                         CI lower  CI upper</span></span>
+<span><span class="co">#&gt; cp@1: Direct effect [Group = low]                      -0.149674 -0.026957</span></span>
+<span><span class="co">#&gt; indirect_1@1: M1 [Group = low]                         -0.013653  0.048356</span></span>
+<span><span class="co">#&gt; indirect_2@1: M2 [Group = low]                         -0.010082  0.005827</span></span>
+<span><span class="co">#&gt; total_indirect@1: Total indirect effect [Group = low]  -0.015942  0.048170</span></span>
+<span><span class="co">#&gt; total@1: Total effect [Group = low]                    -0.132747 -0.019037</span></span>
+<span><span class="co">#&gt; cp@2: Direct effect [Group = med]                      -0.027358  0.080842</span></span>
+<span><span class="co">#&gt; indirect_1@2: M1 [Group = med]                         -0.013195  0.010492</span></span>
+<span><span class="co">#&gt; indirect_2@2: M2 [Group = med]                         -0.008734  0.006367</span></span>
+<span><span class="co">#&gt; total_indirect@2: Total indirect effect [Group = med]  -0.015454  0.011705</span></span>
+<span><span class="co">#&gt; total@2: Total effect [Group = med]                    -0.029364  0.081188</span></span>
+<span><span class="co">#&gt; cp@3: Direct effect [Group = high]                     -0.098881  0.012148</span></span>
+<span><span class="co">#&gt; indirect_1@3: M1 [Group = high]                        -0.012821  0.011406</span></span>
+<span><span class="co">#&gt; indirect_2@3: M2 [Group = high]                        -0.010910  0.005954</span></span>
+<span><span class="co">#&gt; total_indirect@3: Total indirect effect [Group = high] -0.016572  0.011751</span></span>
+<span><span class="co">#&gt; total@3: Total effect [Group = high]                   -0.102191  0.012012</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Fitted group n: low = 34; med = 34; high = 32.</span></span>
+<span><span class="co">#&gt; Fitted group counts after missing-data handling; observed counts exclude</span></span>
+<span><span class="co">#&gt; missing moderator values. </span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed statistical summary</span></span>
+<span><span class="co">#&gt; Model: P | Missing: DE | Observations: 100 </span></span>
+<span><span class="co">#&gt; Effects:</span></span>
+<span><span class="co">#&gt; wsMed all | raw scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt; Moderator: Group ; reference category = low </span></span>
+<span><span class="co">#&gt;                                                         Estimate Std. Error</span></span>
+<span><span class="co">#&gt; cp@1: Direct effect [Group = low]                      -0.089555   0.030978</span></span>
+<span><span class="co">#&gt; indirect_1@1: M1 [Group = low]                          0.013966   0.015565</span></span>
+<span><span class="co">#&gt; indirect_2@1: M2 [Group = low]                         -0.001067   0.003754</span></span>
+<span><span class="co">#&gt; total_indirect@1: Total indirect effect [Group = low]   0.012899   0.016008</span></span>
+<span><span class="co">#&gt; total@1: Total effect [Group = low]                    -0.076656   0.028663</span></span>
+<span><span class="co">#&gt; cp@2: Direct effect [Group = med]                       0.026977   0.027498</span></span>
+<span><span class="co">#&gt; indirect_1@2: M1 [Group = med]                         -0.000403   0.005514</span></span>
+<span><span class="co">#&gt; indirect_2@2: M2 [Group = med]                         -0.000513   0.003516</span></span>
+<span><span class="co">#&gt; total_indirect@2: Total indirect effect [Group = med]  -0.000916   0.006507</span></span>
+<span><span class="co">#&gt; total@2: Total effect [Group = med]                     0.026060   0.028145</span></span>
+<span><span class="co">#&gt; cp@3: Direct effect [Group = high]                     -0.043523   0.028476</span></span>
+<span><span class="co">#&gt; indirect_1@3: M1 [Group = high]                        -0.000226   0.005569</span></span>
+<span><span class="co">#&gt; indirect_2@3: M2 [Group = high]                        -0.001254   0.003977</span></span>
+<span><span class="co">#&gt; total_indirect@3: Total indirect effect [Group = high] -0.001481   0.006840</span></span>
+<span><span class="co">#&gt; total@3: Total effect [Group = high]                   -0.045004   0.029203</span></span>
+<span><span class="co">#&gt;                                                         CI lower  CI upper</span></span>
+<span><span class="co">#&gt; cp@1: Direct effect [Group = low]                      -0.149674 -0.026957</span></span>
+<span><span class="co">#&gt; indirect_1@1: M1 [Group = low]                         -0.013653  0.048356</span></span>
+<span><span class="co">#&gt; indirect_2@1: M2 [Group = low]                         -0.010082  0.005827</span></span>
+<span><span class="co">#&gt; total_indirect@1: Total indirect effect [Group = low]  -0.015942  0.048170</span></span>
+<span><span class="co">#&gt; total@1: Total effect [Group = low]                    -0.132747 -0.019037</span></span>
+<span><span class="co">#&gt; cp@2: Direct effect [Group = med]                      -0.027358  0.080842</span></span>
+<span><span class="co">#&gt; indirect_1@2: M1 [Group = med]                         -0.013195  0.010492</span></span>
+<span><span class="co">#&gt; indirect_2@2: M2 [Group = med]                         -0.008734  0.006367</span></span>
+<span><span class="co">#&gt; total_indirect@2: Total indirect effect [Group = med]  -0.015454  0.011705</span></span>
+<span><span class="co">#&gt; total@2: Total effect [Group = med]                    -0.029364  0.081188</span></span>
+<span><span class="co">#&gt; cp@3: Direct effect [Group = high]                     -0.098881  0.012148</span></span>
+<span><span class="co">#&gt; indirect_1@3: M1 [Group = high]                        -0.012821  0.011406</span></span>
+<span><span class="co">#&gt; indirect_2@3: M2 [Group = high]                        -0.010910  0.005954</span></span>
+<span><span class="co">#&gt; total_indirect@3: Total indirect effect [Group = high] -0.016572  0.011751</span></span>
+<span><span class="co">#&gt; total@3: Total effect [Group = high]                   -0.102191  0.012012</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Fitted group n: low = 34; med = 34; high = 32.</span></span>
+<span><span class="co">#&gt; Fitted group counts after missing-data handling; observed counts exclude</span></span>
+<span><span class="co">#&gt; missing moderator values. </span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Path coefficients:</span></span>
+<span><span class="co">#&gt;                         Estimate Std. Error CI lower CI upper</span></span>
+<span><span class="co">#&gt; cp@1: cp [Group = low]  -0.08956    0.03098 -0.14967 -0.02696</span></span>
+<span><span class="co">#&gt; b1@1: b1 [Group = low]  -0.15866    0.15912 -0.47238  0.15442</span></span>
+<span><span class="co">#&gt; d1@1: d1 [Group = low]  -0.04619    0.09253 -0.22580  0.13807</span></span>
+<span><span class="co">#&gt; b2@1: b2 [Group = low]  -0.06480    0.08982 -0.23953  0.11299</span></span>
+<span><span class="co">#&gt; d2@1: d2 [Group = low]  -0.04119    0.08537 -0.21002  0.12575</span></span>
+<span><span class="co">#&gt; a1@1: a1 [Group = low]  -0.08802    0.02949 -0.14633 -0.03101</span></span>
+<span><span class="co">#&gt; a2@1: a2 [Group = low]   0.01646    0.03086 -0.04441  0.07735</span></span>
+<span><span class="co">#&gt; cp@2: cp [Group = med]   0.02698    0.02750 -0.02736  0.08084</span></span>
+<span><span class="co">#&gt; b1@2: b1 [Group = med]  -0.07904    0.16472 -0.40198  0.24594</span></span>
+<span><span class="co">#&gt; d1@2: d1 [Group = med]  -0.04619    0.09253 -0.22580  0.13807</span></span>
+<span><span class="co">#&gt; b2@2: b2 [Group = med]  -0.06480    0.08982 -0.23953  0.11299</span></span>
+<span><span class="co">#&gt; d2@2: d2 [Group = med]  -0.04119    0.08537 -0.21002  0.12575</span></span>
+<span><span class="co">#&gt; a1@2: a1 [Group = med]   0.00510    0.02933 -0.05222  0.06209</span></span>
+<span><span class="co">#&gt; a2@2: a2 [Group = med]   0.00792    0.03082 -0.05193  0.06885</span></span>
+<span><span class="co">#&gt; cp@3: cp [Group = high] -0.04352    0.02848 -0.09888  0.01215</span></span>
+<span><span class="co">#&gt; b1@3: b1 [Group = high] -0.06778    0.17203 -0.40586  0.26641</span></span>
+<span><span class="co">#&gt; d1@3: d1 [Group = high] -0.04619    0.09253 -0.22580  0.13807</span></span>
+<span><span class="co">#&gt; b2@3: b2 [Group = high] -0.06480    0.08982 -0.23953  0.11299</span></span>
+<span><span class="co">#&gt; d2@3: d2 [Group = high] -0.04119    0.08537 -0.21002  0.12575</span></span>
+<span><span class="co">#&gt; a1@3: a1 [Group = high]  0.00334    0.03010 -0.05597  0.06200</span></span>
+<span><span class="co">#&gt; a2@3: a2 [Group = high]  0.01935    0.03204 -0.04312  0.08287</span></span>
+<span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span></span>
+<span><span class="co">#&gt; Tables: $effects, $coefficients; analysis settings: $info.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
+<div class="float">
+<img src="figures/CategoricalPredictors-fit-1.png" alt="plot of chunk fit"><div class="figcaption">plot of chunk fit</div>
+</div>
+<p>This uses the default 20,000 Monte Carlo draws and seed. The default
+report includes all groups; the plot shows indirect effects in
+factor-level order. <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> also includes conditional
+path coefficients.</p>
+</div>
+<div class="section level2">
+<h2 id="conditional-effects-and-group-differences">Conditional effects and group differences<a class="anchor" aria-label="anchor" href="#conditional-effects-and-group-differences"></a>
+</h2>
+<p>Queries use factor labels, not indicator numbers. With
+<code>at</code> omitted, all levels are returned. Specify labels
+explicitly when their order matters.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">effects</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_effects.html">wsmed_effects</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">effects</span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed indirect | raw scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt; Moderator: Group ; reference category = low </span></span>
+<span><span class="co">#&gt;                                  Estimate Std. Error  CI lower  CI upper</span></span>
+<span><span class="co">#&gt; indirect_1@1: M1 [Group = low]   0.013966   0.015565 -0.013653  0.048356</span></span>
+<span><span class="co">#&gt; indirect_2@1: M2 [Group = low]  -0.001067   0.003754 -0.010082  0.005827</span></span>
+<span><span class="co">#&gt; indirect_1@2: M1 [Group = med]  -0.000403   0.005514 -0.013195  0.010492</span></span>
+<span><span class="co">#&gt; indirect_2@2: M2 [Group = med]  -0.000513   0.003516 -0.008734  0.006367</span></span>
+<span><span class="co">#&gt; indirect_1@3: M1 [Group = high] -0.000226   0.005569 -0.012821  0.011406</span></span>
+<span><span class="co">#&gt; indirect_2@3: M2 [Group = high] -0.001254   0.003977 -0.010910  0.005954</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Fitted group n: low = 34; med = 34; high = 32.</span></span>
+<span><span class="co">#&gt; Fitted group counts after missing-data handling; observed counts exclude</span></span>
+<span><span class="co">#&gt; missing moderator values. </span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">effects</span><span class="op">)</span></span></code></pre></div>
+<div class="float">
+<img src="figures/CategoricalPredictors-effects-1.png" alt="plot of chunk effects"><div class="figcaption">plot of chunk effects</div>
+</div>
+<p>The default plot uses the factor order: <code>low</code>,
+<code>med</code>, <code>high</code>. To change the order, supply
+<code>at = list(Group = c("high", "med", "low"))</code> when extracting
+effects. Use <code>plot(effects, view = "forest")</code> for horizontal
+intervals.</p>
+<p>Compare the indirect effect through A between <code>high</code> and
+<code>low</code> by assigning weights to the corresponding effect
+identifiers. The contrast uses matched joint draws, so its interval
+includes covariance between the two effects.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">tab</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">effects</span><span class="op">)</span></span>
+<span><span class="va">selected</span> <span class="op">&lt;-</span> <span class="va">tab</span><span class="op">$</span><span class="va">effect</span> <span class="op">==</span> <span class="st">"indirect_1"</span> <span class="op">&amp;</span> <span class="va">tab</span><span class="op">$</span><span class="va">at</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"low"</span>, <span class="st">"high"</span><span class="op">)</span></span>
+<span><span class="va">weights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">tab</span><span class="op">$</span><span class="va">at</span><span class="op">[</span><span class="va">selected</span><span class="op">]</span> <span class="op">==</span> <span class="st">"high"</span>, <span class="fl">1</span>, <span class="op">-</span><span class="fl">1</span><span class="op">)</span>,</span>
+<span>                    <span class="va">tab</span><span class="op">$</span><span class="va">term</span><span class="op">[</span><span class="va">selected</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">difference</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_contrasts.html">wsmed_contrasts</a></span><span class="op">(</span></span>
+<span>  <span class="va">effects</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>high_minus_low <span class="op">=</span> <span class="va">weights</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">difference</span></span>
+<span><span class="co">#&gt; wsMed contrasts | raw scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt; Moderator: Group ; reference category = low </span></span>
+<span><span class="co">#&gt; Contrast direction (signed weights):</span></span>
+<span><span class="co">#&gt;  high_minus_low: -1 * M1 [Group = low] +1 * M1 [Group = high]</span></span>
+<span><span class="co">#&gt;                Estimate Std. Error CI lower CI upper</span></span>
+<span><span class="co">#&gt; high_minus_low  -0.0142     0.0164  -0.0500   0.0159</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">difference</span><span class="op">)</span></span></code></pre></div>
+<div class="float">
+<img src="figures/CategoricalPredictors-contrasts-1.png" alt="plot of chunk contrasts"><div class="figcaption">plot of chunk contrasts</div>
+</div>
+<p>The effect intervals in the group plot are pointwise. Their overlap
+is not a test of equality; use the contrast interval to assess the
+difference. The caption reports fitted group counts. With MI it reports
+their range across completed datasets, rather than treating imputed
+memberships as observed. The result table also provides
+<code>n.observed</code>, <code>n.fitted.min</code>, and
+<code>n.fitted.max</code>. These are descriptive participant counts, not
+effective sample sizes for effects.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">standardized</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_effects.html">wsmed_effects</a></span><span class="op">(</span></span>
+<span>  <span class="va">result</span>,</span>
+<span>  scale <span class="op">=</span> <span class="st">"marginal"</span>,</span>
+<span>  at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"low"</span>, <span class="st">"med"</span>, <span class="st">"high"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">standardized</span></span>
+<span><span class="co">#&gt; wsMed indirect | marginal scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt; Moderator: Group ; reference category = low </span></span>
+<span><span class="co">#&gt; Standardization: effect / marginal model-implied SD(D2 - D1); condition contrast is unscaled.</span></span>
+<span><span class="co">#&gt; Plug-in marginal outcome-difference SD: 0.169127 </span></span>
+<span><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
+<span><span class="co">#&gt;                                 Estimate Std. Error CI lower CI upper</span></span>
+<span><span class="co">#&gt; indirect_1@1: M1 [Group = low]   0.08257    0.08854 -0.07898  0.27364</span></span>
+<span><span class="co">#&gt; indirect_2@1: M2 [Group = low]  -0.00631    0.02137 -0.05769  0.03341</span></span>
+<span><span class="co">#&gt; indirect_1@2: M1 [Group = med]  -0.00238    0.03141 -0.07480  0.05967</span></span>
+<span><span class="co">#&gt; indirect_2@2: M2 [Group = med]  -0.00304    0.02003 -0.04999  0.03621</span></span>
+<span><span class="co">#&gt; indirect_1@3: M1 [Group = high] -0.00134    0.03175 -0.07298  0.06504</span></span>
+<span><span class="co">#&gt; indirect_2@3: M2 [Group = high] -0.00742    0.02265 -0.06211  0.03395</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Fitted group n: low = 34; med = 34; high = 32.</span></span>
+<span><span class="co">#&gt; Fitted group counts after missing-data handling; observed counts exclude</span></span>
+<span><span class="co">#&gt; missing moderator values. </span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span></code></pre></div>
+<p>Marginal standardization divides conditional indirect effects by the
+common model-implied SD of the outcome difference. It does not divide by
+a different within-group SD for each category. Factor labels and
+indicator coding remain fixed, while coefficients and the common SD vary
+together across simulation draws. See the <a href="StandardizedModeratedMediation.html">standardization
+tutorial</a>.</p>
+</div>
+<div class="section level2">
+<h2 id="optional-fit-the-same-model-in-stages">Optional: fit the same model in stages<a class="anchor" aria-label="anchor" href="#optional-fit-the-same-model-in-stages"></a>
+</h2>
+<p>The equivalent staged specification uses role names in its
+interaction arrows. <code>main_effects = "all_equations"</code> matches
+the one-call model, and <code>interactions = "A -&gt; Y"</code> matches
+<code>MP = "b1"</code>. The inference seed below matches the default
+one-call seed.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_model.html">wsmed_model</a></span><span class="op">(</span></span>
 <span>  outcome <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>before <span class="op">=</span> <span class="st">"D1"</span>, after <span class="op">=</span> <span class="st">"D2"</span><span class="op">)</span>,</span>
-<span>  mediators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>A <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>before <span class="op">=</span> <span class="st">"A1"</span>, after <span class="op">=</span> <span class="st">"A2"</span><span class="op">)</span>,</span>
-<span>                   B <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>before <span class="op">=</span> <span class="st">"B1"</span>, after <span class="op">=</span> <span class="st">"B2"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  moderator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"Group"</span>, main_effects <span class="op">=</span> <span class="st">"all_equations"</span>,</span>
-<span>                   interactions <span class="op">=</span> <span class="st">"A -&gt; Y"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_fit.html">wsmed_fit</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">dat</span><span class="op">)</span></span>
-<span><span class="va">inference</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_infer.html">wsmed_infer</a></span><span class="op">(</span><span class="va">fit</span>, draws <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">604</span><span class="op">)</span></span>
+<span>  mediators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    A <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>before <span class="op">=</span> <span class="st">"A1"</span>, after <span class="op">=</span> <span class="st">"A2"</span><span class="op">)</span>,</span>
+<span>    B <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>before <span class="op">=</span> <span class="st">"B1"</span>, after <span class="op">=</span> <span class="st">"B2"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  moderator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    variable <span class="op">=</span> <span class="st">"Group"</span>,</span>
+<span>    main_effects <span class="op">=</span> <span class="st">"all_equations"</span>,</span>
+<span>    interactions <span class="op">=</span> <span class="st">"A -&gt; Y"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_fit.html">wsmed_fit</a></span><span class="op">(</span></span>
+<span>  <span class="va">model</span>,</span>
+<span>  <span class="va">dat</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">inference</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_infer.html">wsmed_infer</a></span><span class="op">(</span></span>
+<span>  <span class="va">fit</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">123</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">fit</span></span>
 <span><span class="co">#&gt; wsMed fit: P | DE | 1 fitted dataset(s)</span></span>
 <span><span class="co">#&gt; Observations: 100 of 100 input rows</span></span>
@@ -174,11 +436,12 @@ still vary because its condition effect varies by group.</p>
 <span><span class="co">#&gt; Condition contrast: after - before </span></span>
 <span><span class="co">#&gt; Moderator: Group ; reference category = low </span></span>
 <span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0</span></span></code></pre></div>
-<p>The tutorial uses 2,000 Monte Carlo draws for speed; the package
-default is 20,000. Inspect the coding before interpreting
-coefficients:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">prepared</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_inspect.html">wsmed_inspect</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"data"</span><span class="op">)</span></span>
+<p>Inspect the constructed data to check the indicator coding:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">prepared</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_inspect.html">wsmed_inspect</a></span><span class="op">(</span></span>
+<span>  <span class="va">fit</span>,</span>
+<span>  <span class="st">"data"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">prepared</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Group"</span>, <span class="st">"W1"</span>, <span class="st">"W2"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   Group W1 W2</span></span>
 <span><span class="co">#&gt; 1   low  0  0</span></span>
@@ -202,170 +465,40 @@ one for <code>med</code> and zero for <code>low</code>; its coefficient
 is <strong>med minus low</strong>. Use
 <code>relevel(dat$Group, ref = "high")</code> before fitting to choose a
 different reference.</p>
-</div>
-<div class="section level2">
-<h2 id="conditional-effects-and-group-differences">Conditional effects and group differences<a class="anchor" aria-label="anchor" href="#conditional-effects-and-group-differences"></a>
-</h2>
-<p>Queries use factor labels, not indicator numbers. With
-<code>at</code> omitted, all levels are returned. Specify labels
-explicitly when their order matters.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">effects</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_effects.html">wsmed_effects</a></span><span class="op">(</span><span class="va">inference</span>,</span>
-<span>                         at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"low"</span>, <span class="st">"med"</span>, <span class="st">"high"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">effects</span></span>
-<span><span class="co">#&gt; wsMed indirect | raw scale | mc </span></span>
-<span><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
-<span><span class="co">#&gt; Condition contrast: after - before </span></span>
-<span><span class="co">#&gt; Moderator: Group ; reference category = low </span></span>
-<span><span class="co">#&gt;                                 Estimate Std. Error  CI lower  CI upper</span></span>
-<span><span class="co">#&gt; indirect_1@1: A [Group = low]   0.013966   0.015440 -0.013327  0.048384</span></span>
-<span><span class="co">#&gt; indirect_2@1: B [Group = low]  -0.001067   0.003761 -0.010202  0.004902</span></span>
-<span><span class="co">#&gt; indirect_1@2: A [Group = med]  -0.000403   0.005361 -0.012426  0.010458</span></span>
-<span><span class="co">#&gt; indirect_2@2: B [Group = med]  -0.000513   0.003580 -0.008784  0.006735</span></span>
-<span><span class="co">#&gt; indirect_1@3: A [Group = high] -0.000227   0.005313 -0.011650  0.010909</span></span>
-<span><span class="co">#&gt; indirect_2@3: B [Group = high] -0.001254   0.003950 -0.010223  0.005541</span></span>
-<span><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
-<span><span class="co">#&gt; Fitted group n: low = 34; med = 34; high = 32.</span></span>
-<span><span class="co">#&gt; Fitted group counts after missing-data handling; observed counts exclude</span></span>
-<span><span class="co">#&gt; missing moderator values. </span></span>
-<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">effects</span>, title <span class="op">=</span> <span class="st">"Conditional effects by group"</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
-<div class="float">
-<img src="figures/CategoricalPredictors-effects-1.png" alt="plot of chunk effects"><div class="figcaption">plot of chunk effects</div>
-</div>
-<p>The plot retains <code>low</code>, <code>med</code>,
-<code>high</code> on the category axis, in the requested order. Use
-<code>view = "forest"</code> to display the same values as horizontal
-intervals.</p>
-<p>Compare the indirect effect through A between <code>high</code> and
-<code>low</code> by assigning weights to the corresponding effect
-identifiers. The contrast uses matched joint draws, so its interval
-includes covariance between the two effects.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">tab</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">effects</span><span class="op">)</span></span>
-<span><span class="va">selected</span> <span class="op">&lt;-</span> <span class="va">tab</span><span class="op">$</span><span class="va">effect</span> <span class="op">==</span> <span class="st">"indirect_1"</span> <span class="op">&amp;</span> <span class="va">tab</span><span class="op">$</span><span class="va">at</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"low"</span>, <span class="st">"high"</span><span class="op">)</span></span>
-<span><span class="va">weights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">tab</span><span class="op">$</span><span class="va">at</span><span class="op">[</span><span class="va">selected</span><span class="op">]</span> <span class="op">==</span> <span class="st">"high"</span>, <span class="fl">1</span>, <span class="op">-</span><span class="fl">1</span><span class="op">)</span>,</span>
-<span>                    <span class="va">tab</span><span class="op">$</span><span class="va">term</span><span class="op">[</span><span class="va">selected</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">difference</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_contrasts.html">wsmed_contrasts</a></span><span class="op">(</span><span class="va">effects</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>high_minus_low <span class="op">=</span> <span class="va">weights</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">difference</span></span>
-<span><span class="co">#&gt; wsMed contrasts | raw scale | mc </span></span>
-<span><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
-<span><span class="co">#&gt; Condition contrast: after - before </span></span>
-<span><span class="co">#&gt; Moderator: Group ; reference category = low </span></span>
-<span><span class="co">#&gt; Contrast direction (signed weights):</span></span>
-<span><span class="co">#&gt;  high_minus_low: -1 * A [Group = low] +1 * A [Group = high]</span></span>
-<span><span class="co">#&gt;                Estimate Std. Error CI lower CI upper</span></span>
-<span><span class="co">#&gt; high_minus_low  -0.0142     0.0164  -0.0503   0.0155</span></span>
-<span><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
-<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">difference</span><span class="op">)</span></span></code></pre></div>
-<div class="float">
-<img src="figures/CategoricalPredictors-contrasts-1.png" alt="plot of chunk contrasts"><div class="figcaption">plot of chunk contrasts</div>
-</div>
-<p>The effect intervals in the group plot are pointwise. Their overlap
-is not a test of equality; use the contrast interval to assess the
-difference. The caption reports fitted group counts. With MI it reports
-their range across completed datasets, rather than treating imputed
-memberships as observed. The result table also provides
-<code>n.observed</code>, <code>n.fitted.min</code>, and
-<code>n.fitted.max</code>. These are descriptive participant counts, not
-effective sample sizes for effects.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">standardized</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_effects.html">wsmed_effects</a></span><span class="op">(</span><span class="va">inference</span>, scale <span class="op">=</span> <span class="st">"marginal"</span>,</span>
-<span>                              at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"low"</span>, <span class="st">"med"</span>, <span class="st">"high"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">standardized</span></span>
-<span><span class="co">#&gt; wsMed indirect | marginal scale | mc </span></span>
-<span><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
-<span><span class="co">#&gt; Condition contrast: after - before </span></span>
-<span><span class="co">#&gt; Moderator: Group ; reference category = low </span></span>
-<span><span class="co">#&gt; Standardization: effect / marginal model-implied SD(D2 - D1); condition contrast is unscaled.</span></span>
-<span><span class="co">#&gt; Plug-in marginal outcome-difference SD: 0.169127 </span></span>
-<span><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
-<span><span class="co">#&gt;                                Estimate Std. Error CI lower CI upper</span></span>
-<span><span class="co">#&gt; indirect_1@1: A [Group = low]   0.08257    0.08799 -0.07476  0.27990</span></span>
-<span><span class="co">#&gt; indirect_2@1: B [Group = low]  -0.00631    0.02135 -0.05731  0.02760</span></span>
-<span><span class="co">#&gt; indirect_1@2: A [Group = med]  -0.00238    0.03056 -0.07011  0.06364</span></span>
-<span><span class="co">#&gt; indirect_2@2: B [Group = med]  -0.00304    0.02041 -0.04793  0.03995</span></span>
-<span><span class="co">#&gt; indirect_1@3: A [Group = high] -0.00134    0.03039 -0.07008  0.06185</span></span>
-<span><span class="co">#&gt; indirect_2@3: B [Group = high] -0.00742    0.02231 -0.05878  0.03165</span></span>
-<span><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
-<span><span class="co">#&gt; Fitted group n: low = 34; med = 34; high = 32.</span></span>
-<span><span class="co">#&gt; Fitted group counts after missing-data handling; observed counts exclude</span></span>
-<span><span class="co">#&gt; missing moderator values. </span></span>
-<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span></code></pre></div>
-<p>Marginal standardization divides conditional indirect effects by the
-common model-implied SD of the outcome difference. It does not divide by
-a different within-group SD for each category. Factor labels and
-indicator coding remain fixed, while coefficients and the common SD vary
-together across simulation draws. See the <a href="StandardizedModeratedMediation.html">standardization
-tutorial</a>.</p>
-</div>
-<div class="section level2">
-<h2 id="the-same-analysis-in-one-call">The same analysis in one call<a class="anchor" aria-label="anchor" href="#the-same-analysis-in-one-call"></a>
-</h2>
-<p><code><a href="../reference/wsMed.html">wsMed()</a></code> remains available. The staged model above
-corresponds to moderator main effects on <code>a1</code>,
-<code>a2</code>, and <code>cp</code>, plus the <code>b1</code>
-interaction:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">one_call</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span><span class="va">dat</span>,</span>
-<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>, M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span><span class="op">)</span>,</span>
-<span>  Y_C1 <span class="op">=</span> <span class="st">"D1"</span>, Y_C2 <span class="op">=</span> <span class="st">"D2"</span>, form <span class="op">=</span> <span class="st">"P"</span>,</span>
-<span>  W <span class="op">=</span> <span class="st">"Group"</span>, MP <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a1"</span>, <span class="st">"a2"</span>, <span class="st">"cp"</span>, <span class="st">"b1"</span><span class="op">)</span>,</span>
-<span>  R <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">604</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/wsmed_effects.html">wsmed_effects</a></span><span class="op">(</span><span class="va">one_call</span>, at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"low"</span>, <span class="st">"med"</span>, <span class="st">"high"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; wsMed indirect | raw scale | mc </span></span>
-<span><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
-<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
-<span><span class="co">#&gt; Moderator: Group ; reference category = low </span></span>
-<span><span class="co">#&gt;                                  Estimate Std. Error  CI lower  CI upper</span></span>
-<span><span class="co">#&gt; indirect_1@1: M1 [Group = low]   0.013966   0.015440 -0.013327  0.048384</span></span>
-<span><span class="co">#&gt; indirect_2@1: M2 [Group = low]  -0.001067   0.003761 -0.010202  0.004902</span></span>
-<span><span class="co">#&gt; indirect_1@2: M1 [Group = med]  -0.000403   0.005361 -0.012426  0.010458</span></span>
-<span><span class="co">#&gt; indirect_2@2: M2 [Group = med]  -0.000513   0.003580 -0.008784  0.006735</span></span>
-<span><span class="co">#&gt; indirect_1@3: M1 [Group = high] -0.000227   0.005313 -0.011650  0.010909</span></span>
-<span><span class="co">#&gt; indirect_2@3: M2 [Group = high] -0.001254   0.003950 -0.010223  0.005541</span></span>
-<span><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
-<span><span class="co">#&gt; Fitted group n: low = 34; med = 34; high = 32.</span></span>
-<span><span class="co">#&gt; Fitted group counts after missing-data handling; observed counts exclude</span></span>
-<span><span class="co">#&gt; missing moderator values. </span></span>
-<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
-<span><span class="va">one_call_effects</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_effects.html">wsmed_effects</a></span><span class="op">(</span><span class="va">one_call</span>,</span>
-<span>  at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"low"</span>, <span class="st">"med"</span>, <span class="st">"high"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">one_call_effects</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">effects</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>          <span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">one_call_effects</span><span class="op">$</span><span class="va">draws</span>, <span class="va">effects</span><span class="op">$</span><span class="va">draws</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>The two calls produce the same estimates and draws. See the <a href="ModularWorkflow.html">staged workflow</a> for what each object
+stores and how to reuse the fitted model for inference.</p>
 </div>
 <div class="section level2">
 <h2 id="categorical-covariates">Categorical covariates<a class="anchor" aria-label="anchor" href="#categorical-covariates"></a>
 </h2>
-<p>Endogenous products have an auxiliary moment model with the necessary
-upstream residual covariances. This preserves marginal scales under
-reference recoding. With MI, marginal variances and coefficients are
-pooled jointly; compare the same completed datasets when checking coding
-equivalence. Earlier saved moderated models need refitting. See the <a href="WorkflowReliability.html">diagnostics tutorial</a> for an
-executable reference-group comparison.</p>
 <p>A categorical between-subject covariate uses the same reference
 coding. This separate example adjusts for <code>Group</code> without
 treating it as a moderator:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">adjusted_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_model.html">wsmed_model</a></span><span class="op">(</span></span>
-<span>  outcome <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>before <span class="op">=</span> <span class="st">"D1"</span>, after <span class="op">=</span> <span class="st">"D2"</span><span class="op">)</span>,</span>
-<span>  mediators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>A <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>before <span class="op">=</span> <span class="st">"A1"</span>, after <span class="op">=</span> <span class="st">"A2"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  covariates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>between <span class="op">=</span> <span class="st">"Group"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">adjusted_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_fit.html">wsmed_fit</a></span><span class="op">(</span><span class="va">adjusted_model</span>, <span class="va">dat</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="fu"><a href="../reference/wsmed_inspect.html">wsmed_inspect</a></span><span class="op">(</span><span class="va">adjusted_fit</span>, <span class="st">"data"</span><span class="op">)</span>, <span class="st">"C_info"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $raw</span></span>
-<span><span class="co">#&gt; [1] "Group"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $dummy_names</span></span>
-<span><span class="co">#&gt; [1] "Cb1_1" "Cb1_2"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $dummy_map</span></span>
-<span><span class="co">#&gt; $dummy_map$Cb1_1</span></span>
-<span><span class="co">#&gt; [1] "low vs med"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $dummy_map$Cb1_2</span></span>
-<span><span class="co">#&gt; [1] "low vs high"</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">adjusted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">dat</span>,</span>
+<span>  M_C1 <span class="op">=</span> <span class="st">"A1"</span>,</span>
+<span>  M_C2 <span class="op">=</span> <span class="st">"A2"</span>,</span>
+<span>  Y_C1 <span class="op">=</span> <span class="st">"D1"</span>,</span>
+<span>  Y_C2 <span class="op">=</span> <span class="st">"D2"</span>,</span>
+<span>  C <span class="op">=</span> <span class="st">"Group"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">adjusted</span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed analysis</span></span>
+<span><span class="co">#&gt; Model: P | DE | Observations: 100 </span></span>
+<span><span class="co">#&gt; Effects:</span></span>
+<span><span class="co">#&gt; wsMed all | raw scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt; Covariate: Group ; reference category = low </span></span>
+<span><span class="co">#&gt;                                       Estimate Std. Error CI lower CI upper</span></span>
+<span><span class="co">#&gt; cp: Direct effect                     -0.08738    0.02898 -0.14500 -0.03149</span></span>
+<span><span class="co">#&gt; indirect_1: M1                         0.01059    0.00952 -0.00579  0.03198</span></span>
+<span><span class="co">#&gt; total_indirect: Total indirect effect  0.01059    0.00952 -0.00579  0.03198</span></span>
+<span><span class="co">#&gt; total: Total effect                   -0.07679    0.02815 -0.13165 -0.02243</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="missing-categorical-predictors">Missing categorical predictors<a class="anchor" aria-label="anchor" href="#missing-categorical-predictors"></a>
@@ -387,27 +520,42 @@ differs from the lower-level <code><a href="../reference/ImputeData.html">Impute
 <code class="sourceCode R"><span><span class="va">incomplete</span> <span class="op">&lt;-</span> <span class="va">dat</span></span>
 <span><span class="va">incomplete</span><span class="op">$</span><span class="va">Group</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">18</span>, <span class="fl">37</span>, <span class="fl">68</span>, <span class="fl">89</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span>
 <span><span class="va">incomplete</span><span class="op">$</span><span class="va">A2</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">25</span>, <span class="fl">43</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span>
-<span><span class="va">mi_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_fit.html">wsmed_fit</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">incomplete</span>, missing <span class="op">=</span> <span class="st">"mi"</span>,</span>
-<span>  mi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m <span class="op">=</span> <span class="fl">5</span>, method <span class="op">=</span> <span class="st">"pmm"</span>, seed <span class="op">=</span> <span class="fl">123</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">mi_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_fit.html">wsmed_fit</a></span><span class="op">(</span></span>
+<span>  <span class="va">model</span>,</span>
+<span>  <span class="va">incomplete</span>,</span>
+<span>  missing <span class="op">=</span> <span class="st">"mi"</span>,</span>
+<span>  mi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    m <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>    method <span class="op">=</span> <span class="st">"pmm"</span>,</span>
+<span>    seed <span class="op">=</span> <span class="fl">123</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Internal MI uses main effects only and may be incompatible with</span></span>
 <span><span class="co">#&gt; moderator interactions. Consider model-compatible external imputations via</span></span>
 <span><span class="co">#&gt; completed; see the CompatibleImputation tutorial.</span></span>
-<span><span class="va">mi_inference</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_infer.html">wsmed_infer</a></span><span class="op">(</span><span class="va">mi_fit</span>, method <span class="op">=</span> <span class="st">"mc"</span>, draws <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">604</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/wsmed_effects.html">wsmed_effects</a></span><span class="op">(</span><span class="va">mi_inference</span>, at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"low"</span>, <span class="st">"med"</span>, <span class="st">"high"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">mi_inference</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_infer.html">wsmed_infer</a></span><span class="op">(</span></span>
+<span>  <span class="va">mi_fit</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"mc"</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">123</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/wsmed_effects.html">wsmed_effects</a></span><span class="op">(</span></span>
+<span>  <span class="va">mi_inference</span>,</span>
+<span>  at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"low"</span>, <span class="st">"med"</span>, <span class="st">"high"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; wsMed indirect | raw scale | mc </span></span>
-<span><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
 <span><span class="co">#&gt; Condition contrast: after - before </span></span>
 <span><span class="co">#&gt; Moderator: Group ; reference category = low </span></span>
 <span><span class="co">#&gt; MI: per-imputation centering; first-imputation reporting reference.</span></span>
 <span><span class="co">#&gt; Default MI uses main effects only; interactions may require model-compatible external imputations. </span></span>
 <span><span class="co">#&gt;                                 Estimate Std. Error  CI lower  CI upper</span></span>
-<span><span class="co">#&gt; indirect_1@1: A [Group = low]   0.009419   0.014870 -0.017366  0.043063</span></span>
-<span><span class="co">#&gt; indirect_2@1: B [Group = low]  -0.000937   0.003569 -0.009763  0.005991</span></span>
-<span><span class="co">#&gt; indirect_1@2: A [Group = med]  -0.000454   0.005615 -0.012580  0.012517</span></span>
-<span><span class="co">#&gt; indirect_2@2: B [Group = med]  -0.000255   0.003480 -0.008098  0.006710</span></span>
-<span><span class="co">#&gt; indirect_1@3: A [Group = high]  0.000237   0.005470 -0.011096  0.011448</span></span>
-<span><span class="co">#&gt; indirect_2@3: B [Group = high] -0.001447   0.004133 -0.011794  0.005685</span></span>
-<span><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; indirect_1@1: A [Group = low]   0.009419   0.014976 -0.018085  0.042565</span></span>
+<span><span class="co">#&gt; indirect_2@1: B [Group = low]  -0.000937   0.003624 -0.009837  0.005794</span></span>
+<span><span class="co">#&gt; indirect_1@2: A [Group = med]  -0.000454   0.005792 -0.013511  0.011684</span></span>
+<span><span class="co">#&gt; indirect_2@2: B [Group = med]  -0.000255   0.003600 -0.008566  0.007084</span></span>
+<span><span class="co">#&gt; indirect_1@3: A [Group = high]  0.000237   0.005750 -0.011954  0.013518</span></span>
+<span><span class="co">#&gt; indirect_2@3: B [Group = high] -0.001447   0.004076 -0.011492  0.005867</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
 <span><span class="co">#&gt; Fitted group n: low = 34-36; med = 31-33; high = 32-34.</span></span>
 <span><span class="co">#&gt; Fitted group counts: range across completed datasets; observed counts exclude</span></span>
 <span><span class="co">#&gt; imputed moderator values. </span></span>

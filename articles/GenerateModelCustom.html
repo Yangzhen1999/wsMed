@@ -64,38 +64,19 @@
       <h1>Specifying user-defined mediation models</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/vignettes/GenerateModelCustom.Rmd" class="external-link"><code>vignettes/GenerateModelCustom.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/master/vignettes/GenerateModelCustom.Rmd" class="external-link"><code>vignettes/GenerateModelCustom.Rmd</code></a></small>
       <div class="d-none name"><code>GenerateModelCustom.Rmd</code></div>
     </div>
 
     
     
-<div class="section level2">
-<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
-</h2>
-<p><code><a href="../reference/GenerateModelCustom.html">GenerateModelCustom()</a></code> generates <code>lavaan</code>
-syntax for a user-defined two-condition within-subject mediation model.
-It is useful when the intended mediator structure cannot be represented
-by one of the predefined parallel, chained, chained–parallel, or
-parallel–chained models in <code>wsMed</code>.</p>
-<p>Users specify directed paths among mediators and from mediators to
-the outcome. For example:</p>
+<p>Use <code>wsMed(form = "UD", paths = ...)</code> when the mediator
+connections do not match a predefined model. Supply paired raw
+measurements, then list the arrows among mediators and from mediators to
+the outcome. This tutorial uses the package’s simulated data and the
+default inference and reporting settings.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">custom_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  <span class="st">"M1 -&gt; M3"</span>,</span>
-<span>  <span class="st">"M3 -&gt; Y"</span>,</span>
-<span>  <span class="st">"M2 -&gt; Y"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>Here, <code>M1</code>, <code>M2</code>, and <code>M3</code> denote
-the mediators, and <code>Y</code> denotes the outcome. The user does not
-specify paths beginning with <code>X</code>. The function automatically
-adds an
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><mi>i</mi></msub><annotation encoding="application/x-tex">a_i</annotation></semantics></math>
-path from the within-subject condition to every mediator and the direct
-effect
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mi>p</mi></mrow><annotation encoding="application/x-tex">cp</annotation></semantics></math>
-from the condition to the outcome.</p>
-</div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="mediator-numbering">Mediator numbering<a class="anchor" aria-label="anchor" href="#mediator-numbering"></a>
 </h2>
@@ -140,120 +121,178 @@ construct A to construct C. Mediator numbering identifies variables; it
 does not determine path direction.</p>
 </div>
 <div class="section level2">
-<h2 id="preparing-example-data">Preparing example data<a class="anchor" aria-label="anchor" href="#preparing-example-data"></a>
+<h2 id="specifying-a-custom-model">Specifying a custom model<a class="anchor" aria-label="anchor" href="#specifying-a-custom-model"></a>
 </h2>
-<p>The following reproducible example creates three mediator pairs and
-one outcome pair. It does not depend on an external data file.</p>
+<p>Write one directed connection per string in <code>paths</code>. Use
+the model labels <code>M1</code>, <code>M2</code>, and so on, plus
+<code>Y</code>, rather than raw column names such as <code>A1</code>.
+For example, to connect A to C, C to the outcome, and B to the
+outcome:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">200</span></span>
-<span></span>
-<span><span class="va">example_custom</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  A1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>,</span>
-<span>  A2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span>, mean <span class="op">=</span> <span class="fl">0.30</span><span class="op">)</span>,</span>
-<span>  B1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>,</span>
-<span>  B2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span>, mean <span class="op">=</span> <span class="fl">0.20</span><span class="op">)</span>,</span>
-<span>  C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>,</span>
-<span>  C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span>, mean <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span>,</span>
-<span>  D1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>,</span>
-<span>  D2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span>, mean <span class="op">=</span> <span class="fl">0.35</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">custom_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"M1 -&gt; M3"</span>,  <span class="co"># A to C</span></span>
+<span>  <span class="st">"M3 -&gt; Y"</span>,   <span class="co"># C to the outcome</span></span>
+<span>  <span class="st">"M2 -&gt; Y"</span>    <span class="co"># B to the outcome</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><code><a href="../reference/PrepareData.html">PrepareData()</a></code> converts the raw condition-specific
-variables into mediator difference and centered level components and an
-outcome difference score.</p>
+<table class="table">
+<thead><tr class="header">
+<th>Entry in <code>paths</code>
+</th>
+<th>Connection in this example</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>"M1 -&gt; M3"</code></td>
+<td>A predicts C</td>
+</tr>
+<tr class="even">
+<td><code>"M3 -&gt; Y"</code></td>
+<td>C predicts the outcome D</td>
+</tr>
+<tr class="odd">
+<td><code>"M2 -&gt; Y"</code></td>
+<td>B predicts the outcome D</td>
+</tr>
+</tbody>
+</table>
+<p>Each string represents one arrow, not a complete mediation route. For
+example, specify <code>"M1 -&gt; M3"</code> and
+<code>"M3 -&gt; Y"</code> separately instead of writing
+<code>"M1 -&gt; M3 -&gt; Y"</code>. Spaces around <code>-&gt;</code> are
+optional.</p>
+<p>Only the listed mediator connections are included. In this example
+there is no direct path from M1 to Y, and no directed path between M1
+and M2. Paths from the condition to <strong>every mediator</strong>, and
+the direct path from the condition to the outcome, are added
+automatically. Do not add <code>X</code> to the path vector.</p>
+</div>
+<div class="section level2">
+<h2 id="fitting-the-complete-model-with-wsmed">Fitting the complete model with wsMed<a class="anchor" aria-label="anchor" href="#fitting-the-complete-model-with-wsmed"></a>
+</h2>
+<p>Pass the path vector to <code><a href="../reference/wsMed.html">wsMed()</a></code> along with the paired
+measurements:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">prepared_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PrepareData.html">PrepareData</a></span><span class="op">(</span></span>
-<span>  data <span class="op">=</span> <span class="va">example_custom</span>,</span>
+<code class="sourceCode R"><span><span class="va">result_custom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">example_data</span>,</span>
 <span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span>, <span class="st">"C1"</span><span class="op">)</span>,</span>
 <span>  M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span>, <span class="st">"C2"</span><span class="op">)</span>,</span>
 <span>  Y_C1 <span class="op">=</span> <span class="st">"D1"</span>,</span>
-<span>  Y_C2 <span class="op">=</span> <span class="st">"D2"</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">prepared_data</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Ydiff"  "M1diff" "M2diff" "M3diff" "M1avg"  "M2avg"  "M3avg"</span></span></code></pre></div>
-<p>For mediator
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>M</mi><mi>i</mi></msub><annotation encoding="application/x-tex">M_i</annotation></semantics></math>,
-the two components are</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>M</mi><mrow><mi>i</mi><mo>,</mo><mrow><mi mathvariant="normal">d</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">f</mi><mi mathvariant="normal">f</mi></mrow></mrow></msub><mo>=</mo><msub><mi>M</mi><mrow><mi>i</mi><mn>2</mn></mrow></msub><mo>−</mo><msub><mi>M</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">
-M_{i,\mathrm{diff}} = M_{i2} - M_{i1}
-</annotation></semantics></math></p>
-<p>and</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>M</mi><mrow><mi>i</mi><mo>,</mo><mrow><mi mathvariant="normal">a</mi><mi mathvariant="normal">v</mi><mi mathvariant="normal">g</mi></mrow></mrow></msub><mo>=</mo><mfrac><mrow><msub><mi>M</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>M</mi><mrow><mi>i</mi><mn>2</mn></mrow></msub></mrow><mn>2</mn></mfrac><mo>,</mo></mrow><annotation encoding="application/x-tex">
-M_{i,\mathrm{avg}}
-=
-\frac{M_{i1} + M_{i2}}{2},
-</annotation></semantics></math></p>
-<p>where the average component is centered by
-<code><a href="../reference/PrepareData.html">PrepareData()</a></code>.</p>
-</div>
-<div class="section level2">
-<h2 id="specifying-a-custom-model">Specifying a custom model<a class="anchor" aria-label="anchor" href="#specifying-a-custom-model"></a>
-</h2>
-<p>Each element of <code>paths</code> must describe either a
-mediator-to-mediator path or a mediator-to-outcome path:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">custom_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  <span class="st">"M1 -&gt; M3"</span>,</span>
-<span>  <span class="st">"M3 -&gt; Y"</span>,</span>
-<span>  <span class="st">"M2 -&gt; Y"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>Spaces around <code>-&gt;</code> are optional. For example,
-<code>"M1 -&gt; M3"</code> and <code>"M1-&gt;M3"</code> are
-equivalent.</p>
-<p>The corresponding model syntax is generated as follows:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">custom_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/GenerateModelCustom.html">GenerateModelCustom</a></span><span class="op">(</span></span>
-<span>  prepared_data <span class="op">=</span> <span class="va">prepared_data</span>,</span>
+<span>  Y_C2 <span class="op">=</span> <span class="st">"D2"</span>,</span>
+<span>  form <span class="op">=</span> <span class="st">"UD"</span>,</span>
 <span>  paths <span class="op">=</span> <span class="va">custom_paths</span></span>
 <span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">custom_model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Ydiff ~ cp*1 + b2*M2diff + d2*M2avg + b3*M3diff + d3*M3avg</span></span>
-<span><span class="co">#&gt; M1diff ~ a1*1</span></span>
-<span><span class="co">#&gt; M2diff ~ a2*1</span></span>
-<span><span class="co">#&gt; M3diff ~ a3*1 + b_1_3*M1diff + d_1_3*M1avg</span></span>
-<span><span class="co">#&gt; indirect_1_3 := a1 * b_1_3 * b3</span></span>
-<span><span class="co">#&gt; indirect_2 := a2 * b2</span></span>
-<span><span class="co">#&gt; indirect_3 := a3 * b3</span></span>
-<span><span class="co">#&gt; total_indirect := indirect_1_3 + indirect_2 + indirect_3</span></span>
-<span><span class="co">#&gt; total_effect := cp + total_indirect</span></span></code></pre></div>
-<p>For every specified structural edge, the generated regression
-includes both the difference and level components of the predictor
-mediator. Thus, <code>"M1 -&gt; M3"</code> contributes</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">b_1_3</span><span class="op">*</span><span class="va">M1diff</span> <span class="op">+</span> <span class="va">d_1_3</span><span class="op">*</span><span class="va">M1avg</span></span></code></pre></div>
-<p>to the regression equation for <code>M3diff</code>.</p>
-<p>Only specified structural paths are added. Because
-<code>"M1 -&gt; Y"</code> is absent from <code>custom_paths</code>,
-<code>M1diff</code> and <code>M1avg</code> do not appear directly in the
-regression equation for <code>Ydiff</code>.</p>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result_custom</span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed analysis</span></span>
+<span><span class="co">#&gt; Model: UD | DE | Observations: 100 </span></span>
+<span><span class="co">#&gt; Effects:</span></span>
+<span><span class="co">#&gt; wsMed all | raw scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt;                                        Estimate Std. Error  CI lower  CI upper</span></span>
+<span><span class="co">#&gt; cp: Direct effect                     -3.00e-02   1.68e-02 -6.31e-02  2.90e-03</span></span>
+<span><span class="co">#&gt; indirect_1_3: M1 -&gt; M3                -2.25e-05   3.74e-04 -8.64e-04  7.36e-04</span></span>
+<span><span class="co">#&gt; indirect_2: M2                        -1.40e-03   2.75e-03 -8.43e-03  2.98e-03</span></span>
+<span><span class="co">#&gt; indirect_3: M3                        -1.85e-04   2.17e-03 -5.11e-03  4.38e-03</span></span>
+<span><span class="co">#&gt; total_indirect: Total indirect effect -1.60e-03   3.54e-03 -9.79e-03  4.91e-03</span></span>
+<span><span class="co">#&gt; total: Total effect                   -3.16e-02   1.69e-02 -6.48e-02  1.61e-03</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0</span></span></code></pre></div>
+<p>This call uses the default Monte Carlo CIs and unstandardized output.
+Use the usual summary method for effect and path-coefficient tables:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result_custom</span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed statistical summary</span></span>
+<span><span class="co">#&gt; Model: UD | Missing: DE | Observations: 100 </span></span>
+<span><span class="co">#&gt; Effects:</span></span>
+<span><span class="co">#&gt; wsMed all | raw scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt;                                        Estimate Std. Error  CI lower  CI upper</span></span>
+<span><span class="co">#&gt; cp: Direct effect                     -3.00e-02   1.68e-02 -6.31e-02  2.90e-03</span></span>
+<span><span class="co">#&gt; indirect_1_3: M1 -&gt; M3                -2.25e-05   3.74e-04 -8.64e-04  7.36e-04</span></span>
+<span><span class="co">#&gt; indirect_2: M2                        -1.40e-03   2.75e-03 -8.43e-03  2.98e-03</span></span>
+<span><span class="co">#&gt; indirect_3: M3                        -1.85e-04   2.17e-03 -5.11e-03  4.38e-03</span></span>
+<span><span class="co">#&gt; total_indirect: Total indirect effect -1.60e-03   3.54e-03 -9.79e-03  4.91e-03</span></span>
+<span><span class="co">#&gt; total: Total effect                   -3.16e-02   1.69e-02 -6.48e-02  1.61e-03</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Path coefficients:</span></span>
+<span><span class="co">#&gt;       Estimate Std. Error CI lower CI upper</span></span>
+<span><span class="co">#&gt; cp    -0.03000    0.01684 -0.06307  0.00290</span></span>
+<span><span class="co">#&gt; b2    -0.09632    0.09303 -0.27662  0.08915</span></span>
+<span><span class="co">#&gt; d2    -0.01377    0.08708 -0.18534  0.15458</span></span>
+<span><span class="co">#&gt; b3    -0.01350    0.10245 -0.21287  0.18842</span></span>
+<span><span class="co">#&gt; d3    -0.16325    0.10038 -0.35988  0.03574</span></span>
+<span><span class="co">#&gt; a1    -0.02712    0.01757 -0.06167  0.00727</span></span>
+<span><span class="co">#&gt; a2     0.01448    0.01798 -0.02044  0.04994</span></span>
+<span><span class="co">#&gt; a3     0.01368    0.01641 -0.01819  0.04573</span></span>
+<span><span class="co">#&gt; b_1_3 -0.06142    0.09198 -0.23967  0.12025</span></span>
+<span><span class="co">#&gt; d_1_3 -0.07843    0.08705 -0.24852  0.09208</span></span>
+<span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span></span>
+<span><span class="co">#&gt; Tables: $effects, $coefficients; analysis settings: $info.</span></span></code></pre></div>
+<p>To include a direct M1-to-outcome connection, add its arrow to the
+vector:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">expanded_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="va">custom_paths</span>,</span>
+<span>  <span class="st">"M1 -&gt; Y"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Refit the same call with <code>paths = expanded_paths</code> to
+include that connection. This changes the fitted model and adds the
+indirect route through M1 alone.</p>
+</div>
+<div class="section level2">
+<h2 id="input-requirements">Input requirements<a class="anchor" aria-label="anchor" href="#input-requirements"></a>
+</h2>
+<ul>
+<li>Reference only mediator labels defined by the supplied column
+pairs.</li>
+<li>Use one arrow per string, starting at a mediator and ending at
+another mediator or <code>Y</code>. At least one arrow must end at
+<code>Y</code>.</li>
+<li>Do not repeat an arrow or use a self-loop such as
+<code>"M1 -&gt; M1"</code>.</li>
+<li>Do not create a cycle, such as both <code>"M1 -&gt; M2"</code> and
+<code>"M2 -&gt; M1"</code>.</li>
+</ul>
+<p>Every mediator intended to contribute an indirect effect needs a
+route to <code>Y</code>, either directly or through other mediators. The
+package warns if a supplied mediator has no such route.</p>
 </div>
 <div class="section level2">
 <h2 id="indirect-effects">Indirect effects<a class="anchor" aria-label="anchor" href="#indirect-effects"></a>
 </h2>
-<p><code><a href="../reference/GenerateModelCustom.html">GenerateModelCustom()</a></code> identifies every directed path
-from a mediator to <code>Y</code>. The model above contains three
-indirect effects:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi>𝚒</mi><mi>𝚗</mi><mi>𝚍</mi><mi>𝚒</mi><mi>𝚛</mi><mi>𝚎</mi><mi>𝚌</mi><mi>𝚝</mi><mi mathvariant="monospace">_</mi><mn>𝟷</mn><mi mathvariant="monospace">_</mi><mn>𝟹</mn></mrow><mo>=</mo><mrow><mi>𝚊</mi><mn>𝟷</mn></mrow><mspace width="0.167em"></mspace><mrow><mi>𝚋</mi><mi mathvariant="monospace">_</mi><mn>𝟷</mn><mi mathvariant="monospace">_</mi><mn>𝟹</mn></mrow><mspace width="0.167em"></mspace><mrow><mi>𝚋</mi><mn>𝟹</mn></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
-\mathtt{indirect\_1\_3}
-=
-\mathtt{a1}\,
-\mathtt{b\_1\_3}\,
-\mathtt{b3},
-</annotation></semantics></math></p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi>𝚒</mi><mi>𝚗</mi><mi>𝚍</mi><mi>𝚒</mi><mi>𝚛</mi><mi>𝚎</mi><mi>𝚌</mi><mi>𝚝</mi><mi mathvariant="monospace">_</mi><mn>𝟸</mn></mrow><mo>=</mo><mrow><mi>𝚊</mi><mn>𝟸</mn></mrow><mspace width="0.167em"></mspace><mrow><mi>𝚋</mi><mn>𝟸</mn></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
-\mathtt{indirect\_2}
-=
-\mathtt{a2}\,
-\mathtt{b2},
-</annotation></semantics></math></p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi>𝚒</mi><mi>𝚗</mi><mi>𝚍</mi><mi>𝚒</mi><mi>𝚛</mi><mi>𝚎</mi><mi>𝚌</mi><mi>𝚝</mi><mi mathvariant="monospace">_</mi><mn>𝟹</mn></mrow><mo>=</mo><mrow><mi>𝚊</mi><mn>𝟹</mn></mrow><mspace width="0.167em"></mspace><mrow><mi>𝚋</mi><mn>𝟹</mn></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">
-\mathtt{indirect\_3}
-=
-\mathtt{a3}\,
-\mathtt{b3}.
-</annotation></semantics></math></p>
+<p><code><a href="../reference/wsMed.html">wsMed()</a></code> identifies all indirect routes implied by the
+specified arrows. In the following notation, <code>X</code> denotes the
+within-subject condition; it is not an entry to add to
+<code>paths</code>. The model defined by <code>custom_paths</code>
+contains three indirect effects:</p>
+<table class="table">
+<thead><tr class="header">
+<th>Route</th>
+<th>Parameter label</th>
+<th>Product</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>X -&gt; M1 -&gt; M3 -&gt; Y</code></td>
+<td><code>indirect_1_3</code></td>
+<td><code>a1 * b_1_3 * b3</code></td>
+</tr>
+<tr class="even">
+<td><code>X -&gt; M2 -&gt; Y</code></td>
+<td><code>indirect_2</code></td>
+<td><code>a2 * b2</code></td>
+</tr>
+<tr class="odd">
+<td><code>X -&gt; M3 -&gt; Y</code></td>
+<td><code>indirect_3</code></td>
+<td><code>a3 * b3</code></td>
+</tr>
+</tbody>
+</table>
 <p>The last effect exists because the path from the condition to every
 mediator, including
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>M</mi><mn>3</mn></msub><annotation encoding="application/x-tex">M_3</annotation></semantics></math>,
@@ -301,127 +340,411 @@ uses <code>b_1_3</code> and <code>d_1_3</code>, whereas
 uses <code>b3</code> and <code>d3</code>.</p>
 </div>
 <div class="section level2">
-<h2 id="fitting-the-complete-model-with-wsmed">Fitting the complete model with wsMed<a class="anchor" aria-label="anchor" href="#fitting-the-complete-model-with-wsmed"></a>
+<h2 id="add-a-moderator">Add a moderator<a class="anchor" aria-label="anchor" href="#add-a-moderator"></a>
 </h2>
-<p>For an applied analysis, users can pass the same path specification
-directly to <code><a href="../reference/wsMed.html">wsMed()</a></code> by setting
-<code>form = "UD"</code>.</p>
-<p>The following chunk is not evaluated while the vignette is knitted
-because Monte Carlo confidence intervals can take some time. Remove
-<code>eval=FALSE</code> to run it.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">result_custom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
-<span>  data <span class="op">=</span> <span class="va">example_custom</span>,</span>
+<p>Keep <code>form = "UD"</code> and the same <code>custom_paths</code>.
+Add <code>W</code> to identify the between-subject moderator column and
+<code>MP</code> to select the path coefficients to moderate. You do not
+need to construct product terms yourself.</p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th>Argument</th>
+<th>What to supply</th>
+<th>Example</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>paths</code></td>
+<td>The mediator connections in the model</td>
+<td><code>custom_paths</code></td>
+</tr>
+<tr class="even">
+<td><code>W</code></td>
+<td>The moderator’s column name in the data</td>
+<td><code>"D3"</code></td>
+</tr>
+<tr class="odd">
+<td><code>MP</code></td>
+<td>Coefficient labels for the selected paths</td>
+<td><code>c("b_1_3", "b3")</code></td>
+</tr>
+</tbody>
+</table>
+<div class="section level3">
+<h3 id="choose-the-moderated-paths">Choose the moderated paths<a class="anchor" aria-label="anchor" href="#choose-the-moderated-paths"></a>
+</h3>
+<p><code>paths</code> uses arrows such as <code>"M1 -&gt; M3"</code>,
+whereas <code>MP</code> uses coefficient labels such as
+<code>"b_1_3"</code>. For the current custom model:</p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th>Path to moderate</th>
+<th>Entry in <code>MP</code>
+</th>
+<th>Meaning</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>M1 to M3</td>
+<td><code>"b_1_3"</code></td>
+<td>The M1-difference slope in the M3-difference equation varies with
+W.</td>
+</tr>
+<tr class="even">
+<td>M3 to the outcome</td>
+<td><code>"b3"</code></td>
+<td>The M3-difference slope in the outcome equation varies with W.</td>
+</tr>
+<tr class="odd">
+<td>M2 to the outcome</td>
+<td><code>"b2"</code></td>
+<td>The M2-difference slope in the outcome equation varies with W.</td>
+</tr>
+</tbody>
+</table>
+<p>Thus, <code>MP = "b3"</code> selects only the M3-to-outcome slope,
+while <code>MP = c("b_1_3", "b3")</code> selects both slopes along the
+M1-to-M3-to-outcome route. To add moderation of the M2-to-outcome slope,
+use <code>MP = c("b_1_3", "b3", "b2")</code>. Each label must exist in
+the model: <code>"b1"</code> is unavailable here because
+<code>"M1 -&gt; Y"</code> is absent from <code>custom_paths</code>. Do
+not put an indirect-effect label such as <code>"indirect_1_3"</code> in
+<code>MP</code>; select the coefficients that form that effect.</p>
+<p>The corresponding average-component slopes can be selected with
+<code>"d_1_3"</code>, <code>"d3"</code>, and <code>"d2"</code>. These
+are distinct coefficients: selecting <code>"b3"</code> does not also
+select <code>"d3"</code>.</p>
+<p>The condition-to-mediator labels <code>"a1"</code>,
+<code>"a2"</code>, <code>"a3"</code>, and the direct-effect label
+<code>"cp"</code> are also accepted. With W present, wsMed includes its
+main effect in every mediator-difference and outcome-difference
+equation. Consequently, these condition effects can vary with W even
+when their labels are omitted from <code>MP</code>. For the b and d
+slopes, <code>MP</code> controls which interaction terms are added.</p>
+</div>
+<div class="section level3">
+<h3 id="fit-and-read-the-results">Fit and read the results<a class="anchor" aria-label="anchor" href="#fit-and-read-the-results"></a>
+</h3>
+<p>Here, D3 is a continuous moderator. This call selects the M1-to-M3
+and M3-to-outcome slopes and keeps the default Monte Carlo CIs and
+unstandardized output:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">custom_moderated</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">example_data</span>,</span>
 <span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span>, <span class="st">"C1"</span><span class="op">)</span>,</span>
 <span>  M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span>, <span class="st">"C2"</span><span class="op">)</span>,</span>
 <span>  Y_C1 <span class="op">=</span> <span class="st">"D1"</span>,</span>
 <span>  Y_C2 <span class="op">=</span> <span class="st">"D2"</span>,</span>
 <span>  form <span class="op">=</span> <span class="st">"UD"</span>,</span>
 <span>  paths <span class="op">=</span> <span class="va">custom_paths</span>,</span>
-<span>  Na <span class="op">=</span> <span class="st">"DE"</span>,</span>
-<span>  ci_method <span class="op">=</span> <span class="st">"mc"</span>,</span>
-<span>  R <span class="op">=</span> <span class="fl">5000</span>,</span>
-<span>  standardized <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  seed <span class="op">=</span> <span class="fl">123</span></span>
+<span>  W <span class="op">=</span> <span class="st">"D3"</span>,</span>
+<span>  MP <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"b_1_3"</span>, <span class="st">"b3"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">custom_moderated</span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed analysis</span></span>
+<span><span class="co">#&gt; Model: UD | DE | Observations: 100 </span></span>
+<span><span class="co">#&gt; Effects:</span></span>
+<span><span class="co">#&gt; wsMed all | raw scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt; Moderator: D3 in raw units; centering reference = 0.452271 </span></span>
+<span><span class="co">#&gt;                                                       Estimate Std. Error</span></span>
+<span><span class="co">#&gt; cp@1: Direct effect [D3 = 0.452]                     -0.029850   0.016991</span></span>
+<span><span class="co">#&gt; indirect_1_3@1: M1 -&gt; M3 [D3 = 0.452]                -0.000022   0.000367</span></span>
+<span><span class="co">#&gt; indirect_2@1: M2 [D3 = 0.452]                        -0.001400   0.002744</span></span>
+<span><span class="co">#&gt; indirect_3@1: M3 [D3 = 0.452]                        -0.000183   0.002168</span></span>
+<span><span class="co">#&gt; total_indirect@1: Total indirect effect [D3 = 0.452] -0.001605   0.003581</span></span>
+<span><span class="co">#&gt; total@1: Total effect [D3 = 0.452]                   -0.031455   0.017152</span></span>
+<span><span class="co">#&gt;                                                       CI lower  CI upper</span></span>
+<span><span class="co">#&gt; cp@1: Direct effect [D3 = 0.452]                     -0.063464  0.003219</span></span>
+<span><span class="co">#&gt; indirect_1_3@1: M1 -&gt; M3 [D3 = 0.452]                -0.000838  0.000719</span></span>
+<span><span class="co">#&gt; indirect_2@1: M2 [D3 = 0.452]                        -0.008152  0.003015</span></span>
+<span><span class="co">#&gt; indirect_3@1: M3 [D3 = 0.452]                        -0.005150  0.004257</span></span>
+<span><span class="co">#&gt; total_indirect@1: Total indirect effect [D3 = 0.452] -0.009945  0.004960</span></span>
+<span><span class="co">#&gt; total@1: Total effect [D3 = 0.452]                   -0.065383  0.002083</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0</span></span></code></pre></div>
+<p><code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> reports the conditional effects.
+<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> also shows the conditional path coefficients:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">custom_moderated</span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed statistical summary</span></span>
+<span><span class="co">#&gt; Model: UD | Missing: DE | Observations: 100 </span></span>
+<span><span class="co">#&gt; Effects:</span></span>
+<span><span class="co">#&gt; wsMed all | raw scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt; Moderator: D3 in raw units; centering reference = 0.452271 </span></span>
+<span><span class="co">#&gt;                                                       Estimate Std. Error</span></span>
+<span><span class="co">#&gt; cp@1: Direct effect [D3 = 0.452]                     -0.029850   0.016991</span></span>
+<span><span class="co">#&gt; indirect_1_3@1: M1 -&gt; M3 [D3 = 0.452]                -0.000022   0.000367</span></span>
+<span><span class="co">#&gt; indirect_2@1: M2 [D3 = 0.452]                        -0.001400   0.002744</span></span>
+<span><span class="co">#&gt; indirect_3@1: M3 [D3 = 0.452]                        -0.000183   0.002168</span></span>
+<span><span class="co">#&gt; total_indirect@1: Total indirect effect [D3 = 0.452] -0.001605   0.003581</span></span>
+<span><span class="co">#&gt; total@1: Total effect [D3 = 0.452]                   -0.031455   0.017152</span></span>
+<span><span class="co">#&gt;                                                       CI lower  CI upper</span></span>
+<span><span class="co">#&gt; cp@1: Direct effect [D3 = 0.452]                     -0.063464  0.003219</span></span>
+<span><span class="co">#&gt; indirect_1_3@1: M1 -&gt; M3 [D3 = 0.452]                -0.000838  0.000719</span></span>
+<span><span class="co">#&gt; indirect_2@1: M2 [D3 = 0.452]                        -0.008152  0.003015</span></span>
+<span><span class="co">#&gt; indirect_3@1: M3 [D3 = 0.452]                        -0.005150  0.004257</span></span>
+<span><span class="co">#&gt; total_indirect@1: Total indirect effect [D3 = 0.452] -0.009945  0.004960</span></span>
+<span><span class="co">#&gt; total@1: Total effect [D3 = 0.452]                   -0.065383  0.002083</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Path coefficients:</span></span>
+<span><span class="co">#&gt;                             Estimate Std. Error CI lower CI upper</span></span>
+<span><span class="co">#&gt; cp@1: cp [D3 = 0.452]       -0.02985    0.01699 -0.06346  0.00322</span></span>
+<span><span class="co">#&gt; b2@1: b2 [D3 = 0.452]       -0.09668    0.09286 -0.27706  0.08467</span></span>
+<span><span class="co">#&gt; d2@1: d2 [D3 = 0.452]       -0.00641    0.08965 -0.18213  0.16843</span></span>
+<span><span class="co">#&gt; b3@1: b3 [D3 = 0.452]       -0.01370    0.10379 -0.21420  0.19224</span></span>
+<span><span class="co">#&gt; d3@1: d3 [D3 = 0.452]       -0.15680    0.10278 -0.35544  0.04381</span></span>
+<span><span class="co">#&gt; a1@1: a1 [D3 = 0.452]       -0.02712    0.01728 -0.06113  0.00670</span></span>
+<span><span class="co">#&gt; a2@1: a2 [D3 = 0.452]        0.01448    0.01791 -0.02029  0.04996</span></span>
+<span><span class="co">#&gt; a3@1: a3 [D3 = 0.452]        0.01336    0.01623 -0.01834  0.04508</span></span>
+<span><span class="co">#&gt; b_1_3@1: b_1_3 [D3 = 0.452] -0.05915    0.09216 -0.24131  0.12014</span></span>
+<span><span class="co">#&gt; d_1_3@1: d_1_3 [D3 = 0.452] -0.05761    0.09046 -0.23376  0.11900</span></span>
+<span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span></span>
+<span><span class="co">#&gt; Tables: $effects, $coefficients; analysis settings: $info.</span></span></code></pre></div>
+<p>For this continuous moderator, the default tables evaluate effects at
+the centering reference shown in the output. The default plot instead
+shows the indirect effects across the observed moderator range:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">custom_moderated</span><span class="op">)</span></span></code></pre></div>
+<div class="float">
+<img src="figures/GenerateModelCustom-custom-moderation-plot-1.png" alt="plot of chunk custom-moderation-plot"><div class="figcaption">plot of chunk custom-moderation-plot</div>
+</div>
+<p>Each indirect effect uses all coefficients along its route, evaluated
+at the same moderator value. For example, <code>indirect_1_3</code>
+combines the condition-to-M1, M1-to-M3, and M3-to-outcome coefficients.
+The total indirect effect includes all routes in
+<code>custom_paths</code>, including those without a selected b-path
+interaction. A model that includes moderation need not show evidence
+that an effect varies; interpret the estimates and their
+uncertainty.</p>
+</div>
+<div class="section level3">
+<h3 id="choose-moderator-values">Choose moderator values<a class="anchor" aria-label="anchor" href="#choose-moderator-values"></a>
+</h3>
+<p>To request particular values, add <code>at</code> when reporting
+results. The following uses the 25th, 50th, and 75th percentiles of D3
+as illustrative probes:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">probe_values</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span></span>
+<span>  <span class="va">example_data</span><span class="op">$</span><span class="va">D3</span>,</span>
+<span>  probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="fl">0.50</span>, <span class="fl">0.75</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span></span>
+<span>  <span class="va">custom_moderated</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"indirect"</span>,</span>
+<span>  at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>D3 <span class="op">=</span> <span class="va">probe_values</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed statistical summary</span></span>
+<span><span class="co">#&gt; Model: UD | Missing: DE | Observations: 100 </span></span>
+<span><span class="co">#&gt; Effects:</span></span>
+<span><span class="co">#&gt; wsMed indirect | raw scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt; Moderator: D3 in raw units; centering reference = 0.452271 </span></span>
+<span><span class="co">#&gt;                                        Estimate Std. Error  CI lower  CI upper</span></span>
+<span><span class="co">#&gt; indirect_1_3@1: M1 -&gt; M3 [D3 = 0.288] -7.61e-05   7.42e-04 -1.79e-03  1.41e-03</span></span>
+<span><span class="co">#&gt; indirect_2@1: M2 [D3 = 0.288]         -2.31e-03   3.68e-03 -1.14e-02  3.47e-03</span></span>
+<span><span class="co">#&gt; indirect_3@1: M3 [D3 = 0.288]         -4.06e-04   3.35e-03 -7.90e-03  6.61e-03</span></span>
+<span><span class="co">#&gt; indirect_1_3@2: M1 -&gt; M3 [D3 = 0.462] -1.99e-05   3.62e-04 -8.21e-04  7.13e-04</span></span>
+<span><span class="co">#&gt; indirect_2@2: M2 [D3 = 0.462]         -1.35e-03   2.72e-03 -8.05e-03  3.09e-03</span></span>
+<span><span class="co">#&gt; indirect_3@2: M3 [D3 = 0.462]         -1.73e-04   2.16e-03 -5.11e-03  4.25e-03</span></span>
+<span><span class="co">#&gt; indirect_1_3@3: M1 -&gt; M3 [D3 = 0.605] -4.42e-08   4.89e-04 -1.01e-03  1.05e-03</span></span>
+<span><span class="co">#&gt; indirect_2@3: M2 [D3 = 0.605]         -5.60e-04   2.92e-03 -7.43e-03  5.28e-03</span></span>
+<span><span class="co">#&gt; indirect_3@3: M3 [D3 = 0.605]         -5.49e-05   2.79e-03 -6.26e-03  5.93e-03</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Path coefficients:</span></span>
+<span><span class="co">#&gt;                              Estimate Std. Error  CI lower  CI upper</span></span>
+<span><span class="co">#&gt; cp@1: cp [D3 = 0.288]       -0.025502   0.021699 -0.068032  0.017184</span></span>
+<span><span class="co">#&gt; b2@1: b2 [D3 = 0.288]       -0.096683   0.092856 -0.277064  0.084672</span></span>
+<span><span class="co">#&gt; d2@1: d2 [D3 = 0.288]       -0.006408   0.089646 -0.182134  0.168425</span></span>
+<span><span class="co">#&gt; b3@1: b3 [D3 = 0.288]       -0.020509   0.118303 -0.248059  0.213903</span></span>
+<span><span class="co">#&gt; d3@1: d3 [D3 = 0.288]       -0.156803   0.102775 -0.355442  0.043808</span></span>
+<span><span class="co">#&gt; a1@1: a1 [D3 = 0.288]       -0.030228   0.021483 -0.072126  0.012219</span></span>
+<span><span class="co">#&gt; a2@1: a2 [D3 = 0.288]        0.023870   0.022105 -0.019499  0.067463</span></span>
+<span><span class="co">#&gt; a3@1: a3 [D3 = 0.288]        0.019788   0.020417 -0.019758  0.059997</span></span>
+<span><span class="co">#&gt; b_1_3@1: b_1_3 [D3 = 0.288] -0.122735   0.115591 -0.349926  0.102452</span></span>
+<span><span class="co">#&gt; d_1_3@1: d_1_3 [D3 = 0.288] -0.057606   0.090456 -0.233756  0.118996</span></span>
+<span><span class="co">#&gt; cp@2: cp [D3 = 0.462]       -0.030101   0.016985 -0.063845  0.002871</span></span>
+<span><span class="co">#&gt; b2@2: b2 [D3 = 0.462]       -0.096683   0.092856 -0.277064  0.084672</span></span>
+<span><span class="co">#&gt; d2@2: d2 [D3 = 0.462]       -0.006408   0.089646 -0.182134  0.168425</span></span>
+<span><span class="co">#&gt; b3@2: b3 [D3 = 0.462]       -0.013311   0.104543 -0.215033  0.194371</span></span>
+<span><span class="co">#&gt; d3@2: d3 [D3 = 0.462]       -0.156803   0.102775 -0.355442  0.043808</span></span>
+<span><span class="co">#&gt; a1@2: a1 [D3 = 0.462]       -0.026945   0.017289 -0.060974  0.006947</span></span>
+<span><span class="co">#&gt; a2@2: a2 [D3 = 0.462]        0.013941   0.017923 -0.020877  0.049342</span></span>
+<span><span class="co">#&gt; a3@2: a3 [D3 = 0.462]        0.012991   0.016235 -0.018635  0.044618</span></span>
+<span><span class="co">#&gt; b_1_3@2: b_1_3 [D3 = 0.462] -0.055471   0.092270 -0.237402  0.124112</span></span>
+<span><span class="co">#&gt; d_1_3@2: d_1_3 [D3 = 0.462] -0.057606   0.090456 -0.233756  0.118996</span></span>
+<span><span class="co">#&gt; cp@3: cp [D3 = 0.605]       -0.033877   0.020525 -0.074733  0.005715</span></span>
+<span><span class="co">#&gt; b2@3: b2 [D3 = 0.605]       -0.096683   0.092856 -0.277064  0.084672</span></span>
+<span><span class="co">#&gt; d2@3: d2 [D3 = 0.605]       -0.006408   0.089646 -0.182134  0.168425</span></span>
+<span><span class="co">#&gt; b3@3: b3 [D3 = 0.605]       -0.007402   0.133446 -0.271143  0.254797</span></span>
+<span><span class="co">#&gt; d3@3: d3 [D3 = 0.605]       -0.156803   0.102775 -0.355442  0.043808</span></span>
+<span><span class="co">#&gt; a1@3: a1 [D3 = 0.605]       -0.024249   0.020896 -0.065307  0.016484</span></span>
+<span><span class="co">#&gt; a2@3: a2 [D3 = 0.605]        0.005790   0.021547 -0.035794  0.048020</span></span>
+<span><span class="co">#&gt; a3@3: a3 [D3 = 0.605]        0.007411   0.019648 -0.031067  0.045667</span></span>
+<span><span class="co">#&gt; b_1_3@3: b_1_3 [D3 = 0.605] -0.000246   0.113022 -0.218961  0.222366</span></span>
+<span><span class="co">#&gt; d_1_3@3: d_1_3 [D3 = 0.605] -0.057606   0.090456 -0.233756  0.118996</span></span>
+<span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span></span>
+<span><span class="co">#&gt; Tables: $effects, $coefficients; analysis settings: $info.</span></span></code></pre></div>
+<p>The name <code>D3</code> in <code>at</code> must match the column
+supplied to <code>W</code>. Supply values on the original scale, even
+though wsMed centers continuous moderators internally. Choose values
+that are meaningful for your study and supported by the data. Changing
+<code>at</code> reuses the fitted model and inference draws. See <a href="ResultsGuide.html">Read and export results</a> for selecting and
+comparing effects.</p>
+</div>
+<div class="section level3">
+<h3 id="use-a-categorical-moderator">Use a categorical moderator<a class="anchor" aria-label="anchor" href="#use-a-categorical-moderator"></a>
+</h3>
+<p>The same <code>paths</code> and <code>MP</code> specification works
+with a binary or multicategory moderator. Store it as an unordered
+factor with the desired reference group as its first level, then supply
+its column name through <code>W</code>; for example, use
+<code>W = "Group"</code> if that factor is named Group. The default
+tables report effects for all observed groups, and <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>
+displays group-specific effects with CIs. The <a href="CategoricalPredictors.html">categorical predictor tutorial</a>
+shows how to declare the factor and compare groups.</p>
+</div>
+<div class="section level3">
+<h3 id="standardized-moderated-custom-models">Standardized moderated custom models<a class="anchor" aria-label="anchor" href="#standardized-moderated-custom-models"></a>
+</h3>
+<p>After the default analysis, request standardized results with:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span></span>
+<span>  <span class="va">custom_moderated</span>,</span>
+<span>  standardized <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed statistical summary</span></span>
+<span><span class="co">#&gt; Model: UD | Missing: DE | Observations: 100 </span></span>
+<span><span class="co">#&gt; Effects:</span></span>
+<span><span class="co">#&gt; wsMed all | marginal scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt; Moderator: D3 in raw units; centering reference = 0.452271 </span></span>
+<span><span class="co">#&gt; Standardization: effect / marginal model-implied SD(D2 - D1); condition contrast is unscaled.</span></span>
+<span><span class="co">#&gt; Plug-in marginal outcome-difference SD: 0.169551 </span></span>
+<span><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
+<span><span class="co">#&gt;                                                      Estimate Std. Error</span></span>
+<span><span class="co">#&gt; cp@1: Direct effect [D3 = 0.452]                     -0.17605    0.09921</span></span>
+<span><span class="co">#&gt; indirect_1_3@1: M1 -&gt; M3 [D3 = 0.452]                -0.00013    0.00210</span></span>
+<span><span class="co">#&gt; indirect_2@1: M2 [D3 = 0.452]                        -0.00826    0.01566</span></span>
+<span><span class="co">#&gt; indirect_3@1: M3 [D3 = 0.452]                        -0.00108    0.01242</span></span>
+<span><span class="co">#&gt; total_indirect@1: Total indirect effect [D3 = 0.452] -0.00947    0.02047</span></span>
+<span><span class="co">#&gt; total@1: Total effect [D3 = 0.452]                   -0.18552    0.10010</span></span>
+<span><span class="co">#&gt;                                                      CI lower CI upper</span></span>
+<span><span class="co">#&gt; cp@1: Direct effect [D3 = 0.452]                     -0.37298  0.01861</span></span>
+<span><span class="co">#&gt; indirect_1_3@1: M1 -&gt; M3 [D3 = 0.452]                -0.00481  0.00410</span></span>
+<span><span class="co">#&gt; indirect_2@1: M2 [D3 = 0.452]                        -0.04678  0.01749</span></span>
+<span><span class="co">#&gt; indirect_3@1: M3 [D3 = 0.452]                        -0.02938  0.02437</span></span>
+<span><span class="co">#&gt; total_indirect@1: Total indirect effect [D3 = 0.452] -0.05665  0.02834</span></span>
+<span><span class="co">#&gt; total@1: Total effect [D3 = 0.452]                   -0.38315  0.01184</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Path coefficients:</span></span>
+<span><span class="co">#&gt;                             Estimate Std. Error CI lower CI upper</span></span>
+<span><span class="co">#&gt; cp@1: cp [D3 = 0.452]       -0.17605    0.09921 -0.37298  0.01861</span></span>
+<span><span class="co">#&gt; b2@1: b2 [D3 = 0.452]       -0.10242    0.09570 -0.28644  0.08721</span></span>
+<span><span class="co">#&gt; d2@1: d2 [D3 = 0.452]       -0.00762    0.10379 -0.21175  0.19580</span></span>
+<span><span class="co">#&gt; b3@1: b3 [D3 = 0.452]       -0.01312    0.09834 -0.20399  0.18269</span></span>
+<span><span class="co">#&gt; d3@1: d3 [D3 = 0.452]       -0.16174    0.10200 -0.35126  0.04594</span></span>
+<span><span class="co">#&gt; a1@1: a1 [D3 = 0.452]       -0.15463    0.09977 -0.35401  0.03847</span></span>
+<span><span class="co">#&gt; a2@1: a2 [D3 = 0.452]        0.08064    0.10039 -0.11299  0.28036</span></span>
+<span><span class="co">#&gt; a3@1: a3 [D3 = 0.452]        0.08230    0.09945 -0.11224  0.27691</span></span>
+<span><span class="co">#&gt; b_1_3@1: b_1_3 [D3 = 0.452] -0.06390    0.09788 -0.25431  0.12881</span></span>
+<span><span class="co">#&gt; d_1_3@1: d_1_3 [D3 = 0.452] -0.06531    0.10064 -0.25939  0.13360</span></span>
+<span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span></span>
+<span><span class="co">#&gt; Tables: $effects, $coefficients; analysis settings: $info.</span></span></code></pre></div>
+<p>Alternatively, include <code>standardized = TRUE</code> in the
+original <code><a href="../reference/wsMed.html">wsMed()</a></code> call to make standardized reporting the
+default. <code>at</code> still uses raw moderator values. See <a href="StandardizedModeratedMediation.html">standardized effects</a> for
+the scaling rules and CIs.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="optional-inspect-the-generated-equations">Optional: inspect the generated equations<a class="anchor" aria-label="anchor" href="#optional-inspect-the-generated-equations"></a>
+</h2>
+<p>The call to <code><a href="../reference/wsMed.html">wsMed()</a></code> performs data preparation and model
+generation for you. Use <code>printGM(result_custom)</code> to inspect
+the fitted model specification. If you want to generate the equations
+without fitting, the lower-level functions below provide that
+option.</p>
+<p><code><a href="../reference/PrepareData.html">PrepareData()</a></code> converts the raw condition-specific
+variables into mediator difference and centered level components and an
+outcome difference score.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">prepared_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PrepareData.html">PrepareData</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">example_data</span>,</span>
+<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span>, <span class="st">"C1"</span><span class="op">)</span>,</span>
+<span>  M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span>, <span class="st">"C2"</span><span class="op">)</span>,</span>
+<span>  Y_C1 <span class="op">=</span> <span class="st">"D1"</span>,</span>
+<span>  Y_C2 <span class="op">=</span> <span class="st">"D2"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result_custom</span>, detail <span class="op">=</span> <span class="st">"legacy"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="input-requirements">Input requirements<a class="anchor" aria-label="anchor" href="#input-requirements"></a>
-</h2>
-<p>A valid custom path specification must meet the following
-requirements:</p>
-<ol style="list-style-type: decimal">
-<li>Each path must use a form such as <code>"M1 -&gt; M2"</code> or
-<code>"M2 -&gt; Y"</code>.</li>
-<li>Every referenced mediator must be present in
-<code>prepared_data</code>.</li>
-<li>Duplicate paths and self-loops such as <code>"M1 -&gt; M1"</code>
-are not allowed.</li>
-<li>The mediator structure must be acyclic.</li>
-<li>At least one mediator must have a path ending in
-<code>Y</code>.</li>
-</ol>
-<p>Paths beginning with <code>X</code>, such as
-<code>"X -&gt; M1"</code> or <code>"X -&gt; Y"</code>, should not be
-included because these paths are added automatically. Paths beginning
-with <code>Y</code> are not permitted because <code>Y</code> is the
-final outcome.</p>
-</div>
-<div class="section level2">
-<h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
-</h2>
-<p>To fit a user-defined model:</p>
-<ol style="list-style-type: decimal">
-<li>Supply matched mediator variables through <code>M_C1</code> and
-<code>M_C2</code>.</li>
-<li>Define the structural edges using mediator labels and
-<code>Y</code>.</li>
-<li>Use <code><a href="../reference/GenerateModelCustom.html">GenerateModelCustom()</a></code> to inspect the generated
-syntax or call <code>wsMed(form = "UD", paths = ...)</code> for the
-complete analysis.</li>
-</ol>
-<p>This workflow retains the existing difference-and-level
-parameterization in <code>wsMed</code> while allowing users to specify
-mediation structures beyond the four predefined model forms.</p>
-</div>
-<div class="section level2">
-<h2 id="standardized-moderated-custom-models">Standardized moderated custom models<a class="anchor" aria-label="anchor" href="#standardized-moderated-custom-models"></a>
-</h2>
-<p>The same endpoint scaling applies to a sparse user-defined model.
-Only paths present in <code>paths</code> can be requested in
-<code>MP</code>. For the model above, <code>b_1_3</code> and
-<code>b3</code> exist, whereas <code>b1</code> does not.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">321</span><span class="op">)</span></span>
-<span><span class="va">example_custom</span><span class="op">$</span><span class="va">W</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">example_custom</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">custom_moderated</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
-<span>  data <span class="op">=</span> <span class="va">example_custom</span>,</span>
-<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span>, <span class="st">"C1"</span><span class="op">)</span>, M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span>, <span class="st">"C2"</span><span class="op">)</span>,</span>
-<span>  Y_C1 <span class="op">=</span> <span class="st">"D1"</span>, Y_C2 <span class="op">=</span> <span class="st">"D2"</span>, form <span class="op">=</span> <span class="st">"UD"</span>,</span>
-<span>  paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M1 -&gt; M3"</span>, <span class="st">"M3 -&gt; Y"</span>, <span class="st">"M2 -&gt; Y"</span><span class="op">)</span>,</span>
-<span>  W <span class="op">=</span> <span class="st">"W"</span>, W_type <span class="op">=</span> <span class="st">"continuous"</span>, MP <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"b_1_3"</span>, <span class="st">"b3"</span><span class="op">)</span>,</span>
-<span>  Na <span class="op">=</span> <span class="st">"DE"</span>, ci_method <span class="op">=</span> <span class="st">"mc"</span>, R <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">321</span>,</span>
-<span>  standardized <span class="op">=</span> <span class="cn">TRUE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">prepared_data</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Ydiff"  "M1diff" "M2diff" "M3diff" "M1avg"  "M2avg"  "M3avg"</span></span></code></pre></div>
+<p>For mediator
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>M</mi><mi>i</mi></msub><annotation encoding="application/x-tex">M_i</annotation></semantics></math>,
+the two components are</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>M</mi><mrow><mi>i</mi><mo>,</mo><mrow><mi mathvariant="normal">d</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">f</mi><mi mathvariant="normal">f</mi></mrow></mrow></msub><mo>=</mo><msub><mi>M</mi><mrow><mi>i</mi><mn>2</mn></mrow></msub><mo>−</mo><msub><mi>M</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">
+M_{i,\mathrm{diff}} = M_{i2} - M_{i1}
+</annotation></semantics></math></p>
+<p>and</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>M</mi><mrow><mi>i</mi><mo>,</mo><mrow><mi mathvariant="normal">a</mi><mi mathvariant="normal">v</mi><mi mathvariant="normal">g</mi></mrow></mrow></msub><mo>=</mo><msub><mover><mi>M</mi><mo accent="true">̃</mo></mover><mrow><mi>i</mi><mo>,</mo><mrow><mi mathvariant="normal">a</mi><mi mathvariant="normal">v</mi><mi mathvariant="normal">g</mi></mrow></mrow></msub><mo>−</mo><msub><mover><mover><mi>M</mi><mo accent="true">̃</mo></mover><mo accent="true">¯</mo></mover><mrow><mi>i</mi><mo>,</mo><mrow><mi mathvariant="normal">a</mi><mi mathvariant="normal">v</mi><mi mathvariant="normal">g</mi></mrow></mrow></msub><mo>,</mo><mspace width="2.0em"></mspace><msub><mover><mi>M</mi><mo accent="true">̃</mo></mover><mrow><mi>i</mi><mo>,</mo><mrow><mi mathvariant="normal">a</mi><mi mathvariant="normal">v</mi><mi mathvariant="normal">g</mi></mrow></mrow></msub><mo>=</mo><mfrac><mrow><msub><mi>M</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>M</mi><mrow><mi>i</mi><mn>2</mn></mrow></msub></mrow><mn>2</mn></mfrac><mo>,</mo></mrow><annotation encoding="application/x-tex">
+M_{i,\mathrm{avg}}
+=
+\widetilde M_{i,\mathrm{avg}}-\overline{\widetilde M}_{i,\mathrm{avg}},
+\qquad
+\widetilde M_{i,\mathrm{avg}}=\frac{M_{i1} + M_{i2}}{2},
+</annotation></semantics></math></p>
+<p>where the bar is the sample mean used by <code><a href="../reference/PrepareData.html">PrepareData()</a></code>
+to center the average component. The difference component is not
+centered.</p>
+<p>The corresponding model syntax is generated as follows:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">custom_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/GenerateModelCustom.html">GenerateModelCustom</a></span><span class="op">(</span></span>
+<span>  prepared_data <span class="op">=</span> <span class="va">prepared_data</span>,</span>
+<span>  paths <span class="op">=</span> <span class="va">custom_paths</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">custom_moderated</span><span class="op">$</span><span class="va">moderation_std</span><span class="op">$</span><span class="va">beta_coef</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                  Path Mediators Level W_value    Estimate         SE</span></span>
-<span><span class="co">#&gt; 1 indirect_effect_1_3       1 3 -1 SD  -0.930 -0.00171149 0.00896884</span></span>
-<span><span class="co">#&gt; 2 indirect_effect_1_3       1 3  0 SD   0.004 -0.00246470 0.00330398</span></span>
-<span><span class="co">#&gt; 3 indirect_effect_1_3       1 3 +1 SD   0.937 -0.00091183 0.00257147</span></span>
-<span><span class="co">#&gt; 4   indirect_effect_2         2 -1 SD  -0.930 -0.00419332 0.01090538</span></span>
-<span><span class="co">#&gt; 5   indirect_effect_2         2  0 SD   0.004 -0.00424259 0.00936702</span></span>
-<span><span class="co">#&gt; 6   indirect_effect_2         2 +1 SD   0.937 -0.00429186 0.01083499</span></span>
-<span><span class="co">#&gt;    2.5.%CI.Lo 97.5.%CI.Up Sig</span></span>
-<span><span class="co">#&gt; 1 -0.02173237  0.01560893    </span></span>
-<span><span class="co">#&gt; 2 -0.01069421  0.00266372    </span></span>
-<span><span class="co">#&gt; 3 -0.00762023  0.00251605    </span></span>
-<span><span class="co">#&gt; 4 -0.03150758  0.01561788    </span></span>
-<span><span class="co">#&gt; 5 -0.02637473  0.01262748    </span></span>
-<span><span class="co">#&gt; 6 -0.03068075  0.01443963</span></span>
-<span><span class="va">custom_moderated</span><span class="op">$</span><span class="va">moderation_std</span><span class="op">$</span><span class="va">conditional_overall</span></span>
-<span><span class="co">#&gt;           Effect Level W_value    Estimate         SE  2.5.%CI.Lo 97.5.%CI.Up</span></span>
-<span><span class="co">#&gt; 1 total_indirect -1 SD  -0.930 -0.00084816 0.02119490 -0.04316083  0.04458152</span></span>
-<span><span class="co">#&gt; 3 total_indirect  0 SD   0.004  0.00807839 0.01736182 -0.02472748  0.04602436</span></span>
-<span><span class="co">#&gt; 5 total_indirect +1 SD   0.937  0.01599172 0.02647981 -0.03131806  0.07447651</span></span>
-<span><span class="co">#&gt; 2   total_effect -1 SD  -0.930  0.22936688 0.10222839  0.03065478  0.43092945</span></span>
-<span><span class="co">#&gt; 4   total_effect  0 SD   0.004  0.32281782 0.07117755  0.18700246  0.45900965</span></span>
-<span><span class="co">#&gt; 6   total_effect +1 SD   0.937  0.41525554 0.09784977  0.22477118  0.60300468</span></span>
-<span><span class="co">#&gt;   Sig</span></span>
-<span><span class="co">#&gt; 1    </span></span>
-<span><span class="co">#&gt; 3    </span></span>
-<span><span class="co">#&gt; 5    </span></span>
-<span><span class="co">#&gt; 2   *</span></span>
-<span><span class="co">#&gt; 4   *</span></span>
-<span><span class="co">#&gt; 6   *</span></span></code></pre></div>
-<p>The total indirect effect includes every complete path in this model,
-including paths without a requested interaction. Moderator main effects
-already fitted in the mediator and outcome regressions enter conditional
-intercepts even though <code>a</code> and <code>cp</code> were not
-requested in <code>MP</code>. See <a href="StandardizedModeratedMediation.html">Standardized moderated
-mediation</a> for raw-unit probing, categorical coding and uncertainty
-in the scale factors.</p>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">custom_model</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Ydiff ~ cp*1 + b2*M2diff + d2*M2avg + b3*M3diff + d3*M3avg</span></span>
+<span><span class="co">#&gt; M1diff ~ a1*1</span></span>
+<span><span class="co">#&gt; M2diff ~ a2*1</span></span>
+<span><span class="co">#&gt; M3diff ~ a3*1 + b_1_3*M1diff + d_1_3*M1avg</span></span>
+<span><span class="co">#&gt; indirect_1_3 := a1 * b_1_3 * b3</span></span>
+<span><span class="co">#&gt; indirect_2 := a2 * b2</span></span>
+<span><span class="co">#&gt; indirect_3 := a3 * b3</span></span>
+<span><span class="co">#&gt; total_indirect := indirect_1_3 + indirect_2 + indirect_3</span></span>
+<span><span class="co">#&gt; total_effect := cp + total_indirect</span></span></code></pre></div>
+<p>For every specified structural edge, the generated regression
+includes both the difference and level components of the predictor
+mediator. Thus, <code>"M1 -&gt; M3"</code> contributes</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">b_1_3</span><span class="op">*</span><span class="va">M1diff</span> <span class="op">+</span> <span class="va">d_1_3</span><span class="op">*</span><span class="va">M1avg</span></span></code></pre></div>
+<p>to the regression equation for <code>M3diff</code>.</p>
+<p>Only specified structural paths are added. Because
+<code>"M1 -&gt; Y"</code> is absent from <code>custom_paths</code>,
+<code>M1diff</code> and <code>M1avg</code> do not appear directly in the
+regression equation for <code>Ydiff</code>.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

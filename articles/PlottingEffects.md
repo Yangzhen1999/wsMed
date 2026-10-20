@@ -57,23 +57,52 @@ dm1 <- 2 + .8*w + rnorm(n)
 dm2 <- 1 + .4*w + .3*dm1 + rnorm(n)
 dy <- .5 + .6*w + .5*dm1 + .7*dm2 + .2*dm1*w + .3*avg1 + rnorm(n)
 y1 <- rnorm(n)
-dat <- data.frame(M11=avg1-dm1/2, M12=avg1+dm1/2,
-                  M21=avg2-dm2/2, M22=avg2+dm2/2,
-                  Y1=y1, Y2=y1+dy, W=w)
+dat <- data.frame(
+  M11=avg1-dm1/2,
+  M12=avg1+dm1/2,
+  M21=avg2-dm2/2,
+  M22=avg2+dm2/2,
+  Y1=y1,
+  Y2=y1+dy,
+  W=w
+)
 dat$Group <- cut(w, c(-Inf,2,4,Inf), labels=c("A","B","C"))
-fit_args <- list(data=dat, M_C1=c("M11","M21"), M_C2=c("M12","M22"),
-                 Y_C1="Y1", Y_C2="Y2", form="P", Na="DE", ci_method="mc",
-                 R=2000, seed=2026, standardized=TRUE, verbose=FALSE)
-plain <- do.call(wsMed, fit_args)
-continuous <- do.call(wsMed, c(fit_args,
-  list(W="W", W_type="continuous", MP=c("b1","d1"))))
-categorical <- do.call(wsMed, c(fit_args,
-  list(W="Group", W_type="categorical", MP=c("b1","d1"))))
+plain <- wsMed(
+  data = dat,
+  M_C1 = c("M11", "M21"),
+  M_C2 = c("M12", "M22"),
+  Y_C1 = "Y1",
+  Y_C2 = "Y2",
+  standardized = TRUE
+)
+continuous <- wsMed(
+  data = dat,
+  M_C1 = c("M11", "M21"),
+  M_C2 = c("M12", "M22"),
+  Y_C1 = "Y1",
+  Y_C2 = "Y2",
+  W = "W",
+  MP = c("b1", "d1"),
+  standardized = TRUE
+)
+categorical <- wsMed(
+  data = dat,
+  M_C1 = c("M11", "M21"),
+  M_C2 = c("M12", "M22"),
+  Y_C1 = "Y1",
+  Y_C2 = "Y2",
+  W = "Group",
+  MP = c("b1", "d1"),
+  standardized = TRUE
+)
 ```
 
-These separate fits illustrate each plotting interface; changing W from
-continuous to grouped changes the fitted model and is not a
-transformation of the original conditional estimates.
+These fits request standardized output; the default
+[`plot()`](https://rdrr.io/r/graphics/plot.default.html) inherits that
+choice. They otherwise use the default 20,000 Monte Carlo draws. The
+three fits illustrate the available displays. Grouping a continuous
+moderator changes the fitted model, so the category plot represents a
+separate analysis of these simulated data.
 
 ## A consistent plot method
 
@@ -85,9 +114,7 @@ their order; `labels` changes displayed names.
 
 ``` r
 
-plot(plain, terms = c("indirect_2", "indirect_1"),
-     labels = c(indirect_1 = "Via M1", indirect_2 = "Via M2"),
-     title = "Indirect effects")
+plot(plain)
 ```
 
 ![plot of chunk plot-method](figures/PlottingEffects-plot-method-1.png)
@@ -96,8 +123,7 @@ plot of chunk plot-method
 
 ``` r
 
-plot(continuous, n = 41, scale = "marginal", terms = "indirect_1",
-     title = "Conditional indirect effect", x_label = "W (raw units)", rug = TRUE)
+plot(continuous)
 ```
 
 ![plot of chunk plot-method](figures/PlottingEffects-plot-method-2.png)
@@ -106,13 +132,41 @@ plot of chunk plot-method
 
 ``` r
 
-plot(categorical, at = list(Group = c("C", "A", "B")), ncol = 2,
-     title = "Effects in the selected category order")
+plot(categorical)
 ```
 
 ![plot of chunk plot-method](figures/PlottingEffects-plot-method-3.png)
 
 plot of chunk plot-method
+
+These calls use the default effect selection and plot layout. To select
+or relabel effects, change the probe grid, or reorder categories,
+specify the corresponding arguments explicitly:
+
+``` r
+
+plot(
+  plain,
+  terms = c("indirect_2", "indirect_1"),
+  labels = c(indirect_1 = "Via M1", indirect_2 = "Via M2"),
+  title = "Indirect effects"
+)
+plot(
+  continuous,
+  n = 41,
+  scale = "marginal",
+  terms = "indirect_1",
+  title = "Conditional indirect effect",
+  x_label = "W (raw units)",
+  rug = TRUE
+)
+plot(
+  categorical,
+  at = list(Group = c("C", "A", "B")),
+  ncol = 2,
+  title = "Effects in the selected category order"
+)
+```
 
 An automatic curve uses 51 equally spaced probes by default, from the
 smallest to the largest finite raw moderator value among fitted cases.
@@ -132,8 +186,13 @@ widths.
 
 ``` r
 
-plot(continuous, view = "conditional", at = list(W = c(1, 3, 5)),
-     terms = "indirect_1", title = "Effects at three raw W values")
+plot(
+  continuous,
+  view = "conditional",
+  at = list(W = c(1, 3, 5)),
+  terms = "indirect_1",
+  title = "Effects at three raw W values"
+)
 ```
 
 ![plot of chunk
@@ -147,23 +206,27 @@ checking exactly which estimates and intervals a plot displays:
 
 ``` r
 
-effects <- wsmed_effects(continuous, at = list(W = c(1, 3, 5)),
-                         terms = "indirect_1", scale = "marginal")
+effects <- wsmed_effects(
+  continuous,
+  at = list(W = c(1, 3, 5)),
+  terms = "indirect_1",
+  scale = "marginal"
+)
 summary(effects)
 #> wsMed indirect | marginal scale | mc 
-#> 95% percentile intervals; 2000 joint draws; SE from effect draws
+#> 95% percentile intervals; 20000 joint draws; SE from effect draws
 #> Condition contrast: C2 - C1 
 #> Moderator: W in raw units; centering reference = 3.23288 
 #> Standardization: effect / marginal model-implied SD(Y2 - Y1); condition contrast is unscaled.
 #> Plug-in marginal outcome-difference SD: 6.28886 
 #> The denominator is not a moderator-specific conditional SD.
 #>                          Estimate Std. Error CI lower CI upper
-#> indirect_1@1: M1 [W = 1]   0.3150     0.0308   0.2579   0.3806
-#> indirect_1@2: M1 [W = 3]   0.7859     0.0475   0.6969   0.8836
-#> indirect_1@3: M1 [W = 5]   1.4683     0.0735   1.3269   1.6218
-#> Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.
+#> indirect_1@1: M1 [W = 1]   0.3150     0.0314   0.2565   0.3799
+#> indirect_1@2: M1 [W = 3]   0.7859     0.0485   0.6953   0.8847
+#> indirect_1@3: M1 [W = 5]   1.4683     0.0748   1.3294   1.6210
+#> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
-p <- plot(effects, view = "conditional", title = "Extracted conditional effects")
+p <- plot(effects)
 p
 ```
 
@@ -214,6 +277,12 @@ bias-corrected interval is therefore expected; it does not indicate that
 plotting reran the analysis. The helpers continue to accept
 `engine = "boot"`, while the plot methods use `method = "bootstrap"`.
 
+## Optional named plotting helpers
+
+The following sections show more explicit display settings. The generic
+[`plot()`](https://rdrr.io/r/graphics/plot.default.html) calls above are
+sufficient for a default figure.
+
 ## Forest plots
 
 [`plot_effects()`](https://yangzhen1999.github.io/wsMed/reference/plot_effects.md)
@@ -223,10 +292,13 @@ displays complete indirect effects, their total, the direct effect
 
 ``` r
 
-forest <- plot_effects(plain, standardized=TRUE,
+forest <- plot_effects(
+  plain,
+  standardized=TRUE,
   paths=c("indirect_1", "indirect_2", "total_indirect", "cp", "total_effect"),
   labels=c(indirect_1="Via M1", indirect_2="Via M2",
-           total_indirect="Total indirect", cp="Direct", total_effect="Total"))
+           total_indirect="Total indirect", cp="Direct", total_effect="Total")
+)
 forest
 ```
 
@@ -243,9 +315,13 @@ the next plot.
 
 ``` r
 
-group_plot <- plot_conditional_effects(categorical, standardized=TRUE,
+group_plot <- plot_conditional_effects(
+  categorical,
+  standardized=TRUE,
   paths=c("indirect_1","indirect_2"),
-  labels=c(indirect_1="Via M1",indirect_2="Via M2"), ncol=2)
+  labels=c(indirect_1="Via M1",indirect_2="Via M2"),
+  ncol=2
+)
 group_plot
 ```
 
@@ -265,9 +341,13 @@ continuous W:
 
 ``` r
 
-plot_conditional_effects(continuous, paths="indirect_effect_1",
-  levels=c("-1 SD","0 SD","+1 SD"), standardized=TRUE,
-  labels=c(indirect_effect_1="Via M1"))
+plot_conditional_effects(
+  continuous,
+  paths="indirect_effect_1",
+  levels=c("-1 SD","0 SD","+1 SD"),
+  standardized=TRUE,
+  labels=c(indirect_effect_1="Via M1")
+)
 ```
 
 ![plot of chunk
@@ -289,9 +369,13 @@ displays the difference and its own interval instead.
 
 ``` r
 
-contrast_plot <- plot_contrasts(categorical, standardized=TRUE,
+contrast_plot <- plot_contrasts(
+  categorical,
+  standardized=TRUE,
   paths=c("indirect_1","indirect_2"),
-  labels=c(indirect_1="Via M1",indirect_2="Via M2"), ncol=2)
+  labels=c(indirect_1="Via M1",indirect_2="Via M2"),
+  ncol=2
+)
 contrast_plot
 ```
 
@@ -311,7 +395,10 @@ Without a moderator, the plot compares indirect paths with one another:
 
 ``` r
 
-plot_contrasts(plain, standardized=TRUE)
+plot_contrasts(
+  plain,
+  standardized=TRUE
+)
 ```
 
 ![plot of chunk
@@ -332,7 +419,11 @@ present; specific indirect and path contrasts remain available.
 
 ``` r
 
-plot_moderation_curve(continuous, "total_indirect", standardized=TRUE)
+plot_moderation_curve(
+  continuous,
+  "total_indirect",
+  standardized=TRUE
+)
 ```
 
 ![plot of chunk curve](figures/PlottingEffects-curve-1.png)
@@ -358,14 +449,21 @@ Imputed moderator values do not extend the observed range.
 ``` r
 
 probe_values <- c(mean(dat$W), max(dat$W) + 1)
-supported <- wsmed_effects(continuous, at = list(W = probe_values), terms = "indirect_1")
+supported <- wsmed_effects(
+  continuous,
+  at = list(W = probe_values),
+  terms = "indirect_1"
+)
 #> Warning: Moderator probes outside the observed fitted-case range of W
 #> [-3.17113, 9.61675]: 10.6168. These estimates extrapolate.
 as.data.frame(supported)[, c("at", "estimate", "extrapolated")]
 #>                 at  estimate extrapolated
 #> 1 3.23287569618678 0.8544881        FALSE
-#> 2 10.6167533949209 4.5160205         TRUE
-plot(supported, view = "forest")
+#> 2 10.6167533949209 4.5160203         TRUE
+plot(
+  supported,
+  view = "forest"
+)
 ```
 
 ![plot of chunk support](figures/PlottingEffects-support-1.png)
@@ -384,11 +482,11 @@ These counts are not effective sample sizes for the conditional effects.
 
 forest$data[, c("Path","Estimate","CI.LL","CI.UL")]
 #>              Path   Estimate      CI.LL      CI.UL
-#> 16     indirect_1  1.8547443  1.7203102  1.9914456
-#> 17     indirect_2  1.0906142  0.9855171  1.2006867
-#> 18 total_indirect  2.9453585  2.7769714  3.1253331
-#> 1              cp -0.7473746 -0.8606057 -0.6266327
-#> 19   total_effect  2.1979839  2.0330183  2.3720550
+#> 16     indirect_1  1.8547443  1.7246500  1.9935134
+#> 17     indirect_2  1.0906142  0.9875177  1.1972101
+#> 18 total_indirect  2.9453585  2.7762265  3.1303118
+#> 1              cp -0.7473746 -0.8642842 -0.6260046
+#> 19   total_effect  2.1979839  2.0328561  2.3757007
 attr(forest, "wsmed_plot")
 #> $engine
 #> [1] "mc"
@@ -402,8 +500,19 @@ attr(forest, "wsmed_plot")
 
 ``` r
 
-ggplot2::ggsave("mediation-effects.pdf", forest, width=8, height=5)
-ggplot2::ggsave("group-effects.png", group_plot, width=8, height=5, dpi=300)
+ggplot2::ggsave(
+  "mediation-effects.pdf",
+  forest,
+  width=8,
+  height=5
+)
+ggplot2::ggsave(
+  "group-effects.png",
+  group_plot,
+  width=8,
+  height=5,
+  dpi=300
+)
 ```
 
 All conditional intervals are percentile intervals; bootstrap parameter

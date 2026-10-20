@@ -64,7 +64,7 @@
       <h1>Standardized effects</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/vignettes/StandardizedModeratedMediation.Rmd" class="external-link"><code>vignettes/StandardizedModeratedMediation.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/master/vignettes/StandardizedModeratedMediation.Rmd" class="external-link"><code>vignettes/StandardizedModeratedMediation.Rmd</code></a></small>
       <div class="d-none name"><code>StandardizedModeratedMediation.Rmd</code></div>
     </div>
 
@@ -79,52 +79,33 @@ analysis; subsequent summaries and generic plots inherit that
 preference.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">)</span></span>
-<span><span class="va">standardized_intro</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span><span class="va">example_data</span>,</span>
-<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>, M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span><span class="op">)</span>,</span>
-<span>  Y_C1 <span class="op">=</span> <span class="st">"D1"</span>, Y_C2 <span class="op">=</span> <span class="st">"D2"</span>, standardized <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  R <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">123</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="va">standardized_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">standardized_intro</span><span class="op">)</span><span class="op">$</span><span class="va">effects</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">standardized_table</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"label"</span>, <span class="st">"estimate"</span>, <span class="st">"conf.low"</span>, <span class="st">"conf.high"</span><span class="op">)</span><span class="op">]</span>, digits <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">label</th>
-<th align="right">estimate</th>
-<th align="right">conf.low</th>
-<th align="right">conf.high</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">Direct effect</td>
-<td align="right">-0.1879</td>
-<td align="right">-0.3878</td>
-<td align="right">0.0189</td>
-</tr>
-<tr class="even">
-<td align="left">M1</td>
-<td align="right">0.0077</td>
-<td align="right">-0.0258</td>
-<td align="right">0.0509</td>
-</tr>
-<tr class="odd">
-<td align="left">M2</td>
-<td align="right">-0.0066</td>
-<td align="right">-0.0437</td>
-<td align="right">0.0184</td>
-</tr>
-<tr class="even">
-<td align="left">Total indirect effect</td>
-<td align="right">0.0011</td>
-<td align="right">-0.0442</td>
-<td align="right">0.0515</td>
-</tr>
-<tr class="odd">
-<td align="left">Total effect</td>
-<td align="right">-0.1867</td>
-<td align="right">-0.3799</td>
-<td align="right">0.0180</td>
-</tr>
-</tbody>
-</table>
+<span><span class="va">standardized_intro</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
+<span>  <span class="va">example_data</span>,</span>
+<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>,</span>
+<span>  M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span><span class="op">)</span>,</span>
+<span>  Y_C1 <span class="op">=</span> <span class="st">"D1"</span>,</span>
+<span>  Y_C2 <span class="op">=</span> <span class="st">"D2"</span>,</span>
+<span>  standardized <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">standardized_intro</span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed analysis</span></span>
+<span><span class="co">#&gt; Model: P | DE | Observations: 100 </span></span>
+<span><span class="co">#&gt; Effects:</span></span>
+<span><span class="co">#&gt; wsMed all | marginal scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt; Standardization: effect / marginal model-implied SD(D2 - D1); condition contrast is unscaled.</span></span>
+<span><span class="co">#&gt; Plug-in marginal outcome-difference SD: 0.169239 </span></span>
+<span><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
+<span><span class="co">#&gt;                                       Estimate Std. Error CI lower CI upper</span></span>
+<span><span class="co">#&gt; cp: Direct effect                     -0.18787    0.10032 -0.38252  0.01082</span></span>
+<span><span class="co">#&gt; indirect_1: M1                         0.00775    0.01858 -0.02674  0.05071</span></span>
+<span><span class="co">#&gt; indirect_2: M2                        -0.00662    0.01496 -0.04331  0.01831</span></span>
+<span><span class="co">#&gt; total_indirect: Total indirect effect  0.00113    0.02396 -0.04882  0.05067</span></span>
+<span><span class="co">#&gt; total: Total effect                   -0.18674    0.10061 -0.38051  0.01125</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0</span></span></code></pre></div>
 <p>These complete condition effects are expressed relative to the
 marginal SD of the outcome difference. For a one-off unstandardized
 query, use
@@ -184,11 +165,12 @@ IE^*(w_c)=\frac{(a+a_w w_c)(b+b_w w_c)}{s_Y},
 b_w^*=b_w\frac{s_M s_W}{s_Y},\qquad
 a_w^*=a_w\frac{s_W}{s_M}.
 </annotation></semantics></math></p>
-<p><code>moderation_std$mod_coeff</code> reports interaction
-coefficients per SD of a continuous moderator. Conditional tables and
-curves evaluate effects at fixed numerical moderator values in the
-<strong>original units</strong>. To recover a conditional slope from
-fully standardized coefficients, use
+<p>Standardized interaction coefficients are expressed per SD of a
+continuous moderator. In contrast, <code>summary(result)</code> reports
+conditional effects and paths at selected raw moderator values.
+Conditional tables and curves evaluate effects at fixed numerical
+moderator values in the <strong>original units</strong>. To recover a
+conditional slope from fully standardized coefficients, use
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>b</mi><mo>*</mo></msup><mo stretchy="false" form="prefix">(</mo><msub><mi>w</mi><mi>c</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msup><mi>b</mi><mo>*</mo></msup><mo>+</mo><msubsup><mi>b</mi><mi>w</mi><mo>*</mo></msubsup><mo stretchy="false" form="prefix">(</mo><msub><mi>w</mi><mi>c</mi></msub><mi>/</mi><msub><mi>s</mi><mi>W</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">b^*(w_c)=b^*+b_w^*(w_c/s_W)</annotation></semantics></math>.
 The scale of an interaction is the product of its component scale
 factors, not the SD of the observed product column.</p>
@@ -210,73 +192,328 @@ generated separately to make the two-condition structure explicit.</p>
 <span><span class="va">dy</span> <span class="op">&lt;-</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.6</span> <span class="op">*</span> <span class="va">w</span> <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="va">dm1</span> <span class="op">+</span> <span class="fl">0.7</span> <span class="op">*</span> <span class="va">dm2</span> <span class="op">+</span></span>
 <span>      <span class="fl">0.2</span> <span class="op">*</span> <span class="va">dm1</span> <span class="op">*</span> <span class="va">w</span> <span class="op">+</span> <span class="fl">0.3</span> <span class="op">*</span> <span class="va">avg1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
 <span><span class="va">y1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
-<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>M11 <span class="op">=</span> <span class="va">avg1</span> <span class="op">-</span> <span class="va">dm1</span><span class="op">/</span><span class="fl">2</span>, M12 <span class="op">=</span> <span class="va">avg1</span> <span class="op">+</span> <span class="va">dm1</span><span class="op">/</span><span class="fl">2</span>,</span>
-<span>                  M21 <span class="op">=</span> <span class="va">avg2</span> <span class="op">-</span> <span class="va">dm2</span><span class="op">/</span><span class="fl">2</span>, M22 <span class="op">=</span> <span class="va">avg2</span> <span class="op">+</span> <span class="va">dm2</span><span class="op">/</span><span class="fl">2</span>,</span>
-<span>                  Y1 <span class="op">=</span> <span class="va">y1</span>, Y2 <span class="op">=</span> <span class="va">y1</span> <span class="op">+</span> <span class="va">dy</span>, W <span class="op">=</span> <span class="va">w</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  M11 <span class="op">=</span> <span class="va">avg1</span> <span class="op">-</span> <span class="va">dm1</span><span class="op">/</span><span class="fl">2</span>,</span>
+<span>  M12 <span class="op">=</span> <span class="va">avg1</span> <span class="op">+</span> <span class="va">dm1</span><span class="op">/</span><span class="fl">2</span>,</span>
+<span>  M21 <span class="op">=</span> <span class="va">avg2</span> <span class="op">-</span> <span class="va">dm2</span><span class="op">/</span><span class="fl">2</span>,</span>
+<span>  M22 <span class="op">=</span> <span class="va">avg2</span> <span class="op">+</span> <span class="va">dm2</span><span class="op">/</span><span class="fl">2</span>,</span>
+<span>  Y1 <span class="op">=</span> <span class="va">y1</span>,</span>
+<span>  Y2 <span class="op">=</span> <span class="va">y1</span> <span class="op">+</span> <span class="va">dy</span>,</span>
+<span>  W <span class="op">=</span> <span class="va">w</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
-<span>  data <span class="op">=</span> <span class="va">dat</span>, M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M11"</span>, <span class="st">"M21"</span><span class="op">)</span>, M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M12"</span>, <span class="st">"M22"</span><span class="op">)</span>,</span>
-<span>  Y_C1 <span class="op">=</span> <span class="st">"Y1"</span>, Y_C2 <span class="op">=</span> <span class="st">"Y2"</span>, form <span class="op">=</span> <span class="st">"P"</span>,</span>
-<span>  W <span class="op">=</span> <span class="st">"W"</span>, W_type <span class="op">=</span> <span class="st">"continuous"</span>, MP <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"b1"</span>, <span class="st">"d1"</span><span class="op">)</span>,</span>
-<span>  Na <span class="op">=</span> <span class="st">"DE"</span>, ci_method <span class="op">=</span> <span class="st">"mc"</span>, R <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">2026</span>,</span>
-<span>  fixed.x <span class="op">=</span> <span class="cn">FALSE</span>, standardized <span class="op">=</span> <span class="cn">TRUE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  data <span class="op">=</span> <span class="va">dat</span>,</span>
+<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M11"</span>, <span class="st">"M21"</span><span class="op">)</span>,</span>
+<span>  M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M12"</span>, <span class="st">"M22"</span><span class="op">)</span>,</span>
+<span>  Y_C1 <span class="op">=</span> <span class="st">"Y1"</span>,</span>
+<span>  Y_C2 <span class="op">=</span> <span class="st">"Y2"</span>,</span>
+<span>  W <span class="op">=</span> <span class="st">"W"</span>,</span>
+<span>  MP <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"b1"</span>, <span class="st">"d1"</span><span class="op">)</span>,</span>
+<span>  standardized <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">moderation_std</span><span class="op">$</span><span class="va">beta_coef</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                Path Mediators Level W_value  Estimate         SE 2.5.%CI.Lo</span></span>
-<span><span class="co">#&gt; 1 indirect_effect_1         1 -1 SD   1.264 0.3650760 0.03271513  0.3045721</span></span>
-<span><span class="co">#&gt; 2 indirect_effect_1         1  0 SD   3.233 0.8544881 0.04991624  0.7618185</span></span>
-<span><span class="co">#&gt; 3 indirect_effect_1         1 +1 SD   5.202 1.5488777 0.07684148  1.4009409</span></span>
-<span><span class="co">#&gt; 4 indirect_effect_2         2 -1 SD   1.264 0.2808029 0.02410413  0.2355370</span></span>
-<span><span class="co">#&gt; 5 indirect_effect_2         2  0 SD   3.233 0.4512197 0.03567798  0.3825366</span></span>
-<span><span class="co">#&gt; 6 indirect_effect_2         2 +1 SD   5.202 0.6216366 0.04878867  0.5303888</span></span>
-<span><span class="co">#&gt;   97.5.%CI.Up Sig</span></span>
-<span><span class="co">#&gt; 1   0.4343538   *</span></span>
-<span><span class="co">#&gt; 2   0.9574690   *</span></span>
-<span><span class="co">#&gt; 3   1.7085247   *</span></span>
-<span><span class="co">#&gt; 4   0.3281407   *</span></span>
-<span><span class="co">#&gt; 5   0.5211855   *</span></span>
-<span><span class="co">#&gt; 6   0.7199859   *</span></span>
-<span><span class="va">result</span><span class="op">$</span><span class="va">moderation_std</span><span class="op">$</span><span class="va">conditional_overall</span></span>
-<span><span class="co">#&gt;           Effect Level W_value  Estimate         SE 2.5.%CI.Lo 97.5.%CI.Up Sig</span></span>
-<span><span class="co">#&gt; 1 total_indirect -1 SD   1.264 0.6458789 0.04430771  0.5640013   0.7348572   *</span></span>
-<span><span class="co">#&gt; 3 total_indirect  0 SD   3.233 1.3057078 0.06832314  1.1803575   1.4474992   *</span></span>
-<span><span class="co">#&gt; 5 total_indirect +1 SD   5.202 2.1705143 0.10122286  1.9781866   2.3756559   *</span></span>
-<span><span class="co">#&gt; 2   total_effect -1 SD   1.264 0.8339962 0.04039678  0.7570401   0.9185213   *</span></span>
-<span><span class="co">#&gt; 4   total_effect  0 SD   3.233 1.6449140 0.06497096  1.5272517   1.7768975   *</span></span>
-<span><span class="co">#&gt; 6   total_effect +1 SD   5.202 2.6608094 0.09780391  2.4802409   2.8631909   *</span></span>
-<span><span class="va">result</span><span class="op">$</span><span class="va">moderation_std</span><span class="op">$</span><span class="va">mod_coeff</span></span>
-<span><span class="co">#&gt;     Path BaseCoef W_dummy     Estimate         SE   2.5%CI.Lo 97.5%CI.Up Sig</span></span>
-<span><span class="co">#&gt; 1 bw1_W1       b1       W  0.120655183 0.00787400  0.10506398 0.13687092   *</span></span>
-<span><span class="co">#&gt; 2 dw1_W1       d1       W -0.001564476 0.00755477 -0.01607491 0.01328741    </span></span>
-<span><span class="co">#&gt; 3 cpw_W1       cp       W  0.150872919 0.02630338  0.09842712 0.20192575   *</span></span>
-<span><span class="co">#&gt; 4 aw1_W1       a1       W  0.847008347 0.01512466  0.81523810 0.87509978   *</span></span>
-<span><span class="co">#&gt; 5 aw2_W1       a2       W  0.811031129 0.01845675  0.77454680 0.84540806   *</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed analysis</span></span>
+<span><span class="co">#&gt; Model: P | DE | Observations: 350 </span></span>
+<span><span class="co">#&gt; Effects:</span></span>
+<span><span class="co">#&gt; wsMed all | marginal scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt; Moderator: W in raw units; centering reference = 3.23288 </span></span>
+<span><span class="co">#&gt; Standardization: effect / marginal model-implied SD(Y2 - Y1); condition contrast is unscaled.</span></span>
+<span><span class="co">#&gt; Plug-in marginal outcome-difference SD: 6.28886 </span></span>
+<span><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
+<span><span class="co">#&gt;                                                    Estimate Std. Error CI lower</span></span>
+<span><span class="co">#&gt; cp@1: Direct effect [W = 3.23]                       0.3392     0.0535   0.2375</span></span>
+<span><span class="co">#&gt; indirect_1@1: M1 [W = 3.23]                          0.8545     0.0510   0.7597</span></span>
+<span><span class="co">#&gt; indirect_2@1: M2 [W = 3.23]                          0.4512     0.0364   0.3818</span></span>
+<span><span class="co">#&gt; total_indirect@1: Total indirect effect [W = 3.23]   1.3057     0.0705   1.1741</span></span>
+<span><span class="co">#&gt; total@1: Total effect [W = 3.23]                     1.6449     0.0650   1.5285</span></span>
+<span><span class="co">#&gt;                                                    CI upper</span></span>
+<span><span class="co">#&gt; cp@1: Direct effect [W = 3.23]                       0.4477</span></span>
+<span><span class="co">#&gt; indirect_1@1: M1 [W = 3.23]                          0.9590</span></span>
+<span><span class="co">#&gt; indirect_2@1: M2 [W = 3.23]                          0.5243</span></span>
+<span><span class="co">#&gt; total_indirect@1: Total indirect effect [W = 3.23]   1.4527</span></span>
+<span><span class="co">#&gt; total@1: Total effect [W = 3.23]                     1.7822</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed statistical summary</span></span>
+<span><span class="co">#&gt; Model: P | Missing: DE | Observations: 350 </span></span>
+<span><span class="co">#&gt; Effects:</span></span>
+<span><span class="co">#&gt; wsMed all | marginal scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt; Moderator: W in raw units; centering reference = 3.23288 </span></span>
+<span><span class="co">#&gt; Standardization: effect / marginal model-implied SD(Y2 - Y1); condition contrast is unscaled.</span></span>
+<span><span class="co">#&gt; Plug-in marginal outcome-difference SD: 6.28886 </span></span>
+<span><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
+<span><span class="co">#&gt;                                                    Estimate Std. Error CI lower</span></span>
+<span><span class="co">#&gt; cp@1: Direct effect [W = 3.23]                       0.3392     0.0535   0.2375</span></span>
+<span><span class="co">#&gt; indirect_1@1: M1 [W = 3.23]                          0.8545     0.0510   0.7597</span></span>
+<span><span class="co">#&gt; indirect_2@1: M2 [W = 3.23]                          0.4512     0.0364   0.3818</span></span>
+<span><span class="co">#&gt; total_indirect@1: Total indirect effect [W = 3.23]   1.3057     0.0705   1.1741</span></span>
+<span><span class="co">#&gt; total@1: Total effect [W = 3.23]                     1.6449     0.0650   1.5285</span></span>
+<span><span class="co">#&gt;                                                    CI upper</span></span>
+<span><span class="co">#&gt; cp@1: Direct effect [W = 3.23]                       0.4477</span></span>
+<span><span class="co">#&gt; indirect_1@1: M1 [W = 3.23]                          0.9590</span></span>
+<span><span class="co">#&gt; indirect_2@1: M2 [W = 3.23]                          0.5243</span></span>
+<span><span class="co">#&gt; total_indirect@1: Total indirect effect [W = 3.23]   1.4527</span></span>
+<span><span class="co">#&gt; total@1: Total effect [W = 3.23]                     1.7822</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Path coefficients:</span></span>
+<span><span class="co">#&gt;                      Estimate Std. Error  CI lower  CI upper</span></span>
+<span><span class="co">#&gt; cp@1: cp [W = 3.23]  0.339206   0.053507  0.237543  0.447743</span></span>
+<span><span class="co">#&gt; b1@1: b1 [W = 3.23]  0.352858   0.017579  0.318425  0.387543</span></span>
+<span><span class="co">#&gt; d1@1: d1 [W = 3.23]  0.037421   0.008851  0.020355  0.055020</span></span>
+<span><span class="co">#&gt; b2@1: b2 [W = 3.23]  0.209823   0.015722  0.179426  0.240768</span></span>
+<span><span class="co">#&gt; d2@1: d2 [W = 3.23] -0.000698   0.008546 -0.017691  0.015856</span></span>
+<span><span class="co">#&gt; a1@1: a1 [W = 3.23]  2.421621   0.095983  2.245296  2.618727</span></span>
+<span><span class="co">#&gt; a2@1: a2 [W = 3.23]  2.150475   0.087890  1.988346  2.333949</span></span>
+<span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span></span>
+<span><span class="co">#&gt; Tables: $effects, $coefficients; analysis settings: $info.</span></span></code></pre></div>
 <p><code>MP</code> requests interactions and focal paths. Moderator main
 effects already included in the fitted regressions also enter
 conditional intercepts, even when <code>a1</code> or <code>cp</code> is
 absent from <code>MP</code>. The total indirect effect includes both
 mediator paths in this example, not just the path with a requested
 interaction.</p>
-<p>The original <code>result$moderation</code> remains available.
-Without a moderator, <code>standardized = TRUE</code> supplies parameter
-tables such as <code>result$mc$std_mc</code>, but there is no
-conditional moderation table.</p>
+<p>The default report and summary inherit
+<code>standardized = TRUE</code>. Use
+<code>summary(result, standardized = FALSE)</code> to request
+unstandardized results without fitting again. Use
+<code>wsmed_effects(result)</code> when you need a separate effect table
+for further comparisons or export.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_moderation_curve.html">plot_moderation_curve</a></span><span class="op">(</span><span class="va">result</span>, <span class="st">"total_indirect"</span>, standardized <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
 <div class="float">
 <img src="figures/StandardizedModeratedMediation-plot-continuous-1.png" alt="plot of chunk plot-continuous"><div class="figcaption">plot of chunk plot-continuous</div>
 </div>
-<p>The horizontal axis retains raw moderator units. Shading marks stored
-grid values whose pointwise confidence interval excludes zero; boundary
-labels report raw W values. These are grid approximations, not exact
-analytical Johnson–Neyman boundaries or simultaneous confidence
-regions.</p>
+<p>The horizontal axis retains raw moderator units. The default curves
+show specific indirect effects with pointwise CIs over the observed
+range. They are not simultaneous confidence bands or exact
+Johnson–Neyman regions.</p>
+</div>
+<div class="section level2">
+<h2 id="categorical-moderators">Categorical moderators<a class="anchor" aria-label="anchor" href="#categorical-moderators"></a>
+</h2>
+<p>Categorical moderators retain their 0/1 dummy coding. There is no
+SD-of-dummy multiplier, and all groups share the same marginal endpoint
+scales. The factor levels below make the reference category
+explicit.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">dat</span><span class="op">$</span><span class="va">Group</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cut.html" class="external-link">cut</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">W</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="fl">2</span>, <span class="fl">4</span>, <span class="cn">Inf</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">Group</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "A" "B" "C"</span></span>
+<span><span class="va">group_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">dat</span>,</span>
+<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M11"</span>, <span class="st">"M21"</span><span class="op">)</span>,</span>
+<span>  M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M12"</span>, <span class="st">"M22"</span><span class="op">)</span>,</span>
+<span>  Y_C1 <span class="op">=</span> <span class="st">"Y1"</span>,</span>
+<span>  Y_C2 <span class="op">=</span> <span class="st">"Y2"</span>,</span>
+<span>  W <span class="op">=</span> <span class="st">"Group"</span>,</span>
+<span>  MP <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"b1"</span>, <span class="st">"d1"</span><span class="op">)</span>,</span>
+<span>  standardized <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">group_result</span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed analysis</span></span>
+<span><span class="co">#&gt; Model: P | DE | Observations: 350 </span></span>
+<span><span class="co">#&gt; Effects:</span></span>
+<span><span class="co">#&gt; wsMed all | marginal scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt; Moderator: Group ; reference category = A </span></span>
+<span><span class="co">#&gt; Standardization: effect / marginal model-implied SD(Y2 - Y1); condition contrast is unscaled.</span></span>
+<span><span class="co">#&gt; Plug-in marginal outcome-difference SD: 6.05489 </span></span>
+<span><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
+<span><span class="co">#&gt;                                                     Estimate Std. Error</span></span>
+<span><span class="co">#&gt; cp@1: Direct effect [Group = A]                      -0.0196     0.0649</span></span>
+<span><span class="co">#&gt; indirect_1@1: M1 [Group = A]                          0.4185     0.0612</span></span>
+<span><span class="co">#&gt; indirect_2@1: M2 [Group = A]                          0.4019     0.0365</span></span>
+<span><span class="co">#&gt; total_indirect@1: Total indirect effect [Group = A]   0.8204     0.0757</span></span>
+<span><span class="co">#&gt; total@1: Total effect [Group = A]                     0.8008     0.0559</span></span>
+<span><span class="co">#&gt; cp@2: Direct effect [Group = B]                       0.0997     0.0939</span></span>
+<span><span class="co">#&gt; indirect_1@2: M1 [Group = B]                          0.8752     0.0908</span></span>
+<span><span class="co">#&gt; indirect_2@2: M2 [Group = B]                          0.6407     0.0468</span></span>
+<span><span class="co">#&gt; total_indirect@2: Total indirect effect [Group = B]   1.5159     0.1085</span></span>
+<span><span class="co">#&gt; total@2: Total effect [Group = B]                     1.6156     0.0735</span></span>
+<span><span class="co">#&gt; cp@3: Direct effect [Group = C]                      -0.7902     0.1210</span></span>
+<span><span class="co">#&gt; indirect_1@3: M1 [Group = C]                          2.8137     0.1359</span></span>
+<span><span class="co">#&gt; indirect_2@3: M2 [Group = C]                          0.9578     0.0640</span></span>
+<span><span class="co">#&gt; total_indirect@3: Total indirect effect [Group = C]   3.7715     0.1619</span></span>
+<span><span class="co">#&gt; total@3: Total effect [Group = C]                     2.9813     0.1019</span></span>
+<span><span class="co">#&gt;                                                     CI lower CI upper</span></span>
+<span><span class="co">#&gt; cp@1: Direct effect [Group = A]                      -0.1474   0.1086</span></span>
+<span><span class="co">#&gt; indirect_1@1: M1 [Group = A]                          0.3025   0.5425</span></span>
+<span><span class="co">#&gt; indirect_2@1: M2 [Group = A]                          0.3350   0.4762</span></span>
+<span><span class="co">#&gt; total_indirect@1: Total indirect effect [Group = A]   0.6793   0.9751</span></span>
+<span><span class="co">#&gt; total@1: Total effect [Group = A]                     0.6963   0.9149</span></span>
+<span><span class="co">#&gt; cp@2: Direct effect [Group = B]                      -0.0807   0.2859</span></span>
+<span><span class="co">#&gt; indirect_1@2: M1 [Group = B]                          0.7015   1.0580</span></span>
+<span><span class="co">#&gt; indirect_2@2: M2 [Group = B]                          0.5525   0.7355</span></span>
+<span><span class="co">#&gt; total_indirect@2: Total indirect effect [Group = B]   1.3105   1.7385</span></span>
+<span><span class="co">#&gt; total@2: Total effect [Group = B]                     1.4780   1.7673</span></span>
+<span><span class="co">#&gt; cp@3: Direct effect [Group = C]                      -1.0279  -0.5559</span></span>
+<span><span class="co">#&gt; indirect_1@3: M1 [Group = C]                          2.5576   3.0881</span></span>
+<span><span class="co">#&gt; indirect_2@3: M2 [Group = C]                          0.8360   1.0856</span></span>
+<span><span class="co">#&gt; total_indirect@3: Total indirect effect [Group = C]   3.4662   4.1007</span></span>
+<span><span class="co">#&gt; total@3: Total effect [Group = C]                     2.7928   3.1915</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Fitted group n: A = 100; B = 139; C = 111.</span></span>
+<span><span class="co">#&gt; Fitted group counts after missing-data handling; observed counts exclude</span></span>
+<span><span class="co">#&gt; missing moderator values. </span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">group_result</span><span class="op">)</span></span></code></pre></div>
+<div class="float">
+<img src="figures/StandardizedModeratedMediation-categorical-1.png" alt="plot of chunk categorical"><div class="figcaption">plot of chunk categorical</div>
+</div>
+<p>The default report includes each observed category. The
+continuous-moderator curve example above should not be interpreted as
+interpolating between groups.</p>
+</div>
+<div class="section level2">
+<h2 id="confidence-intervals-bootstrap-and-both-engines">Confidence intervals, bootstrap and both engines<a class="anchor" aria-label="anchor" href="#confidence-intervals-bootstrap-and-both-engines"></a>
+</h2>
+<p>Each valid joint draw supplies both regression coefficients and
+model-implied SDs. Transform the effect using those draw-specific SDs,
+then summarize the transformed draws. For continuous moderators, the
+selected raw values (for example the reference mean and mean plus/minus
+one reference SD) remain fixed across draws. If standardized
+coefficients are used, evaluate them at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mi>c</mi></msub><mi>/</mi><msubsup><mi>s</mi><mi>W</mi><mrow><mo stretchy="false" form="prefix">(</mo><mi>r</mi><mo stretchy="false" form="postfix">)</mo></mrow></msubsup></mrow><annotation encoding="application/x-tex">w_c/s_W^{(r)}</annotation></semantics></math>
+in draw
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>r</mi><annotation encoding="application/x-tex">r</annotation></semantics></math>,
+not at one fixed standardized moderator value.</p>
+<p>Point estimates evaluate the effect at the fitted parameters, or at
+pooled primitive parameters for MI. For MI models with products of
+mediator differences and the moderator, the marginal variance estimators
+are pooled jointly with those coefficients before taking square roots.
+Point estimates are not averages of nonlinear draw effects. Invalid
+joint draws are excluded together; use
+<code>wsmed_effects(result)$diagnostics</code> to inspect the query
+diagnostics.</p>
+<p>The current effect reports from <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>,
+<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> and <code><a href="../reference/wsmed_effects.html">wsmed_effects()</a></code>, and
+<code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code> applied to extracted effects, use percentile
+intervals for both MC and bootstrap, <strong>with or without
+moderation</strong>. They use R’s type-7 quantiles.
+<code>boot_ci_type</code> affects stored legacy parameter tables; it
+does not change these effect intervals. See the expandable
+implementation notes below for the legacy conventions.</p>
+<p>The following longer bootstrap example is not run during vignette
+rebuilding:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">both_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">dat</span>,</span>
+<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M11"</span>, <span class="st">"M21"</span><span class="op">)</span>,</span>
+<span>  M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M12"</span>, <span class="st">"M22"</span><span class="op">)</span>,</span>
+<span>  Y_C1 <span class="op">=</span> <span class="st">"Y1"</span>,</span>
+<span>  Y_C2 <span class="op">=</span> <span class="st">"Y2"</span>,</span>
+<span>  W <span class="op">=</span> <span class="st">"W"</span>,</span>
+<span>  MP <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"b1"</span>, <span class="st">"d1"</span><span class="op">)</span>,</span>
+<span>  ci_method <span class="op">=</span> <span class="st">"both"</span>,</span>
+<span>  standardized <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">both_result</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span></span>
+<span>  <span class="va">both_result</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"mc"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span></span>
+<span>  <span class="va">both_result</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"bootstrap"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">both_result</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"bootstrap"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>When both engines are stored, <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> reports both. Use
+<code>method</code> in <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> and <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> to
+select one engine.</p>
+</div>
+<div class="section level2">
+<h2 id="missing-data-and-reporting">Missing data and reporting<a class="anchor" aria-label="anchor" href="#missing-data-and-reporting"></a>
+</h2>
+<p>FIML and MI use the same effect definition. With
+<code>fixed.x = FALSE</code>, estimated external moments participate in
+the joint transformation. With <code>fixed.x = TRUE</code>,
+transformations condition on fitted external moments. Products
+containing an endogenous mediator are modeled with auxiliary moment
+equations and covariances with their upstream mediator disturbances.
+This preserves the predictor moment structure when a reference group
+changes. <code>fixed.x</code> applies to the remaining genuine exogenous
+predictors; endogenous product moments are always estimated.</p>
+<p>MI supports MC inference and evaluates effects at pooled primitive
+parameters; its probing and centering reference is the first completed
+dataset. With MI and <code>fixed.x = TRUE</code>, external moments from
+that reference are held fixed. This does not introduce
+population-relative moderator probing or a new imputation procedure.</p>
+<p>For MI models with interactions involving mediator differences, wsMed
+averages each marginal variance estimate over completed datasets. It
+pools its covariance with the primitive coefficients using delta-method
+within-imputation covariances and Rubin’s rules. MC samples the
+variances jointly with the coefficients, so the denominator is not
+treated as fixed. Pooling the variance itself avoids the coding
+dependence of evaluating a nonlinear marginal variance only after
+pooling covariance-model parameters. This additional variance-pooling
+step is specific to those endogenous products; it is not applied to
+every MI model. Other models obtain marginal scales from the jointly
+drawn model parameters. The original coefficient pooling and imputation
+procedure are retained.</p>
+<p>Report the condition difference direction, model and moderated paths,
+moderator coding/reference and raw probe values, marginal SD definition,
+missing-data method, <code>fixed.x</code>, inference engine, number of
+valid draws and interval type. Distinguish standardized interaction
+coefficients per SD of W from conditional indirect effects at particular
+raw W values.</p>
+<p>For serial and sparse models, see the <a href="GenerateModelCustom.html">custom-model tutorial</a>. Their
+complete indirect effects follow the same endpoint scaling rule.</p>
+</div>
+<div class="section level2">
+<h2 id="more-plots-for-reporting">More plots for reporting<a class="anchor" aria-label="anchor" href="#more-plots-for-reporting"></a>
+</h2>
+<p>Start with <code>plot(result)</code> for the default display.
+Optional named helpers include <code><a href="../reference/plot_effects.html">plot_effects()</a></code> for an effect
+forest, <code><a href="../reference/plot_conditional_effects.html">plot_conditional_effects()</a></code> for group or
+reference-level point intervals, and <code><a href="../reference/plot_contrasts.html">plot_contrasts()</a></code> for
+effect differences with their own confidence intervals. All three
+support <code>standardized</code> and the MC/bootstrap
+<code>engine</code> selection. See <a href="PlottingEffects.html">Plotting mediation effects and contrasts</a>
+for executed examples, selection of paths and labels, and export to PDF
+or PNG.</p>
+</div>
+<div class="section level2">
+<h2 id="imputation-compatibility">Imputation compatibility<a class="anchor" aria-label="anchor" href="#imputation-compatibility"></a>
+</h2>
+<p>Correct standardization does not repair an imputation model that
+omits substantive interactions. Default raw-variable MI uses main
+effects. To use model-compatible external imputations, pass a list of
+completed wide datasets (or a <code>mice</code> mids object) through
+<code>wsmed_fit(..., missing = "mi", mi = list(completed = completed))</code>
+or
+<code>wsMed(..., Na = "MI", mi_args = list(completed = completed))</code>.
+The difference scores and products are regenerated in each completion;
+observed cells and factor levels are checked. See <a href="CompatibleImputation.html">the worked example</a> for assumptions,
+an explicit SMC-FCS predictor matrix and convergence guidance.</p>
+</div>
+<div class="section level2">
+<h2 id="optional-implementation-checks">Optional implementation checks<a class="anchor" aria-label="anchor" href="#optional-implementation-checks"></a>
+</h2>
+<details><summary>
+Expand numerical checks and legacy moderation-table details
+</summary><p>These checks inspect stored internals. They are not required to
+request standardized results through <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>,
+<code><a href="../reference/wsmed_effects.html">wsmed_effects()</a></code> or <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>.</p>
 <div class="section level3">
-<h3 id="a-check-of-the-point-estimates">A check of the point estimates<a class="anchor" aria-label="anchor" href="#a-check-of-the-point-estimates"></a>
+<h3 id="check-the-stored-point-estimates">Check the stored point estimates<a class="anchor" aria-label="anchor" href="#check-the-stored-point-estimates"></a>
 </h3>
 <p>For this complete-data MC fit, the standardized overall effects must
 equal the raw effects divided by the fitted marginal outcome SD:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu">lavaan</span><span class="fu">::</span><span class="fu">fitted</span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">mc</span><span class="op">$</span><span class="va">fit</span><span class="op">)</span><span class="op">$</span><span class="va">cov</span><span class="op">[</span><span class="st">"Ydiff"</span>, <span class="st">"Ydiff"</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span></span>
 <span>  <span class="va">result</span><span class="op">$</span><span class="va">moderation_std</span><span class="op">$</span><span class="va">conditional_overall</span><span class="op">$</span><span class="va">Estimate</span>,</span>
@@ -288,60 +525,15 @@ equal the raw effects divided by the fitted marginal outcome SD:</p>
 <p>This identity concerns point estimates. It does <strong>not</strong>
 justify dividing raw confidence limits by the fitted SD.</p>
 </div>
-</div>
-<div class="section level2">
-<h2 id="categorical-moderators">Categorical moderators<a class="anchor" aria-label="anchor" href="#categorical-moderators"></a>
-</h2>
-<p>Categorical moderators retain their 0/1 dummy coding. There is no
-SD-of-dummy multiplier, and all groups share the same marginal endpoint
-scales. The factor levels below make the reference category
-explicit.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dat</span><span class="op">$</span><span class="va">Group</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cut.html" class="external-link">cut</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">W</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="fl">2</span>, <span class="fl">4</span>, <span class="cn">Inf</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">Group</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "A" "B" "C"</span></span>
-<span><span class="va">group_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
-<span>  data <span class="op">=</span> <span class="va">dat</span>, M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M11"</span>, <span class="st">"M21"</span><span class="op">)</span>, M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M12"</span>, <span class="st">"M22"</span><span class="op">)</span>,</span>
-<span>  Y_C1 <span class="op">=</span> <span class="st">"Y1"</span>, Y_C2 <span class="op">=</span> <span class="st">"Y2"</span>, form <span class="op">=</span> <span class="st">"P"</span>,</span>
-<span>  W <span class="op">=</span> <span class="st">"Group"</span>, W_type <span class="op">=</span> <span class="st">"categorical"</span>, MP <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"b1"</span>, <span class="st">"d1"</span><span class="op">)</span>,</span>
-<span>  Na <span class="op">=</span> <span class="st">"DE"</span>, ci_method <span class="op">=</span> <span class="st">"mc"</span>, R <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">2026</span>,</span>
-<span>  fixed.x <span class="op">=</span> <span class="cn">FALSE</span>, standardized <span class="op">=</span> <span class="cn">TRUE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">group_result</span><span class="op">$</span><span class="va">moderation_std</span><span class="op">$</span><span class="va">conditional_IE</span></span>
-<span><span class="co">#&gt;           IE Group  Estimate         SE 2.5%CI.Lo 97.5%CI.Up Sig</span></span>
-<span><span class="co">#&gt; 1 indirect_1     A 0.4184915 0.06133865 0.3035930  0.5445018   *</span></span>
-<span><span class="co">#&gt; 2 indirect_1     B 0.8751952 0.09283580 0.6969977  1.0633826   *</span></span>
-<span><span class="co">#&gt; 3 indirect_1     C 2.8136732 0.13467264 2.5569732  3.0829130   *</span></span>
-<span><span class="co">#&gt; 4 indirect_2     A 0.4018768 0.03637889 0.3343063  0.4770116   *</span></span>
-<span><span class="co">#&gt; 5 indirect_2     B 0.6406972 0.04595490 0.5549033  0.7363760   *</span></span>
-<span><span class="co">#&gt; 6 indirect_2     C 0.9578364 0.06327426 0.8379816  1.0898480   *</span></span>
-<span><span class="va">group_result</span><span class="op">$</span><span class="va">moderation_std</span><span class="op">$</span><span class="va">IE_contrasts</span></span>
-<span><span class="co">#&gt;           IE Contrast  Estimate         SE 2.5%CI.Lo 97.5%CI.Up Sig</span></span>
-<span><span class="co">#&gt; 1 indirect_1    B - A 0.4567037 0.10655952 0.2575287  0.6705150   *</span></span>
-<span><span class="co">#&gt; 2 indirect_1    C - A 2.3951818 0.13609898 2.1349499  2.6735862   *</span></span>
-<span><span class="co">#&gt; 3 indirect_1    C - B 1.9384780 0.14590645 1.6426100  2.2252149   *</span></span>
-<span><span class="co">#&gt; 4 indirect_2    B - A 0.2388204 0.03262885 0.1776572  0.3028650   *</span></span>
-<span><span class="co">#&gt; 5 indirect_2    C - A 0.5559597 0.04390288 0.4741881  0.6472965   *</span></span>
-<span><span class="co">#&gt; 6 indirect_2    C - B 0.3171392 0.03357895 0.2557334  0.3852625   *</span></span>
-<span><span class="va">group_result</span><span class="op">$</span><span class="va">moderation_std</span><span class="op">$</span><span class="va">conditional_overall</span></span>
-<span><span class="co">#&gt;           Effect Group  Estimate         SE 2.5%CI.Lo 97.5%CI.Up Sig</span></span>
-<span><span class="co">#&gt; 1 total_indirect     A 0.8203683 0.07570328 0.6771897  0.9756619   *</span></span>
-<span><span class="co">#&gt; 3 total_indirect     B 1.5158924 0.10953121 1.3061032  1.7389931   *</span></span>
-<span><span class="co">#&gt; 5 total_indirect     C 3.7715097 0.15957553 3.4599441  4.0930114   *</span></span>
-<span><span class="co">#&gt; 2   total_effect     A 0.8008090 0.05550103 0.6963898  0.9182957   *</span></span>
-<span><span class="co">#&gt; 4   total_effect     B 1.6155540 0.07417847 1.4806658  1.7727188   *</span></span>
-<span><span class="co">#&gt; 6   total_effect     C 2.9812606 0.10178839 2.7930067  3.2047015   *</span></span></code></pre></div>
-<p>Use these group tables for categorical moderators. The
-continuous-moderator curve example above should not be interpreted as
-interpolating between groups.</p>
-</div>
-<div class="section level2">
-<h2 id="convert-a-fitted-result-without-refitting">Convert a fitted result without refitting<a class="anchor" aria-label="anchor" href="#convert-a-fitted-result-without-refitting"></a>
-</h2>
-<p><code><a href="../reference/standardize_moderation.html">standardize_moderation()</a></code> uses the joint MC or bootstrap
-draws stored in a <code>wsMed</code> object with a moderator. It returns
-the standardized moderation list:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="section level3">
+<h3 id="legacy-moderation-tables">Legacy moderation tables<a class="anchor" aria-label="anchor" href="#legacy-moderation-tables"></a>
+</h3>
+<p><code>summary(result, standardized = TRUE)</code> is sufficient for
+ordinary reporting. The older <code><a href="../reference/standardize_moderation.html">standardize_moderation()</a></code>
+helper uses the joint MC or bootstrap draws stored in a
+<code>wsMed</code> object with a moderator. It returns the standardized
+moderation list:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">converted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/standardize_moderation.html">standardize_moderation</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">converted</span>, <span class="va">result</span><span class="op">$</span><span class="va">moderation_std</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">result</span><span class="op">$</span><span class="va">moderation_std</span> <span class="op">&lt;-</span> <span class="va">converted</span></span>
@@ -369,10 +561,10 @@ the standardized moderation list:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $diagnostics</span></span>
 <span><span class="co">#&gt; $diagnostics$requested</span></span>
-<span><span class="co">#&gt; [1] 2000</span></span>
+<span><span class="co">#&gt; [1] 20000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $diagnostics$valid</span></span>
-<span><span class="co">#&gt; [1] 2000</span></span>
+<span><span class="co">#&gt; [1] 20000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $diagnostics$invalid</span></span>
 <span><span class="co">#&gt; [1] 0</span></span>
@@ -384,116 +576,14 @@ the standardized moderation list:</p>
 <span><span class="co">#&gt; &lt; table of extent 0 &gt;</span></span></code></pre></div>
 <p>A result without the required stored draws cannot be converted by
 this helper.</p>
+<p>In standardized legacy parameter tables, <code>"bc"</code> and
+<code>"bca.simple"</code> apply bias correction with zero acceleration;
+this is not a full BCa calculation. Their bootstrap p-values require at
+least 1,000 valid replicates. That threshold does not define the
+availability of percentile effect CIs in the current interface.</p>
+
 </div>
-<div class="section level2">
-<h2 id="confidence-intervals-bootstrap-and-both-engines">Confidence intervals, bootstrap and both engines<a class="anchor" aria-label="anchor" href="#confidence-intervals-bootstrap-and-both-engines"></a>
-</h2>
-<p>Each valid joint draw supplies both regression coefficients and
-model-implied SDs. Transform the effect using those draw-specific SDs,
-then summarize the transformed draws. For continuous moderators, the
-selected raw values (for example the reference mean and mean plus/minus
-one reference SD) remain fixed across draws. If standardized
-coefficients are used, evaluate them at
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mi>c</mi></msub><mi>/</mi><msubsup><mi>s</mi><mi>W</mi><mrow><mo stretchy="false" form="prefix">(</mo><mi>r</mi><mo stretchy="false" form="postfix">)</mo></mrow></msubsup></mrow><annotation encoding="application/x-tex">w_c/s_W^{(r)}</annotation></semantics></math>
-in draw
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>r</mi><annotation encoding="application/x-tex">r</annotation></semantics></math>,
-not at one fixed standardized moderator value.</p>
-<p>Point estimates evaluate the effect at the fitted parameters, or at
-pooled primitive parameters for MI. For MI models containing endogenous
-products, the marginal variance estimators are pooled separately and
-jointly with those coefficients before taking square roots. They are not
-averages of nonlinear draw effects. Invalid joint draws are excluded
-with diagnostics; inspect the <code>standardization</code> attribute for
-their counts, indices and reasons.</p>
-<p>All <strong>conditional</strong> tables use percentile intervals, for
-both MC and bootstrap. <code>boot_ci_type</code> controls
-parameter-table intervals; it does not change conditional intervals. In
-standardized parameter tables, <code>"bc"</code> and
-<code>"bca.simple"</code> use bias correction with zero acceleration,
-not a full acceleration-adjusted BCa calculation. Standardized bootstrap
-p-values require at least 1000 valid replicates; that is not a minimum
-for conditional intervals.</p>
-<p>The following longer bootstrap example is not run during vignette
-rebuilding:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">both_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
-<span>  data <span class="op">=</span> <span class="va">dat</span>, M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M11"</span>, <span class="st">"M21"</span><span class="op">)</span>, M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M12"</span>, <span class="st">"M22"</span><span class="op">)</span>,</span>
-<span>  Y_C1 <span class="op">=</span> <span class="st">"Y1"</span>, Y_C2 <span class="op">=</span> <span class="st">"Y2"</span>, form <span class="op">=</span> <span class="st">"P"</span>,</span>
-<span>  W <span class="op">=</span> <span class="st">"W"</span>, W_type <span class="op">=</span> <span class="st">"continuous"</span>, MP <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"b1"</span>, <span class="st">"d1"</span><span class="op">)</span>,</span>
-<span>  Na <span class="op">=</span> <span class="st">"DE"</span>, ci_method <span class="op">=</span> <span class="st">"both"</span>, R <span class="op">=</span> <span class="fl">5000</span>, bootstrap <span class="op">=</span> <span class="fl">2000</span>,</span>
-<span>  seed <span class="op">=</span> <span class="fl">2026</span>, iseed <span class="op">=</span> <span class="fl">2026</span>, boot_ci_type <span class="op">=</span> <span class="st">"perc"</span>,</span>
-<span>  standardized <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">both_result</span><span class="op">$</span><span class="va">moderation_std</span><span class="op">$</span><span class="va">mc</span><span class="op">$</span><span class="va">conditional_overall</span></span>
-<span><span class="va">both_result</span><span class="op">$</span><span class="va">moderation_std</span><span class="op">$</span><span class="va">boot</span><span class="op">$</span><span class="va">conditional_overall</span></span>
-<span><span class="fu"><a href="../reference/plot_moderation_curve.html">plot_moderation_curve</a></span><span class="op">(</span><span class="va">both_result</span>, <span class="st">"total_indirect"</span>,</span>
-<span>                      standardized <span class="op">=</span> <span class="cn">TRUE</span>, engine <span class="op">=</span> <span class="st">"boot"</span><span class="op">)</span></span></code></pre></div>
-<p>For a single engine (<code>"mc"</code> or <code>"bootstrap"</code>),
-tables are directly inside <code>moderation_std</code>. For
-<code>"both"</code>, they are nested under <code>$mc</code> and
-<code>$boot</code>; the plotting <code>engine</code> argument selects
-between them.</p>
-</div>
-<div class="section level2">
-<h2 id="missing-data-and-reporting">Missing data and reporting<a class="anchor" aria-label="anchor" href="#missing-data-and-reporting"></a>
-</h2>
-<p>FIML and MI use the same effect definition. With
-<code>fixed.x = FALSE</code>, estimated external moments participate in
-the joint transformation. With <code>fixed.x = TRUE</code>,
-transformations condition on fitted external moments. Products
-containing an endogenous mediator are modeled with auxiliary moment
-equations and covariances with their upstream mediator disturbances.
-This preserves the predictor moment structure when a reference group
-changes. <code>fixed.x</code> applies to the remaining genuine exogenous
-predictors; endogenous product moments are always estimated.</p>
-<p>MI supports MC inference and evaluates effects at pooled primitive
-parameters; its probing and centering reference is the first completed
-dataset. With MI and <code>fixed.x = TRUE</code>, external moments from
-that reference are held fixed. This does not introduce
-population-relative moderator probing or a new imputation procedure.</p>
-<p>For MI moderated models, wsMed averages each marginal variance
-estimate over completed datasets. It pools its covariance with the
-primitive coefficients using delta-method within-imputation covariances
-and Rubin’s rules. MC samples the variances jointly with the
-coefficients, so the denominator is not treated as fixed. Pooling the
-variance itself avoids the coding dependence of evaluating a nonlinear
-marginal variance only after pooling covariance-model parameters. The
-original coefficient pooling and imputation procedure are retained.
-Refit earlier saved moderated models before using this correction.</p>
-<p>Report the condition difference direction, model and moderated paths,
-moderator coding/reference and raw probe values, marginal SD definition,
-missing-data method, <code>fixed.x</code>, inference engine, number of
-valid draws and interval type. Distinguish standardized interaction
-coefficients per SD of W from conditional indirect effects at particular
-raw W values.</p>
-<p>For serial and sparse models, see the <a href="GenerateModelCustom.html">custom-model tutorial</a>. Their
-complete indirect effects follow the same endpoint scaling rule.</p>
-</div>
-<div class="section level2">
-<h2 id="more-plots-for-reporting">More plots for reporting<a class="anchor" aria-label="anchor" href="#more-plots-for-reporting"></a>
-</h2>
-<p>Use <code><a href="../reference/plot_effects.html">plot_effects()</a></code> for an effect forest,
-<code><a href="../reference/plot_conditional_effects.html">plot_conditional_effects()</a></code> for group or reference-level
-point intervals, and <code><a href="../reference/plot_contrasts.html">plot_contrasts()</a></code> for effect
-differences with their own confidence intervals. All three support
-<code>standardized</code> and the MC/bootstrap <code>engine</code>
-selection. See <a href="PlottingEffects.html">Plotting mediation effects
-and contrasts</a> for executed examples, selection of paths and labels,
-and export to PDF or PNG.</p>
-</div>
-<div class="section level2">
-<h2 id="imputation-compatibility">Imputation compatibility<a class="anchor" aria-label="anchor" href="#imputation-compatibility"></a>
-</h2>
-<p>Correct standardization does not repair an imputation model that
-omits substantive interactions. Default raw-variable MI uses main
-effects. To use model-compatible external imputations, pass a list of
-completed wide datasets (or a <code>mice</code> mids object) through
-<code>wsmed_fit(..., missing = "mi", mi = list(completed = completed))</code>
-or
-<code>wsMed(..., Na = "MI", mi_args = list(completed = completed))</code>.
-The difference scores and products are regenerated in each completion;
-observed cells and factor levels are checked. See <a href="CompatibleImputation.html">the worked example</a> for assumptions,
-an explicit SMC-FCS predictor matrix and convergence guidance.</p>
+</details>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

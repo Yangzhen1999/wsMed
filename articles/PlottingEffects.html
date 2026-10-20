@@ -64,7 +64,7 @@
       <h1>Plotting mediation effects and contrasts</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/vignettes/PlottingEffects.Rmd" class="external-link"><code>vignettes/PlottingEffects.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/master/vignettes/PlottingEffects.Rmd" class="external-link"><code>vignettes/PlottingEffects.Rmd</code></a></small>
       <div class="d-none name"><code>PlottingEffects.Rmd</code></div>
     </div>
 
@@ -120,21 +120,50 @@ Run once: create the three example fits
 <span><span class="va">dm2</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="op">+</span> <span class="fl">.4</span><span class="op">*</span><span class="va">w</span> <span class="op">+</span> <span class="fl">.3</span><span class="op">*</span><span class="va">dm1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
 <span><span class="va">dy</span> <span class="op">&lt;-</span> <span class="fl">.5</span> <span class="op">+</span> <span class="fl">.6</span><span class="op">*</span><span class="va">w</span> <span class="op">+</span> <span class="fl">.5</span><span class="op">*</span><span class="va">dm1</span> <span class="op">+</span> <span class="fl">.7</span><span class="op">*</span><span class="va">dm2</span> <span class="op">+</span> <span class="fl">.2</span><span class="op">*</span><span class="va">dm1</span><span class="op">*</span><span class="va">w</span> <span class="op">+</span> <span class="fl">.3</span><span class="op">*</span><span class="va">avg1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
 <span><span class="va">y1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
-<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>M11<span class="op">=</span><span class="va">avg1</span><span class="op">-</span><span class="va">dm1</span><span class="op">/</span><span class="fl">2</span>, M12<span class="op">=</span><span class="va">avg1</span><span class="op">+</span><span class="va">dm1</span><span class="op">/</span><span class="fl">2</span>,</span>
-<span>                  M21<span class="op">=</span><span class="va">avg2</span><span class="op">-</span><span class="va">dm2</span><span class="op">/</span><span class="fl">2</span>, M22<span class="op">=</span><span class="va">avg2</span><span class="op">+</span><span class="va">dm2</span><span class="op">/</span><span class="fl">2</span>,</span>
-<span>                  Y1<span class="op">=</span><span class="va">y1</span>, Y2<span class="op">=</span><span class="va">y1</span><span class="op">+</span><span class="va">dy</span>, W<span class="op">=</span><span class="va">w</span><span class="op">)</span></span>
+<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  M11<span class="op">=</span><span class="va">avg1</span><span class="op">-</span><span class="va">dm1</span><span class="op">/</span><span class="fl">2</span>,</span>
+<span>  M12<span class="op">=</span><span class="va">avg1</span><span class="op">+</span><span class="va">dm1</span><span class="op">/</span><span class="fl">2</span>,</span>
+<span>  M21<span class="op">=</span><span class="va">avg2</span><span class="op">-</span><span class="va">dm2</span><span class="op">/</span><span class="fl">2</span>,</span>
+<span>  M22<span class="op">=</span><span class="va">avg2</span><span class="op">+</span><span class="va">dm2</span><span class="op">/</span><span class="fl">2</span>,</span>
+<span>  Y1<span class="op">=</span><span class="va">y1</span>,</span>
+<span>  Y2<span class="op">=</span><span class="va">y1</span><span class="op">+</span><span class="va">dy</span>,</span>
+<span>  W<span class="op">=</span><span class="va">w</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">dat</span><span class="op">$</span><span class="va">Group</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cut.html" class="external-link">cut</a></span><span class="op">(</span><span class="va">w</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>,<span class="fl">2</span>,<span class="fl">4</span>,<span class="cn">Inf</span><span class="op">)</span>, labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>,<span class="st">"B"</span>,<span class="st">"C"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">fit_args</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">dat</span>, M_C1<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M11"</span>,<span class="st">"M21"</span><span class="op">)</span>, M_C2<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M12"</span>,<span class="st">"M22"</span><span class="op">)</span>,</span>
-<span>                 Y_C1<span class="op">=</span><span class="st">"Y1"</span>, Y_C2<span class="op">=</span><span class="st">"Y2"</span>, form<span class="op">=</span><span class="st">"P"</span>, Na<span class="op">=</span><span class="st">"DE"</span>, ci_method<span class="op">=</span><span class="st">"mc"</span>,</span>
-<span>                 R<span class="op">=</span><span class="fl">2000</span>, seed<span class="op">=</span><span class="fl">2026</span>, standardized<span class="op">=</span><span class="cn">TRUE</span>, verbose<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="va">plain</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">wsMed</span>, <span class="va">fit_args</span><span class="op">)</span></span>
-<span><span class="va">continuous</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">wsMed</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">fit_args</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>W<span class="op">=</span><span class="st">"W"</span>, W_type<span class="op">=</span><span class="st">"continuous"</span>, MP<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"b1"</span>,<span class="st">"d1"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">categorical</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">wsMed</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">fit_args</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>W<span class="op">=</span><span class="st">"Group"</span>, W_type<span class="op">=</span><span class="st">"categorical"</span>, MP<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"b1"</span>,<span class="st">"d1"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-</details><p>These separate fits illustrate each plotting interface; changing W
-from continuous to grouped changes the fitted model and is not a
-transformation of the original conditional estimates.</p>
+<span><span class="va">plain</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">dat</span>,</span>
+<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M11"</span>, <span class="st">"M21"</span><span class="op">)</span>,</span>
+<span>  M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M12"</span>, <span class="st">"M22"</span><span class="op">)</span>,</span>
+<span>  Y_C1 <span class="op">=</span> <span class="st">"Y1"</span>,</span>
+<span>  Y_C2 <span class="op">=</span> <span class="st">"Y2"</span>,</span>
+<span>  standardized <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">continuous</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">dat</span>,</span>
+<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M11"</span>, <span class="st">"M21"</span><span class="op">)</span>,</span>
+<span>  M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M12"</span>, <span class="st">"M22"</span><span class="op">)</span>,</span>
+<span>  Y_C1 <span class="op">=</span> <span class="st">"Y1"</span>,</span>
+<span>  Y_C2 <span class="op">=</span> <span class="st">"Y2"</span>,</span>
+<span>  W <span class="op">=</span> <span class="st">"W"</span>,</span>
+<span>  MP <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"b1"</span>, <span class="st">"d1"</span><span class="op">)</span>,</span>
+<span>  standardized <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">categorical</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">dat</span>,</span>
+<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M11"</span>, <span class="st">"M21"</span><span class="op">)</span>,</span>
+<span>  M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M12"</span>, <span class="st">"M22"</span><span class="op">)</span>,</span>
+<span>  Y_C1 <span class="op">=</span> <span class="st">"Y1"</span>,</span>
+<span>  Y_C2 <span class="op">=</span> <span class="st">"Y2"</span>,</span>
+<span>  W <span class="op">=</span> <span class="st">"Group"</span>,</span>
+<span>  MP <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"b1"</span>, <span class="st">"d1"</span><span class="op">)</span>,</span>
+<span>  standardized <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</details><p>These fits request standardized output; the default
+<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> inherits that choice. They otherwise use the default
+20,000 Monte Carlo draws. The three fits illustrate the available
+displays. Grouping a continuous moderator changes the fitted model, so
+the category plot represents a separate analysis of these simulated
+data.</p>
 </div>
 <div class="section level2">
 <h2 id="a-consistent-plot-method">A consistent plot method<a class="anchor" aria-label="anchor" href="#a-consistent-plot-method"></a>
@@ -145,24 +174,45 @@ categorical moderator. Specify <code>view</code> to choose another
 supported display. <code>terms</code> selects effects and their order;
 <code>labels</code> changes displayed names.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">plain</span>, terms <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"indirect_2"</span>, <span class="st">"indirect_1"</span><span class="op">)</span>,</span>
-<span>     labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>indirect_1 <span class="op">=</span> <span class="st">"Via M1"</span>, indirect_2 <span class="op">=</span> <span class="st">"Via M2"</span><span class="op">)</span>,</span>
-<span>     title <span class="op">=</span> <span class="st">"Indirect effects"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">plain</span><span class="op">)</span></span></code></pre></div>
 <div class="float">
 <img src="figures/PlottingEffects-plot-method-1.png" alt="plot of chunk plot-method"><div class="figcaption">plot of chunk plot-method</div>
 </div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">continuous</span>, n <span class="op">=</span> <span class="fl">41</span>, scale <span class="op">=</span> <span class="st">"marginal"</span>, terms <span class="op">=</span> <span class="st">"indirect_1"</span>,</span>
-<span>     title <span class="op">=</span> <span class="st">"Conditional indirect effect"</span>, x_label <span class="op">=</span> <span class="st">"W (raw units)"</span>, rug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">continuous</span><span class="op">)</span></span></code></pre></div>
 <div class="float">
 <img src="figures/PlottingEffects-plot-method-2.png" alt="plot of chunk plot-method"><div class="figcaption">plot of chunk plot-method</div>
 </div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">categorical</span>, at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C"</span>, <span class="st">"A"</span>, <span class="st">"B"</span><span class="op">)</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>     title <span class="op">=</span> <span class="st">"Effects in the selected category order"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">categorical</span><span class="op">)</span></span></code></pre></div>
 <div class="float">
 <img src="figures/PlottingEffects-plot-method-3.png" alt="plot of chunk plot-method"><div class="figcaption">plot of chunk plot-method</div>
 </div>
+<p>These calls use the default effect selection and plot layout. To
+select or relabel effects, change the probe grid, or reorder categories,
+specify the corresponding arguments explicitly:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">plain</span>,</span>
+<span>  terms <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"indirect_2"</span>, <span class="st">"indirect_1"</span><span class="op">)</span>,</span>
+<span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>indirect_1 <span class="op">=</span> <span class="st">"Via M1"</span>, indirect_2 <span class="op">=</span> <span class="st">"Via M2"</span><span class="op">)</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">"Indirect effects"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">continuous</span>,</span>
+<span>  n <span class="op">=</span> <span class="fl">41</span>,</span>
+<span>  scale <span class="op">=</span> <span class="st">"marginal"</span>,</span>
+<span>  terms <span class="op">=</span> <span class="st">"indirect_1"</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">"Conditional indirect effect"</span>,</span>
+<span>  x_label <span class="op">=</span> <span class="st">"W (raw units)"</span>,</span>
+<span>  rug <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">categorical</span>,</span>
+<span>  at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C"</span>, <span class="st">"A"</span>, <span class="st">"B"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  ncol <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">"Effects in the selected category order"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>An automatic curve uses 51 equally spaced probes by default, from the
 smallest to the largest finite raw moderator value among fitted cases.
 For MI, the first completed dataset defines this range. The caption
@@ -177,38 +227,47 @@ a fitted/inference/one-call object, which retains the original data;
 extracted effects alone do not contain the observations. Rug marks
 describe where data occur, without changing estimates or interval
 widths.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">continuous</span>, view <span class="op">=</span> <span class="st">"conditional"</span>, at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>W <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>     terms <span class="op">=</span> <span class="st">"indirect_1"</span>, title <span class="op">=</span> <span class="st">"Effects at three raw W values"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">continuous</span>,</span>
+<span>  view <span class="op">=</span> <span class="st">"conditional"</span>,</span>
+<span>  at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>W <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  terms <span class="op">=</span> <span class="st">"indirect_1"</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">"Effects at three raw W values"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <div class="float">
 <img src="figures/PlottingEffects-selected-probes-1.png" alt="plot of chunk selected-probes"><div class="figcaption">plot of chunk selected-probes</div>
 </div>
 <p>The same methods work after a staged analysis. A fit without
 inference shows point estimates only. Extracting results first is useful
 for checking exactly which estimates and intervals a plot displays:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">effects</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_effects.html">wsmed_effects</a></span><span class="op">(</span><span class="va">continuous</span>, at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>W <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                         terms <span class="op">=</span> <span class="st">"indirect_1"</span>, scale <span class="op">=</span> <span class="st">"marginal"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">effects</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_effects.html">wsmed_effects</a></span><span class="op">(</span></span>
+<span>  <span class="va">continuous</span>,</span>
+<span>  at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>W <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  terms <span class="op">=</span> <span class="st">"indirect_1"</span>,</span>
+<span>  scale <span class="op">=</span> <span class="st">"marginal"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">effects</span><span class="op">)</span></span>
 <span><span class="co">#&gt; wsMed indirect | marginal scale | mc </span></span>
-<span><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
 <span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
 <span><span class="co">#&gt; Moderator: W in raw units; centering reference = 3.23288 </span></span>
 <span><span class="co">#&gt; Standardization: effect / marginal model-implied SD(Y2 - Y1); condition contrast is unscaled.</span></span>
 <span><span class="co">#&gt; Plug-in marginal outcome-difference SD: 6.28886 </span></span>
 <span><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
 <span><span class="co">#&gt;                          Estimate Std. Error CI lower CI upper</span></span>
-<span><span class="co">#&gt; indirect_1@1: M1 [W = 1]   0.3150     0.0308   0.2579   0.3806</span></span>
-<span><span class="co">#&gt; indirect_1@2: M1 [W = 3]   0.7859     0.0475   0.6969   0.8836</span></span>
-<span><span class="co">#&gt; indirect_1@3: M1 [W = 5]   1.4683     0.0735   1.3269   1.6218</span></span>
-<span><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; indirect_1@1: M1 [W = 1]   0.3150     0.0314   0.2565   0.3799</span></span>
+<span><span class="co">#&gt; indirect_1@2: M1 [W = 3]   0.7859     0.0485   0.6953   0.8847</span></span>
+<span><span class="co">#&gt; indirect_1@3: M1 [W = 5]   1.4683     0.0748   1.3294   1.6210</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
 <span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
-<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">effects</span>, view <span class="op">=</span> <span class="st">"conditional"</span>, title <span class="op">=</span> <span class="st">"Extracted conditional effects"</span><span class="op">)</span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">effects</span><span class="op">)</span></span>
 <span><span class="va">p</span></span></code></pre></div>
 <div class="float">
 <img src="figures/PlottingEffects-extraction-first-1.png" alt="plot of chunk extraction-first"><div class="figcaption">plot of chunk extraction-first</div>
 </div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">estimate</span>, <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">effects</span><span class="op">)</span><span class="op">$</span><span class="va">estimate</span><span class="op">)</span>,</span>
 <span>          <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">conf.low</span>, <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">effects</span><span class="op">)</span><span class="op">$</span><span class="va">conf.low</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Extracted results retain only the probes they contain;
@@ -245,17 +304,27 @@ accept <code>engine = "boot"</code>, while the plot methods use
 <code>method = "bootstrap"</code>.</p>
 </div>
 <div class="section level2">
+<h2 id="optional-named-plotting-helpers">Optional named plotting helpers<a class="anchor" aria-label="anchor" href="#optional-named-plotting-helpers"></a>
+</h2>
+<p>The following sections show more explicit display settings. The
+generic <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> calls above are sufficient for a default
+figure.</p>
+</div>
+<div class="section level2">
 <h2 id="forest-plots">Forest plots<a class="anchor" aria-label="anchor" href="#forest-plots"></a>
 </h2>
 <p><code><a href="../reference/plot_effects.html">plot_effects()</a></code> displays complete indirect effects, their
 total, the direct effect (<code>cp</code>) and the total effect. Choose
 rows and their display order with <code>paths</code>; use a named
 <code>labels</code> vector for readable descriptions.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">forest</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_effects.html">plot_effects</a></span><span class="op">(</span><span class="va">plain</span>, standardized<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">forest</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_effects.html">plot_effects</a></span><span class="op">(</span></span>
+<span>  <span class="va">plain</span>,</span>
+<span>  standardized<span class="op">=</span><span class="cn">TRUE</span>,</span>
 <span>  paths<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"indirect_1"</span>, <span class="st">"indirect_2"</span>, <span class="st">"total_indirect"</span>, <span class="st">"cp"</span>, <span class="st">"total_effect"</span><span class="op">)</span>,</span>
 <span>  labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>indirect_1<span class="op">=</span><span class="st">"Via M1"</span>, indirect_2<span class="op">=</span><span class="st">"Via M2"</span>,</span>
-<span>           total_indirect<span class="op">=</span><span class="st">"Total indirect"</span>, cp<span class="op">=</span><span class="st">"Direct"</span>, total_effect<span class="op">=</span><span class="st">"Total"</span><span class="op">)</span><span class="op">)</span></span>
+<span>           total_indirect<span class="op">=</span><span class="st">"Total indirect"</span>, cp<span class="op">=</span><span class="st">"Direct"</span>, total_effect<span class="op">=</span><span class="st">"Total"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">forest</span></span></code></pre></div>
 <div class="float">
 <img src="figures/PlottingEffects-forest-1.png" alt="plot of chunk forest"><div class="figcaption">plot of chunk forest</div>
@@ -268,10 +337,14 @@ use the next plot.</p>
 <div class="section level2">
 <h2 id="conditional-effects-by-group-or-selected-level">Conditional effects by group or selected level<a class="anchor" aria-label="anchor" href="#conditional-effects-by-group-or-selected-level"></a>
 </h2>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">group_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_conditional_effects.html">plot_conditional_effects</a></span><span class="op">(</span><span class="va">categorical</span>, standardized<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">group_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_conditional_effects.html">plot_conditional_effects</a></span><span class="op">(</span></span>
+<span>  <span class="va">categorical</span>,</span>
+<span>  standardized<span class="op">=</span><span class="cn">TRUE</span>,</span>
 <span>  paths<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"indirect_1"</span>,<span class="st">"indirect_2"</span><span class="op">)</span>,</span>
-<span>  labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>indirect_1<span class="op">=</span><span class="st">"Via M1"</span>,indirect_2<span class="op">=</span><span class="st">"Via M2"</span><span class="op">)</span>, ncol<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span>
+<span>  labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>indirect_1<span class="op">=</span><span class="st">"Via M1"</span>,indirect_2<span class="op">=</span><span class="st">"Via M2"</span><span class="op">)</span>,</span>
+<span>  ncol<span class="op">=</span><span class="fl">2</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">group_plot</span></span></code></pre></div>
 <div class="float">
 <img src="figures/PlottingEffects-categorical-effects-1.png" alt="plot of chunk categorical-effects"><div class="figcaption">plot of chunk categorical-effects</div>
@@ -283,10 +356,14 @@ available path coefficients or <code>type = "overall"</code> for total
 indirect and total effects. All panels share their effect axis.</p>
 <p>The same function can display the stored reference levels of a
 continuous W:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_conditional_effects.html">plot_conditional_effects</a></span><span class="op">(</span><span class="va">continuous</span>, paths<span class="op">=</span><span class="st">"indirect_effect_1"</span>,</span>
-<span>  levels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"-1 SD"</span>,<span class="st">"0 SD"</span>,<span class="st">"+1 SD"</span><span class="op">)</span>, standardized<span class="op">=</span><span class="cn">TRUE</span>,</span>
-<span>  labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>indirect_effect_1<span class="op">=</span><span class="st">"Via M1"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_conditional_effects.html">plot_conditional_effects</a></span><span class="op">(</span></span>
+<span>  <span class="va">continuous</span>,</span>
+<span>  paths<span class="op">=</span><span class="st">"indirect_effect_1"</span>,</span>
+<span>  levels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"-1 SD"</span>,<span class="st">"0 SD"</span>,<span class="st">"+1 SD"</span><span class="op">)</span>,</span>
+<span>  standardized<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<span>  labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>indirect_effect_1<span class="op">=</span><span class="st">"Via M1"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <div class="float">
 <img src="figures/PlottingEffects-continuous-levels-1.png" alt="plot of chunk continuous-levels"><div class="figcaption">plot of chunk continuous-levels</div>
 </div>
@@ -302,10 +379,14 @@ existing identifiers.</p>
 an interval that includes zero does not establish a difference between
 them. <code><a href="../reference/plot_contrasts.html">plot_contrasts()</a></code> displays the difference and its own
 interval instead.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">contrast_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_contrasts.html">plot_contrasts</a></span><span class="op">(</span><span class="va">categorical</span>, standardized<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">contrast_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_contrasts.html">plot_contrasts</a></span><span class="op">(</span></span>
+<span>  <span class="va">categorical</span>,</span>
+<span>  standardized<span class="op">=</span><span class="cn">TRUE</span>,</span>
 <span>  paths<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"indirect_1"</span>,<span class="st">"indirect_2"</span><span class="op">)</span>,</span>
-<span>  labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>indirect_1<span class="op">=</span><span class="st">"Via M1"</span>,indirect_2<span class="op">=</span><span class="st">"Via M2"</span><span class="op">)</span>, ncol<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span>
+<span>  labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>indirect_1<span class="op">=</span><span class="st">"Via M1"</span>,indirect_2<span class="op">=</span><span class="st">"Via M2"</span><span class="op">)</span>,</span>
+<span>  ncol<span class="op">=</span><span class="fl">2</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">contrast_plot</span></span></code></pre></div>
 <div class="float">
 <img src="figures/PlottingEffects-categorical-contrasts-1.png" alt="plot of chunk categorical-contrasts"><div class="figcaption">plot of chunk categorical-contrasts</div>
@@ -319,8 +400,11 @@ already-computed joint-draw contrast intervals, not differences between
 endpoints of separate intervals.</p>
 <p>Without a moderator, the plot compares indirect paths with one
 another:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_contrasts.html">plot_contrasts</a></span><span class="op">(</span><span class="va">plain</span>, standardized<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_contrasts.html">plot_contrasts</a></span><span class="op">(</span></span>
+<span>  <span class="va">plain</span>,</span>
+<span>  standardized<span class="op">=</span><span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <div class="float">
 <img src="figures/PlottingEffects-path-contrasts-1.png" alt="plot of chunk path-contrasts"><div class="figcaption">plot of chunk path-contrasts</div>
 </div>
@@ -337,8 +421,12 @@ available.</p>
 <div class="section level2">
 <h2 id="conditional-curves-and-their-highlighted-ranges">Conditional curves and their highlighted ranges<a class="anchor" aria-label="anchor" href="#conditional-curves-and-their-highlighted-ranges"></a>
 </h2>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_moderation_curve.html">plot_moderation_curve</a></span><span class="op">(</span><span class="va">continuous</span>, <span class="st">"total_indirect"</span>, standardized<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_moderation_curve.html">plot_moderation_curve</a></span><span class="op">(</span></span>
+<span>  <span class="va">continuous</span>,</span>
+<span>  <span class="st">"total_indirect"</span>,</span>
+<span>  standardized<span class="op">=</span><span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <div class="float">
 <img src="figures/PlottingEffects-curve-1.png" alt="plot of chunk curve"><div class="figcaption">plot of chunk curve</div>
 </div>
@@ -358,16 +446,23 @@ moderator range issue a warning when effects are extracted and remain
 marked in the table and plot caption. This is a marginal-range check,
 not a test of joint covariate overlap or density. Imputed moderator
 values do not extend the observed range.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">probe_values</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">W</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">W</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">supported</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_effects.html">wsmed_effects</a></span><span class="op">(</span><span class="va">continuous</span>, at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>W <span class="op">=</span> <span class="va">probe_values</span><span class="op">)</span>, terms <span class="op">=</span> <span class="st">"indirect_1"</span><span class="op">)</span></span>
+<span><span class="va">supported</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_effects.html">wsmed_effects</a></span><span class="op">(</span></span>
+<span>  <span class="va">continuous</span>,</span>
+<span>  at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>W <span class="op">=</span> <span class="va">probe_values</span><span class="op">)</span>,</span>
+<span>  terms <span class="op">=</span> <span class="st">"indirect_1"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Moderator probes outside the observed fitted-case range of W</span></span>
 <span><span class="co">#&gt; [-3.17113, 9.61675]: 10.6168. These estimates extrapolate.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">supported</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"at"</span>, <span class="st">"estimate"</span>, <span class="st">"extrapolated"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;                 at  estimate extrapolated</span></span>
 <span><span class="co">#&gt; 1 3.23287569618678 0.8544881        FALSE</span></span>
-<span><span class="co">#&gt; 2 10.6167533949209 4.5160205         TRUE</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">supported</span>, view <span class="op">=</span> <span class="st">"forest"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co">#&gt; 2 10.6167533949209 4.5160203         TRUE</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">supported</span>,</span>
+<span>  view <span class="op">=</span> <span class="st">"forest"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <div class="float">
 <img src="figures/PlottingEffects-support-1.png" alt="plot of chunk support"><div class="figcaption">plot of chunk support</div>
 </div>
@@ -379,14 +474,14 @@ report the minimum and maximum across completed datasets. The table also
 distinguishes observed memberships (<code>n.observed</code>) from fitted
 counts. These counts are not effective sample sizes for the conditional
 effects.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">forest</span><span class="op">$</span><span class="va">data</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Path"</span>,<span class="st">"Estimate"</span>,<span class="st">"CI.LL"</span>,<span class="st">"CI.UL"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;              Path   Estimate      CI.LL      CI.UL</span></span>
-<span><span class="co">#&gt; 16     indirect_1  1.8547443  1.7203102  1.9914456</span></span>
-<span><span class="co">#&gt; 17     indirect_2  1.0906142  0.9855171  1.2006867</span></span>
-<span><span class="co">#&gt; 18 total_indirect  2.9453585  2.7769714  3.1253331</span></span>
-<span><span class="co">#&gt; 1              cp -0.7473746 -0.8606057 -0.6266327</span></span>
-<span><span class="co">#&gt; 19   total_effect  2.1979839  2.0330183  2.3720550</span></span>
+<span><span class="co">#&gt; 16     indirect_1  1.8547443  1.7246500  1.9935134</span></span>
+<span><span class="co">#&gt; 17     indirect_2  1.0906142  0.9875177  1.1972101</span></span>
+<span><span class="co">#&gt; 18 total_indirect  2.9453585  2.7762265  3.1303118</span></span>
+<span><span class="co">#&gt; 1              cp -0.7473746 -0.8642842 -0.6260046</span></span>
+<span><span class="co">#&gt; 19   total_effect  2.1979839  2.0328561  2.3757007</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">forest</span>, <span class="st">"wsmed_plot"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $engine</span></span>
 <span><span class="co">#&gt; [1] "mc"</span></span>
@@ -396,9 +491,20 @@ effects.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $level</span></span>
 <span><span class="co">#&gt; [1] 0.95</span></span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"mediation-effects.pdf"</span>, <span class="va">forest</span>, width<span class="op">=</span><span class="fl">8</span>, height<span class="op">=</span><span class="fl">5</span><span class="op">)</span></span>
-<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"group-effects.png"</span>, <span class="va">group_plot</span>, width<span class="op">=</span><span class="fl">8</span>, height<span class="op">=</span><span class="fl">5</span>, dpi<span class="op">=</span><span class="fl">300</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span></span>
+<span>  <span class="st">"mediation-effects.pdf"</span>,</span>
+<span>  <span class="va">forest</span>,</span>
+<span>  width<span class="op">=</span><span class="fl">8</span>,</span>
+<span>  height<span class="op">=</span><span class="fl">5</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span></span>
+<span>  <span class="st">"group-effects.png"</span>,</span>
+<span>  <span class="va">group_plot</span>,</span>
+<span>  width<span class="op">=</span><span class="fl">8</span>,</span>
+<span>  height<span class="op">=</span><span class="fl">5</span>,</span>
+<span>  dpi<span class="op">=</span><span class="fl">300</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>All conditional intervals are percentile intervals; bootstrap
 parameter forest plots use the stored bootstrap interval type. The
 common marginal scale, fixed raw W probes and joint uncertainty are

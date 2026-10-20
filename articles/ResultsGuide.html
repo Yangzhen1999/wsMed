@@ -64,232 +64,374 @@
       <h1>Read and export results</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/vignettes/ResultsGuide.Rmd" class="external-link"><code>vignettes/ResultsGuide.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/master/vignettes/ResultsGuide.Rmd" class="external-link"><code>vignettes/ResultsGuide.Rmd</code></a></small>
       <div class="d-none name"><code>ResultsGuide.Rmd</code></div>
     </div>
 
     
     
-<p><strong>Goal:</strong> obtain one organized table of all core
-effects, understand its scale and intervals, and export it without
-copying numbers from the console.</p>
-<p>Use the <a href="GetStarted.html">quick start</a> first if you have
-not fitted a model. The short setup below makes this page independently
-runnable.</p>
+<p>Start by reading the default report. Use more specific queries only
+when you need a different effect, reporting scale or confidence
+level.</p>
+<p>The example below is the parallel mediation model from <a href="GetStarted.html">Get started</a>.</p>
 <details><summary>
-Example setup: create result
+Example setup
 </summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">)</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">example_data</span>,</span>
-<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>, M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span><span class="op">)</span>,</span>
-<span>  Y_C1 <span class="op">=</span> <span class="st">"D1"</span>, Y_C2 <span class="op">=</span> <span class="st">"D2"</span>,</span>
-<span>  form <span class="op">=</span> <span class="st">"P"</span>, Na <span class="op">=</span> <span class="st">"DE"</span>, ci_method <span class="op">=</span> <span class="st">"mc"</span>,</span>
-<span>  R <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">123</span>, standardized <span class="op">=</span> <span class="cn">TRUE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>,</span>
+<span>  M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span><span class="op">)</span>,</span>
+<span>  Y_C1 <span class="op">=</span> <span class="st">"D1"</span>,</span>
+<span>  Y_C2 <span class="op">=</span> <span class="st">"D2"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-</details><p>This example requests <strong>standardized results</strong> during
-analysis. The reports, summary tables and generic plots below inherit
-that choice.</p>
-<div class="section level2">
-<h2 id="get-the-table-you-need">Get the table you need<a class="anchor" aria-label="anchor" href="#get-the-table-you-need"></a>
+</details><div class="section level2">
+<h2 id="read-the-default-report">Read the default report<a class="anchor" aria-label="anchor" href="#read-the-default-report"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">effects</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"label"</span>, <span class="st">"estimate"</span>, <span class="st">"std.error"</span>, <span class="st">"conf.low"</span>, <span class="st">"conf.high"</span><span class="op">)</span><span class="op">]</span>,</span>
-<span>  digits <span class="op">=</span> <span class="fl">4</span>, col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Effect / pathway"</span>, <span class="st">"Estimate"</span>, <span class="st">"SE"</span>, <span class="st">"CI lower"</span>, <span class="st">"CI upper"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">Effect / pathway</th>
-<th align="right">Estimate</th>
-<th align="right">SE</th>
-<th align="right">CI lower</th>
-<th align="right">CI upper</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">Direct effect</td>
-<td align="right">-0.1879</td>
-<td align="right">0.1020</td>
-<td align="right">-0.3878</td>
-<td align="right">0.0189</td>
-</tr>
-<tr class="even">
-<td align="left">M1</td>
-<td align="right">0.0077</td>
-<td align="right">0.0182</td>
-<td align="right">-0.0258</td>
-<td align="right">0.0509</td>
-</tr>
-<tr class="odd">
-<td align="left">M2</td>
-<td align="right">-0.0066</td>
-<td align="right">0.0148</td>
-<td align="right">-0.0437</td>
-<td align="right">0.0184</td>
-</tr>
-<tr class="even">
-<td align="left">Total indirect effect</td>
-<td align="right">0.0011</td>
-<td align="right">0.0231</td>
-<td align="right">-0.0442</td>
-<td align="right">0.0515</td>
-</tr>
-<tr class="odd">
-<td align="left">Total effect</td>
-<td align="right">-0.1867</td>
-<td align="right">0.1007</td>
-<td align="right">-0.3799</td>
-<td align="right">0.0180</td>
-</tr>
-</tbody>
-</table>
-<p>The rows cover the direct effect, each specific indirect effect, the
-total indirect effect and the total effect. In a single-mediator model,
-the specific and total indirect effects are equal; both named rows
-remain available. <code><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">knitr::kable()</a></code> rounds only this display,
-while <code>s$effects</code> retains full precision.</p>
-<table class="table">
-<colgroup>
-<col width="50%">
-<col width="50%">
-</colgroup>
-<thead><tr class="header">
-<th>You want to…</th>
-<th>Use</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td>Read a core report in the console</td>
-<td><code>print(result)</code></td>
-</tr>
-<tr class="even">
-<td>Include path coefficients in the report</td>
-<td><code>print(result, detail = "full")</code></td>
-</tr>
-<tr class="odd">
-<td>Save a statistical summary</td>
-<td><code>s &lt;- summary(result)</code></td>
-</tr>
-<tr class="even">
-<td>Get all selected effects as a data frame</td>
-<td>
-<code>s$effects</code> or <code>as.data.frame(s)</code>
-</td>
-</tr>
-<tr class="odd">
-<td>Get conditional path coefficients</td>
-<td><code>s$coefficients</code></td>
-</tr>
-<tr class="even">
-<td>Check method, scale and confidence level</td>
-<td><code>s$info</code></td>
-</tr>
-</tbody>
-</table>
-<p><code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> displays a report and returns the original
-object invisibly. <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> creates a structured result
-that you can save, filter and plot; entering <code>s</code> displays its
-ordinary R coefficient tables. Neither repeats fitting or sampling. With
-moderation, <code>$coefficients</code> contains slopes evaluated at the
-selected moderator values; use <code>type = "parameters"</code> for
-primitive parameters.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed analysis</span></span>
+<span><span class="co">#&gt; Model: P | DE | Observations: 100 </span></span>
+<span><span class="co">#&gt; Effects:</span></span>
+<span><span class="co">#&gt; wsMed all | raw scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt;                                        Estimate Std. Error  CI lower  CI upper</span></span>
+<span><span class="co">#&gt; cp: Direct effect                     -0.031795   0.017000 -0.064525  0.001864</span></span>
+<span><span class="co">#&gt; indirect_1: M1                         0.001311   0.003208 -0.004586  0.008760</span></span>
+<span><span class="co">#&gt; indirect_2: M2                        -0.001120   0.002587 -0.007507  0.003186</span></span>
+<span><span class="co">#&gt; total_indirect: Total indirect effect  0.000191   0.004138 -0.008459  0.008723</span></span>
+<span><span class="co">#&gt; total: Total effect                   -0.031604   0.017049 -0.064633  0.001895</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0</span></span></code></pre></div>
+<p><code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> displays the core effects and analysis
+information. The report gives the estimate, SE and CI for each specific
+indirect effect, the total indirect effect, the direct effect and the
+total effect. Here the default output is unstandardized, with 95% Monte
+Carlo CIs.</p>
 </div>
 <div class="section level2">
-<h2 id="check-the-scale-and-intervals">Check the scale and intervals<a class="anchor" aria-label="anchor" href="#check-the-scale-and-intervals"></a>
+<h2 id="get-a-statistical-summary">Get a statistical summary<a class="anchor" aria-label="anchor" href="#get-a-statistical-summary"></a>
 </h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">s</span><span class="op">$</span><span class="va">info</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"standardized"</span>, <span class="st">"method"</span>, <span class="st">"level"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt; $standardized</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed statistical summary</span></span>
+<span><span class="co">#&gt; Model: P | Missing: DE | Observations: 100 </span></span>
+<span><span class="co">#&gt; Effects:</span></span>
+<span><span class="co">#&gt; wsMed all | raw scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt;                                        Estimate Std. Error  CI lower  CI upper</span></span>
+<span><span class="co">#&gt; cp: Direct effect                     -0.031795   0.017000 -0.064525  0.001864</span></span>
+<span><span class="co">#&gt; indirect_1: M1                         0.001311   0.003208 -0.004586  0.008760</span></span>
+<span><span class="co">#&gt; indirect_2: M2                        -0.001120   0.002587 -0.007507  0.003186</span></span>
+<span><span class="co">#&gt; total_indirect: Total indirect effect  0.000191   0.004138 -0.008459  0.008723</span></span>
+<span><span class="co">#&gt; total: Total effect                   -0.031604   0.017049 -0.064633  0.001895</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $method</span></span>
-<span><span class="co">#&gt; [1] "mc"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $level</span></span>
-<span><span class="co">#&gt; [1] 0.95</span></span></code></pre></div>
-<p>For these complete condition effects, standardization divides the
-estimate by the model-implied <strong>marginal SD of the outcome
-difference</strong>. It does not use a separate denominator for each
-moderator value or category. See <a href="StandardizedModeratedMediation.html">standardized effects</a> for
-the definition and conditional examples.</p>
+<span><span class="co">#&gt; Path coefficients:</span></span>
+<span><span class="co">#&gt;    Estimate Std. Error CI lower CI upper</span></span>
+<span><span class="co">#&gt; cp -0.03180    0.01700 -0.06453  0.00186</span></span>
+<span><span class="co">#&gt; b1 -0.04834    0.09555 -0.23422  0.13918</span></span>
+<span><span class="co">#&gt; d1 -0.06905    0.09524 -0.25390  0.11568</span></span>
+<span><span class="co">#&gt; b2 -0.07732    0.09387 -0.26459  0.10461</span></span>
+<span><span class="co">#&gt; d2 -0.03676    0.08675 -0.20684  0.13625</span></span>
+<span><span class="co">#&gt; a1 -0.02712    0.01772 -0.06162  0.00817</span></span>
+<span><span class="co">#&gt; a2  0.01448    0.01796 -0.02032  0.04929</span></span>
+<span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span></span>
+<span><span class="co">#&gt; Tables: $effects, $coefficients; analysis settings: $info.</span></span></code></pre></div>
+<p><code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> returns a structured report containing
+effects, path coefficients and analysis settings; its default display
+shows the statistical tables. Unlike <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, it creates a
+summary object that can be saved and reused:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">raw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, standardized <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="va">raw</span><span class="op">$</span><span class="va">effects</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"effect"</span>, <span class="st">"estimate"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;           effect      estimate</span></span>
-<span><span class="co">#&gt; 1             cp -0.0317954295</span></span>
-<span><span class="co">#&gt; 2     indirect_1  0.0013113045</span></span>
-<span><span class="co">#&gt; 3     indirect_2 -0.0011199168</span></span>
-<span><span class="co">#&gt; 4 total_indirect  0.0001913877</span></span>
-<span><span class="co">#&gt; 5          total -0.0316040417</span></span></code></pre></div>
-<p>The override affects this query only. <code>result</code> keeps its
-original preference. Summary effect SEs come from the stored effect
-draws, and intervals are percentile intervals. The older stored-table
-report may use a different bootstrap interval convention; use the same
-convention when comparing reports.</p>
+<code class="sourceCode R"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
+<p>Typing <code>s</code> displays the same summary. Neither operation
+repeats fitting or sampling. The stored tables retain full precision
+even though the printed values are rounded.</p>
 </div>
 <div class="section level2">
-<h2 id="select-effects-or-change-confidence-level">Select effects or change confidence level<a class="anchor" aria-label="anchor" href="#select-effects-or-change-confidence-level"></a>
+<h2 id="plot-the-results">Plot the results<a class="anchor" aria-label="anchor" href="#plot-the-results"></a>
 </h2>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">indirect</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, type <span class="op">=</span> <span class="st">"indirect"</span><span class="op">)</span></span>
-<span><span class="va">indirect</span><span class="op">$</span><span class="va">effects</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"effect"</span>, <span class="st">"label"</span>, <span class="st">"estimate"</span>, <span class="st">"conf.low"</span>, <span class="st">"conf.high"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;       effect label     estimate    conf.low  conf.high</span></span>
-<span><span class="co">#&gt; 1 indirect_1    M1  0.007748230 -0.02579869 0.05091815</span></span>
-<span><span class="co">#&gt; 2 indirect_2    M2 -0.006617359 -0.04369740 0.01837558</span></span>
-<span><span class="va">ci90</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span>, level <span class="op">=</span> <span class="fl">.90</span><span class="op">)</span></span>
-<span><span class="va">ci90</span><span class="op">$</span><span class="va">effects</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"effect"</span>, <span class="st">"conf.low"</span>, <span class="st">"conf.high"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;           effect    conf.low   conf.high</span></span>
-<span><span class="co">#&gt; 1             cp -0.35850086 -0.01930912</span></span>
-<span><span class="co">#&gt; 2     indirect_1 -0.01843490  0.04134868</span></span>
-<span><span class="co">#&gt; 3     indirect_2 -0.03354337  0.01277992</span></span>
-<span><span class="co">#&gt; 4 total_indirect -0.03741600  0.03940504</span></span>
-<span><span class="co">#&gt; 5          total -0.35134695 -0.01420823</span></span></code></pre></div>
-<p>Other choices are <code>type = "direct"</code>,
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
+<div class="float">
+<img src="figures/ResultsGuide-default-plot-1.png" alt="plot of chunk default-plot"><div class="figcaption">plot of chunk default-plot</div>
+</div>
+<p>The default plot of this model shows the specific indirect effects.
+To plot all effects selected in the summary, use <code>plot(s)</code>.
+Both inherit the reporting scale saved during the analysis. See the <a href="PlottingEffects.html">plot gallery</a> for the available displays
+and optional settings.</p>
+</div>
+<div class="section level2">
+<h2 id="choose-more-specific-output">Choose more specific output<a class="anchor" aria-label="anchor" href="#choose-more-specific-output"></a>
+</h2>
+<p>Start with the calls above. The following options change one part of
+the report without fitting again.</p>
+<div class="section level3">
+<h3 id="request-standardized-effects">Request standardized effects<a class="anchor" aria-label="anchor" href="#request-standardized-effects"></a>
+</h3>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span></span>
+<span>  <span class="va">result</span>,</span>
+<span>  standardized <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed statistical summary</span></span>
+<span><span class="co">#&gt; Model: P | Missing: DE | Observations: 100 </span></span>
+<span><span class="co">#&gt; Effects:</span></span>
+<span><span class="co">#&gt; wsMed all | marginal scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt; Standardization: effect / marginal model-implied SD(D2 - D1); condition contrast is unscaled.</span></span>
+<span><span class="co">#&gt; Plug-in marginal outcome-difference SD: 0.169239 </span></span>
+<span><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
+<span><span class="co">#&gt;                                       Estimate Std. Error CI lower CI upper</span></span>
+<span><span class="co">#&gt; cp: Direct effect                     -0.18787    0.10032 -0.38252  0.01082</span></span>
+<span><span class="co">#&gt; indirect_1: M1                         0.00775    0.01858 -0.02674  0.05071</span></span>
+<span><span class="co">#&gt; indirect_2: M2                        -0.00662    0.01496 -0.04331  0.01831</span></span>
+<span><span class="co">#&gt; total_indirect: Total indirect effect  0.00113    0.02396 -0.04882  0.05067</span></span>
+<span><span class="co">#&gt; total: Total effect                   -0.18674    0.10061 -0.38051  0.01125</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Path coefficients:</span></span>
+<span><span class="co">#&gt;    Estimate Std. Error CI lower CI upper</span></span>
+<span><span class="co">#&gt; cp  -0.1879     0.1003  -0.3825   0.0108</span></span>
+<span><span class="co">#&gt; b1  -0.0501     0.0970  -0.2352   0.1423</span></span>
+<span><span class="co">#&gt; d1  -0.0751     0.1013  -0.2707   0.1264</span></span>
+<span><span class="co">#&gt; b2  -0.0821     0.0975  -0.2715   0.1099</span></span>
+<span><span class="co">#&gt; d2  -0.0438     0.1012  -0.2393   0.1587</span></span>
+<span><span class="co">#&gt; a1  -0.1546     0.1028  -0.3594   0.0470</span></span>
+<span><span class="co">#&gt; a2   0.0806     0.1011  -0.1153   0.2784</span></span>
+<span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span></span>
+<span><span class="co">#&gt; Tables: $effects, $coefficients; analysis settings: $info.</span></span></code></pre></div>
+<p>For complete condition effects, standardization uses the
+model-implied marginal SD of the outcome difference. See <a href="StandardizedModeratedMediation.html">standardized effects</a> for
+the treatment of paths, interactions and conditional effects.</p>
+<p>If the original call used <code>standardized = TRUE</code>, plain
+<code>print(result)</code>, <code>summary(result)</code> and
+<code>plot(result)</code> already use standardized output.</p>
+</div>
+<div class="section level3">
+<h3 id="select-an-effect-family">Select an effect family<a class="anchor" aria-label="anchor" href="#select-an-effect-family"></a>
+</h3>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span></span>
+<span>  <span class="va">result</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"indirect"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed statistical summary</span></span>
+<span><span class="co">#&gt; Model: P | Missing: DE | Observations: 100 </span></span>
+<span><span class="co">#&gt; Effects:</span></span>
+<span><span class="co">#&gt; wsMed indirect | raw scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt;                Estimate Std. Error CI lower CI upper</span></span>
+<span><span class="co">#&gt; indirect_1: M1  0.00131    0.00321 -0.00459  0.00876</span></span>
+<span><span class="co">#&gt; indirect_2: M2 -0.00112    0.00259 -0.00751  0.00319</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Path coefficients:</span></span>
+<span><span class="co">#&gt;    Estimate Std. Error CI lower CI upper</span></span>
+<span><span class="co">#&gt; cp -0.03180    0.01700 -0.06453  0.00186</span></span>
+<span><span class="co">#&gt; b1 -0.04834    0.09555 -0.23422  0.13918</span></span>
+<span><span class="co">#&gt; d1 -0.06905    0.09524 -0.25390  0.11568</span></span>
+<span><span class="co">#&gt; b2 -0.07732    0.09387 -0.26459  0.10461</span></span>
+<span><span class="co">#&gt; d2 -0.03676    0.08675 -0.20684  0.13625</span></span>
+<span><span class="co">#&gt; a1 -0.02712    0.01772 -0.06162  0.00817</span></span>
+<span><span class="co">#&gt; a2  0.01448    0.01796 -0.02032  0.04929</span></span>
+<span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span></span>
+<span><span class="co">#&gt; Tables: $effects, $coefficients; analysis settings: $info.</span></span></code></pre></div>
+<p>Other selections include <code>"direct"</code>,
 <code>"total_indirect"</code>, <code>"total"</code>,
-<code>"paths"</code> or <code>"parameters"</code>. <code>terms</code>
-selects identifiers listed in the <code>effect</code> column. If the
-original analysis stored both engines (<code>ci_method = "both"</code>),
-select <code>method = "mc"</code> or <code>"bootstrap"</code> in
-<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>; <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> labels them separately.</p>
-<p>For a moderated analysis, supply raw values with
-<code>at = list(Age = c(30, 50))</code> or original category labels. Use
-your moderator’s actual column name. Without <code>at</code>, continuous
-moderators use their centering reference and categorical moderators use
-all observed levels. These are <strong>conditional effects</strong>, not
-effects averaged over the moderator. See the <a href="AnalysisGuide.html#add-moderation">analysis guide</a>.</p>
+<code>"paths"</code> and <code>"parameters"</code>. Use
+<code>terms</code> only when selecting particular named effects.</p>
+</div>
+<div class="section level3">
+<h3 id="change-the-confidence-level">Change the confidence level<a class="anchor" aria-label="anchor" href="#change-the-confidence-level"></a>
+</h3>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span></span>
+<span>  <span class="va">result</span>,</span>
+<span>  level <span class="op">=</span> <span class="fl">0.90</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed statistical summary</span></span>
+<span><span class="co">#&gt; Model: P | Missing: DE | Observations: 100 </span></span>
+<span><span class="co">#&gt; Effects:</span></span>
+<span><span class="co">#&gt; wsMed all | raw scale | mc </span></span>
+<span><span class="co">#&gt; 90% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt;                                        Estimate Std. Error  CI lower  CI upper</span></span>
+<span><span class="co">#&gt; cp: Direct effect                     -0.031795   0.017000 -0.059453 -0.003589</span></span>
+<span><span class="co">#&gt; indirect_1: M1                         0.001311   0.003208 -0.003348  0.007167</span></span>
+<span><span class="co">#&gt; indirect_2: M2                        -0.001120   0.002587 -0.005991  0.002170</span></span>
+<span><span class="co">#&gt; total_indirect: Total indirect effect  0.000191   0.004138 -0.006581  0.006993</span></span>
+<span><span class="co">#&gt; total: Total effect                   -0.031604   0.017049 -0.059402 -0.003324</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Path coefficients:</span></span>
+<span><span class="co">#&gt;    Estimate Std. Error CI lower CI upper</span></span>
+<span><span class="co">#&gt; cp -0.03180    0.01700 -0.05945 -0.00359</span></span>
+<span><span class="co">#&gt; b1 -0.04834    0.09555 -0.20435  0.10967</span></span>
+<span><span class="co">#&gt; d1 -0.06905    0.09524 -0.22561  0.08720</span></span>
+<span><span class="co">#&gt; b2 -0.07732    0.09387 -0.23305  0.07588</span></span>
+<span><span class="co">#&gt; d2 -0.03676    0.08675 -0.18004  0.10598</span></span>
+<span><span class="co">#&gt; a1 -0.02712    0.01772 -0.05624  0.00217</span></span>
+<span><span class="co">#&gt; a2  0.01448    0.01796 -0.01494  0.04405</span></span>
+<span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span></span>
+<span><span class="co">#&gt; Tables: $effects, $coefficients; analysis settings: $info.</span></span></code></pre></div>
+<p>The interval is recalculated from the stored draws. Effect SEs are
+sample SDs of the joint effect draws, and effect CIs are percentile
+intervals.</p>
+<p>For a model that stored both inference engines, choose
+<code>method = "mc"</code> or <code>method = "bootstrap"</code> in
+<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>. The default <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> reports
+both.</p>
+</div>
+<div class="section level3">
+<h3 id="choose-moderator-values">Choose moderator values<a class="anchor" aria-label="anchor" href="#choose-moderator-values"></a>
+</h3>
+<p>For moderated mediation, the default report uses the centering
+reference for a continuous moderator and all observed levels for a
+categorical moderator. Use <code>at</code> to choose raw values or
+category labels. For example, after fitting the second <a href="GetStarted.html#example-2-add-a-continuous-moderator">Get started
+example</a>:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span></span>
+<span>  <span class="va">moderated</span>,</span>
+<span>  at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>D3 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">D3</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>These are conditional effects at specified values, not effects
+averaged over the moderator distribution.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="compare-two-pathways">Compare two pathways<a class="anchor" aria-label="anchor" href="#compare-two-pathways"></a>
 </h2>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<p>A difference between effects needs its own CI. Use the stored joint
+draws to form that difference, then print the result directly:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">effects</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_effects.html">wsmed_effects</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span><span class="va">difference</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_contrasts.html">wsmed_contrasts</a></span><span class="op">(</span><span class="va">effects</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>B_minus_A <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>indirect_2 <span class="op">=</span> <span class="fl">1</span>, indirect_1 <span class="op">=</span> <span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">difference</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"label"</span>, <span class="st">"estimate"</span>, <span class="st">"conf.low"</span>, <span class="st">"conf.high"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;       label    estimate    conf.low  conf.high</span></span>
-<span><span class="co">#&gt; 1 B_minus_A -0.01436559 -0.06939103 0.02830113</span></span></code></pre></div>
+<span><span class="va">difference</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_contrasts.html">wsmed_contrasts</a></span><span class="op">(</span></span>
+<span>  <span class="va">effects</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>B_minus_A <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>indirect_2 <span class="op">=</span> <span class="fl">1</span>, indirect_1 <span class="op">=</span> <span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">difference</span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed contrasts | raw scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt; Contrast direction (signed weights):</span></span>
+<span><span class="co">#&gt;  B_minus_A: +1 * M2 -1 * M1</span></span>
+<span><span class="co">#&gt;           Estimate Std. Error CI lower CI upper</span></span>
+<span><span class="co">#&gt; B_minus_A -0.00243    0.00410 -0.01184  0.00489</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span></code></pre></div>
 <p><code>B_minus_A</code> is the indirect effect through B minus the
-effect through A. Its interval is computed from their matched joint
-draws. Do not subtract confidence-interval endpoints or infer a
-difference merely because only one of the separate intervals excludes
+effect through A. Do not subtract separate CI endpoints, or infer a
+difference simply because only one of the separate intervals excludes
 zero.</p>
 </div>
 <div class="section level2">
-<h2 id="export-numbers-and-save-a-figure">Export numbers and save a figure<a class="anchor" aria-label="anchor" href="#export-numbers-and-save-a-figure"></a>
+<h2 id="extract-or-export-results-when-needed">Extract or export results when needed<a class="anchor" aria-label="anchor" href="#extract-or-export-results-when-needed"></a>
 </h2>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">effects</span>, <span class="st">"mediation-effects.csv"</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">coefficients</span>, <span class="st">"path-coefficients.csv"</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">s</span>, title <span class="op">=</span> <span class="st">"Standardized mediation effects"</span><span class="op">)</span></span>
-<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"mediation-effects.png"</span>, <span class="va">p</span>, width <span class="op">=</span> <span class="fl">7</span>, height <span class="op">=</span> <span class="fl">4.5</span>, dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span></code></pre></div>
-<p>The exported data retain full precision. CSV files include effect
-identifiers, scale, inference method, confidence level and any moderator
-information. The export examples write files to your working directory;
-change the names before using them if those files already exist.</p>
-<p><strong>Next:</strong> <a href="PlottingEffects.html">choose a
-plot</a>, or learn to <a href="ModularWorkflow.html">reuse a fit</a> and
-<a href="WorkflowReliability.html">record diagnostics and
-provenance</a>.</p>
+<p>Extraction is useful for further calculations or export; it is not
+required for ordinary reports and plots.</p>
+<table class="table">
+<thead><tr class="header">
+<th>Task</th>
+<th>Call</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Effects as a data frame</td>
+<td><code>as.data.frame(s)</code></td>
+</tr>
+<tr class="even">
+<td>Selected result columns</td>
+<td><code>effect_table[, columns]</code></td>
+</tr>
+<tr class="odd">
+<td>Effect estimates</td>
+<td><code>coef(s)</code></td>
+</tr>
+<tr class="even">
+<td>Effect CIs</td>
+<td><code>confint(s)</code></td>
+</tr>
+<tr class="odd">
+<td>Covariance of effect draws</td>
+<td><code>vcov(s)</code></td>
+</tr>
+<tr class="even">
+<td>Path-coefficient table</td>
+<td><code>s$coefficients</code></td>
+</tr>
+<tr class="odd">
+<td>Method, scale and confidence level</td>
+<td><code>s$info</code></td>
+</tr>
+<tr class="even">
+<td>Sample size of the fitted data</td>
+<td><code>nobs(result)</code></td>
+</tr>
+</tbody>
+</table>
+<p>The methods on <code>s</code> concern its selected effects. In
+contrast, <code>coef(result)</code>, <code>vcov(result)</code> and
+<code>confint(result)</code> concern primitive model parameters.</p>
+<p>To choose which columns to display, list their names in the order you
+want. For example, keep the effect name, estimate, SE and both CI
+limits:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">effect_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span></span>
+<span><span class="va">columns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"label"</span>,</span>
+<span>  <span class="st">"estimate"</span>,</span>
+<span>  <span class="st">"std.error"</span>,</span>
+<span>  <span class="st">"conf.low"</span>,</span>
+<span>  <span class="st">"conf.high"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">effect_table</span><span class="op">[</span>, <span class="va">columns</span><span class="op">]</span></span>
+<span><span class="co">#&gt;                   label      estimate   std.error     conf.low   conf.high</span></span>
+<span><span class="co">#&gt; 1         Direct effect -0.0317954295 0.016999695 -0.064525050 0.001863738</span></span>
+<span><span class="co">#&gt; 2                    M1  0.0013113045 0.003208354 -0.004586379 0.008759829</span></span>
+<span><span class="co">#&gt; 3                    M2 -0.0011199168 0.002587292 -0.007506753 0.003185604</span></span>
+<span><span class="co">#&gt; 4 Total indirect effect  0.0001913877 0.004138371 -0.008458737 0.008723282</span></span>
+<span><span class="co">#&gt; 5          Total effect -0.0316040417 0.017049340 -0.064633149 0.001894936</span></span></code></pre></div>
+<p>Remove <code>"std.error"</code> from <code>columns</code> to omit
+SEs, or remove <code>"conf.low"</code> and <code>"conf.high"</code> to
+omit CIs. <code>names(effect_table)</code> lists all available columns;
+for moderated mediation, retain <code>moderator</code> and
+<code>at</code> to identify the evaluated values or groups. Use
+<code>s$coefficients[, columns]</code> for the path-coefficient
+table.</p>
+<p>To export the same selected columns:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span></span>
+<span>  <span class="va">effect_table</span><span class="op">[</span>, <span class="va">columns</span><span class="op">]</span>,</span>
+<span>  <span class="st">"mediation-effects.csv"</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span></span>
+<span>  <span class="st">"mediation-effects.png"</span>,</span>
+<span>  plot <span class="op">=</span> <span class="va">p</span>,</span>
+<span>  width <span class="op">=</span> <span class="fl">7</span>,</span>
+<span>  height <span class="op">=</span> <span class="fl">4.5</span>,</span>
+<span>  dpi <span class="op">=</span> <span class="fl">300</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>The CSV contains the selected columns at full precision. Use
+<code>as.data.frame(s)</code> instead to export the complete effect
+table, including analysis settings. Choose your own filenames when
+saving results.</p>
+<p><strong>Next:</strong> <a href="PlottingEffects.html">customize a
+plot</a>, or <a href="ModularWorkflow.html">reuse a fit</a> for another
+inference method.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

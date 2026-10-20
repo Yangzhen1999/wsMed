@@ -64,7 +64,7 @@
       <h1>Inspecting generated SEM syntax</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/vignettes/printGM.Rmd" class="external-link"><code>vignettes/printGM.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/master/vignettes/printGM.Rmd" class="external-link"><code>vignettes/printGM.Rmd</code></a></small>
       <div class="d-none name"><code>printGM.Rmd</code></div>
     </div>
 
@@ -81,17 +81,13 @@
 and format the model equations.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://yangzhen1999.github.io/wsMed/">wsMed</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">)</span></span>
 <span><span class="va">result1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">example_data</span>,</span>
-<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>,<span class="st">"B1"</span>,<span class="st">"C1"</span><span class="op">)</span>,</span>
-<span>  M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>,<span class="st">"B2"</span>,<span class="st">"C2"</span><span class="op">)</span>,</span>
+<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span>, <span class="st">"C1"</span><span class="op">)</span>,</span>
+<span>  M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span>, <span class="st">"C2"</span><span class="op">)</span>,</span>
 <span>  Y_C1 <span class="op">=</span> <span class="st">"D1"</span>,</span>
-<span>  Y_C2 <span class="op">=</span> <span class="st">"D2"</span>,</span>
-<span>  form <span class="op">=</span> <span class="st">"P"</span>,</span>
-<span>  Na <span class="op">=</span> <span class="st">"DE"</span>,</span>
-<span>  standardized <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  ci_method <span class="op">=</span> <span class="st">"mc"</span>, R <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>  seed <span class="op">=</span> <span class="fl">123</span></span>
+<span>  Y_C2 <span class="op">=</span> <span class="st">"D2"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/printGM.html">printGM</a></span><span class="op">(</span><span class="va">result1</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
@@ -167,10 +163,10 @@ functions.</p>
 <span><span class="co">##  total_effect := cp + total_indirect</span></span></code></pre>
 <p><code><a href="../reference/printGM.html">printGM()</a></code> displays the unstandardized model equations;
 requesting standardized estimates does not rewrite the SEM syntax. For
-standardized conditional estimates and plots, use
-<code>moderation_std</code> and
-<code>plot_moderation_curve(..., standardized = TRUE)</code>, as shown
-in <a href="StandardizedModeratedMediation.html">Standardized moderated
+standardized estimates and plots, use
+<code>summary(result1, standardized = TRUE)</code> and
+<code>plot(result1, standardized = TRUE)</code>. The same methods also
+support conditional results when a moderator is present; see <a href="StandardizedModeratedMediation.html">Standardized moderated
 mediation</a>.</p>
 </div>
 </div>

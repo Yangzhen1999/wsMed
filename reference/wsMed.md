@@ -145,7 +145,9 @@ wsMed(
 
 - boot_ci_type:
 
-  Character; bootstrap CI type: `"perc"`, `"bc"`, or `"bca.simple"`.
+  Character; CI type for stored legacy bootstrap parameter tables:
+  `"perc"`, `"bc"`, or `"bca.simple"` (zero acceleration). Current
+  effect reports use percentile intervals regardless of this setting.
 
 - iseed, seed:
 
@@ -256,9 +258,10 @@ Missing-data strategies:
 
 Confidence-interval engines:
 
-- Bootstrap: percentile, BC, or BCa (DE and FIML only)
+- Bootstrap: participant resampling (DE and FIML only)
 
-- Monte Carlo: draws via semmcci (all `Na` options)
+- Monte Carlo: joint parameter draws via semmcci for DE/FIML, or the
+  package's pooled-parameter sampler for MI
 
 Monte Carlo inference uses the existing joint-parameter sampler. The
 legacy `MCmethod = "bootSD"` option was accepted but never applied; it
@@ -269,21 +272,24 @@ Standardization divides differences by their marginal model-implied SDs,
 without recentering them. Dummy variables retain 0/1 units; interaction
 terms use the product of their component scale factors, not the
 interaction column SD. MC and bootstrap draws are transformed jointly
-with their scales. Standardized bootstrap intervals use type-7
-quantiles; bc and bca.simple apply bias correction with zero
-acceleration. P-values use inversion of that distribution and require at
-least 1000 valid replicates.
+with their scales. Current effect reports from print, summary and
+wsmed_effects, and confint applied to extracted effects, use percentile
+intervals (type-7 quantiles), with or without moderation. The
+boot_ci_type argument controls stored legacy parameter-table intervals,
+not these effect reports. In standardized legacy tables, bc and
+bca.simple apply bias correction with zero acceleration, not full BCa.
+Their bootstrap p-values require at least 1000 valid replicates.
 
 Conditional tables use percentile intervals and fixed numerical probes.
 With fixed.x=TRUE, scale transformations condition on the fitted
 external moments rather than adding sampling uncertainty for those
 moments. In MI, probes/centering references use the first completed data
 set; fixed.x=TRUE also conditions on its external moments in the pooled
-transform. In moderated MI models, marginal variances are pooled jointly
-with primitive coefficients, including their delta-method
-within-imputation and Rubin between-imputation covariance. MC propagates
-this joint uncertainty. Endogenous product moments are estimated even
-with fixed.x=TRUE.
+transform. In MI models with products of mediator differences and the
+moderator, marginal variances are pooled jointly with primitive
+coefficients, including their delta-method within-imputation and Rubin
+between-imputation covariance. MC propagates this joint uncertainty.
+Endogenous product moments are estimated even with fixed.x=TRUE.
 
 Workflow: (1) preprocess -\> (2) generate SEM syntax -\> (3) fit -\> (4)
 compute confidence intervals -\> (5) optional: standardize estimates.
@@ -295,8 +301,8 @@ moderators as unordered factors with explicit levels before fitting. The
 first factor level is the reference group. Existing automatic
 recognition of numeric 0/1 predictors is retained in this one-call
 interface. The empirical manuscript dataset is available as
-[`wsmed_examples()`](https://yangzhen1999.github.io/wsMed/reference/wsmed_examples.md);
-[`example_data()`](https://yangzhen1999.github.io/wsMed/reference/example_data.md)
+[wsmed_examples](https://yangzhen1999.github.io/wsMed/reference/wsmed_examples.md);
+[example_data](https://yangzhen1999.github.io/wsMed/reference/example_data.md)
 is simulated tutorial data.
 
 The one-call interface uses the same fitting and inference engines as
@@ -304,8 +310,9 @@ The one-call interface uses the same fitting and inference engines as
 [`wsmed_fit()`](https://yangzhen1999.github.io/wsMed/reference/wsmed_fit.md),
 and
 [`wsmed_infer()`](https://yangzhen1999.github.io/wsMed/reference/wsmed_infer.md).
-Default printing is concise; use `print(result, detail = "full")` for
-the original tables. Use
+Default printing is concise; `print(result, detail = "full")` adds path
+coefficients to the structured effect report. Use `detail = "legacy"`
+for the original tables. Use
 [`wsmed_effects()`](https://yangzhen1999.github.io/wsMed/reference/wsmed_effects.md)
 to query stored draws without rerunning the analysis.
 
@@ -313,13 +320,12 @@ to query stored draws without rerunning the analysis.
 
 ``` r
 data("example_data", package = "wsMed")
-set.seed(123)
 result <- wsMed(
   data = example_data,
-  M_C1 = c("A2", "B2"),
-  M_C2 = c("A1", "B1"),
-  Y_C1 = "C1", Y_C2 = "C2",
-  form = "P", Na = "DE"
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2"
 )
 print(result)
 #> wsMed analysis
@@ -329,11 +335,11 @@ print(result)
 #> 95% percentile intervals; 20000 joint draws; SE from effect draws
 #> Condition contrast: C2 - C1 
 #>                                        Estimate Std. Error  CI lower  CI upper
-#> cp: Direct effect                      0.015995   0.016235 -0.016037  0.047686
-#> indirect_1: M1                         0.000977   0.003002 -0.004805  0.007940
-#> indirect_2: M2                        -0.001626   0.002900 -0.008681  0.003040
-#> total_indirect: Total indirect effect -0.000650   0.004151 -0.009492  0.007664
-#> total: Total effect                    0.015346   0.016328 -0.016597  0.047203
+#> cp: Direct effect                     -0.031795   0.017000 -0.064525  0.001864
+#> indirect_1: M1                         0.001311   0.003208 -0.004586  0.008760
+#> indirect_2: M2                        -0.001120   0.002587 -0.007507  0.003186
+#> total_indirect: Total indirect effect  0.000191   0.004138 -0.008459  0.008723
+#> total: Total effect                   -0.031604   0.017049 -0.064633  0.001895
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 #> Post-fit admissibility: 1 of 1 ; excluded rows: 0 

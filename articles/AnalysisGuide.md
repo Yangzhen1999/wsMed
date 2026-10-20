@@ -27,18 +27,86 @@ condition 1**.
 | Research structure | `form` | Meaning / next step |
 |----|----|----|
 | Parallel pathways | `"P"` | Each mediator forms a separate pathway; start with the [quick start](https://yangzhen1999.github.io/wsMed/articles/GetStarted.md). |
-| Serial pathways | `"CN"` | Mediators are connected in order; see [model selection](https://yangzhen1999.github.io/wsMed/articles/WsMed.html#predefined-models). |
-| Serial-parallel structure | `"CP"` | A serial component feeds parallel pathways; inspect the diagram in [the model description](https://yangzhen1999.github.io/wsMed/articles/GenerateModelCP.md). |
-| Parallel-serial structure | `"PC"` | Parallel pathways feed a later mediator; inspect the diagram in [the model description](https://yangzhen1999.github.io/wsMed/articles/GenerateModelPC.md). |
-| User-defined pathways | `"UD"` | Specify the directed mediator connections; see [custom models](https://yangzhen1999.github.io/wsMed/articles/GenerateModelCustom.md). |
+| Serial pathways | `"CN"` | Each mediator predicts every later mediator in the supplied order. |
+| Serial-parallel structure | `"CP"` | The first mediator (`M1`) predicts all remaining mediators. |
+| Parallel-serial structure | `"PC"` | All remaining mediators predict the first mediator (`M1`). |
+| User-defined pathways | `"UD"` | Set `form = "UD"` and list each mediator-to-mediator or mediator-to-outcome arrow in `paths`; see the example below. |
 
-Choose the structure using your research design and substantive
-assumptions. Check mediator ordering against the diagram and generated
-equations; the two mixed structures are not interchangeable. Their
-[equation
-articles](https://yangzhen1999.github.io/wsMed/articles/index.md)
-provide definitions rather than additional required steps for an
-ordinary fit.
+The four predefined models are shown below. Each includes paths from the
+condition to every mediator and to the outcome, and from every mediator
+to the outcome. Choose the structure and mediator order from your
+research design; `CP` and `PC` place `M1` at opposite ends of the
+mediator connections.
+
+**P: Parallel**
+
+[![P model: parallel mediator
+pathways](Wa.png)](https://yangzhen1999.github.io/wsMed/articles/Wa.png)
+
+No directed connections among mediators. [Model
+equations](https://yangzhen1999.github.io/wsMed/articles/GenerateModelP.md).
+
+**CN: Serial**
+
+[![CN model: earlier mediators predict later
+mediators](Wb.png)](https://yangzhen1999.github.io/wsMed/articles/Wb.png)
+
+Each earlier mediator predicts every later mediator. [Model
+equations](https://yangzhen1999.github.io/wsMed/articles/GenerateModelCN.md).
+
+**CP: Serial-parallel**
+
+[![CP model: M1 predicts the remaining parallel
+mediators](Wc.png)](https://yangzhen1999.github.io/wsMed/articles/Wc.png)
+
+M1 predicts M2, M3, and so on. [Model
+equations](https://yangzhen1999.github.io/wsMed/articles/GenerateModelCP.md).
+
+**PC: Parallel-serial**
+
+[![PC model: the parallel mediators predict
+M1](Wd.png)](https://yangzhen1999.github.io/wsMed/articles/Wd.png)
+
+M2, M3, and so on predict M1. [Model
+equations](https://yangzhen1999.github.io/wsMed/articles/GenerateModelPC.md).
+
+Click a diagram to enlarge it. In these difference-score diagrams,
+`diff` denotes condition 2 minus condition 1 and `avg` denotes the
+centered average; the triangle represents the constant used to estimate
+condition effects.
+
+For **user-defined models**, `M1`, `M2`, and so on refer to the
+positions in `M_C1` and `M_C2`; `Y` refers to the pair supplied through
+`Y_C1` and `Y_C2`. For example, with `M_C1 = c("A1", "B1", "C1")` and
+`M_C2 = c("A2", "B2", "C2")`, the following specifies A to C, C to the
+outcome, and B to the outcome:
+
+``` r
+
+custom_paths <- c(
+  "M1 -> M3",  # A to C
+  "M3 -> Y",   # C to the outcome
+  "M2 -> Y"    # B to the outcome
+)
+```
+
+Pass this vector as `paths = custom_paths` together with `form = "UD"`
+in [`wsMed()`](https://yangzhen1999.github.io/wsMed/reference/wsMed.md).
+Write one arrow per string using these model labels, not the raw column
+names. Only the listed mediator connections are included: this example
+omits `M1 -> Y`. Condition-to-mediator paths and the direct
+condition-to-outcome path are added automatically. The [worked UD
+example](https://yangzhen1999.github.io/wsMed/articles/GenerateModelCustom.md)
+shows the complete call, input rules, and resulting indirect effects.
+
+To add a moderator to this UD model, keep `custom_paths` and add
+`W = "D3"` and `MP = c("b_1_3", "b3")` to the call. Here, D3 is the
+moderator column; `b_1_3` and `b3` select the M1-to-M3 and M3-to-outcome
+slopes. Use coefficient labels in `MP`, not the arrow strings used in
+`paths`. The [UD moderation
+example](https://yangzhen1999.github.io/wsMed/articles/GenerateModelCustom.html#add-a-moderator)
+shows the complete call, how to choose other paths, and how to read
+conditional effects at selected moderator values.
 
 ## Add moderation
 
@@ -87,7 +155,7 @@ predictors have additional
 
 | Task | Guide |
 |----|----|
-| Fit once, then compare inference methods | [Staged workflow](https://yangzhen1999.github.io/wsMed/articles/ModularWorkflow.md) |
+| Specify, fit, infer, and inspect or extract at each stage | [Staged workflow](https://yangzhen1999.github.io/wsMed/articles/ModularWorkflow.md) |
 | Inspect generated SEM syntax | [Model syntax](https://yangzhen1999.github.io/wsMed/articles/printGM.md) |
 | Check warnings, diagnostics and reproducibility | [Diagnostics and migration](https://yangzhen1999.github.io/wsMed/articles/WorkflowReliability.md) |
 | Read mathematical definitions and software comparisons | [All articles](https://yangzhen1999.github.io/wsMed/articles/index.md) |

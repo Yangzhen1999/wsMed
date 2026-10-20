@@ -1,1813 +1,494 @@
 # Analysis options: a complete walkthrough
 
-**Looking for a short first example?** Start with [Get
-started](https://yangzhen1999.github.io/wsMed/articles/GetStarted.md).
-This longer guide explains analysis options and preserves historical
-full-report examples. Use [Read and export
-results](https://yangzhen1999.github.io/wsMed/articles/ResultsGuide.md)
-for the current [`print()`](https://rdrr.io/r/base/print.html) and
-[`summary()`](https://rdrr.io/r/base/summary.html) workflow.
+Use the [Get started
+examples](https://yangzhen1999.github.io/wsMed/articles/GetStarted.md)
+for a first analysis. This guide shows which arguments to add when your
+question needs a different model, covariates, missing-data handling or
+inference method.
 
-## Introduction
-
-[`wsMed()`](https://yangzhen1999.github.io/wsMed/reference/wsMed.md)
-fits multiple mediation and moderated mediation models for two-condition
-within-subject designs. A complete call identifies the paired mediator
-and outcome variables, selects the mediation structure, specifies the
-estimation options, and, when needed, adds moderators or covariates.
-
-This tutorial shows how to construct a
-[`wsMed()`](https://yangzhen1999.github.io/wsMed/reference/wsMed.md)
-call one step at a time. Each section begins with the same basic call
-and changes only the arguments needed for the next part of the analysis.
-
-## Quick start
-
-The examples below use the artificial `example_data` dataset. The
-empirical manuscript data are also included as `wsmed_examples` (123
-participants, 14 columns). Load them without an external data file:
+## Start with the defaults
 
 ``` r
 
-data(wsmed_examples, package = "wsMed")
-dim(wsmed_examples)
-#> [1] 123  14
-colSums(is.na(wsmed_examples))
-#>  TSRQ_T1  TSRQ_T2 WEMBS_T1 WEMBS_T2  SMUF_T1  SMUF_T2   ISI_T1   ISI_T2 
-#>        1       22        0       22        8       18        0       19 
-#> DASSS_T1 DASSS_T2   HES_T1   HES_T2      Age      BMI 
-#>        0       23        0       20        0       13
-```
-
-See
-[`help("wsmed_examples")`](https://yangzhen1999.github.io/wsMed/reference/wsmed_examples.md)
-for variable meanings, source and license, preprocessing, and
-missingness. These data retain the manuscript’s missing values. The
-[categorical predictor
-tutorial](https://yangzhen1999.github.io/wsMed/articles/CategoricalPredictors.md)
-uses the separate simulated data to illustrate factor coding and group
-comparisons.
-
-The following example fits a parallel mediation model with two
-mediators. It uses `example_data`, which is included in the package.
-
-``` r
-
-data("example_data", package = "wsMed")
-```
-
-``` r
-
+data(example_data)
 result <- wsMed(
   data = example_data,
   M_C1 = c("A1", "B1"),
   M_C2 = c("A2", "B2"),
-  Y_C1 = "C1",
-  Y_C2 = "C2",
-  form = "P",
-  Na = "DE",
-  ci_method = "mc",
-  R = 5000,
-  seed = 123
+  Y_C1 = "D1",
+  Y_C2 = "D2"
 )
-
-print(result, detail = "legacy")
+print(result)
+#> wsMed analysis
+#> Model: P | DE | Observations: 100 
+#> Effects:
+#> wsMed all | raw scale | mc 
+#> 95% percentile intervals; 20000 joint draws; SE from effect draws
+#> Condition contrast: C2 - C1 
+#>                                        Estimate Std. Error  CI lower  CI upper
+#> cp: Direct effect                     -0.031795   0.017000 -0.064525  0.001864
+#> indirect_1: M1                         0.001311   0.003208 -0.004586  0.008760
+#> indirect_2: M2                        -0.001120   0.002587 -0.007507  0.003186
+#> total_indirect: Total indirect effect  0.000191   0.004138 -0.008459  0.008723
+#> total: Total effect                   -0.031604   0.017049 -0.064633  0.001895
+#> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
+#> Use as.data.frame() for the full-precision table and metadata.
+#> Post-fit admissibility: 1 of 1 ; excluded rows: 0
 ```
 
-The arguments in this call answer four basic questions:
+The default is parallel mediation with Monte Carlo inference, 20,000
+draws, 95% CIs and unstandardized output. Listwise deletion is the
+default missing-data strategy; the example data are complete. Later
+calls keep these defaults unless an argument is explicitly changed.
 
-- Which data set should be analyzed?
-- Which columns contain the mediator and outcome measurements under the
-  two conditions?
-- What is the mediation structure?
-- How should missing data and confidence intervals be handled?
+## Paired variables
 
-The following sections explain how to answer each question.
+Each row represents one participant. Match each mediator’s condition 1
+and condition 2 measurements by position in `M_C1` and `M_C2`. `Y_C1`
+and `Y_C2` identify the outcome pair. Differences are always **condition
+2 minus condition 1**.
 
-## Step 1: Specify the repeated-measures variables
+| Construct | Condition 1 | Condition 2 | Role                   |
+|-----------|-------------|-------------|------------------------|
+| A         | `A1`        | `A2`        | First mediator (`M1`)  |
+| B         | `B1`        | `B2`        | Second mediator (`M2`) |
+| D         | `D1`        | `D2`        | Outcome (`Y`)          |
 
-The data must be in wide format. Each row represents one participant,
-and each repeated measure has a separate column for each condition.
+Outcomes, mediators and within-subject covariates are analyzed as
+continuous numeric variables. Binary and multicategory variables can be
+between-subject covariates or moderators; use unordered factors with
+explicit levels. See [categorical
+predictors](https://yangzhen1999.github.io/wsMed/articles/CategoricalPredictors.md).
 
-The mediator names are supplied through `M_C1` and `M_C2`. Their
-positions must match. For example:
-
-``` r
-
-M_C1 = c("A1", "B1")
-M_C2 = c("A2", "B2")
-```
-
-This tells
-[`wsMed()`](https://yangzhen1999.github.io/wsMed/reference/wsMed.md)
-that `A1` and `A2` are the two measurements of the first mediator,
-whereas `B1` and `B2` are the two measurements of the second mediator.
-The outcome pair is supplied through `Y_C1` and `Y_C2`:
-
-``` r
-
-Y_C1 = "C1"
-Y_C2 = "C2"
-```
-
-The variable mapping in the quick-start example is therefore:
-
-| Construct | Condition 1 | Condition 2 | Internal label |
-|:----------|:------------|:------------|:---------------|
-| A         | `A1`        | `A2`        | `M1`           |
-| B         | `B1`        | `B2`        | `M2`           |
-| C         | `C1`        | `C2`        | `Y`            |
-
-The internal mediator labels are determined by position. If three
-mediators are supplied as follows:
-
-``` r
-
-M_C1 = c("A1", "B1", "C1")
-M_C2 = c("A2", "B2", "C2")
-```
-
-then A, B, and C are labeled `M1`, `M2`, and `M3`, respectively. This
-numbering is especially important when specifying a user-defined model
-in Step 2.
-
-[`wsMed()`](https://yangzhen1999.github.io/wsMed/reference/wsMed.md)
-automatically prepares the difference and level components used in the
-model. Users should supply the original condition-specific columns, not
-manually computed difference or average scores.
-
-## Step 2: Choose the mediation structure
-
-The mediation structure is selected with `form`. Users can choose one of
-four predefined structures or define the mediator paths themselves.
+## Choose the mediator structure
 
 ### Predefined models
 
-The predefined options are:
+| `form` | Structure |
+|----|----|
+| `"P"` (default) | Parallel mediation |
+| `"CN"` | Serial mediation; each mediator predicts every later mediator |
+| `"CP"` | Serial-parallel mediation; M1 predicts the remaining mediators |
+| `"PC"` | Parallel-serial mediation; the remaining mediators predict M1 |
 
-| `form` | Structure | How the mediators are connected |
-|:---|:---|:---|
-| `"P"` | Parallel | All mediators operate in parallel. |
-| `"CN"` | Chained/serial | The mediators form one serial chain. |
-| `"CP"` | Chained–parallel | The first mediator predicts multiple later mediators. |
-| `"PC"` | Parallel–chained | Multiple mediators predict one final mediator. |
+The diagrams show the four predefined structures. Each includes
+condition effects on every mediator and the outcome, and paths from
+every mediator to the outcome. The connections among mediators
+distinguish the models.
 
-For a predefined model, the mediator order in `M_C1` and `M_C2`
-determines their positions in the structure. To fit a different
-predefined structure, replace the value of `form` in the basic call:
+**P: Parallel**
+
+[![P model: parallel mediator
+pathways](Wa.png)](https://yangzhen1999.github.io/wsMed/articles/Wa.png)
+
+No directed connections among mediators. [Model
+equations](https://yangzhen1999.github.io/wsMed/articles/GenerateModelP.md).
+
+**CN: Serial**
+
+[![CN model: earlier mediators predict later
+mediators](Wb.png)](https://yangzhen1999.github.io/wsMed/articles/Wb.png)
+
+Each earlier mediator predicts every later mediator. [Model
+equations](https://yangzhen1999.github.io/wsMed/articles/GenerateModelCN.md).
+
+**CP: Serial-parallel**
+
+[![CP model: M1 predicts the remaining parallel
+mediators](Wc.png)](https://yangzhen1999.github.io/wsMed/articles/Wc.png)
+
+M1 predicts M2, M3, and so on. [Model
+equations](https://yangzhen1999.github.io/wsMed/articles/GenerateModelCP.md).
+
+**PC: Parallel-serial**
+
+[![PC model: the parallel mediators predict
+M1](Wd.png)](https://yangzhen1999.github.io/wsMed/articles/Wd.png)
+
+M2, M3, and so on predict M1. [Model
+equations](https://yangzhen1999.github.io/wsMed/articles/GenerateModelPC.md).
+
+Click a diagram to enlarge it. In these difference-score diagrams,
+`diff` denotes condition 2 minus condition 1 and `avg` denotes the
+centered average; the triangle represents the constant used to estimate
+condition effects.
+
+For example, change only `form` to fit a serial model:
 
 ``` r
 
-form = "P"
-form = "CN"
-form = "CP"
-form = "PC"
-```
-
-For example, the following call fits a three-mediator chained model:
-
-``` r
-
-result_chained <- wsMed(
+serial <- wsMed(
   data = example_data,
-  M_C1 = c("A1", "B1", "C1"),
-  M_C2 = c("A2", "B2", "C2"),
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
   Y_C1 = "D1",
   Y_C2 = "D2",
-  form = "CN",
-  Na = "DE",
-  ci_method = "mc",
-  R = 5000,
-  seed = 123
+  form = "CN"
 )
+print(serial)
 ```
 
-Here, the mediator order defines the chain from A (`M1`) to B (`M2`) and
-then to C (`M3`).
+Choose mediator order from the research design. The model articles show
+the
+[parallel](https://yangzhen1999.github.io/wsMed/articles/GenerateModelP.md),
+[serial](https://yangzhen1999.github.io/wsMed/articles/GenerateModelCN.md),
+[serial-parallel](https://yangzhen1999.github.io/wsMed/articles/GenerateModelCP.md)
+and
+[parallel-serial](https://yangzhen1999.github.io/wsMed/articles/GenerateModelPC.md)
+equations and diagrams.
 
 ### User-defined models
 
-Use `form = "UD"` when the intended paths cannot be represented by one
-of the four predefined structures. The mediator labels still come from
-the order of `M_C1` and `M_C2`, but the paths are supplied through
-`paths`.
-
-Suppose A, B, and C are the three mediators and the intended structure
-contains:
-
-- a path from A (`M1`) to C (`M3`);
-- a path from C (`M3`) to the outcome; and
-- a path from B (`M2`) to the outcome.
-
-The path vector is:
+Use `form = "UD"` when you want to specify the mediator connections
+yourself. Mediator labels follow the order in `M_C1` and `M_C2`: in the
+call below, `M1` is A, `M2` is B, and `M3` is C. `Y` is the outcome pair
+D1/D2. In `paths`, write one arrow per string using these labels:
 
 ``` r
 
 custom_paths <- c(
-  "M1 -> M3",
-  "M3 -> Y",
-  "M2 -> Y"
+  "M1 -> M3",  # A predicts C
+  "M3 -> Y",   # C predicts the outcome
+  "M2 -> Y"    # B predicts the outcome
 )
 ```
 
 Pass this vector to
-[`wsMed()`](https://yangzhen1999.github.io/wsMed/reference/wsMed.md)
-together with `form = "UD"`:
+[`wsMed()`](https://yangzhen1999.github.io/wsMed/reference/wsMed.md);
+all other settings keep their defaults:
 
 ``` r
 
-result_custom <- wsMed(
+custom <- wsMed(
   data = example_data,
   M_C1 = c("A1", "B1", "C1"),
   M_C2 = c("A2", "B2", "C2"),
   Y_C1 = "D1",
   Y_C2 = "D2",
   form = "UD",
-  paths = custom_paths,
-  Na = "DE",
-  ci_method = "mc",
-  R = 5000,
-  seed = 123
+  paths = custom_paths
 )
+print(custom)
+#> wsMed analysis
+#> Model: UD | DE | Observations: 100 
+#> Effects:
+#> wsMed all | raw scale | mc 
+#> 95% percentile intervals; 20000 joint draws; SE from effect draws
+#> Condition contrast: C2 - C1 
+#>                                        Estimate Std. Error  CI lower  CI upper
+#> cp: Direct effect                     -3.00e-02   1.68e-02 -6.31e-02  2.90e-03
+#> indirect_1_3: M1 -> M3                -2.25e-05   3.74e-04 -8.64e-04  7.36e-04
+#> indirect_2: M2                        -1.40e-03   2.75e-03 -8.43e-03  2.98e-03
+#> indirect_3: M3                        -1.85e-04   2.17e-03 -5.11e-03  4.38e-03
+#> total_indirect: Total indirect effect -1.60e-03   3.54e-03 -9.79e-03  4.91e-03
+#> total: Total effect                   -3.16e-02   1.69e-02 -6.48e-02  1.61e-03
+#> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
+#> Use as.data.frame() for the full-precision table and metadata.
+#> Post-fit admissibility: 1 of 1 ; excluded rows: 0
 ```
 
-Only mediator-to-mediator and mediator-to-outcome paths are included in
-`paths`. Do not add paths beginning with `X`:
-[`wsMed()`](https://yangzhen1999.github.io/wsMed/reference/wsMed.md)
-automatically adds the condition-to-mediator paths and the direct path
-from the condition to the outcome.
+Only the specified mediator connections are fitted. For example,
+`M1 -> Y` is absent here; add that string to `custom_paths` if the model
+should include it. Paths from the condition to every mediator and the
+direct condition-to-outcome path are added automatically, so do not
+include `X` in `paths`.
 
-The specified mediator structure must be acyclic. Detailed path rules,
-parameter labels, generated equations, and indirect-effect definitions
-are described in the
-[`GenerateModelCustom()`](https://yangzhen1999.github.io/wsMed/reference/GenerateModelCustom.md)
-vignette.
+The arrows must not form a cycle, and at least one must end at `Y`. The
+[worked UD
+example](https://yangzhen1999.github.io/wsMed/articles/GenerateModelCustom.md)
+explains these rules and shows how the specified arrows determine the
+indirect effects.
 
-## Step 3: Choose the estimation options
+To add moderation, keep `custom_paths` and add `W = "D3"` and
+`MP = c("b_1_3", "b3")`. This selects the M1-to-M3 and M3-to-outcome
+slopes for moderation by D3. Unlike `paths`, `MP` takes coefficient
+labels, not arrow strings. See the [UD moderation
+example](https://yangzhen1999.github.io/wsMed/articles/GenerateModelCustom.html#add-a-moderator)
+for the full call, path-label choices, and conditional results.
 
-After selecting the mediation structure, choose how to handle missing
-data, construct confidence intervals, and, if required, standardize the
-effects.
-
-### Missing data and confidence intervals
-
-The `Na` argument selects the missing-data method, and `ci_method`
-selects the confidence-interval method.
-
-| `Na` | Missing-data method | Available `ci_method` |
-|:---|:---|:---|
-| `"DE"` | Listwise deletion | `"mc"`, `"bootstrap"`, or `"both"` |
-| `"FIML"` | Full-information maximum likelihood | `"mc"`, `"bootstrap"`, or `"both"` |
-| `"MI"` | Multiple imputation | `"mc"` |
-
-For a complete data analysis using Monte Carlo confidence intervals,
-use:
-
-``` r
-
-Na = "DE"
-ci_method = "mc"
-R = 5000
-seed = 123
-```
-
-`R` controls the number of Monte Carlo draws, and `seed` makes the
-results reproducible.
-
-To use bootstrap confidence intervals instead, use:
-
-``` r
-
-Na = "DE"
-ci_method = "bootstrap"
-bootstrap = 2000
-boot_ci_type = "perc"
-iseed = 123
-```
-
-The supported values of `boot_ci_type` are `"perc"`, `"bc"`, and
-`"bca.simple"`. Setting `ci_method = "both"` requests Monte Carlo and
-bootstrap intervals in the same analysis.
-
-The following code creates a copy of `example_data` with missing values
-for the FIML and multiple-imputation examples:
-
-``` r
-
-set.seed(123)
-example_data_missing <- example_data
-analysis_variables <- c("A1", "A2", "B1", "B2", "C1", "C2")
-
-for (variable in analysis_variables) {
-  missing_rows <- sample(
-    seq_len(nrow(example_data_missing)),
-    size = ceiling(0.10 * nrow(example_data_missing))
-  )
-  example_data_missing[missing_rows, variable] <- NA_real_
-}
-```
-
-For data with missing values, FIML can be requested by changing `Na`:
-
-``` r
-
-result_fiml <- wsMed(
-  data = example_data_missing,
-  M_C1 = c("A1", "B1"),
-  M_C2 = c("A2", "B2"),
-  Y_C1 = "C1",
-  Y_C2 = "C2",
-  form = "P",
-  Na = "FIML",
-  ci_method = "mc",
-  R = 5000,
-  seed = 123
-)
-```
-
-For FIML with Monte Carlo intervals, use the default `MCmethod = "mc"`.
-The current fitting pipeline does not activate a separate `"bootSD"`
-correction.
-
-Multiple imputation is requested with `Na = "MI"`. Its controls are
-supplied through `mi_args`:
-
-``` r
-
-result_mi <- wsMed(
-  data = example_data_missing,
-  M_C1 = c("A1", "B1"),
-  M_C2 = c("A2", "B2"),
-  Y_C1 = "C1",
-  Y_C2 = "C2",
-  form = "P",
-  Na = "MI",
-  ci_method = "mc",
-  mi_args = list(
-    m = 20,
-    method_num = "pmm"
-  ),
-  R = 5000,
-  seed = 123
-)
-```
-
-Here, `m` is the number of imputed data sets and `method_num` is the
-imputation method passed to the multiple-imputation procedure.
-
-### Standardized effects
-
-Set `standardized = TRUE` when standardized path coefficients and
-effects are needed:
-
-``` r
-
-result_standardized <- wsMed(
-  data = example_data,
-  M_C1 = c("A1", "B1"),
-  M_C2 = c("A2", "B2"),
-  Y_C1 = "C1",
-  Y_C2 = "C2",
-  form = "P",
-  Na = "DE",
-  ci_method = "mc",
-  R = 5000,
-  standardized = TRUE,
-  seed = 123
-)
-```
-
-Standardization uses marginal model-implied SDs of the difference and
-average components; differences are not recentered. A full indirect
-effect is divided by the outcome-difference SD, including in serial
-models. With a moderator, `standardized = TRUE` also adds
-`moderation_std` while preserving raw conditional results in
-`moderation`. The parameter table alone does not describe effects at all
-moderator values.
-
-See [Standardized moderated
-mediation](https://yangzhen1999.github.io/wsMed/articles/StandardizedModeratedMediation.md)
-for the scale definitions, executable examples and inference
-conventions.
-
-## Step 4: Add optional model components
-
-Moderators and covariates are added to the same
-[`wsMed()`](https://yangzhen1999.github.io/wsMed/reference/wsMed.md)
-call. They do not require a separate analysis workflow.
-
-### Moderators
-
-Three arguments control a moderated mediation analysis:
-
-- `W` identifies the moderator variable;
-- `W_type` optionally specifies `"continuous"` or `"categorical"`; and
-- `MP` identifies the paths moderated by `W`.
-
-For example:
-
-``` r
-
-result_moderated <- wsMed(
-  data = example_data,
-  M_C1 = c("A1", "B1"),
-  M_C2 = c("A2", "B2"),
-  Y_C1 = "C1",
-  Y_C2 = "C2",
-  form = "CN",
-  W = "D3",
-  W_type = "continuous",
-  MP = c("a1", "b_1_2", "b2", "cp"),
-  Na = "DE",
-  ci_method = "mc",
-  R = 5000,
-  standardized = TRUE,
-  seed = 123
-)
-```
-
-In this chained model, `a1` is the condition-to-`M1` path, `b_1_2` is
-the `M1`-to-`M2` difference-component path, `b2` is the `M2`-to-outcome
-difference-component path, and `cp` is the direct effect. Every label in
-`MP` must correspond to a path that exists in the selected model.
-
-The same arguments can be used with `form = "UD"`. For example, the
-user-defined model in Step 2 contains the labels `b_1_3`, `b2`, and
-`b3`, but it does not contain `b1` because `"M1 -> Y"` was not
-specified.
-
-Declare categorical covariates and moderators as unordered factors
-before using either interface. Set factor levels explicitly; the first
-level is the reference group. For example:
-
-``` r
-
-example_data$Group <- factor(example_data$Group,
-                             levels = c("low", "med", "high"))
-```
-
-Then use the factor column as the moderator:
-
-``` r
-
-W = "Group"
-```
-
-`W_type = "categorical"` remains available, but is not needed for a
-factor. The same factor declaration applies to categorical
-between-subject covariates selected through `C`. The [categorical
-predictor
-guide](https://yangzhen1999.github.io/wsMed/articles/CategoricalPredictors.md)
-explains binary coding, reference groups, and compatibility defaults for
-numeric 0/1 columns.
-
-After fitting a moderated model,
-[`plot_moderation_curve()`](https://yangzhen1999.github.io/wsMed/reference/plot_moderation_curve.md)
-can be used to display conditional effects:
-
-``` r
-
-plot_moderation_curve(
-  result_moderated,
-  "indirect_effect_1_2"
-)
-
-plot_moderation_curve(
-  result_moderated,
-  "b_1_2"
-)
-```
-
-The conditional indirect effect used by
-[`plot_moderation_curve()`](https://yangzhen1999.github.io/wsMed/reference/plot_moderation_curve.md)
-is named `indirect_effect_1_2`; the corresponding indirect effect in the
-generated SEM syntax is named `indirect_1_2`.
+## Add optional model components
 
 ### Covariates
 
-Within-subject covariates are supplied as matched pairs through `C_C1`
-and `C_C2`. Between-subject covariates are supplied through `C`, with
-their type identified by `C_type`.
+Use `C_C1` and `C_C2` for paired within-subject covariates and `C` for
+between-subject covariates. Their measurements remain in the same wide
+dataset:
 
 ``` r
 
-result_covariates <- wsMed(
+adjusted <- wsMed(
   data = example_data,
   M_C1 = c("A1", "B1"),
   M_C2 = c("A2", "B2"),
-  Y_C1 = "C1",
-  Y_C2 = "C2",
-  form = "P",
-  C_C1 = "D1",
-  C_C2 = "D2",
-  C = "D3",
-  C_type = "continuous",
-  Na = "DE",
-  ci_method = "mc",
-  R = 5000,
-  seed = 123
-)
-```
-
-In this example, `D1` and `D2` form one within-subject covariate, and
-`D3` is a continuous between-subject covariate. The prepared covariate
-terms are included in the mediator and outcome regressions.
-
-## Step 5: Inspect the results
-
-Print the fitted object to obtain the main analysis summary:
-
-``` r
-
-print(result, detail = "legacy")
-```
-
-Depending on the selected options, the printed output includes:
-
-- the variables included in the analysis;
-- model-fit information;
-- regression paths;
-- specific indirect effects;
-- the total indirect effect;
-- the direct and total effects;
-- confidence intervals;
-- standardized effects; and
-- conditional effects for moderated models.
-
-Use
-[`printGM()`](https://yangzhen1999.github.io/wsMed/reference/printGM.md)
-to display the generated model equations:
-
-``` r
-
-printGM(result)
-```
-
-Frequently used components of the fitted object can also be accessed
-directly:
-
-``` r
-
-result$sem_model       # generated lavaan syntax
-result$mc$fit          # fitted lavaan object
-result$moderation      # moderation results, when requested
-result$paths           # path vector when form = "UD"
-```
-
-The exact contents depend on the selected missing-data and
-confidence-interval methods.
-
-## Step 6: Interpret the printed results
-
-This section uses two examples to explain the object returned by
-[`wsMed()`](https://yangzhen1999.github.io/wsMed/reference/wsMed.md).
-Example 1 describes the output shared by analyses without an external
-moderator. Example 2 then focuses on the additional output produced when
-a continuous moderator is included.
-
-The explanations follow the order of the sections printed by
-[`print()`](https://rdrr.io/r/base/print.html). They describe what each
-section contains and how to locate the relevant results; they are not
-substantive interpretations of the example data.
-
-### Example 1: A model without an external moderator
-
-The first example fits a parallel mediation model using multiple
-imputation and Monte Carlo confidence intervals. Standardized results
-are also requested so that all principal output sections are
-illustrated.
-
-``` r
-
-result4_mi <- wsMed(
-  data = example_data_missing,
-  M_C1 = c("A1", "B1"),
-  M_C2 = c("A2", "B2"),
-  Y_C1 = "C1",
-  Y_C2 = "C2",
-  form = "P",
-  Na = "MI",
-  ci_method = "mc",
-  mi_args = list(
-    m = 20,
-    method_num = "pmm"
-  ),
-  R = 5000,
-  standardized = TRUE,
-  seed = 123
-)
-
-print(result4_mi, detail = "legacy")
-#> 
-#> 
-#> *************** VARIABLES ***************
-#> Outcome (Y):
-#>    Condition 1: C1 
-#>    Condition 2: C2 
-#> Mediators (M):
-#>   M1:
-#>     Condition 1: A1
-#>     Condition 2: A2
-#>   M2:
-#>     Condition 1: B1
-#>     Condition 2: B2
-#> Sample size (rows kept): 100 
-#> 
-#> 
-#> *************** MODEL FIT ***************
-#> 
-#> 
-#> |Measure   |  Value|
-#> |:---------|------:|
-#> |Chi-Sq    | 13.724|
-#> |df        |  5.000|
-#> |p         |  0.017|
-#> |CFI       |  0.160|
-#> |TLI       | -0.512|
-#> |RMSEA     |  0.132|
-#> |RMSEA Low |  0.051|
-#> |RMSEA Up  |  0.218|
-#> |SRMR      |  0.083|
-#> 
-#> 
-#> ************* TOTAL / DIRECT / TOTAL-IND (MC) *************
-#> 
-#> 
-#> |Label          | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:--------------|--------:|-----:|---------:|----------:|
-#> |Total effect   |    0.026| 0.018|    -0.009|      0.060|
-#> |Direct effect  |    0.022| 0.017|    -0.013|      0.056|
-#> |Total indirect |    0.004| 0.005|    -0.005|      0.015|
-#> 
-#> Indirect effects:
-#> 
-#> 
-#> |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:-----|--------:|-----:|---------:|----------:|
-#> |ind_1 |    0.004| 0.004|    -0.003|      0.014|
-#> |ind_2 |   -0.000| 0.002|    -0.005|      0.004|
-#> 
-#> Indirect-effect key:
-#> 
-#> 
-#> |Ind   |Path                 |
-#> |:-----|:--------------------|
-#> |ind_1 |X -> M1diff -> Ydiff |
-#> |ind_2 |X -> M2diff -> Ydiff |
-#> 
-#> 
-#> *************** MODERATION EFFECTS (d-paths, MC) ***************
-#> 
-#> 
-#> |Coefficient | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:-----------|--------:|-----:|---------:|----------:|
-#> |d1          |    0.031| 0.105|    -0.175|      0.235|
-#> |d2          |   -0.096| 0.089|    -0.269|      0.076|
-#> 
-#> 
-#> *************** MODERATION KEY (d-paths) ***************
-#> 
-#> 
-#> |Coefficient |Path           |Moderated       |
-#> |:-----------|:--------------|:---------------|
-#> |d1          |M1avg -> Ydiff |M1diff -> Ydiff |
-#> |d2          |M2avg -> Ydiff |M2diff -> Ydiff |
-#> 
-#> UNSTANDARDIZED CONDITIONAL EFFECTS (mc)
-#> Percentile intervals; moderator probes and centering references are held fixed.
-#> 
-#> 
-#> *************** CONTRAST INDIRECT EFFECTS (No Moderator) ***************
-#> 
-#> 
-#> |Contrast                  | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:-------------------------|--------:|-----:|---------:|----------:|
-#> |indirect_2  -  indirect_1 |   -0.004| 0.005|    -0.015|      0.004|
-#> 
-#> 
-#> *************** C1-C2 COEFFICIENTS (No Moderator) ***************
-#> 
-#> 
-#> |Coeff | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:-----|--------:|-----:|---------:|----------:|
-#> |X1_b1 |   -0.147| 0.106|    -0.354|      0.057|
-#> |X0_b1 |   -0.178| 0.109|    -0.386|      0.037|
-#> |X1_b2 |   -0.091| 0.106|    -0.304|      0.119|
-#> |X0_b2 |    0.005| 0.101|    -0.190|      0.205|
-#> 
-#> 
-#> *************** REGRESSION PATHS (MC) ***************
-#> 
-#> 
-#> |Path           |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:--------------|:-----|--------:|-----:|---------:|----------:|
-#> |Ydiff ~ M1diff |b1    |   -0.162| 0.094|    -0.346|      0.020|
-#> |Ydiff ~ M1avg  |d1    |    0.031| 0.105|    -0.175|      0.235|
-#> |Ydiff ~ M2diff |b2    |   -0.043| 0.094|    -0.225|      0.142|
-#> |Ydiff ~ M2avg  |d2    |   -0.096| 0.089|    -0.269|      0.076|
-#> 
-#> 
-#> *************** INTERCEPTS (MC) ***************
-#> 
-#> 
-#> |Intercept |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:---------|:-----|--------:|-----:|---------:|----------:|
-#> |Ydiff~1   |cp    |    0.022| 0.017|    -0.013|      0.056|
-#> |M1diff~1  |a1    |   -0.025| 0.020|    -0.064|      0.013|
-#> |M2diff~1  |a2    |    0.006| 0.020|    -0.033|      0.045|
-#> |M1avg~1   |      |   -0.000| 0.018|    -0.036|      0.034|
-#> |M2avg~1   |      |   -0.000| 0.020|    -0.039|      0.039|
-#> 
-#> 
-#> *************** VARIANCES (MC) ***************
-#> 
-#> 
-#> |Variance       |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:--------------|:-----|--------:|-----:|---------:|----------:|
-#> |Ydiff~~Ydiff   |      |    0.024| 0.004|     0.017|      0.031|
-#> |M1diff~~M1diff |      |    0.033| 0.006|     0.022|      0.045|
-#> |M2diff~~M2diff |      |    0.033| 0.005|     0.023|      0.044|
-#> |M1avg~~M1avg   |      |    0.033| 0.005|     0.024|      0.043|
-#> |M2avg~~M2avg   |      |    0.040| 0.006|     0.028|      0.052|
-#> 
-#> 
-#> *************** STANDARDIZED (MC) ***************
-#> 
-#> 
-#> |Parameter      | Estimate|    SE|        R|   2.5%| 97.5%|
-#> |:--------------|--------:|-----:|--------:|------:|-----:|
-#> |cp             |    0.136| 0.108| 5000.000| -0.078| 0.350|
-#> |b1             |   -0.185| 0.103| 5000.000| -0.377| 0.022|
-#> |d1             |    0.035| 0.117| 5000.000| -0.197| 0.254|
-#> |b2             |   -0.049| 0.105| 5000.000| -0.255| 0.158|
-#> |d2             |   -0.121| 0.108| 5000.000| -0.326| 0.095|
-#> |a1             |   -0.138| 0.112| 5000.000| -0.367| 0.071|
-#> |a2             |    0.032| 0.111| 5000.000| -0.182| 0.253|
-#> |Ydiff~~Ydiff   |    0.950| 0.053| 5000.000|  0.784| 0.983|
-#> |M1diff~~M1diff |    1.000| 0.000| 5000.000|  1.000| 1.000|
-#> |M2diff~~M2diff |    1.000| 0.000| 5000.000|  1.000| 1.000|
-#> |M1avg~~M1avg   |    1.000| 0.000| 5000.000|  1.000| 1.000|
-#> |M1avg~~M2avg   |    0.274| 0.098| 5000.000|  0.075| 0.458|
-#> |M2avg~~M2avg   |    1.000| 0.000| 5000.000|  1.000| 1.000|
-#> |M1avg~1        |   -0.000| 0.099| 5000.000| -0.199| 0.188|
-#> |M2avg~1        |   -0.000| 0.102| 5000.000| -0.203| 0.199|
-#> |indirect_1     |    0.026| 0.026| 5000.000| -0.015| 0.085|
-#> |indirect_2     |   -0.002| 0.013| 5000.000| -0.031| 0.027|
-#> |total_indirect |    0.024| 0.029| 5000.000| -0.028| 0.091|
-#> |total_effect   |    0.160| 0.110| 5000.000| -0.054| 0.374|
-```
-
-The output sections and their main purposes are:
-
-| Printed section | What it answers |
-|:---|:---|
-| `VARIABLES` | Which observed variables and how many cases were used? |
-| `MODEL FIT` | How well does the complete SEM reproduce the observed covariance structure? |
-| `TOTAL / DIRECT / TOTAL-IND` | What are the overall, direct, and combined indirect effects? |
-| `Indirect effects` and `Indirect-effect key` | What is the estimate for each mediation route, and which route does each label represent? |
-| `MODERATION EFFECTS (d-paths)` and its key | What are the level-component coefficients associated with the mediator paths? |
-| `CONTRAST INDIRECT EFFECTS` | How do the specific indirect effects differ from one another? |
-| `C1-C2 COEFFICIENTS` | What are the reconstructed coefficients for the two conditions? |
-| `REGRESSION PATHS` | What are the estimates for the individual regression paths? |
-| `INTERCEPTS` | What are the estimated difference-score intercepts, including the `a` and `cp` paths? |
-| `VARIANCES` | What are the estimated residual variances? |
-| `STANDARDIZED` | What are the standardized estimates and confidence intervals? |
-
-The suffix in a heading identifies the requested confidence-interval
-engine. For example, `(MC)` denotes Monte Carlo results. When bootstrap
-intervals are requested, the corresponding bootstrap output is printed;
-with `ci_method = "both"`, both sets of results can be returned.
-
-#### Variables and analysis sample
-
-The `VARIABLES` section restates the condition-specific outcome and
-mediator columns. It also maps each mediator pair to its internal label
-(`M1`, `M2`, and so on) and reports the number of rows retained for the
-analysis.
-
-This section should be checked before interpreting any estimates. In
-particular, verify that:
-
-- the Condition 1 and Condition 2 columns have not been reversed;
-- the order of the mediator pairs matches the intended model; and
-- the retained sample size is consistent with the selected missing-data
-  method.
-
-#### Model fit
-
-The `MODEL FIT` section reports the model chi-squared statistic, degrees
-of freedom, its $`p`$ value, CFI, TLI, RMSEA with its confidence
-interval, and SRMR. These indices evaluate the model as a whole; they do
-not test an individual direct or indirect effect.
-
-Fit indices should be interpreted in light of the fitted model. For a
-just-identified or saturated model, global fit is perfect by
-construction and does not provide evidence that the individual paths are
-substantively appropriate.
-
-#### Total, direct, and indirect effects
-
-The `TOTAL / DIRECT / TOTAL-IND` section gives a compact decomposition:
-
-``` math
-\text{total effect}
-=
-\text{direct effect}
-+
-\text{total indirect effect}.
-```
-
-The rows have the following meanings:
-
-- `Total effect` is the overall condition effect on the outcome
-  difference.
-- `Direct effect` is the remaining condition effect after accounting for
-  the mediators; its model label is `cp`.
-- `Total indirect` is the sum of all specific indirect effects
-  identified by the selected mediation structure.
-
-The `Indirect effects` table then reports each specific route
-separately. The accompanying `Indirect-effect key` should be used to
-translate a printed label into a path. For example, a key may map
-`ind_1` to `X -> M1diff -> Ydiff`. For serial or user-defined models, a
-label can refer to a route through more than one mediator.
-
-Each row reports an estimate, its standard error, and confidence limits.
-For an indirect effect, inference should be based on the confidence
-interval for the complete product rather than on whether every component
-path is individually significant. An interval that excludes zero
-provides evidence that the corresponding effect differs from zero at the
-stated confidence level.
-
-#### Level-component paths and condition-specific coefficients
-
-The printed heading `MODERATION EFFECTS (d-paths)` can appear even when
-no external moderator was supplied through `W`. In this section, the `d`
-coefficients are the effects of mediator level components, such as
-`M1avg`, in the outcome or mediator-difference equation. They are part
-of the within-subject parameterization and should not be confused with
-moderation by a user-supplied variable.
-
-The associated key maps each `d` label to its regression path. For a
-direct mediator-to-outcome path, the difference-component and
-level-component terms appear together, for example:
-
-``` text
-Ydiff ~ b1 * M1diff + d1 * M1avg
-```
-
-The `C1-C2 COEFFICIENTS` section expresses this pair as coefficients for
-the two conditions. It is useful when the research question concerns
-whether the corresponding mediator-to-outcome relation is the same under
-both conditions. The `b` coefficient summarizes the common component,
-whereas the `d` coefficient captures the difference between the two
-condition-specific coefficients.
-
-#### Contrasts between indirect effects
-
-When the model contains more than one specific indirect effect,
-`CONTRAST INDIRECT EFFECTS` reports pairwise differences between them. A
-contrast should be read according to the order shown in its label. For
-example:
-
-``` text
-indirect_2 - indirect_1
-```
-
-compares the second specific indirect effect with the first. Its
-confidence interval evaluates the difference between the two effects,
-not whether either effect separately differs from zero.
-
-#### Regression paths, intercepts, and variances
-
-`REGRESSION PATHS` lists the individual regression coefficients in the
-generated SEM. The `Path` column shows the regression in `lavaan`
-notation, whereas `Label` gives the name used elsewhere in the output
-and in `MP`. Common labels include:
-
-- `b1`, `b2`, and so on for mediator difference-component paths to the
-  outcome;
-- `d1`, `d2`, and so on for the corresponding level-component paths; and
-- labels such as `b_1_2` and `d_1_2` for paths from one mediator to
-  another.
-
-`INTERCEPTS` contains the `a` paths and the direct effect because, after
-the paired measurements are transformed, the condition effects are
-represented as intercepts of the difference-score equations. Thus, `a1`
-is found on the `M1diff ~ 1` row, and `cp` is found on the `Ydiff ~ 1`
-row.
-
-`VARIANCES` reports the estimated residual variances for the endogenous
-difference components and any other modeled variables. These rows
-describe unexplained variability; they are not additional mediation
-effects.
-
-#### Standardized results
-
-The `STANDARDIZED` section is printed when `standardized = TRUE`. It
-contains standardized versions of the path coefficients and derived
-effects, including the specific indirect, total indirect, and total
-effects when available.
-
-Standardized and unstandardized results answer different reporting
-needs. Unstandardized estimates retain the scale of the original
-variables, whereas standardized estimates facilitate comparisons across
-variables or effects. A report should state explicitly which version is
-presented and should not combine an unstandardized estimate with a
-standardized confidence interval.
-
-#### Inspecting and extracting Example 1
-
-Use
-[`printGM()`](https://yangzhen1999.github.io/wsMed/reference/printGM.md)
-to connect the printed labels to the generated model:
-
-``` r
-
-printGM(result4_mi)
-```
-
-The returned object can also be inspected programmatically:
-
-``` r
-
-names(result4_mi)
-
-result4_mi$input_vars    # variables supplied to wsMed()
-result4_mi$sem_model     # generated lavaan syntax
-result4_mi$mc$fit        # fitted lavaan model
-result4_mi$mc$result     # Monte Carlo results
-result4_mi$mc$std_mc     # standardized Monte Carlo results
-```
-
-`print(result4_mi, detail = "legacy")` is intended for reading the
-analysis summary, whereas the stored components are intended for
-inspection or downstream programming.
-
-### Example 2: A model with a continuous moderator
-
-The second example fits a chained–parallel model and adds `D3` as a
-continuous moderator. The paths listed in `MP` are allowed to vary with
-the moderator.
-
-``` r
-
-result5 <- wsMed(
-  data = example_data_missing,
-  M_C1 = c("A1", "B1", "C1"),
-  M_C2 = c("A2", "B2", "C2"),
   Y_C1 = "D1",
   Y_C2 = "D2",
-  form = "CP",
+  C_C1 = "C1",
+  C_C2 = "C2",
+  C = "D3"
+)
+print(adjusted)
+```
+
+### Moderators
+
+Use `W` for the moderator column and `MP` for the paths to moderate. In
+the parallel model, `b1` and `b2` are the mediator-to-outcome difference
+slopes:
+
+``` r
+
+moderated <- wsMed(
+  data = example_data,
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2",
   W = "D3",
-  W_type = "continuous",
-  MP = c("a1", "b2", "d1", "cp", "b_1_2", "d_1_2"),
-  Na = "DE",
-  ci_method = "mc",
-  R = 5000,
-  standardized = TRUE,
-  seed = 123
+  MP = c("b1", "b2")
 )
-
-print(result5, detail = "legacy")
-#> 
-#> 
-#> *************** VARIABLES ***************
-#> Outcome (Y):
-#>    Condition 1: D1 
-#>    Condition 2: D2 
-#> Mediators (M):
-#>   M1:
-#>     Condition 1: A1
-#>     Condition 2: A2
-#>   M2:
-#>     Condition 1: B1
-#>     Condition 2: B2
-#>   M3:
-#>     Condition 1: C1
-#>     Condition 2: C2
-#> Moderators (W):
-#>    W1 : D3 
-#> Sample size (rows kept): 100 
-#> 
-#> 
-#> *************** MODEL FIT ***************
-#> 
-#> 
-#> |Measure   |  Value|
-#> |:---------|------:|
-#> |Chi-Sq    | 14.158|
-#> |df        | 13.000|
-#> |p         |  0.363|
-#> |CFI       |  0.000|
-#> |TLI       |  5.128|
-#> |RMSEA     |  0.039|
-#> |RMSEA Low |  0.000|
-#> |RMSEA Up  |  0.139|
-#> |SRMR      |  0.046|
-#> 
-#> 
-#> ************* TOTAL / DIRECT / TOTAL-IND (MC) *************
-#> 
-#> 
-#> |Label          | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:--------------|--------:|-----:|---------:|----------:|
-#> |Total effect   |   -0.032| 0.023|    -0.078|      0.013|
-#> |Direct effect  |   -0.029| 0.023|    -0.073|      0.016|
-#> |Total indirect |   -0.003| 0.008|    -0.021|      0.013|
-#> 
-#> Indirect effects:
-#> 
-#> 
-#> |Label   | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:-------|--------:|-----:|---------:|----------:|
-#> |ind_1   |    0.002| 0.005|    -0.007|      0.016|
-#> |ind_2   |    0.000| 0.004|    -0.008|      0.008|
-#> |ind_1_2 |   -0.000| 0.002|    -0.004|      0.003|
-#> |ind_3   |   -0.004| 0.006|    -0.019|      0.005|
-#> |ind_1_3 |   -0.001| 0.001|    -0.004|      0.001|
-#> 
-#> Indirect-effect key:
-#> 
-#> 
-#> |Ind     |Path                           |
-#> |:-------|:------------------------------|
-#> |ind_1   |X -> M1diff -> Ydiff           |
-#> |ind_2   |X -> M2diff -> Ydiff           |
-#> |ind_1_2 |X -> M1diff -> M2diff -> Ydiff |
-#> |ind_3   |X -> M3diff -> Ydiff           |
-#> |ind_1_3 |X -> M1diff -> M3diff -> Ydiff |
-#> 
-#> 
-#> *************** MODERATION EFFECTS (d-paths, MC) ***************
-#> 
-#> 
-#> |Coefficient | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:-----------|--------:|-----:|---------:|----------:|
-#> |d1          |   -0.040| 0.124|    -0.276|      0.208|
-#> |d2          |   -0.000| 0.129|    -0.254|      0.258|
-#> |d3          |   -0.160| 0.142|    -0.431|      0.111|
-#> |d_1_2       |   -0.044| 0.108|    -0.258|      0.167|
-#> |d_1_3       |    0.088| 0.114|    -0.128|      0.311|
-#> 
-#> 
-#> *************** MODERATION KEY (d-paths) ***************
-#> 
-#> 
-#> |Coefficient |Path            |Moderated        |
-#> |:-----------|:---------------|:----------------|
-#> |d1          |M1avg -> Ydiff  |M1diff -> Ydiff  |
-#> |d2          |M2avg -> Ydiff  |M2diff -> Ydiff  |
-#> |d3          |M3avg -> Ydiff  |M3diff -> Ydiff  |
-#> |d_1_2       |M1avg -> M2diff |M1diff -> M2diff |
-#> |d_1_3       |M1avg -> M3diff |M1diff -> M3diff |
-#> 
-#> UNSTANDARDIZED CONDITIONAL EFFECTS (mc)
-#> Percentile intervals; moderator probes and centering references are held fixed.
-#> 
-#> 
-#> *************** MODERATION RESULTS (Continuous Moderator) ***************
-#> 
-#> --- Moderated Coefficients ---
-#> 
-#> 
-#> |Path      |BaseCoef |W_dummy | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|Sig |
-#> |:---------|:--------|:-------|--------:|-----:|---------:|----------:|:---|
-#> |cpw_W1    |cp       |D3      |   -0.173| 0.097|    -0.368|      0.017|    |
-#> |dw1_W1    |d1       |D3      |   -0.114| 0.657|    -1.413|      1.196|    |
-#> |bw2_W1    |b2       |D3      |   -0.514| 0.662|    -1.821|      0.770|    |
-#> |aw1_W1    |a1       |D3      |    0.056| 0.099|    -0.143|      0.246|    |
-#> |aw2_W1    |a2       |D3      |    0.007| 0.099|    -0.187|      0.202|    |
-#> |bw_1_2_W1 |b_1_2    |D3      |   -0.300| 0.552|    -1.388|      0.796|    |
-#> |dw_1_2_W1 |d_1_2    |D3      |    0.594| 0.603|    -0.585|      1.765|    |
-#> |aw3_W1    |a3       |D3      |   -0.081| 0.095|    -0.268|      0.104|    |
-#> 
-#> --- Conditional Indirect Effects ---
-#> 
-#> 
-#> |Path                |Mediators | Level| W_value| Estimate|    SE| 2.5.%CI.Lo| 97.5.%CI.Up|Sig |
-#> |:-------------------|:---------|-----:|-------:|--------:|-----:|----------:|-----------:|:---|
-#> |indirect_effect_1   |1         | -1 SD|   0.223|    0.003| 0.007|     -0.009|       0.021|    |
-#> |indirect_effect_1   |1         |  0 SD|   0.452|    0.002| 0.005|     -0.007|       0.016|    |
-#> |indirect_effect_1   |1         | +1 SD|   0.681|    0.001| 0.006|     -0.009|       0.015|    |
-#> |indirect_effect_1_2 |1 2       | -1 SD|   0.223|   -0.002| 0.005|     -0.013|       0.006|    |
-#> |indirect_effect_1_2 |1 2       |  0 SD|   0.452|   -0.000| 0.002|     -0.004|       0.003|    |
-#> |indirect_effect_1_2 |1 2       | +1 SD|   0.681|    0.000| 0.002|     -0.004|       0.006|    |
-#> |indirect_effect_1_3 |1 3       | -1 SD|   0.223|   -0.001| 0.002|     -0.006|       0.001|    |
-#> |indirect_effect_1_3 |1 3       |  0 SD|   0.452|   -0.001| 0.001|     -0.004|       0.001|    |
-#> |indirect_effect_1_3 |1 3       | +1 SD|   0.681|   -0.000| 0.001|     -0.004|       0.002|    |
-#> |indirect_effect_2   |2         | -1 SD|   0.223|    0.001| 0.008|     -0.014|       0.020|    |
-#> |indirect_effect_2   |2         |  0 SD|   0.452|    0.000| 0.004|     -0.008|       0.008|    |
-#> |indirect_effect_2   |2         | +1 SD|   0.681|   -0.002| 0.008|     -0.020|       0.012|    |
-#> |indirect_effect_3   |3         | -1 SD|   0.223|   -0.008| 0.009|     -0.030|       0.006|    |
-#> |indirect_effect_3   |3         |  0 SD|   0.452|   -0.004| 0.006|     -0.019|       0.005|    |
-#> |indirect_effect_3   |3         | +1 SD|   0.681|   -0.001| 0.007|     -0.016|       0.013|    |
-#> 
-#> --- Indirect Effect Contrasts ---
-#> 
-#> 
-#> |Path                |            Contrast| Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|Sig |
-#> |:-------------------|-------------------:|--------:|-----:|---------:|----------:|:---|
-#> |indirect_effect_1   | (0 SD)   -  (-1 SD)|   -0.001| 0.004|    -0.011|      0.006|    |
-#> |indirect_effect_1   | (+1 SD)  -  (-1 SD)|   -0.002| 0.008|    -0.021|      0.012|    |
-#> |indirect_effect_1   | (+1 SD)  -   (0 SD)|   -0.001| 0.004|    -0.011|      0.006|    |
-#> |indirect_effect_1_2 | (0 SD)   -  (-1 SD)|    0.002| 0.004|    -0.005|      0.012|    |
-#> |indirect_effect_1_2 | (+1 SD)  -  (-1 SD)|    0.002| 0.005|    -0.007|      0.015|    |
-#> |indirect_effect_1_2 | (+1 SD)  -   (0 SD)|    0.000| 0.002|    -0.004|      0.006|    |
-#> |indirect_effect_1_3 | (0 SD)   -  (-1 SD)|    0.000| 0.001|    -0.001|      0.003|    |
-#> |indirect_effect_1_3 | (+1 SD)  -  (-1 SD)|    0.001| 0.002|    -0.003|      0.006|    |
-#> |indirect_effect_1_3 | (+1 SD)  -   (0 SD)|    0.000| 0.001|    -0.001|      0.003|    |
-#> |indirect_effect_2   | (0 SD)   -  (-1 SD)|   -0.001| 0.007|    -0.018|      0.013|    |
-#> |indirect_effect_2   | (+1 SD)  -  (-1 SD)|   -0.003| 0.011|    -0.028|      0.018|    |
-#> |indirect_effect_2   | (+1 SD)  -   (0 SD)|   -0.002| 0.007|    -0.018|      0.011|    |
-#> |indirect_effect_3   | (0 SD)   -  (-1 SD)|    0.003| 0.006|    -0.006|      0.017|    |
-#> |indirect_effect_3   | (+1 SD)  -  (-1 SD)|    0.007| 0.011|    -0.012|      0.033|    |
-#> |indirect_effect_3   | (+1 SD)  -   (0 SD)|    0.003| 0.006|    -0.006|      0.017|    |
-#> 
-#> --- Moderated Path Coefficients ---
-#> 
-#> 
-#> |Path  | Level| W_value| Estimate|    SE| 2.5.%CI.Lo| 97.5.%CI.Up|Sig |
-#> |:-----|-----:|-------:|--------:|-----:|----------:|-----------:|:---|
-#> |a1    | -1 SD|   0.223|   -0.039| 0.033|     -0.101|       0.026|    |
-#> |a1    |  0 SD|   0.452|   -0.026| 0.024|     -0.072|       0.021|    |
-#> |a1    | +1 SD|   0.681|   -0.013| 0.033|     -0.078|       0.050|    |
-#> |b2    | -1 SD|   0.223|    0.119| 0.208|     -0.302|       0.520|    |
-#> |b2    |  0 SD|   0.452|    0.002| 0.137|     -0.274|       0.270|    |
-#> |b2    | +1 SD|   0.681|   -0.116| 0.201|     -0.513|       0.276|    |
-#> |d1    | -1 SD|   0.223|   -0.014| 0.204|     -0.406|       0.398|    |
-#> |d1    |  0 SD|   0.452|   -0.040| 0.124|     -0.276|       0.208|    |
-#> |d1    | +1 SD|   0.681|   -0.066| 0.185|     -0.420|       0.296|    |
-#> |cp    | -1 SD|   0.223|    0.010| 0.032|     -0.053|       0.073|    |
-#> |cp    |  0 SD|   0.452|   -0.029| 0.023|     -0.073|       0.016|    |
-#> |cp    | +1 SD|   0.681|   -0.069| 0.032|     -0.132|      -0.006|*   |
-#> |b_1_2 | -1 SD|   0.223|    0.375| 0.177|      0.028|       0.731|*   |
-#> |b_1_2 |  0 SD|   0.452|    0.306| 0.119|      0.079|       0.543|*   |
-#> |b_1_2 | +1 SD|   0.681|    0.237| 0.171|     -0.098|       0.579|    |
-#> |d_1_2 | -1 SD|   0.223|   -0.180| 0.170|     -0.532|       0.143|    |
-#> |d_1_2 |  0 SD|   0.452|   -0.044| 0.108|     -0.258|       0.167|    |
-#> |d_1_2 | +1 SD|   0.681|    0.092| 0.181|     -0.263|       0.443|    |
-#> |a2    | -1 SD|   0.223|    0.012| 0.033|     -0.051|       0.076|    |
-#> |a2    |  0 SD|   0.452|    0.014| 0.022|     -0.031|       0.056|    |
-#> |a2    | +1 SD|   0.681|    0.015| 0.030|     -0.045|       0.072|    |
-#> |a3    | -1 SD|   0.223|    0.041| 0.032|     -0.021|       0.105|    |
-#> |a3    |  0 SD|   0.452|    0.023| 0.022|     -0.022|       0.065|    |
-#> |a3    | +1 SD|   0.681|    0.004| 0.030|     -0.054|       0.063|    |
-#> 
-#> --- Path Coefficient Contrasts ---
-#> 
-#> 
-#> |Path  |            Contrast| Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|Sig |
-#> |:-----|-------------------:|--------:|-----:|---------:|----------:|:---|
-#> |a1    | (0 SD)   -  (-1 SD)|    0.013| 0.023|    -0.033|      0.056|    |
-#> |a1    | (+1 SD)  -  (-1 SD)|    0.025| 0.046|    -0.066|      0.113|    |
-#> |a1    | (+1 SD)  -   (0 SD)|    0.013| 0.023|    -0.033|      0.056|    |
-#> |a2    | (0 SD)   -  (-1 SD)|    0.002| 0.023|    -0.043|      0.046|    |
-#> |a2    | (+1 SD)  -  (-1 SD)|    0.003| 0.045|    -0.086|      0.092|    |
-#> |a2    | (+1 SD)  -   (0 SD)|    0.002| 0.023|    -0.043|      0.046|    |
-#> |a3    | (0 SD)   -  (-1 SD)|   -0.019| 0.022|    -0.061|      0.024|    |
-#> |a3    | (+1 SD)  -  (-1 SD)|   -0.037| 0.044|    -0.123|      0.048|    |
-#> |a3    | (+1 SD)  -   (0 SD)|   -0.019| 0.022|    -0.061|      0.024|    |
-#> |b_1_2 | (0 SD)   -  (-1 SD)|   -0.069| 0.127|    -0.318|      0.183|    |
-#> |b_1_2 | (+1 SD)  -  (-1 SD)|   -0.138| 0.253|    -0.636|      0.365|    |
-#> |b_1_2 | (+1 SD)  -   (0 SD)|   -0.069| 0.127|    -0.318|      0.183|    |
-#> |b2    | (0 SD)   -  (-1 SD)|   -0.118| 0.152|    -0.418|      0.176|    |
-#> |b2    | (+1 SD)  -  (-1 SD)|   -0.236| 0.303|    -0.835|      0.353|    |
-#> |b2    | (+1 SD)  -   (0 SD)|   -0.118| 0.152|    -0.418|      0.176|    |
-#> |cp    | (0 SD)   -  (-1 SD)|   -0.040| 0.022|    -0.084|      0.004|    |
-#> |cp    | (+1 SD)  -  (-1 SD)|   -0.079| 0.045|    -0.169|      0.008|    |
-#> |cp    | (+1 SD)  -   (0 SD)|   -0.040| 0.022|    -0.084|      0.004|    |
-#> |d_1_2 | (0 SD)   -  (-1 SD)|    0.136| 0.138|    -0.134|      0.405|    |
-#> |d_1_2 | (+1 SD)  -  (-1 SD)|    0.272| 0.277|    -0.268|      0.809|    |
-#> |d_1_2 | (+1 SD)  -   (0 SD)|    0.136| 0.138|    -0.134|      0.405|    |
-#> |d1    | (0 SD)   -  (-1 SD)|   -0.026| 0.151|    -0.324|      0.274|    |
-#> |d1    | (+1 SD)  -  (-1 SD)|   -0.052| 0.301|    -0.648|      0.549|    |
-#> |d1    | (+1 SD)  -   (0 SD)|   -0.026| 0.151|    -0.324|      0.274|    |
-#> 
-#> --- Conditional Total Effect and Total Indirect Effect ---
-#> 
-#> 
-#> |Effect         | Level| W_value| Estimate|    SE| 2.5.%CI.Lo| 97.5.%CI.Up|Sig |
-#> |:--------------|-----:|-------:|--------:|-----:|----------:|-----------:|:---|
-#> |total_indirect | -1 SD|   0.223|   -0.006| 0.014|     -0.035|       0.021|    |
-#> |total_indirect |  0 SD|   0.452|   -0.003| 0.008|     -0.021|       0.013|    |
-#> |total_indirect | +1 SD|   0.681|   -0.001| 0.012|     -0.026|       0.021|    |
-#> |total_effect   | -1 SD|   0.223|    0.005| 0.034|     -0.061|       0.070|    |
-#> |total_effect   |  0 SD|   0.452|   -0.032| 0.023|     -0.078|       0.013|    |
-#> |total_effect   | +1 SD|   0.681|   -0.071| 0.033|     -0.137|      -0.006|*   |
-#> 
-#> STANDARDIZED CONDITIONAL EFFECTS (mc)
-#> Marginal endpoint scales; fixed raw W probes; percentile intervals.
-#> Moderation coefficients: per SD of continuous W; categorical contrasts keep 0/1 units.
-#> 
-#> 
-#> *************** MODERATION RESULTS (Continuous Moderator) ***************
-#> 
-#> --- Moderated Coefficients ---
-#> 
-#> 
-#> |Path      |BaseCoef |W_dummy | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|Sig |
-#> |:---------|:--------|:-------|--------:|-----:|---------:|----------:|:---|
-#> |cpw_W1    |cp       |D3      |   -0.225| 0.116|    -0.431|      0.020|    |
-#> |dw1_W1    |d1       |D3      |   -0.029| 0.157|    -0.336|      0.285|    |
-#> |bw2_W1    |b2       |D3      |   -0.113| 0.141|    -0.384|      0.166|    |
-#> |aw1_W1    |a1       |D3      |    0.073| 0.130|    -0.190|      0.320|    |
-#> |aw2_W1    |a2       |D3      |    0.010| 0.130|    -0.245|      0.263|    |
-#> |bw_1_2_W1 |b_1_2    |D3      |   -0.073| 0.129|    -0.329|      0.185|    |
-#> |dw_1_2_W1 |d_1_2    |D3      |    0.160| 0.156|    -0.151|      0.459|    |
-#> |aw3_W1    |a3       |D3      |   -0.111| 0.127|    -0.362|      0.141|    |
-#> 
-#> --- Conditional Indirect Effects ---
-#> 
-#> 
-#> |Path                |Mediators | Level| W_value| Estimate|    SE| 2.5.%CI.Lo| 97.5.%CI.Up|Sig |
-#> |:-------------------|:---------|-----:|-------:|--------:|-----:|----------:|-----------:|:---|
-#> |indirect_effect_1   |1         | -1 SD|   0.223|    0.019| 0.039|     -0.047|       0.110|    |
-#> |indirect_effect_1   |1         |  0 SD|   0.452|    0.012| 0.027|     -0.035|       0.080|    |
-#> |indirect_effect_1   |1         | +1 SD|   0.681|    0.006| 0.029|     -0.048|       0.077|    |
-#> |indirect_effect_1_2 |1 2       | -1 SD|   0.223|   -0.010| 0.025|     -0.069|       0.030|    |
-#> |indirect_effect_1_2 |1 2       |  0 SD|   0.452|   -0.000| 0.008|     -0.018|       0.018|    |
-#> |indirect_effect_1_2 |1 2       | +1 SD|   0.681|    0.002| 0.012|     -0.021|       0.032|    |
-#> |indirect_effect_1_3 |1 3       | -1 SD|   0.223|   -0.006| 0.010|     -0.032|       0.007|    |
-#> |indirect_effect_1_3 |1 3       |  0 SD|   0.452|   -0.004| 0.007|     -0.022|       0.006|    |
-#> |indirect_effect_1_3 |1 3       | +1 SD|   0.681|   -0.002| 0.008|     -0.021|       0.012|    |
-#> |indirect_effect_2   |2         | -1 SD|   0.223|    0.008| 0.043|     -0.076|       0.108|    |
-#> |indirect_effect_2   |2         |  0 SD|   0.452|    0.000| 0.019|     -0.043|       0.041|    |
-#> |indirect_effect_2   |2         | +1 SD|   0.681|   -0.010| 0.039|     -0.105|       0.064|    |
-#> |indirect_effect_3   |3         | -1 SD|   0.223|   -0.042| 0.048|     -0.159|       0.032|    |
-#> |indirect_effect_3   |3         |  0 SD|   0.452|   -0.023| 0.031|     -0.096|       0.025|    |
-#> |indirect_effect_3   |3         | +1 SD|   0.681|   -0.004| 0.035|     -0.083|       0.069|    |
-#> 
-#> --- Indirect Effect Contrasts ---
-#> 
-#> 
-#> |Path                |            Contrast| Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|Sig |
-#> |:-------------------|-------------------:|--------:|-----:|---------:|----------:|:---|
-#> |indirect_effect_1   | (0 SD)   -  (-1 SD)|   -0.006| 0.021|    -0.055|      0.033|    |
-#> |indirect_effect_1   | (+1 SD)  -  (-1 SD)|   -0.012| 0.042|    -0.110|      0.066|    |
-#> |indirect_effect_1   | (+1 SD)  -   (0 SD)|   -0.006| 0.021|    -0.055|      0.033|    |
-#> |indirect_effect_1_2 | (0 SD)   -  (-1 SD)|    0.010| 0.022|    -0.024|      0.063|    |
-#> |indirect_effect_1_2 | (+1 SD)  -  (-1 SD)|    0.012| 0.028|    -0.034|      0.079|    |
-#> |indirect_effect_1_2 | (+1 SD)  -   (0 SD)|    0.002| 0.012|    -0.021|      0.029|    |
-#> |indirect_effect_1_3 | (0 SD)   -  (-1 SD)|    0.002| 0.005|    -0.007|      0.015|    |
-#> |indirect_effect_1_3 | (+1 SD)  -  (-1 SD)|    0.004| 0.011|    -0.014|      0.030|    |
-#> |indirect_effect_1_3 | (+1 SD)  -   (0 SD)|    0.002| 0.005|    -0.007|      0.015|    |
-#> |indirect_effect_2   | (0 SD)   -  (-1 SD)|   -0.008| 0.037|    -0.092|      0.067|    |
-#> |indirect_effect_2   | (+1 SD)  -  (-1 SD)|   -0.018| 0.058|    -0.150|      0.093|    |
-#> |indirect_effect_2   | (+1 SD)  -   (0 SD)|   -0.010| 0.036|    -0.093|      0.058|    |
-#> |indirect_effect_3   | (0 SD)   -  (-1 SD)|    0.019| 0.029|    -0.030|      0.088|    |
-#> |indirect_effect_3   | (+1 SD)  -  (-1 SD)|    0.038| 0.058|    -0.060|      0.175|    |
-#> |indirect_effect_3   | (+1 SD)  -   (0 SD)|    0.019| 0.029|    -0.030|      0.088|    |
-#> 
-#> --- Moderated Path Coefficients ---
-#> 
-#> 
-#> |Path  | Level| W_value| Estimate|    SE| 2.5.%CI.Lo| 97.5.%CI.Up|Sig |
-#> |:-----|-----:|-------:|--------:|-----:|----------:|-----------:|:---|
-#> |a1    | -1 SD|   0.223|   -0.220| 0.187|     -0.572|       0.152|    |
-#> |a1    |  0 SD|   0.452|   -0.148| 0.137|     -0.423|       0.119|    |
-#> |a1    | +1 SD|   0.681|   -0.075| 0.189|     -0.451|       0.287|    |
-#> |b2    | -1 SD|   0.223|    0.113| 0.191|     -0.282|       0.474|    |
-#> |b2    |  0 SD|   0.452|    0.001| 0.126|     -0.250|       0.247|    |
-#> |b2    | +1 SD|   0.681|   -0.110| 0.185|     -0.474|       0.258|    |
-#> |d1    | -1 SD|   0.223|   -0.016| 0.210|     -0.416|       0.401|    |
-#> |d1    |  0 SD|   0.452|   -0.044| 0.127|     -0.287|       0.212|    |
-#> |d1    | +1 SD|   0.681|   -0.073| 0.191|     -0.433|       0.310|    |
-#> |cp    | -1 SD|   0.223|    0.057| 0.170|     -0.283|       0.375|    |
-#> |cp    |  0 SD|   0.452|   -0.165| 0.123|     -0.393|       0.082|    |
-#> |cp    | +1 SD|   0.681|   -0.387| 0.166|     -0.685|      -0.035|*   |
-#> |b_1_2 | -1 SD|   0.223|    0.392| 0.174|      0.030|       0.716|*   |
-#> |b_1_2 |  0 SD|   0.452|    0.320| 0.115|      0.083|       0.530|*   |
-#> |b_1_2 | +1 SD|   0.681|    0.248| 0.170|     -0.100|       0.573|    |
-#> |d_1_2 | -1 SD|   0.223|   -0.209| 0.189|     -0.584|       0.166|    |
-#> |d_1_2 |  0 SD|   0.452|   -0.051| 0.121|     -0.288|       0.187|    |
-#> |d_1_2 | +1 SD|   0.681|    0.107| 0.201|     -0.297|       0.491|    |
-#> |a2    | -1 SD|   0.223|    0.071| 0.187|     -0.300|       0.444|    |
-#> |a2    |  0 SD|   0.452|    0.081| 0.127|     -0.176|       0.326|    |
-#> |a2    | +1 SD|   0.681|    0.091| 0.175|     -0.265|       0.426|    |
-#> |a3    | -1 SD|   0.223|    0.246| 0.188|     -0.123|       0.604|    |
-#> |a3    |  0 SD|   0.452|    0.136| 0.132|     -0.130|       0.392|    |
-#> |a3    | +1 SD|   0.681|    0.026| 0.176|     -0.308|       0.377|    |
-#> 
-#> --- Path Coefficient Contrasts ---
-#> 
-#> 
-#> |Path  |            Contrast| Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|Sig |
-#> |:-----|-------------------:|--------:|-----:|---------:|----------:|:---|
-#> |a1    | (0 SD)   -  (-1 SD)|    0.072| 0.129|    -0.186|      0.314|    |
-#> |a1    | (+1 SD)  -  (-1 SD)|    0.145| 0.257|    -0.373|      0.628|    |
-#> |a1    | (+1 SD)  -   (0 SD)|    0.072| 0.129|    -0.186|      0.314|    |
-#> |a2    | (0 SD)   -  (-1 SD)|    0.010| 0.129|    -0.247|      0.263|    |
-#> |a2    | (+1 SD)  -  (-1 SD)|    0.020| 0.258|    -0.495|      0.526|    |
-#> |a2    | (+1 SD)  -   (0 SD)|    0.010| 0.129|    -0.247|      0.263|    |
-#> |a3    | (0 SD)   -  (-1 SD)|   -0.110| 0.125|    -0.350|      0.139|    |
-#> |a3    | (+1 SD)  -  (-1 SD)|   -0.220| 0.250|    -0.701|      0.277|    |
-#> |a3    | (+1 SD)  -   (0 SD)|   -0.110| 0.125|    -0.350|      0.139|    |
-#> |b_1_2 | (0 SD)   -  (-1 SD)|   -0.072| 0.128|    -0.319|      0.185|    |
-#> |b_1_2 | (+1 SD)  -  (-1 SD)|   -0.144| 0.256|    -0.638|      0.369|    |
-#> |b_1_2 | (+1 SD)  -   (0 SD)|   -0.072| 0.128|    -0.319|      0.185|    |
-#> |b2    | (0 SD)   -  (-1 SD)|   -0.111| 0.139|    -0.379|      0.166|    |
-#> |b2    | (+1 SD)  -  (-1 SD)|   -0.223| 0.279|    -0.759|      0.332|    |
-#> |b2    | (+1 SD)  -   (0 SD)|   -0.111| 0.139|    -0.379|      0.166|    |
-#> |cp    | (0 SD)   -  (-1 SD)|   -0.222| 0.115|    -0.427|      0.020|    |
-#> |cp    | (+1 SD)  -  (-1 SD)|   -0.444| 0.229|    -0.855|      0.040|    |
-#> |cp    | (+1 SD)  -   (0 SD)|   -0.222| 0.115|    -0.427|      0.020|    |
-#> |d_1_2 | (0 SD)   -  (-1 SD)|    0.158| 0.153|    -0.154|      0.446|    |
-#> |d_1_2 | (+1 SD)  -  (-1 SD)|    0.316| 0.307|    -0.307|      0.892|    |
-#> |d_1_2 | (+1 SD)  -   (0 SD)|    0.158| 0.153|    -0.154|      0.446|    |
-#> |d1    | (0 SD)   -  (-1 SD)|   -0.029| 0.156|    -0.335|      0.287|    |
-#> |d1    | (+1 SD)  -  (-1 SD)|   -0.057| 0.312|    -0.671|      0.575|    |
-#> |d1    | (+1 SD)  -   (0 SD)|   -0.029| 0.156|    -0.335|      0.287|    |
-#> 
-#> --- Conditional Total Effect and Total Indirect Effect ---
-#> 
-#> 
-#> |Effect         | Level| W_value| Estimate|    SE| 2.5.%CI.Lo| 97.5.%CI.Up|Sig |
-#> |:--------------|-----:|-------:|--------:|-----:|----------:|-----------:|:---|
-#> |total_indirect | -1 SD|   0.223|   -0.031| 0.071|     -0.183|       0.108|    |
-#> |total_indirect |  0 SD|   0.452|   -0.015| 0.043|     -0.109|       0.069|    |
-#> |total_indirect | +1 SD|   0.681|   -0.008| 0.060|     -0.132|       0.111|    |
-#> |total_effect   | -1 SD|   0.223|    0.026| 0.178|     -0.332|       0.359|    |
-#> |total_effect   |  0 SD|   0.452|   -0.180| 0.126|     -0.421|       0.073|    |
-#> |total_effect   | +1 SD|   0.681|   -0.395| 0.173|     -0.708|      -0.033|*   |
-#> 
-#> 
-#> *************** REGRESSION PATHS (MC) ***************
-#> 
-#> 
-#> |Path                         |Label     | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:----------------------------|:---------|--------:|-----:|---------:|----------:|
-#> |Ydiff ~ M1diff               |b1        |   -0.085| 0.131|    -0.338|      0.172|
-#> |Ydiff ~ M1avg                |d1        |   -0.040| 0.124|    -0.276|      0.208|
-#> |Ydiff ~ M2diff               |b2        |    0.002| 0.137|    -0.274|      0.270|
-#> |Ydiff ~ M2avg                |d2        |   -0.000| 0.129|    -0.254|      0.258|
-#> |Ydiff ~ M3diff               |b3        |   -0.182| 0.132|    -0.439|      0.079|
-#> |Ydiff ~ M3avg                |d3        |   -0.160| 0.142|    -0.431|      0.111|
-#> |Ydiff ~ W1                   |cpw_W1    |   -0.173| 0.097|    -0.368|      0.017|
-#> |Ydiff ~ int_M1avg_W1         |dw1_W1    |   -0.114| 0.657|    -1.413|      1.196|
-#> |Ydiff ~ int_M2diff_W1        |bw2_W1    |   -0.514| 0.662|    -1.821|      0.770|
-#> |M1diff ~ W1                  |aw1_W1    |    0.056| 0.099|    -0.143|      0.246|
-#> |M2diff ~ M1diff              |b_1_2     |    0.306| 0.119|     0.079|      0.543|
-#> |M2diff ~ M1avg               |d_1_2     |   -0.044| 0.108|    -0.258|      0.167|
-#> |M2diff ~ W1                  |aw2_W1    |    0.007| 0.099|    -0.187|      0.202|
-#> |M2diff ~ int_M1diff_W1       |bw_1_2_W1 |   -0.300| 0.552|    -1.388|      0.796|
-#> |M2diff ~ int_M1avg_W1        |dw_1_2_W1 |    0.594| 0.603|    -0.585|      1.765|
-#> |M3diff ~ M1diff              |b_1_3     |   -0.147| 0.124|    -0.389|      0.103|
-#> |M3diff ~ M1avg               |d_1_3     |    0.088| 0.114|    -0.128|      0.311|
-#> |M3diff ~ W1                  |aw3_W1    |   -0.081| 0.095|    -0.268|      0.104|
-#> |int_M1diff_W1 ~ int_M1avg_W1 |          |    0.038| 0.147|    -0.248|      0.327|
-#> |int_M1diff_W1 ~ M1avg        |          |   -0.008| 0.028|    -0.064|      0.048|
-#> |int_M1diff_W1 ~ M2avg        |          |   -0.002| 0.028|    -0.059|      0.053|
-#> |int_M1diff_W1 ~ M3avg        |          |   -0.013| 0.032|    -0.077|      0.050|
-#> |int_M1diff_W1 ~ W1           |          |   -0.062| 0.022|    -0.104|     -0.017|
-#> |int_M2diff_W1 ~ int_M1avg_W1 |          |   -0.077| 0.130|    -0.340|      0.175|
-#> |int_M2diff_W1 ~ M1avg        |          |    0.006| 0.025|    -0.043|      0.055|
-#> |int_M2diff_W1 ~ M2avg        |          |   -0.003| 0.025|    -0.052|      0.048|
-#> |int_M2diff_W1 ~ M3avg        |          |    0.021| 0.028|    -0.034|      0.075|
-#> |int_M2diff_W1 ~ W1           |          |    0.006| 0.019|    -0.032|      0.044|
-#> 
-#> 
-#> *************** INTERCEPTS (MC) ***************
-#> 
-#> 
-#> |Intercept       |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:---------------|:-----|--------:|-----:|---------:|----------:|
-#> |Ydiff~1         |cp    |   -0.029| 0.023|    -0.073|      0.016|
-#> |M1diff~1        |a1    |   -0.026| 0.024|    -0.072|      0.021|
-#> |M2diff~1        |a2    |    0.014| 0.022|    -0.031|      0.056|
-#> |M3diff~1        |a3    |    0.023| 0.022|    -0.022|      0.065|
-#> |int_M1diff_W1~1 |      |    0.003| 0.005|    -0.007|      0.012|
-#> |int_M2diff_W1~1 |      |    0.003| 0.004|    -0.006|      0.012|
-#> |M1avg~1         |      |   -0.014| 0.026|    -0.063|      0.037|
-#> |M2avg~1         |      |    0.001| 0.026|    -0.050|      0.051|
-#> |M3avg~1         |      |   -0.012| 0.023|    -0.057|      0.033|
-#> |W1~1            |      |    0.004| 0.031|    -0.058|      0.066|
-#> |int_M1avg_W1~1  |      |    0.009| 0.005|    -0.000|      0.018|
-#> 
-#> 
-#> *************** VARIANCES (MC) ***************
-#> 
-#> 
-#> |Variance                     |Label | Estimate|    SE| 2.5%CI.Lo| 97.5%CI.Up|
-#> |:----------------------------|:-----|--------:|-----:|---------:|----------:|
-#> |int_M1diff_W1~~int_M1diff_W1 |      |    0.001| 0.000|     0.001|      0.002|
-#> |int_M2diff_W1~~int_M2diff_W1 |      |    0.001| 0.000|     0.001|      0.001|
-#> |Ydiff~~Ydiff                 |      |    0.027| 0.005|     0.018|      0.037|
-#> |M1diff~~M1diff               |      |    0.031| 0.006|     0.019|      0.042|
-#> |M2diff~~M2diff               |      |    0.025| 0.005|     0.016|      0.034|
-#> |M3diff~~M3diff               |      |    0.027| 0.005|     0.017|      0.037|
-#> |M1avg~~M1avg                 |      |    0.038| 0.007|     0.024|      0.053|
-#> |M2avg~~M2avg                 |      |    0.038| 0.007|     0.024|      0.051|
-#> |M3avg~~M3avg                 |      |    0.031| 0.006|     0.020|      0.043|
-#> |W1~~W1                       |      |    0.054| 0.010|     0.034|      0.073|
-#> |int_M1avg_W1~~int_M1avg_W1   |      |    0.001| 0.000|     0.001|      0.002|
-#> 
-#> 
-#> *************** STANDARDIZED (MC) ***************
-#> 
-#> 
-#> |Parameter                    | Estimate|    SE|        R|   2.5%|  97.5%|
-#> |:----------------------------|--------:|-----:|--------:|------:|------:|
-#> |cp                           |   -0.165| 0.123| 5000.000| -0.393|  0.082|
-#> |b1                           |   -0.084| 0.122| 5000.000| -0.314|  0.168|
-#> |d1                           |   -0.044| 0.127| 5000.000| -0.287|  0.212|
-#> |b2                           |    0.001| 0.126| 5000.000| -0.250|  0.247|
-#> |d2                           |   -0.000| 0.131| 5000.000| -0.268|  0.263|
-#> |b3                           |   -0.172| 0.118| 5000.000| -0.388|  0.075|
-#> |d3                           |   -0.159| 0.132| 5000.000| -0.399|  0.101|
-#> |cpw_W1                       |   -0.225| 0.116| 5000.000| -0.431|  0.020|
-#> |dw1_W1                       |   -0.029| 0.157| 5000.000| -0.336|  0.285|
-#> |bw2_W1                       |   -0.113| 0.141| 5000.000| -0.384|  0.166|
-#> |a1                           |   -0.148| 0.137| 5000.000| -0.423|  0.119|
-#> |aw1_W1                       |    0.073| 0.130| 5000.000| -0.190|  0.320|
-#> |a2                           |    0.081| 0.127| 5000.000| -0.176|  0.326|
-#> |b_1_2                        |    0.320| 0.115| 5000.000|  0.083|  0.530|
-#> |d_1_2                        |   -0.051| 0.121| 5000.000| -0.288|  0.187|
-#> |aw2_W1                       |    0.010| 0.130| 5000.000| -0.245|  0.263|
-#> |bw_1_2_W1                    |   -0.073| 0.129| 5000.000| -0.329|  0.185|
-#> |dw_1_2_W1                    |    0.160| 0.156| 5000.000| -0.151|  0.459|
-#> |a3                           |    0.136| 0.132| 5000.000| -0.130|  0.392|
-#> |b_1_3                        |   -0.154| 0.127| 5000.000| -0.389|  0.107|
-#> |d_1_3                        |    0.102| 0.129| 5000.000| -0.151|  0.348|
-#> |aw3_W1                       |   -0.111| 0.127| 5000.000| -0.362|  0.141|
-#> |int_M1diff_W1~int_M1avg_W1   |    0.042| 0.166| 5000.000| -0.280|  0.373|
-#> |int_M1diff_W1~M1avg          |   -0.038| 0.140| 5000.000| -0.321|  0.232|
-#> |int_M1diff_W1~M2avg          |   -0.011| 0.139| 5000.000| -0.291|  0.260|
-#> |int_M1diff_W1~M3avg          |   -0.058| 0.145| 5000.000| -0.345|  0.228|
-#> |int_M1diff_W1~W1             |   -0.349| 0.133| 5000.000| -0.620| -0.096|
-#> |int_M2diff_W1~int_M1avg_W1   |   -0.089| 0.148| 5000.000| -0.390|  0.198|
-#> |int_M2diff_W1~M1avg          |    0.032| 0.124| 5000.000| -0.215|  0.277|
-#> |int_M2diff_W1~M2avg          |   -0.016| 0.124| 5000.000| -0.258|  0.235|
-#> |int_M2diff_W1~M3avg          |    0.096| 0.126| 5000.000| -0.147|  0.347|
-#> |int_M2diff_W1~W1             |    0.035| 0.110| 5000.000| -0.183|  0.252|
-#> |int_M1diff_W1~~int_M1diff_W1 |    0.839| 0.341| 5000.000|  0.436|  1.713|
-#> |int_M1diff_W1~~int_M2diff_W1 |    0.007| 0.109| 5000.000| -0.210|  0.219|
-#> |int_M2diff_W1~~int_M2diff_W1 |    0.708| 0.251| 5000.000|  0.345|  1.292|
-#> |M1diff~~int_M1diff_W1        |    0.048| 0.127| 5000.000| -0.195|  0.300|
-#> |M1diff~~int_M2diff_W1        |   -0.055| 0.112| 5000.000| -0.284|  0.166|
-#> |M2diff~~int_M2diff_W1        |    0.013| 0.103| 5000.000| -0.187|  0.218|
-#> |Ydiff~~Ydiff                 |    0.856| 0.085| 5000.000|  0.576|  0.905|
-#> |M1diff~~M1diff               |    0.995| 0.029| 5000.000|  0.897|  1.000|
-#> |M2diff~~M2diff               |    0.877| 0.085| 5000.000|  0.626|  0.949|
-#> |M3diff~~M3diff               |    0.956| 0.061| 5000.000|  0.762|  0.990|
-#> |M1avg~~M1avg                 |    1.000| 0.000| 5000.000|  1.000|  1.000|
-#> |M1avg~~M2avg                 |    0.344| 0.121| 5000.000|  0.087|  0.561|
-#> |M1avg~~M3avg                 |    0.390| 0.117| 5000.000|  0.131|  0.602|
-#> |M1avg~~W1                    |    0.192| 0.133| 5000.000| -0.091|  0.437|
-#> |M1avg~~int_M1avg_W1          |   -0.027| 0.110| 5000.000| -0.245|  0.193|
-#> |M2avg~~M2avg                 |    1.000| 0.000| 5000.000|  1.000|  1.000|
-#> |M2avg~~M3avg                 |    0.363| 0.118| 5000.000|  0.115|  0.578|
-#> |M2avg~~W1                    |    0.263| 0.128| 5000.000| -0.006|  0.506|
-#> |M2avg~~int_M1avg_W1          |   -0.163| 0.109| 5000.000| -0.387|  0.040|
-#> |M3avg~~M3avg                 |    1.000| 0.000| 5000.000|  1.000|  1.000|
-#> |M3avg~~W1                    |    0.176| 0.133| 5000.000| -0.105|  0.420|
-#> |M3avg~~int_M1avg_W1          |   -0.165| 0.108| 5000.000| -0.393|  0.043|
-#> |W1~~W1                       |    1.000| 0.000| 5000.000|  1.000|  1.000|
-#> |W1~~int_M1avg_W1             |   -0.001| 0.107| 5000.000| -0.215|  0.211|
-#> |int_M1avg_W1~~int_M1avg_W1   |    0.581| 0.231| 5000.000|  0.303|  1.202|
-#> |int_M1diff_W1~1              |    0.062| 0.127| 5000.000| -0.187|  0.318|
-#> |int_M2diff_W1~1              |    0.077| 0.116| 5000.000| -0.145|  0.308|
-#> |M1avg~1                      |   -0.070| 0.133| 5000.000| -0.334|  0.199|
-#> |M2avg~1                      |    0.004| 0.135| 5000.000| -0.264|  0.269|
-#> |M3avg~1                      |   -0.070| 0.134| 5000.000| -0.325|  0.192|
-#> |W1~1                         |    0.017| 0.137| 5000.000| -0.253|  0.293|
-#> |int_M1avg_W1~1               |    0.191| 0.110| 5000.000| -0.011|  0.422|
-#> |indirect_1                   |    0.012| 0.027| 5000.000| -0.035|  0.080|
-#> |indirect_2                   |    0.000| 0.019| 5000.000| -0.043|  0.041|
-#> |indirect_1_2                 |   -0.000| 0.008| 5000.000| -0.018|  0.018|
-#> |indirect_3                   |   -0.023| 0.031| 5000.000| -0.096|  0.025|
-#> |indirect_1_3                 |   -0.004| 0.007| 5000.000| -0.022|  0.006|
-#> |total_indirect               |   -0.015| 0.043| 5000.000| -0.109|  0.069|
-#> |total_effect                 |   -0.180| 0.126| 5000.000| -0.421|  0.073|
+print(moderated)
+plot(moderated)
 ```
 
-Most printed sections have the same interpretation as in Example 1. The
-important additions are:
+Moderator main effects enter the difference equations automatically. For
+a continuous moderator, the default report uses the centering reference,
+whereas the default plot shows curves over the observed range. These two
+displays answer different questions. The second [Get started
+example](https://yangzhen1999.github.io/wsMed/articles/GetStarted.html#example-2-add-a-continuous-moderator)
+shows both outputs. Use `at` only to request particular raw moderator
+values.
 
-| Additional output | What it contains |
-|:---|:---|
-| Moderator in `VARIABLES` | The observed variable mapped to the internal moderator label, such as `W1`. |
-| `Moderated Coefficients` | Moderator coefficients, including already-fitted moderator main effects. |
-| `Conditional Indirect Effects` | Indirect effects evaluated at selected moderator values. |
-| `Indirect Effect Contrasts` | Differences between conditional indirect effects at those values. |
-| `Moderated Path Coefficients` | The selected path coefficients evaluated at each moderator value. |
-| `Path Coefficient Contrasts` | Differences between conditional path coefficients. |
-| `Conditional Total Effect and Total Indirect Effect` | Overall and combined indirect effects evaluated at each moderator value. |
+For a categorical moderator, declare an unordered factor, choose its
+reference level, and pass its column name to `W`. See the [categorical
+example](https://yangzhen1999.github.io/wsMed/articles/CategoricalPredictors.html#fit-categorical-moderated-mediation).
 
-#### Moderated coefficients
+## Missing data and confidence intervals
 
-The `Moderated Coefficients` table reports requested interactions and
-already-fitted moderator main effects used in conditional intercepts.
-The `BaseCoef` column links the interaction to the original path. For
-example, a row whose base coefficient is `a1` indicates whether the
-condition-to-`M1` path changes with `D3`.
+### Choose a missing-data strategy
 
-In the unstandardized table, the interaction estimate describes the
-expected change in the base path for a one-unit increase in the
-moderator. In the standardized `mod_coeff` table, it is per SD of the
-continuous moderator. Its confidence interval evaluates whether that
-change differs from zero. This table should be consulted before
-interpreting the pattern of conditional path coefficients.
+| `Na` | Data handling | Available CI methods |
+|----|----|----|
+| `"DE"` (default) | Listwise deletion | Monte Carlo or bootstrap |
+| `"FIML"` | Full-information maximum likelihood | Monte Carlo or bootstrap |
+| `"MI"` | Multiple imputation | Monte Carlo |
 
-Because the continuous moderator is centered during data preparation,
-the ordinary path estimates in the main output refer to the value
-represented by centered $`W=0`$, typically the sample mean of the
-original moderator. The conditional tables make the values used for
-interpretation explicit.
-
-#### Conditional effects
-
-For a continuous moderator, conditional results are commonly reported at
-three reference levels:
-
-- one standard deviation below the mean (`-1 SD`);
-- the mean (`0 SD`); and
-- one standard deviation above the mean (`+1 SD`).
-
-The `W_value` column gives the corresponding value on the moderator’s
-original scale. The `Estimate`, `SE`, and confidence-limit columns
-describe the effect at that value of $`W`$.
-
-`Conditional Indirect Effects` reports how each mediation route changes
-across these values. Labels used here have the prefix
-`indirect_effect_`. For example:
-
-``` text
-indirect_effect_1_2
-```
-
-refers to the conditional indirect route through `M1` and `M2`. This
-name is used by the moderation output and plotting functions. The
-corresponding defined parameter in the generated SEM uses:
-
-``` text
-indirect_1_2
-```
-
-The `Indirect Effect Contrasts` table directly compares the conditional
-indirect effect between moderator levels. These contrasts answer whether
-the indirect effect changes between the selected values; they are
-distinct from testing the indirect effect against zero at any one value.
-
-`Moderated Path Coefficients` and `Path Coefficient Contrasts` provide
-the same two views for the individual paths listed in `MP`. The first
-table shows each conditional coefficient, and the second tests
-differences between the selected moderator levels.
-
-Finally, `Conditional Total Effect and Total Indirect Effect` combines
-the relevant paths at each moderator value. When a specific indirect
-effect is of primary interest, its row in `Conditional Indirect Effects`
-should still be reported separately rather than relying only on the
-conditional total indirect effect.
-
-#### Significance markers and confidence intervals
-
-The `Sig` column provides a compact marker when the reported confidence
-interval excludes zero. The confidence limits should remain the primary
-basis for interpretation because they show both the direction and
-precision of the estimate.
-
-A blank marker does not show that two moderator levels are equivalent.
-To evaluate a difference between levels, use the relevant contrast table
-rather than comparing the two significance markers.
-
-#### Visualizing conditional effects
-
-[`plot_moderation_curve()`](https://yangzhen1999.github.io/wsMed/reference/plot_moderation_curve.md)
-displays a conditional indirect effect, an individual path coefficient,
-or a total effect across the observed range of a continuous moderator:
+To illustrate these choices, remove a few simulated post-condition
+measurements:
 
 ``` r
 
-plot_moderation_curve(
-  result5,
-  "indirect_effect_1_2"
+incomplete <- example_data
+incomplete$A2[1:5] <- NA
+incomplete$D2[6:10] <- NA
+```
+
+Add `Na = "FIML"` when you want FIML:
+
+``` r
+
+fiml_result <- wsMed(
+  data = incomplete,
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2",
+  Na = "FIML"
 )
+print(fiml_result)
+```
 
-plot_moderation_curve(
-  result5,
-  "b_1_2"
+Use `Na = "MI"` for multiple imputation. The default uses five
+predictive mean matching imputations for the numeric variables in this
+example:
+
+``` r
+
+mi_result <- wsMed(
+  data = incomplete,
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2",
+  Na = "MI"
 )
+print(mi_result)
+```
 
-plot_moderation_curve(
-  result5,
-  "total_effect"
+For finer control, `mi_args` accepts imputation settings; for example,
+`mi_args = list(m = 20)` requests 20 imputations. Select the imputation
+method and number of imputations for your data and analysis.
+
+MI imputes the original measurements before constructing analysis
+variables within each completed dataset. FIML handles missing analysis
+variables during fitting, after differences, averages and interactions
+have been constructed. FIML requires categorical predictors to be fully
+observed.
+
+Choose a strategy that is appropriate for the missing-data assumptions
+and variable roles. With moderation, default main-effects imputation may
+not preserve the substantive interactions; see [model-compatible
+imputation](https://yangzhen1999.github.io/wsMed/articles/CompatibleImputation.md).
+
+### Choose the inference method
+
+Monte Carlo is the default. To combine FIML with bootstrap CIs, specify
+both `Na` and `ci_method`. This executed example uses the incomplete
+data above and the default 2,000 bootstrap replicates:
+
+``` r
+
+boot_result <- wsMed(
+  data = incomplete,
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2",
+  Na = "FIML",
+  ci_method = "bootstrap"
 )
+print(boot_result)
+#> wsMed analysis
+#> Model: P | FIML | Observations: 100 
+#> Effects:
+#> wsMed all | raw scale | bootstrap 
+#> 95% percentile intervals; 2000 joint draws; SE from effect draws
+#> Condition contrast: C2 - C1 
+#>                                        Estimate Std. Error  CI lower  CI upper
+#> cp: Direct effect                     -0.028639   0.017200 -0.062908  0.005576
+#> indirect_1: M1                        -0.000828   0.003209 -0.008216  0.005280
+#> indirect_2: M2                        -0.001846   0.003449 -0.010600  0.003383
+#> total_indirect: Total indirect effect -0.002673   0.004737 -0.013825  0.005631
+#> total: Total effect                   -0.031313   0.017464 -0.066589  0.003270
+#> Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.
+#> Use as.data.frame() for the full-precision table and metadata.
+#> Post-fit admissibility: 1 of 1 ; excluded rows: 0
 ```
 
-The first call uses a conditional-effect label from the moderation
-output. The second uses an individual model-path label. The third
-displays the conditional total effect. The curve shows the estimated
-effect over $`W`$, the confidence band shows its uncertainty, and the
-zero reference line indicates where the interval changes from including
-to excluding zero.
+When one member of a measurement pair is missing, its difference and
+average are missing too. FIML handles these constructed variables during
+fitting; the observed member of the original pair is not separately
+included in this model. The bootstrap resamples participant rows of the
+constructed analysis data, retaining the within-participant pairing and
+fitting each sample with FIML. For complete data or listwise deletion,
+omit `Na = "FIML"` from this call.
 
-Available curve labels can be checked before plotting:
+`R` controls Monte Carlo draws, `bootstrap` controls bootstrap
+replicates, and `alpha` controls the confidence level as `1 - alpha`.
+`seed` and `iseed` control the Monte Carlo and bootstrap random draws,
+respectively. `ci_method = "both"` retains both inference engines;
+[`print()`](https://rdrr.io/r/base/print.html) then reports them
+separately. MI currently supports Monte Carlo only.
+
+## Standardized effects
+
+The default output is unstandardized. Add `standardized = TRUE` to the
+analysis to save standardized reporting as its default, or request it
+for one summary:
 
 ``` r
 
-names(result5$moderation)
-
-unique(result5$moderation$theta_curve$Path)
-unique(result5$moderation$path_curve$Path)
+summary(
+  result,
+  standardized = TRUE
+)
+#> wsMed statistical summary
+#> Model: P | Missing: DE | Observations: 100 
+#> Effects:
+#> wsMed all | marginal scale | mc 
+#> 95% percentile intervals; 20000 joint draws; SE from effect draws
+#> Condition contrast: C2 - C1 
+#> Standardization: effect / marginal model-implied SD(D2 - D1); condition contrast is unscaled.
+#> Plug-in marginal outcome-difference SD: 0.169239 
+#> The denominator is not a moderator-specific conditional SD.
+#>                                       Estimate Std. Error CI lower CI upper
+#> cp: Direct effect                     -0.18787    0.10032 -0.38252  0.01082
+#> indirect_1: M1                         0.00775    0.01858 -0.02674  0.05071
+#> indirect_2: M2                        -0.00662    0.01496 -0.04331  0.01831
+#> total_indirect: Total indirect effect  0.00113    0.02396 -0.04882  0.05067
+#> total: Total effect                   -0.18674    0.10061 -0.38051  0.01125
+#> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
+#> Use as.data.frame() for the full-precision table and metadata.
+#> 
+#> Path coefficients:
+#>    Estimate Std. Error CI lower CI upper
+#> cp  -0.1879     0.1003  -0.3825   0.0108
+#> b1  -0.0501     0.0970  -0.2352   0.1423
+#> d1  -0.0751     0.1013  -0.2707   0.1264
+#> b2  -0.0821     0.0975  -0.2715   0.1099
+#> d2  -0.0438     0.1012  -0.2393   0.1587
+#> a1  -0.1546     0.1028  -0.3594   0.0470
+#> a2   0.0806     0.1011  -0.1153   0.2784
+#> Post-fit admissibility: 1 of 1 ; excluded rows: 0 
+#> Tables: $effects, $coefficients; analysis settings: $info.
 ```
 
-When `ci_method = "both"`, the Monte Carlo and bootstrap moderation
-results are stored separately. Select the desired branch before
-accessing its curve data:
+Changing the reporting scale does not fit a new model. Standardized CIs
+propagate uncertainty in the coefficients and model-implied scales; they
+are not obtained by dividing the unstandardized CI endpoints by a single
+fitted SD. See [standardized
+effects](https://yangzhen1999.github.io/wsMed/articles/StandardizedModeratedMediation.md).
+
+## Inspect and present the results
 
 ``` r
 
-result_both$moderation$mc$theta_curve
-result_both$moderation$boot$theta_curve
+summary(result)
+#> wsMed statistical summary
+#> Model: P | Missing: DE | Observations: 100 
+#> Effects:
+#> wsMed all | raw scale | mc 
+#> 95% percentile intervals; 20000 joint draws; SE from effect draws
+#> Condition contrast: C2 - C1 
+#>                                        Estimate Std. Error  CI lower  CI upper
+#> cp: Direct effect                     -0.031795   0.017000 -0.064525  0.001864
+#> indirect_1: M1                         0.001311   0.003208 -0.004586  0.008760
+#> indirect_2: M2                        -0.001120   0.002587 -0.007507  0.003186
+#> total_indirect: Total indirect effect  0.000191   0.004138 -0.008459  0.008723
+#> total: Total effect                   -0.031604   0.017049 -0.064633  0.001895
+#> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
+#> Use as.data.frame() for the full-precision table and metadata.
+#> 
+#> Path coefficients:
+#>    Estimate Std. Error CI lower CI upper
+#> cp -0.03180    0.01700 -0.06453  0.00186
+#> b1 -0.04834    0.09555 -0.23422  0.13918
+#> d1 -0.06905    0.09524 -0.25390  0.11568
+#> b2 -0.07732    0.09387 -0.26459  0.10461
+#> d2 -0.03676    0.08675 -0.20684  0.13625
+#> a1 -0.02712    0.01772 -0.06162  0.00817
+#> a2  0.01448    0.01796 -0.02032  0.04929
+#> Post-fit admissibility: 1 of 1 ; excluded rows: 0 
+#> Tables: $effects, $coefficients; analysis settings: $info.
+plot(result)
 ```
 
-### What to report
+![plot of chunk results](figures/WsMed-results-1.png)
 
-The exact reporting format depends on the research question, but a
-reproducible summary should identify:
+plot of chunk results
 
-1.  the selected model form and the order of the mediators;
-2.  the missing-data method and confidence-interval method;
-3.  the number of Monte Carlo draws or bootstrap samples;
-4.  model-fit information when it is informative for the fitted model;
-5.  the direct, specific indirect, total indirect, and total effects,
-    with confidence intervals;
-6.  whether the reported estimates are standardized or unstandardized;
-    and
-7.  for moderated models, the moderator, the paths in `MP`, their
-    interaction estimates, and the relevant conditional effects or
-    contrasts.
+Use `print(result)` for the core report and `summary(result)` for a
+structured statistical summary. Their default displays can be read
+directly. Numerical extraction, selected moderator values and export are
+optional next steps in [Read and export
+results](https://yangzhen1999.github.io/wsMed/articles/ResultsGuide.md).
 
-For every indirect-effect label, use the printed key or
-[`printGM()`](https://yangzhen1999.github.io/wsMed/reference/printGM.md)
-to verify the exact mediator route before reporting it.
+For generated model syntax, use `printGM(result)`. For separate model
+specification, fitting, inspection and inference, use the [staged
+workflow](https://yangzhen1999.github.io/wsMed/articles/ModularWorkflow.md).
 
-## Further model details
+## Manuscript data
 
-This tutorial focuses on constructing and running
-[`wsMed()`](https://yangzhen1999.github.io/wsMed/reference/wsMed.md)
-calls. The model-generation vignettes provide the corresponding
-equations, parameter-label conventions, and indirect-effect definitions:
-
-- [`GenerateModelP()`](https://yangzhen1999.github.io/wsMed/reference/GenerateModelP.md)
-  for parallel models;
-- [`GenerateModelCN()`](https://yangzhen1999.github.io/wsMed/reference/GenerateModelCN.md)
-  for chained models;
-- [`GenerateModelCP()`](https://yangzhen1999.github.io/wsMed/reference/GenerateModelCP.md)
-  for chained–parallel models;
-- [`GenerateModelPC()`](https://yangzhen1999.github.io/wsMed/reference/GenerateModelPC.md)
-  for parallel–chained models; and
-- [`GenerateModelCustom()`](https://yangzhen1999.github.io/wsMed/reference/GenerateModelCustom.md)
-  for user-defined models.
-
-These vignettes are most useful when users need to inspect how a
-selected structure is translated into `lavaan` syntax or determine the
-label of a path supplied through `MP`.
-
-## Summary
-
-A [`wsMed()`](https://yangzhen1999.github.io/wsMed/reference/wsMed.md)
-analysis can be completed in six steps:
-
-1.  Supply matched mediator and outcome variables for the two
-    conditions.
-2.  Select a predefined model with `form`, or use `form = "UD"` together
-    with `paths`.
-3.  Choose `Na`, `ci_method`, and whether standardized effects are
-    required.
-4.  Add moderators or covariates when they are part of the analysis.
-5.  Print the fitted object and inspect the generated model.
-6.  Read the shared output first, then interpret any additional
-    conditional results for a moderated model.
-
-The same basic call is therefore used across simple, user-defined,
-missing-data, moderated, and covariate-adjusted analyses. Only the
-arguments needed for the intended analysis have to be added or changed.
-The returned object can be read through
-[`print()`](https://rdrr.io/r/base/print.html), connected to the
-generated model with
-[`printGM()`](https://yangzhen1999.github.io/wsMed/reference/printGM.md),
-and accessed directly for further analysis or reporting.
-
-## Reading standardized conditional results
-
-The moderated example above provides both scales:
+The package also includes the empirical dataset used in the paper:
 
 ``` r
 
-head(result5$moderation_std$beta_coef)
-#>                  Path Mediators Level W_value    Estimate         SE
-#> 1   indirect_effect_1         1 -1 SD   0.223  0.01851179 0.03853350
-#> 2   indirect_effect_1         1  0 SD   0.452  0.01241918 0.02706592
-#> 3   indirect_effect_1         1 +1 SD   0.681  0.00632657 0.02901303
-#> 4 indirect_effect_1_2       1 2 -1 SD   0.223 -0.00971447 0.02474938
-#> 5 indirect_effect_1_2       1 2  0 SD   0.452 -0.00006888 0.00847441
-#> 6 indirect_effect_1_2       1 2 +1 SD   0.681  0.00204660 0.01230367
-#>    2.5.%CI.Lo 97.5.%CI.Up Sig
-#> 1 -0.04693503  0.10957838    
-#> 2 -0.03504596  0.08017097    
-#> 3 -0.04849223  0.07675749    
-#> 4 -0.06941232  0.03039126    
-#> 5 -0.01807556  0.01809927    
-#> 6 -0.02053757  0.03233936
-result5$moderation_std$conditional_overall
-#>           Effect Level W_value    Estimate         SE 2.5.%CI.Lo 97.5.%CI.Up
-#> 1 total_indirect -1 SD   0.223 -0.03128198 0.07109154 -0.1834272  0.10758593
-#> 3 total_indirect  0 SD   0.452 -0.01476742 0.04345483 -0.1090928  0.06944515
-#> 5 total_indirect +1 SD   0.681 -0.00803368 0.06021063 -0.1321828  0.11074425
-#> 2   total_effect -1 SD   0.223  0.02585195 0.17818896 -0.3322253  0.35900195
-#> 4   total_effect  0 SD   0.452 -0.17968841 0.12585504 -0.4208829  0.07261438
-#> 6   total_effect +1 SD   0.681 -0.39500959 0.17258286 -0.7076863 -0.03309498
-#>   Sig
-#> 1    
-#> 3    
-#> 5    
-#> 2    
-#> 4    
-#> 6   *
-attr(result5$moderation_std, "standardization")
-#> $effect_scale
-#> [1] "marginal model-implied endpoint scales; IE / SD(Ydiff)"
-#> 
-#> $moderator_units
-#> [1] "raw; fixed numerical probes; dummy coding unchanged"
-#> 
-#> $mod_coeff_units
-#> [1] "per SD of continuous W; per 0/1 dummy contrast"
-#> 
-#> $interval
-#> [1] "percentile"
-#> 
-#> $engine
-#> [1] "mc"
-#> 
-#> $fixed.x
-#> [1] FALSE
-#> 
-#> $MI_reference
-#> NULL
-#> 
-#> $diagnostics
-#> $diagnostics$requested
-#> [1] 5000
-#> 
-#> $diagnostics$valid
-#> [1] 5000
-#> 
-#> $diagnostics$invalid
-#> [1] 0
-#> 
-#> $diagnostics$invalid_indices
-#> integer(0)
-#> 
-#> $diagnostics$reasons
-#> < table of extent 0 >
+data(wsmed_examples)
+dim(wsmed_examples)
+#> [1] 123  14
 ```
 
-Continuous interaction coefficients in `mod_coeff` are per SD of the
-moderator. Conditional effects and curves are evaluated at fixed
-numerical values in the original moderator units, using a common
-marginal endpoint scale. These are different reporting quantities.
-Existing moderator main effects enter conditional intercepts whether or
-not `a`/`cp` is listed in `MP`; totals include all model-implied
-indirect paths.
-
-``` r
-
-plot_moderation_curve(result5, "total_indirect", standardized = TRUE)
-```
-
-![plot of chunk
-standardized-conditional-plot](figures/WsMed-standardized-conditional-plot-1.png)
-
-plot of chunk standardized-conditional-plot
-
-Conditional intervals are percentile intervals from jointly transformed
-draws, including uncertainty in the SDs when those moments are
-estimated. Do not divide raw interval limits by a single fitted SD.
-Point estimates evaluate the effect at fitted (or pooled primitive)
-parameters, rather than averaging the nonlinear effect over draws.
-Report the raw moderator probes, the marginal scale definition,
-`fixed.x`, and the interval engine.
-
-For `ci_method = "both"`, extract `moderation_std$mc` or
-`moderation_std$boot`; choose `engine = "mc"` or `engine = "boot"` in
-the plotting call. The [dedicated
-tutorial](https://yangzhen1999.github.io/wsMed/articles/StandardizedModeratedMediation.md)
-also covers categorical moderators, post-fit conversion, FIML and MI.
-
-## More plots for reporting
-
-Use
-[`plot_effects()`](https://yangzhen1999.github.io/wsMed/reference/plot_effects.md)
-for an effect forest,
-[`plot_conditional_effects()`](https://yangzhen1999.github.io/wsMed/reference/plot_conditional_effects.md)
-for group or reference-level point intervals, and
-[`plot_contrasts()`](https://yangzhen1999.github.io/wsMed/reference/plot_contrasts.md)
-for effect differences with their own confidence intervals. All three
-support `standardized` and the MC/bootstrap `engine` selection. See
-[Plotting mediation effects and
-contrasts](https://yangzhen1999.github.io/wsMed/articles/PlottingEffects.md)
-for executed examples, selection of paths and labels, and export to PDF
-or PNG.
+It contains 123 intervention-group participants and retains the original
+missing values. Its help page documents the study, processing, variable
+definitions and license. The examples on this page use simulated data to
+teach analysis choices; the paper’s replication materials record the
+full settings and computing environment for its numerical results.

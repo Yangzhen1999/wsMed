@@ -37,7 +37,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Building and validating wsMed documentation</h1>
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/.github/CONTRIBUTING.md" class="external-link"><code>.github/CONTRIBUTING.md</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/master/.github/CONTRIBUTING.md" class="external-link"><code>.github/CONTRIBUTING.md</code></a></small>
     </div>
 
 <div id="building-and-validating-wsmed-documentation" class="section level1">
@@ -46,6 +46,7 @@
 <div class="section level2">
 <h2 id="editable-sources">Editable sources<a class="anchor" aria-label="anchor" href="#editable-sources"></a></h2>
 <p>Executable tutorial sources are <code>vignettes/*.Rmd.original</code>. Edit each as an <code>.Rmd</code>, execute it, then restore <code>.Rmd.original</code>. New tutorials follow the same convention. The neighboring frozen <code>.Rmd</code> files are generated output. Keep examples independently runnable, specify random seeds and show only the output needed to explain the task. Preserve meaningful statistical qualifications.</p>
+<p>Start user tutorials with the simplest call that demonstrates the task. Rely on the documented defaults of <code><a href="reference/wsMed.html">wsMed()</a></code> (including its seed), and show <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> and <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> before optional selectors or extraction code. Put each argument on its own line in multiline calls. Introduce explicit settings after the default workflow, explaining what they change. Installation examples use CRAN and GitHub <code>master</code>; historical validation records retain their audited versions and commits.</p>
 </div>
 <div class="section level2">
 <h2 id="rebuild-and-check">Rebuild and check<a class="anchor" aria-label="anchor" href="#rebuild-and-check"></a></h2>

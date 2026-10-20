@@ -1,181 +1,375 @@
 # Read and export results
 
-**Goal:** obtain one organized table of all core effects, understand its
-scale and intervals, and export it without copying numbers from the
-console.
+Start by reading the default report. Use more specific queries only when
+you need a different effect, reporting scale or confidence level.
 
-Use the [quick
-start](https://yangzhen1999.github.io/wsMed/articles/GetStarted.md)
-first if you have not fitted a model. The short setup below makes this
-page independently runnable.
+The example below is the parallel mediation model from [Get
+started](https://yangzhen1999.github.io/wsMed/articles/GetStarted.md).
 
-Example setup: create result
+Example setup
 
 ``` r
 
 data(example_data)
 result <- wsMed(
   data = example_data,
-  M_C1 = c("A1", "B1"), M_C2 = c("A2", "B2"),
-  Y_C1 = "D1", Y_C2 = "D2",
-  form = "P", Na = "DE", ci_method = "mc",
-  R = 2000, seed = 123, standardized = TRUE, verbose = FALSE
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2"
 )
 ```
 
-This example requests **standardized results** during analysis. The
-reports, summary tables and generic plots below inherit that choice.
+## Read the default report
 
-## Get the table you need
+``` r
+
+print(result)
+#> wsMed analysis
+#> Model: P | DE | Observations: 100 
+#> Effects:
+#> wsMed all | raw scale | mc 
+#> 95% percentile intervals; 20000 joint draws; SE from effect draws
+#> Condition contrast: C2 - C1 
+#>                                        Estimate Std. Error  CI lower  CI upper
+#> cp: Direct effect                     -0.031795   0.017000 -0.064525  0.001864
+#> indirect_1: M1                         0.001311   0.003208 -0.004586  0.008760
+#> indirect_2: M2                        -0.001120   0.002587 -0.007507  0.003186
+#> total_indirect: Total indirect effect  0.000191   0.004138 -0.008459  0.008723
+#> total: Total effect                   -0.031604   0.017049 -0.064633  0.001895
+#> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
+#> Use as.data.frame() for the full-precision table and metadata.
+#> Post-fit admissibility: 1 of 1 ; excluded rows: 0
+```
+
+[`print()`](https://rdrr.io/r/base/print.html) displays the core effects
+and analysis information. The report gives the estimate, SE and CI for
+each specific indirect effect, the total indirect effect, the direct
+effect and the total effect. Here the default output is unstandardized,
+with 95% Monte Carlo CIs.
+
+## Get a statistical summary
+
+``` r
+
+summary(result)
+#> wsMed statistical summary
+#> Model: P | Missing: DE | Observations: 100 
+#> Effects:
+#> wsMed all | raw scale | mc 
+#> 95% percentile intervals; 20000 joint draws; SE from effect draws
+#> Condition contrast: C2 - C1 
+#>                                        Estimate Std. Error  CI lower  CI upper
+#> cp: Direct effect                     -0.031795   0.017000 -0.064525  0.001864
+#> indirect_1: M1                         0.001311   0.003208 -0.004586  0.008760
+#> indirect_2: M2                        -0.001120   0.002587 -0.007507  0.003186
+#> total_indirect: Total indirect effect  0.000191   0.004138 -0.008459  0.008723
+#> total: Total effect                   -0.031604   0.017049 -0.064633  0.001895
+#> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
+#> Use as.data.frame() for the full-precision table and metadata.
+#> 
+#> Path coefficients:
+#>    Estimate Std. Error CI lower CI upper
+#> cp -0.03180    0.01700 -0.06453  0.00186
+#> b1 -0.04834    0.09555 -0.23422  0.13918
+#> d1 -0.06905    0.09524 -0.25390  0.11568
+#> b2 -0.07732    0.09387 -0.26459  0.10461
+#> d2 -0.03676    0.08675 -0.20684  0.13625
+#> a1 -0.02712    0.01772 -0.06162  0.00817
+#> a2  0.01448    0.01796 -0.02032  0.04929
+#> Post-fit admissibility: 1 of 1 ; excluded rows: 0 
+#> Tables: $effects, $coefficients; analysis settings: $info.
+```
+
+[`summary()`](https://rdrr.io/r/base/summary.html) returns a structured
+report containing effects, path coefficients and analysis settings; its
+default display shows the statistical tables. Unlike
+[`print()`](https://rdrr.io/r/base/print.html), it creates a summary
+object that can be saved and reused:
 
 ``` r
 
 s <- summary(result)
-knitr::kable(s$effects[c("label", "estimate", "std.error", "conf.low", "conf.high")],
-  digits = 4, col.names = c("Effect / pathway", "Estimate", "SE", "CI lower", "CI upper"))
 ```
 
-| Effect / pathway      | Estimate |     SE | CI lower | CI upper |
-|:----------------------|---------:|-------:|---------:|---------:|
-| Direct effect         |  -0.1879 | 0.1020 |  -0.3878 |   0.0189 |
-| M1                    |   0.0077 | 0.0182 |  -0.0258 |   0.0509 |
-| M2                    |  -0.0066 | 0.0148 |  -0.0437 |   0.0184 |
-| Total indirect effect |   0.0011 | 0.0231 |  -0.0442 |   0.0515 |
-| Total effect          |  -0.1867 | 0.1007 |  -0.3799 |   0.0180 |
+Typing `s` displays the same summary. Neither operation repeats fitting
+or sampling. The stored tables retain full precision even though the
+printed values are rounded.
 
-The rows cover the direct effect, each specific indirect effect, the
-total indirect effect and the total effect. In a single-mediator model,
-the specific and total indirect effects are equal; both named rows
-remain available.
-[`knitr::kable()`](https://rdrr.io/pkg/knitr/man/kable.html) rounds only
-this display, while `s$effects` retains full precision.
-
-| You want to… | Use |
-|----|----|
-| Read a core report in the console | `print(result)` |
-| Include path coefficients in the report | `print(result, detail = "full")` |
-| Save a statistical summary | `s <- summary(result)` |
-| Get all selected effects as a data frame | `s$effects` or `as.data.frame(s)` |
-| Get conditional path coefficients | `s$coefficients` |
-| Check method, scale and confidence level | `s$info` |
-
-[`print()`](https://rdrr.io/r/base/print.html) displays a report and
-returns the original object invisibly.
-[`summary()`](https://rdrr.io/r/base/summary.html) creates a structured
-result that you can save, filter and plot; entering `s` displays its
-ordinary R coefficient tables. Neither repeats fitting or sampling. With
-moderation, `$coefficients` contains slopes evaluated at the selected
-moderator values; use `type = "parameters"` for primitive parameters.
-
-## Check the scale and intervals
+## Plot the results
 
 ``` r
 
-s$info[c("standardized", "method", "level")]
-#> $standardized
-#> [1] TRUE
-#> 
-#> $method
-#> [1] "mc"
-#> 
-#> $level
-#> [1] 0.95
+plot(result)
 ```
 
-For these complete condition effects, standardization divides the
-estimate by the model-implied **marginal SD of the outcome difference**.
-It does not use a separate denominator for each moderator value or
-category. See [standardized
+![plot of chunk default-plot](figures/ResultsGuide-default-plot-1.png)
+
+plot of chunk default-plot
+
+The default plot of this model shows the specific indirect effects. To
+plot all effects selected in the summary, use `plot(s)`. Both inherit
+the reporting scale saved during the analysis. See the [plot
+gallery](https://yangzhen1999.github.io/wsMed/articles/PlottingEffects.md)
+for the available displays and optional settings.
+
+## Choose more specific output
+
+Start with the calls above. The following options change one part of the
+report without fitting again.
+
+### Request standardized effects
+
+``` r
+
+summary(
+  result,
+  standardized = TRUE
+)
+#> wsMed statistical summary
+#> Model: P | Missing: DE | Observations: 100 
+#> Effects:
+#> wsMed all | marginal scale | mc 
+#> 95% percentile intervals; 20000 joint draws; SE from effect draws
+#> Condition contrast: C2 - C1 
+#> Standardization: effect / marginal model-implied SD(D2 - D1); condition contrast is unscaled.
+#> Plug-in marginal outcome-difference SD: 0.169239 
+#> The denominator is not a moderator-specific conditional SD.
+#>                                       Estimate Std. Error CI lower CI upper
+#> cp: Direct effect                     -0.18787    0.10032 -0.38252  0.01082
+#> indirect_1: M1                         0.00775    0.01858 -0.02674  0.05071
+#> indirect_2: M2                        -0.00662    0.01496 -0.04331  0.01831
+#> total_indirect: Total indirect effect  0.00113    0.02396 -0.04882  0.05067
+#> total: Total effect                   -0.18674    0.10061 -0.38051  0.01125
+#> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
+#> Use as.data.frame() for the full-precision table and metadata.
+#> 
+#> Path coefficients:
+#>    Estimate Std. Error CI lower CI upper
+#> cp  -0.1879     0.1003  -0.3825   0.0108
+#> b1  -0.0501     0.0970  -0.2352   0.1423
+#> d1  -0.0751     0.1013  -0.2707   0.1264
+#> b2  -0.0821     0.0975  -0.2715   0.1099
+#> d2  -0.0438     0.1012  -0.2393   0.1587
+#> a1  -0.1546     0.1028  -0.3594   0.0470
+#> a2   0.0806     0.1011  -0.1153   0.2784
+#> Post-fit admissibility: 1 of 1 ; excluded rows: 0 
+#> Tables: $effects, $coefficients; analysis settings: $info.
+```
+
+For complete condition effects, standardization uses the model-implied
+marginal SD of the outcome difference. See [standardized
 effects](https://yangzhen1999.github.io/wsMed/articles/StandardizedModeratedMediation.md)
-for the definition and conditional examples.
+for the treatment of paths, interactions and conditional effects.
+
+If the original call used `standardized = TRUE`, plain `print(result)`,
+`summary(result)` and `plot(result)` already use standardized output.
+
+### Select an effect family
 
 ``` r
 
-raw <- summary(result, standardized = FALSE)
-raw$effects[c("effect", "estimate")]
-#>           effect      estimate
-#> 1             cp -0.0317954295
-#> 2     indirect_1  0.0013113045
-#> 3     indirect_2 -0.0011199168
-#> 4 total_indirect  0.0001913877
-#> 5          total -0.0316040417
+summary(
+  result,
+  type = "indirect"
+)
+#> wsMed statistical summary
+#> Model: P | Missing: DE | Observations: 100 
+#> Effects:
+#> wsMed indirect | raw scale | mc 
+#> 95% percentile intervals; 20000 joint draws; SE from effect draws
+#> Condition contrast: C2 - C1 
+#>                Estimate Std. Error CI lower CI upper
+#> indirect_1: M1  0.00131    0.00321 -0.00459  0.00876
+#> indirect_2: M2 -0.00112    0.00259 -0.00751  0.00319
+#> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
+#> Use as.data.frame() for the full-precision table and metadata.
+#> 
+#> Path coefficients:
+#>    Estimate Std. Error CI lower CI upper
+#> cp -0.03180    0.01700 -0.06453  0.00186
+#> b1 -0.04834    0.09555 -0.23422  0.13918
+#> d1 -0.06905    0.09524 -0.25390  0.11568
+#> b2 -0.07732    0.09387 -0.26459  0.10461
+#> d2 -0.03676    0.08675 -0.20684  0.13625
+#> a1 -0.02712    0.01772 -0.06162  0.00817
+#> a2  0.01448    0.01796 -0.02032  0.04929
+#> Post-fit admissibility: 1 of 1 ; excluded rows: 0 
+#> Tables: $effects, $coefficients; analysis settings: $info.
 ```
 
-The override affects this query only. `result` keeps its original
-preference. Summary effect SEs come from the stored effect draws, and
-intervals are percentile intervals. The older stored-table report may
-use a different bootstrap interval convention; use the same convention
-when comparing reports.
+Other selections include `"direct"`, `"total_indirect"`, `"total"`,
+`"paths"` and `"parameters"`. Use `terms` only when selecting particular
+named effects.
 
-## Select effects or change confidence level
+### Change the confidence level
 
 ``` r
 
-indirect <- summary(result, type = "indirect")
-indirect$effects[c("effect", "label", "estimate", "conf.low", "conf.high")]
-#>       effect label     estimate    conf.low  conf.high
-#> 1 indirect_1    M1  0.007748230 -0.02579869 0.05091815
-#> 2 indirect_2    M2 -0.006617359 -0.04369740 0.01837558
-ci90 <- summary(result, level = .90)
-ci90$effects[c("effect", "conf.low", "conf.high")]
-#>           effect    conf.low   conf.high
-#> 1             cp -0.35850086 -0.01930912
-#> 2     indirect_1 -0.01843490  0.04134868
-#> 3     indirect_2 -0.03354337  0.01277992
-#> 4 total_indirect -0.03741600  0.03940504
-#> 5          total -0.35134695 -0.01420823
+summary(
+  result,
+  level = 0.90
+)
+#> wsMed statistical summary
+#> Model: P | Missing: DE | Observations: 100 
+#> Effects:
+#> wsMed all | raw scale | mc 
+#> 90% percentile intervals; 20000 joint draws; SE from effect draws
+#> Condition contrast: C2 - C1 
+#>                                        Estimate Std. Error  CI lower  CI upper
+#> cp: Direct effect                     -0.031795   0.017000 -0.059453 -0.003589
+#> indirect_1: M1                         0.001311   0.003208 -0.003348  0.007167
+#> indirect_2: M2                        -0.001120   0.002587 -0.005991  0.002170
+#> total_indirect: Total indirect effect  0.000191   0.004138 -0.006581  0.006993
+#> total: Total effect                   -0.031604   0.017049 -0.059402 -0.003324
+#> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
+#> Use as.data.frame() for the full-precision table and metadata.
+#> 
+#> Path coefficients:
+#>    Estimate Std. Error CI lower CI upper
+#> cp -0.03180    0.01700 -0.05945 -0.00359
+#> b1 -0.04834    0.09555 -0.20435  0.10967
+#> d1 -0.06905    0.09524 -0.22561  0.08720
+#> b2 -0.07732    0.09387 -0.23305  0.07588
+#> d2 -0.03676    0.08675 -0.18004  0.10598
+#> a1 -0.02712    0.01772 -0.05624  0.00217
+#> a2  0.01448    0.01796 -0.01494  0.04405
+#> Post-fit admissibility: 1 of 1 ; excluded rows: 0 
+#> Tables: $effects, $coefficients; analysis settings: $info.
 ```
 
-Other choices are `type = "direct"`, `"total_indirect"`, `"total"`,
-`"paths"` or `"parameters"`. `terms` selects identifiers listed in the
-`effect` column. If the original analysis stored both engines
-(`ci_method = "both"`), select `method = "mc"` or `"bootstrap"` in
-[`summary()`](https://rdrr.io/r/base/summary.html);
-[`print()`](https://rdrr.io/r/base/print.html) labels them separately.
+The interval is recalculated from the stored draws. Effect SEs are
+sample SDs of the joint effect draws, and effect CIs are percentile
+intervals.
 
-For a moderated analysis, supply raw values with
-`at = list(Age = c(30, 50))` or original category labels. Use your
-moderator’s actual column name. Without `at`, continuous moderators use
-their centering reference and categorical moderators use all observed
-levels. These are **conditional effects**, not effects averaged over the
-moderator. See the [analysis
-guide](https://yangzhen1999.github.io/wsMed/articles/AnalysisGuide.html#add-moderation).
+For a model that stored both inference engines, choose `method = "mc"`
+or `method = "bootstrap"` in
+[`summary()`](https://rdrr.io/r/base/summary.html). The default
+[`print()`](https://rdrr.io/r/base/print.html) reports both.
+
+### Choose moderator values
+
+For moderated mediation, the default report uses the centering reference
+for a continuous moderator and all observed levels for a categorical
+moderator. Use `at` to choose raw values or category labels. For
+example, after fitting the second [Get started
+example](https://yangzhen1999.github.io/wsMed/articles/GetStarted.html#example-2-add-a-continuous-moderator):
+
+``` r
+
+summary(
+  moderated,
+  at = list(D3 = mean(example_data$D3))
+)
+```
+
+These are conditional effects at specified values, not effects averaged
+over the moderator distribution.
 
 ## Compare two pathways
+
+A difference between effects needs its own CI. Use the stored joint
+draws to form that difference, then print the result directly:
 
 ``` r
 
 effects <- wsmed_effects(result)
-difference <- wsmed_contrasts(effects,
-  list(B_minus_A = c(indirect_2 = 1, indirect_1 = -1)))
-as.data.frame(difference)[c("label", "estimate", "conf.low", "conf.high")]
-#>       label    estimate    conf.low  conf.high
-#> 1 B_minus_A -0.01436559 -0.06939103 0.02830113
+difference <- wsmed_contrasts(
+  effects,
+  list(B_minus_A = c(indirect_2 = 1, indirect_1 = -1))
+)
+print(difference)
+#> wsMed contrasts | raw scale | mc 
+#> 95% percentile intervals; 20000 joint draws; SE from effect draws
+#> Condition contrast: C2 - C1 
+#> Contrast direction (signed weights):
+#>  B_minus_A: +1 * M2 -1 * M1
+#>           Estimate Std. Error CI lower CI upper
+#> B_minus_A -0.00243    0.00410 -0.01184  0.00489
+#> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
+#> Use as.data.frame() for the full-precision table and metadata.
 ```
 
 `B_minus_A` is the indirect effect through B minus the effect through A.
-Its interval is computed from their matched joint draws. Do not subtract
-confidence-interval endpoints or infer a difference merely because only
-one of the separate intervals excludes zero.
+Do not subtract separate CI endpoints, or infer a difference simply
+because only one of the separate intervals excludes zero.
 
-## Export numbers and save a figure
+## Extract or export results when needed
+
+Extraction is useful for further calculations or export; it is not
+required for ordinary reports and plots.
+
+| Task                               | Call                      |
+|------------------------------------|---------------------------|
+| Effects as a data frame            | `as.data.frame(s)`        |
+| Selected result columns            | `effect_table[, columns]` |
+| Effect estimates                   | `coef(s)`                 |
+| Effect CIs                         | `confint(s)`              |
+| Covariance of effect draws         | `vcov(s)`                 |
+| Path-coefficient table             | `s$coefficients`          |
+| Method, scale and confidence level | `s$info`                  |
+| Sample size of the fitted data     | `nobs(result)`            |
+
+The methods on `s` concern its selected effects. In contrast,
+`coef(result)`, `vcov(result)` and `confint(result)` concern primitive
+model parameters.
+
+To choose which columns to display, list their names in the order you
+want. For example, keep the effect name, estimate, SE and both CI
+limits:
 
 ``` r
 
-write.csv(s$effects, "mediation-effects.csv", row.names = FALSE)
-write.csv(s$coefficients, "path-coefficients.csv", row.names = FALSE)
-p <- plot(s, title = "Standardized mediation effects")
-ggplot2::ggsave("mediation-effects.png", p, width = 7, height = 4.5, dpi = 300)
+effect_table <- as.data.frame(s)
+columns <- c(
+  "label",
+  "estimate",
+  "std.error",
+  "conf.low",
+  "conf.high"
+)
+effect_table[, columns]
+#>                   label      estimate   std.error     conf.low   conf.high
+#> 1         Direct effect -0.0317954295 0.016999695 -0.064525050 0.001863738
+#> 2                    M1  0.0013113045 0.003208354 -0.004586379 0.008759829
+#> 3                    M2 -0.0011199168 0.002587292 -0.007506753 0.003185604
+#> 4 Total indirect effect  0.0001913877 0.004138371 -0.008458737 0.008723282
+#> 5          Total effect -0.0316040417 0.017049340 -0.064633149 0.001894936
 ```
 
-The exported data retain full precision. CSV files include effect
-identifiers, scale, inference method, confidence level and any moderator
-information. The export examples write files to your working directory;
-change the names before using them if those files already exist.
+Remove `"std.error"` from `columns` to omit SEs, or remove `"conf.low"`
+and `"conf.high"` to omit CIs. `names(effect_table)` lists all available
+columns; for moderated mediation, retain `moderator` and `at` to
+identify the evaluated values or groups. Use `s$coefficients[, columns]`
+for the path-coefficient table.
 
-**Next:** [choose a
+To export the same selected columns:
+
+``` r
+
+write.csv(
+  effect_table[, columns],
+  "mediation-effects.csv",
+  row.names = FALSE
+)
+
+p <- plot(result)
+ggplot2::ggsave(
+  "mediation-effects.png",
+  plot = p,
+  width = 7,
+  height = 4.5,
+  dpi = 300
+)
+```
+
+The CSV contains the selected columns at full precision. Use
+`as.data.frame(s)` instead to export the complete effect table,
+including analysis settings. Choose your own filenames when saving
+results.
+
+**Next:** [customize a
 plot](https://yangzhen1999.github.io/wsMed/articles/PlottingEffects.md),
-or learn to [reuse a
+or [reuse a
 fit](https://yangzhen1999.github.io/wsMed/articles/ModularWorkflow.md)
-and [record diagnostics and
-provenance](https://yangzhen1999.github.io/wsMed/articles/WorkflowReliability.md).
+for another inference method.

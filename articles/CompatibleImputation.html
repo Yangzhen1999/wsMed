@@ -64,7 +64,7 @@
       <h1>Model-compatible multiple imputation</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/vignettes/CompatibleImputation.Rmd" class="external-link"><code>vignettes/CompatibleImputation.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/master/vignettes/CompatibleImputation.Rmd" class="external-link"><code>vignettes/CompatibleImputation.Rmd</code></a></small>
       <div class="d-none name"><code>CompatibleImputation.Rmd</code></div>
     </div>
 
@@ -112,12 +112,23 @@ validation.</p>
 <span><span class="va">M</span> <span class="op">&lt;-</span> <span class="fl">.4</span> <span class="op">+</span> <span class="fl">.3</span><span class="op">*</span><span class="va">W</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
 <span><span class="va">Y</span> <span class="op">&lt;-</span> <span class="fl">.2</span> <span class="op">+</span> <span class="fl">.1</span><span class="op">*</span><span class="va">W</span> <span class="op">+</span> <span class="op">(</span><span class="fl">.4</span> <span class="op">+</span> <span class="fl">.2</span><span class="op">*</span><span class="va">W</span><span class="op">)</span><span class="op">*</span><span class="va">M</span> <span class="op">+</span> <span class="fl">.2</span><span class="op">*</span><span class="va">A</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
 <span><span class="va">y1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
-<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">y1</span>, y2 <span class="op">=</span> <span class="va">y1</span><span class="op">+</span><span class="va">Y</span>, m1 <span class="op">=</span> <span class="va">A</span><span class="op">-</span><span class="va">M</span><span class="op">/</span><span class="fl">2</span>, m2 <span class="op">=</span> <span class="va">A</span><span class="op">+</span><span class="va">M</span><span class="op">/</span><span class="fl">2</span>, <span class="va">W</span><span class="op">)</span></span>
+<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  <span class="va">y1</span>,</span>
+<span>  y2 <span class="op">=</span> <span class="va">y1</span><span class="op">+</span><span class="va">Y</span>,</span>
+<span>  m1 <span class="op">=</span> <span class="va">A</span><span class="op">-</span><span class="va">M</span><span class="op">/</span><span class="fl">2</span>,</span>
+<span>  m2 <span class="op">=</span> <span class="va">A</span><span class="op">+</span><span class="va">M</span><span class="op">/</span><span class="fl">2</span>,</span>
+<span>  <span class="va">W</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">dat</span><span class="op">$</span><span class="va">m1</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">.2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span>
 <span><span class="va">dat</span><span class="op">$</span><span class="va">y2</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">.2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span>
-<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_model.html">wsmed_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>before <span class="op">=</span> <span class="st">"y1"</span>, after <span class="op">=</span> <span class="st">"y2"</span><span class="op">)</span>,</span>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_model.html">wsmed_model</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>before <span class="op">=</span> <span class="st">"y1"</span>, after <span class="op">=</span> <span class="st">"y2"</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>M <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>before <span class="op">=</span> <span class="st">"m1"</span>, after <span class="op">=</span> <span class="st">"m2"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  moderator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"W"</span>, interactions <span class="op">=</span> <span class="st">"M -&gt; Y"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>  moderator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    variable <span class="op">=</span> <span class="st">"W"</span>,</span>
+<span>    interactions <span class="op">=</span> <span class="st">"M -&gt; Y"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="impute-using-the-outcome-interaction">Impute using the outcome interaction<a class="anchor" aria-label="anchor" href="#impute-using-the-outcome-interaction"></a>
@@ -131,9 +142,17 @@ model, not imputed as independent variables. For this data-generating
 model, the imputation regression for m1 given m2 and W is normal and
 linear. These are model assumptions, not data-validation results.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">imp_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>yd <span class="op">=</span> <span class="va">dat</span><span class="op">$</span><span class="va">y2</span><span class="op">-</span><span class="va">dat</span><span class="op">$</span><span class="va">y1</span>, m1 <span class="op">=</span> <span class="va">dat</span><span class="op">$</span><span class="va">m1</span>, m2 <span class="op">=</span> <span class="va">dat</span><span class="op">$</span><span class="va">m2</span>, W <span class="op">=</span> <span class="va">dat</span><span class="op">$</span><span class="va">W</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">imp_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  yd <span class="op">=</span> <span class="va">dat</span><span class="op">$</span><span class="va">y2</span><span class="op">-</span><span class="va">dat</span><span class="op">$</span><span class="va">y1</span>,</span>
+<span>  m1 <span class="op">=</span> <span class="va">dat</span><span class="op">$</span><span class="va">m1</span>,</span>
+<span>  m2 <span class="op">=</span> <span class="va">dat</span><span class="op">$</span><span class="va">m2</span>,</span>
+<span>  W <span class="op">=</span> <span class="va">dat</span><span class="op">$</span><span class="va">W</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">imp_data</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">imp_data</span><span class="op">)</span>,</span>
-<span>  dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">imp_data</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">imp_data</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">imp_data</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">imp_data</span><span class="op">)</span></span>
+<span>  <span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">pred</span><span class="op">[</span><span class="st">"m1"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"m2"</span>, <span class="st">"W"</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">721</span><span class="op">)</span></span>
 <span><span class="va">imp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">withCallingHandlers</a></span><span class="op">(</span><span class="fu">smcfcs</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/smcfcs/man/smcfcs.html" class="external-link">smcfcs</a></span><span class="op">(</span><span class="va">imp_data</span>, smtype <span class="op">=</span> <span class="st">"lm"</span>,</span>
@@ -178,9 +197,22 @@ predictor matrix.</p>
 <h2 id="use-either-wsmed-interface">Use either wsMed interface<a class="anchor" aria-label="anchor" href="#use-either-wsmed-interface"></a>
 </h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_fit.html">wsmed_fit</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">dat</span>, missing <span class="op">=</span> <span class="st">"mi"</span>, mi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>completed <span class="op">=</span> <span class="va">completed</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">inference</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_infer.html">wsmed_infer</a></span><span class="op">(</span><span class="va">fit</span>, draws <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">722</span><span class="op">)</span></span>
-<span><span class="va">effects</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_effects.html">wsmed_effects</a></span><span class="op">(</span><span class="va">inference</span>, at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>W <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>, scale <span class="op">=</span> <span class="st">"marginal"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_fit.html">wsmed_fit</a></span><span class="op">(</span></span>
+<span>  <span class="va">model</span>,</span>
+<span>  <span class="va">dat</span>,</span>
+<span>  missing <span class="op">=</span> <span class="st">"mi"</span>,</span>
+<span>  mi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>completed <span class="op">=</span> <span class="va">completed</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">inference</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_infer.html">wsmed_infer</a></span><span class="op">(</span></span>
+<span>  <span class="va">fit</span>,</span>
+<span>  draws <span class="op">=</span> <span class="fl">2000</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">722</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">effects</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsmed_effects.html">wsmed_effects</a></span><span class="op">(</span></span>
+<span>  <span class="va">inference</span>,</span>
+<span>  at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>W <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  scale <span class="op">=</span> <span class="st">"marginal"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">effects</span></span>
 <span><span class="co">#&gt; wsMed indirect | marginal scale | mc </span></span>
 <span><span class="co">#&gt; 95% percentile intervals; 2000 joint draws; SE from effect draws</span></span>
@@ -189,19 +221,32 @@ predictor matrix.</p>
 <span><span class="co">#&gt; MI: per-imputation centering; first-imputation reporting reference.</span></span>
 <span><span class="co">#&gt; External imputations: compatibility and convergence require the imputer's own checks. </span></span>
 <span><span class="co">#&gt; Standardization: effect / marginal model-implied SD(y2 - y1); condition contrast is unscaled.</span></span>
-<span><span class="co">#&gt; Plug-in marginal outcome-difference SD: 1.17613 </span></span>
+<span><span class="co">#&gt; Plug-in marginal outcome-difference SD: 1.1661 </span></span>
 <span><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
 <span><span class="co">#&gt;                          Estimate Std. Error CI lower CI upper</span></span>
-<span><span class="co">#&gt; indirect_1@1: M [W = -1]  0.04930    0.02899  0.00336  0.11215</span></span>
-<span><span class="co">#&gt; indirect_1@2: M [W = 0]   0.19798    0.03465  0.13400  0.27048</span></span>
-<span><span class="co">#&gt; indirect_1@3: M [W = 1]   0.44603    0.06805  0.31813  0.58572</span></span>
+<span><span class="co">#&gt; indirect_1@1: M [W = -1]   0.0382     0.0247   0.0016   0.0952</span></span>
+<span><span class="co">#&gt; indirect_1@2: M [W = 0]    0.1811     0.0328   0.1222   0.2516</span></span>
+<span><span class="co">#&gt; indirect_1@3: M [W = 1]    0.4296     0.0655   0.3066   0.5626</span></span>
 <span><span class="co">#&gt; Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.</span></span>
 <span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
 <span></span>
 <span><span class="co"># The original one-call interface remains available.</span></span>
-<span><span class="va">one_call</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span><span class="va">dat</span>, <span class="st">"m1"</span>, <span class="st">"m2"</span>, <span class="st">"y1"</span>, <span class="st">"y2"</span>, W <span class="op">=</span> <span class="st">"W"</span>,</span>
-<span>  MP <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a1"</span>, <span class="st">"b1"</span>, <span class="st">"cp"</span><span class="op">)</span>, Na <span class="op">=</span> <span class="st">"MI"</span>, R <span class="op">=</span> <span class="fl">2000</span>, standardized <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  mi_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>completed <span class="op">=</span> <span class="va">completed</span>, seed <span class="op">=</span> <span class="fl">722</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">one_call</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
+<span>  <span class="va">dat</span>,</span>
+<span>  <span class="st">"m1"</span>,</span>
+<span>  <span class="st">"m2"</span>,</span>
+<span>  <span class="st">"y1"</span>,</span>
+<span>  <span class="st">"y2"</span>,</span>
+<span>  W <span class="op">=</span> <span class="st">"W"</span>,</span>
+<span>  MP <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a1"</span>, <span class="st">"b1"</span>, <span class="st">"cp"</span><span class="op">)</span>,</span>
+<span>  Na <span class="op">=</span> <span class="st">"MI"</span>,</span>
+<span>  R <span class="op">=</span> <span class="fl">2000</span>,</span>
+<span>  standardized <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  mi_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    completed <span class="op">=</span> <span class="va">completed</span>,</span>
+<span>    seed <span class="op">=</span> <span class="fl">722</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">one_call</span><span class="op">$</span><span class="va">fit</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>The staged interface also accepts a <code>mice</code> mids object as
 <code>mi$completed</code>. It infers m, validates row names/order,
@@ -224,7 +269,7 @@ incomplete datasets analyzed with default PMM, SMC-FCS and the
 underlying complete data. It records raw and standardized effects,
 estimated standardization denominators, bias, coverage, simulation
 uncertainty, warnings and failures. This isolates the effect of changing
-the imputer while keeping pooling and effect inference fixed. See the <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/.github/validation/mi-comparison/RESULTS.md" class="external-link">paired
+the imputer while keeping pooling and effect inference fixed. See the <a href="https://github.com/Yangzhen1999/wsMed/blob/master/.github/validation/mi-comparison/RESULTS.md" class="external-link">paired
 study report</a>.</p>
 <p>The comparison is restricted to its stated scenarios; it is not proof
 of nominal coverage for arbitrary models, data distributions or

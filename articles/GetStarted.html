@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Get started: your first mediation analysis • wsMed</title>
+<title>Get started: two mediation examples • wsMed</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
-<meta property="og:title" content="Get started: your first mediation analysis">
+<meta property="og:title" content="Get started: two mediation examples">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -61,35 +61,39 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Get started: your first mediation analysis</h1>
+      <h1>Get started: two mediation examples</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/feature/modular-api/vignettes/GetStarted.Rmd" class="external-link"><code>vignettes/GetStarted.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Yangzhen1999/wsMed/blob/master/vignettes/GetStarted.Rmd" class="external-link"><code>vignettes/GetStarted.Rmd</code></a></small>
       <div class="d-none name"><code>GetStarted.Rmd</code></div>
     </div>
 
     
     
-<p>Fit a two-condition parallel mediation model, read its effects, and
-draw a forest plot. This example uses complete simulated data and the
-one-call <code><a href="../reference/wsMed.html">wsMed()</a></code> interface. No external data file is
-needed.</p>
-<p><strong>Documentation version:</strong> the reporting interfaces on
-this site require the <code>feature/modular-api</code> development build
-(<code>1.2.0</code>). Install it once:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"Yangzhen1999/wsMed@feature/modular-api"</span><span class="op">)</span></span></code></pre></div>
-<p>Restart R after updating the package, then follow the steps below.
-For the published CRAN version, use
-<code>install.packages("wsMed")</code>; its reporting interface differs
-from this development tutorial.</p>
+<p>Learn the basic workflow through two examples: parallel mediation,
+followed by moderated mediation. Both use the package’s complete
+simulated data and start with the default analysis, report and plot. No
+external data file is needed.</p>
 <div class="section level2">
-<h2 id="match-your-columns-to-the-two-conditions">1. Match your columns to the two conditions<a class="anchor" aria-label="anchor" href="#match-your-columns-to-the-two-conditions"></a>
+<h2 id="install-wsmed">Install wsMed<a class="anchor" aria-label="anchor" href="#install-wsmed"></a>
 </h2>
-<p>Use <strong>one row per participant</strong>, with a separate column
-for each measurement. Here, <code>A</code> and <code>B</code> are
-mediators and <code>D</code> is the outcome:</p>
+<p>These tutorials describe <strong>wsMed 1.2.0</strong>. Install the
+released package from CRAN:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"wsMed"</span><span class="op">)</span></span></code></pre></div>
+<p>Or install the version on the GitHub <code>master</code> branch:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"Yangzhen1999/wsMed@master"</span><span class="op">)</span></span></code></pre></div>
+<p>Restart R after updating. <code>packageVersion("wsMed")</code> shows
+the installed version.</p>
+</div>
+<div class="section level2">
+<h2 id="match-your-columns-to-the-two-conditions">Match your columns to the two conditions<a class="anchor" aria-label="anchor" href="#match-your-columns-to-the-two-conditions"></a>
+</h2>
+<p>Use <strong>one row per participant</strong>, with separate columns
+for the two conditions. In this dataset, A and B are mediators and D is
+the outcome:</p>
 <table class="table">
 <thead><tr class="header">
 <th>Role</th>
@@ -108,131 +112,251 @@ mediators and <code>D</code> is the outcome:</p>
 <td><code>B2</code></td>
 </tr>
 <tr class="odd">
-<td>Outcome</td>
+<td>Outcome D</td>
 <td><code>D1</code></td>
 <td><code>D2</code></td>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://yangzhen1999.github.io/wsMed/">wsMed</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"A2"</span>, <span class="st">"B1"</span>, <span class="st">"B2"</span>, <span class="st">"D1"</span>, <span class="st">"D2"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">3</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 3 × 6</span></span>
-<span><span class="co">#&gt;      A1    A2     B1    B2    D1    D2</span></span>
-<span><span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 0.520 0.348 0.0935 0.254 0.702 0.485</span></span>
-<span><span class="co">#&gt; 2 0.329 0.121 0.259  0.328 0     0.392</span></span>
-<span><span class="co">#&gt; 3 0.208 0.168 0.295  0.342 0.336 0.706</span></span></code></pre></div>
-<p>The direction is <strong>condition 2 minus condition 1</strong>. Put
-the mediator columns in the same order in <code>M_C1</code> and
-<code>M_C2</code>. Replace the column names when using your data; wsMed
-constructs the differences internally.</p>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">)</span></span></code></pre></div>
+<p>The analysis uses <strong>condition 2 minus condition 1</strong>.
+List the mediators in the same order in <code>M_C1</code> and
+<code>M_C2</code>; wsMed constructs the difference scores internally.
+These simulated variables illustrate the interface.</p>
 </div>
 <div class="section level2">
-<h2 id="run-the-analysis">2. Run the analysis<a class="anchor" aria-label="anchor" href="#run-the-analysis"></a>
+<h2 id="example-1-parallel-mediation">Example 1: parallel mediation<a class="anchor" aria-label="anchor" href="#example-1-parallel-mediation"></a>
 </h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="section level3">
+<h3 id="run-the-analysis">Run the analysis<a class="anchor" aria-label="anchor" href="#run-the-analysis"></a>
+</h3>
+<p>Only the dataset and paired mediator and outcome columns are
+required:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">example_data</span>,</span>
-<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>, M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span><span class="op">)</span>,</span>
-<span>  Y_C1 <span class="op">=</span> <span class="st">"D1"</span>, Y_C2 <span class="op">=</span> <span class="st">"D2"</span>,</span>
-<span>  form <span class="op">=</span> <span class="st">"P"</span>, Na <span class="op">=</span> <span class="st">"DE"</span>, ci_method <span class="op">=</span> <span class="st">"mc"</span>,</span>
-<span>  R <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">123</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>,</span>
+<span>  M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span><span class="op">)</span>,</span>
+<span>  Y_C1 <span class="op">=</span> <span class="st">"D1"</span>,</span>
+<span>  Y_C2 <span class="op">=</span> <span class="st">"D2"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><code>form = "P"</code> requests parallel mediation.
-<code>Na = "DE"</code> removes incomplete analysis rows; this dataset is
-complete. <code>R = 2000</code> keeps this teaching example quick, and
-<code>seed</code> makes its Monte Carlo draws repeatable in the same
-environment. For a final analysis, assess interval stability with more
-draws.</p>
-</div>
-<div class="section level2">
-<h2 id="read-the-core-effects">3. Read the core effects<a class="anchor" aria-label="anchor" href="#read-the-core-effects"></a>
-</h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">effects</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"label"</span>, <span class="st">"estimate"</span>, <span class="st">"std.error"</span>, <span class="st">"conf.low"</span>, <span class="st">"conf.high"</span><span class="op">)</span><span class="op">]</span>,</span>
-<span>  digits <span class="op">=</span> <span class="fl">4</span>, col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Effect / pathway"</span>, <span class="st">"Estimate"</span>, <span class="st">"SE"</span>, <span class="st">"CI lower"</span>, <span class="st">"CI upper"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>The omitted arguments use the package defaults:</p>
 <table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
 <thead><tr class="header">
-<th align="left">Effect / pathway</th>
-<th align="right">Estimate</th>
-<th align="right">SE</th>
-<th align="right">CI lower</th>
-<th align="right">CI upper</th>
+<th>Setting</th>
+<th>Default</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">Direct effect</td>
-<td align="right">-0.0318</td>
-<td align="right">0.0171</td>
-<td align="right">-0.0643</td>
-<td align="right">0.0030</td>
+<td>Mediator structure</td>
+<td>Parallel mediation (<code>form = "P"</code>)</td>
 </tr>
 <tr class="even">
-<td align="left">M1</td>
-<td align="right">0.0013</td>
-<td align="right">0.0031</td>
-<td align="right">-0.0046</td>
-<td align="right">0.0088</td>
+<td>Missing data</td>
+<td>Listwise deletion (<code>Na = "DE"</code>); this dataset is
+complete</td>
 </tr>
 <tr class="odd">
-<td align="left">M2</td>
-<td align="right">-0.0011</td>
-<td align="right">0.0026</td>
-<td align="right">-0.0076</td>
-<td align="right">0.0032</td>
+<td>Inference</td>
+<td>Monte Carlo (<code>ci_method = "mc"</code>) with 20,000 draws</td>
 </tr>
 <tr class="even">
-<td align="left">Total indirect effect</td>
-<td align="right">0.0002</td>
-<td align="right">0.0040</td>
-<td align="right">-0.0079</td>
-<td align="right">0.0087</td>
+<td>Confidence level</td>
+<td>95% (<code>alpha = 0.05</code>)</td>
 </tr>
 <tr class="odd">
-<td align="left">Total effect</td>
-<td align="right">-0.0316</td>
-<td align="right">0.0169</td>
-<td align="right">-0.0634</td>
-<td align="right">0.0032</td>
+<td>Reporting scale</td>
+<td>Unstandardized (<code>standardized = FALSE</code>)</td>
+</tr>
+<tr class="even">
+<td>Random seed</td>
+<td><code>seed = 123</code></td>
 </tr>
 </tbody>
 </table>
-<p>Read the table in three steps:</p>
-<ul>
-<li>The specific indirect rows describe the pathways through A
-(<code>M1</code>) and B (<code>M2</code>), in the order supplied to
-<code>M_C1</code> and <code>M_C2</code>. Their sum is the <strong>total
-indirect effect</strong>.</li>
-<li>The <strong>total effect</strong> is the direct effect plus the
-total indirect effect.</li>
-<li>The estimates above are <strong>unstandardized</strong>. The
-interval columns are 95% percentile Monte Carlo intervals. An interval
-containing zero does not establish that the effect is exactly zero.</li>
-</ul>
-<p>The synthetic variable names describe roles, not substantive
-constructs. Use study-specific names when reporting your own analysis,
-and distinguish statistical mediation from a causal interpretation.</p>
-<p>For the console report, use <code>print(result)</code>. For
-additional path coefficients, use
-<code>print(result, detail = "full")</code>. The <a href="ResultsGuide.html">results guide</a> explains the report,
-structured tables and export options.</p>
 </div>
-<div class="section level2">
-<h2 id="draw-the-effects">4. Draw the effects<a class="anchor" aria-label="anchor" href="#draw-the-effects"></a>
-</h2>
+<div class="section level3">
+<h3 id="read-the-results">Read the results<a class="anchor" aria-label="anchor" href="#read-the-results"></a>
+</h3>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">s</span>, title <span class="op">=</span> <span class="st">"Core mediation effects"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed analysis</span></span>
+<span><span class="co">#&gt; Model: P | DE | Observations: 100 </span></span>
+<span><span class="co">#&gt; Effects:</span></span>
+<span><span class="co">#&gt; wsMed all | raw scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt;                                        Estimate Std. Error  CI lower  CI upper</span></span>
+<span><span class="co">#&gt; cp: Direct effect                     -0.031795   0.017000 -0.064525  0.001864</span></span>
+<span><span class="co">#&gt; indirect_1: M1                         0.001311   0.003208 -0.004586  0.008760</span></span>
+<span><span class="co">#&gt; indirect_2: M2                        -0.001120   0.002587 -0.007507  0.003186</span></span>
+<span><span class="co">#&gt; total_indirect: Total indirect effect  0.000191   0.004138 -0.008459  0.008723</span></span>
+<span><span class="co">#&gt; total: Total effect                   -0.031604   0.017049 -0.064633  0.001895</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0</span></span></code></pre></div>
+<p>The report includes the direct effect, the indirect pathways through
+A (<code>M1</code>) and B (<code>M2</code>), their total indirect
+effect, and the total effect. Read each estimate together with its SE
+and CI. The total effect is the direct effect plus the total indirect
+effect. An interval containing zero does not establish a zero
+effect.</p>
+<p>To see the effect and path-coefficient tables in a statistical
+summary, use:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed statistical summary</span></span>
+<span><span class="co">#&gt; Model: P | Missing: DE | Observations: 100 </span></span>
+<span><span class="co">#&gt; Effects:</span></span>
+<span><span class="co">#&gt; wsMed all | raw scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt;                                        Estimate Std. Error  CI lower  CI upper</span></span>
+<span><span class="co">#&gt; cp: Direct effect                     -0.031795   0.017000 -0.064525  0.001864</span></span>
+<span><span class="co">#&gt; indirect_1: M1                         0.001311   0.003208 -0.004586  0.008760</span></span>
+<span><span class="co">#&gt; indirect_2: M2                        -0.001120   0.002587 -0.007507  0.003186</span></span>
+<span><span class="co">#&gt; total_indirect: Total indirect effect  0.000191   0.004138 -0.008459  0.008723</span></span>
+<span><span class="co">#&gt; total: Total effect                   -0.031604   0.017049 -0.064633  0.001895</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Path coefficients:</span></span>
+<span><span class="co">#&gt;    Estimate Std. Error CI lower CI upper</span></span>
+<span><span class="co">#&gt; cp -0.03180    0.01700 -0.06453  0.00186</span></span>
+<span><span class="co">#&gt; b1 -0.04834    0.09555 -0.23422  0.13918</span></span>
+<span><span class="co">#&gt; d1 -0.06905    0.09524 -0.25390  0.11568</span></span>
+<span><span class="co">#&gt; b2 -0.07732    0.09387 -0.26459  0.10461</span></span>
+<span><span class="co">#&gt; d2 -0.03676    0.08675 -0.20684  0.13625</span></span>
+<span><span class="co">#&gt; a1 -0.02712    0.01772 -0.06162  0.00817</span></span>
+<span><span class="co">#&gt; a2  0.01448    0.01796 -0.02032  0.04929</span></span>
+<span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span></span>
+<span><span class="co">#&gt; Tables: $effects, $coefficients; analysis settings: $info.</span></span></code></pre></div>
+<p>These calls use the stored analysis; they do not fit the model again.
+You do not need to select table columns or write formatting code to read
+the results.</p>
+</div>
+<div class="section level3">
+<h3 id="plot-the-indirect-effects">Plot the indirect effects<a class="anchor" aria-label="anchor" href="#plot-the-indirect-effects"></a>
+</h3>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
 <div class="float">
 <img src="figures/GetStarted-first-plot-1.png" alt="plot of chunk first-plot"><div class="figcaption">plot of chunk first-plot</div>
 </div>
-<p>Each point is an effect estimate and each line is its confidence
-interval. This graph uses the same rows as <code>s$effects</code>.</p>
+<p>The default plot shows the specific indirect effects and their CIs. A
+point is an estimate and a horizontal line is its interval.</p>
+</div>
 </div>
 <div class="section level2">
-<h2 id="make-one-change-at-a-time">5. Make one change at a time<a class="anchor" aria-label="anchor" href="#make-one-change-at-a-time"></a>
+<h2 id="example-2-add-a-continuous-moderator">Example 2: add a continuous moderator<a class="anchor" aria-label="anchor" href="#example-2-add-a-continuous-moderator"></a>
+</h2>
+<p>Keep the same mediator and outcome columns, and add <code>D3</code>
+as the moderator. Here <code>MP</code> allows both mediator-to-outcome
+difference slopes (<code>b1</code> and <code>b2</code>) to vary with the
+moderator. Moderator main effects are included automatically.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">moderated</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">example_data</span>,</span>
+<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>,</span>
+<span>  M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span><span class="op">)</span>,</span>
+<span>  Y_C1 <span class="op">=</span> <span class="st">"D1"</span>,</span>
+<span>  Y_C2 <span class="op">=</span> <span class="st">"D2"</span>,</span>
+<span>  W <span class="op">=</span> <span class="st">"D3"</span>,</span>
+<span>  MP <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"b1"</span>, <span class="st">"b2"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="read-the-conditional-effects">Read the conditional effects<a class="anchor" aria-label="anchor" href="#read-the-conditional-effects"></a>
+</h3>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">moderated</span><span class="op">)</span></span>
+<span><span class="co">#&gt; wsMed analysis</span></span>
+<span><span class="co">#&gt; Model: P | DE | Observations: 100 </span></span>
+<span><span class="co">#&gt; Effects:</span></span>
+<span><span class="co">#&gt; wsMed all | raw scale | mc </span></span>
+<span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span><span class="co">#&gt; Moderator: D3 in raw units; centering reference = 0.452271 </span></span>
+<span><span class="co">#&gt;                                                       Estimate Std. Error</span></span>
+<span><span class="co">#&gt; cp@1: Direct effect [D3 = 0.452]                     -0.034124   0.016983</span></span>
+<span><span class="co">#&gt; indirect_1@1: M1 [D3 = 0.452]                         0.001505   0.003204</span></span>
+<span><span class="co">#&gt; indirect_2@1: M2 [D3 = 0.452]                        -0.001426   0.002793</span></span>
+<span><span class="co">#&gt; total_indirect@1: Total indirect effect [D3 = 0.452]  0.000079   0.004268</span></span>
+<span><span class="co">#&gt; total@1: Total effect [D3 = 0.452]                   -0.034045   0.017007</span></span>
+<span><span class="co">#&gt;                                                       CI lower  CI upper</span></span>
+<span><span class="co">#&gt; cp@1: Direct effect [D3 = 0.452]                     -0.067146 -0.000556</span></span>
+<span><span class="co">#&gt; indirect_1@1: M1 [D3 = 0.452]                        -0.004158  0.009031</span></span>
+<span><span class="co">#&gt; indirect_2@1: M2 [D3 = 0.452]                        -0.008340  0.003168</span></span>
+<span><span class="co">#&gt; total_indirect@1: Total indirect effect [D3 = 0.452] -0.008653  0.008943</span></span>
+<span><span class="co">#&gt; total@1: Total effect [D3 = 0.452]                   -0.067165 -0.000773</span></span>
+<span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0</span></span></code></pre></div>
+<p>With a continuous moderator, the default report evaluates effects at
+its centering reference, the fitted-sample mean for this complete
+dataset. The report identifies that value. These are effects at that
+reference, not averages of effects across participants.</p>
+</div>
+<div class="section level3">
+<h3 id="plot-how-the-indirect-effects-change">Plot how the indirect effects change<a class="anchor" aria-label="anchor" href="#plot-how-the-indirect-effects-change"></a>
+</h3>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">moderated</span><span class="op">)</span></span></code></pre></div>
+<div class="float">
+<img src="figures/GetStarted-moderated-plot-1.png" alt="plot of chunk moderated-plot"><div class="figcaption">plot of chunk moderated-plot</div>
+</div>
+<p>The default plot now shows conditional indirect-effect curves across
+the observed moderator range. The horizontal axis uses the moderator’s
+original units, and the bands are pointwise CIs. No additional plotting
+settings are required.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="specify-more-only-when-you-need-it">Specify more only when you need it<a class="anchor" aria-label="anchor" href="#specify-more-only-when-you-need-it"></a>
+</h2>
+<p>The first call can also be written with its settings explicitly
+stated:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">example_data</span>,</span>
+<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>,</span>
+<span>  M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span><span class="op">)</span>,</span>
+<span>  Y_C1 <span class="op">=</span> <span class="st">"D1"</span>,</span>
+<span>  Y_C2 <span class="op">=</span> <span class="st">"D2"</span>,</span>
+<span>  form <span class="op">=</span> <span class="st">"P"</span>,</span>
+<span>  Na <span class="op">=</span> <span class="st">"DE"</span>,</span>
+<span>  ci_method <span class="op">=</span> <span class="st">"mc"</span>,</span>
+<span>  R <span class="op">=</span> <span class="fl">20000</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">123</span>,</span>
+<span>  standardized <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>This is equivalent to the minimal call in Example 1. Change an
+argument when your analysis needs a different model, missing-data
+strategy or inference method. The <a href="AnalysisGuide.html">analysis
+guide</a> explains those choices.</p>
+<p>For a particular reporting question, add an option to the default
+report:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Request standardized results without fitting again.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span></span>
+<span>  <span class="va">result</span>,</span>
+<span>  standardized <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Evaluate the moderated model at a chosen raw moderator value.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span></span>
+<span>  <span class="va">moderated</span>,</span>
+<span>  at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>D3 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">$</span><span class="va">D3</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="continue-with-your-own-analysis">Continue with your own analysis<a class="anchor" aria-label="anchor" href="#continue-with-your-own-analysis"></a>
 </h2>
 <table class="table">
 <colgroup>
@@ -241,49 +365,39 @@ interval. This graph uses the same rows as <code>s$effects</code>.</p>
 </colgroup>
 <thead><tr class="header">
 <th>Your next task</th>
-<th>Where to go</th>
+<th>Guide</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>Choose serial, mixed or custom pathways</td>
+<td>Choose serial or user-defined pathways</td>
 <td><a href="AnalysisGuide.html#choose-your-model">Choose an
 analysis</a></td>
 </tr>
 <tr class="even">
-<td>Read, standardize or export tables</td>
+<td>Add covariates or handle missing data</td>
+<td><a href="WsMed.html">Analysis options</a></td>
+</tr>
+<tr class="odd">
+<td>Work with categorical predictors</td>
+<td><a href="CategoricalPredictors.html">Categorical predictors</a></td>
+</tr>
+<tr class="even">
+<td>Select effects, standardize or export results</td>
 <td><a href="ResultsGuide.html">Read and export results</a></td>
 </tr>
 <tr class="odd">
-<td>Add a continuous or categorical moderator</td>
-<td><a href="AnalysisGuide.html#add-moderation">Add moderation</a></td>
+<td>Customize a figure</td>
+<td><a href="PlottingEffects.html">Plot gallery</a></td>
 </tr>
 <tr class="even">
-<td>Handle incomplete data</td>
-<td><a href="AnalysisGuide.html#handle-missing-data">Missing
-data</a></td>
-</tr>
-<tr class="odd">
-<td>Choose another figure</td>
-<td><a href="PlottingEffects.html">Plot gallery</a></td>
+<td>Specify, fit and inspect a model in separate steps</td>
+<td><a href="ModularWorkflow.html">Staged workflow</a></td>
 </tr>
 </tbody>
 </table>
-<details><summary>
-Copy the complete example
-</summary><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://yangzhen1999.github.io/wsMed/">wsMed</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">example_data</span><span class="op">)</span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wsMed.html">wsMed</a></span><span class="op">(</span></span>
-<span>  data <span class="op">=</span> <span class="va">example_data</span>,</span>
-<span>  M_C1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A1"</span>, <span class="st">"B1"</span><span class="op">)</span>, M_C2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A2"</span>, <span class="st">"B2"</span><span class="op">)</span>,</span>
-<span>  Y_C1 <span class="op">=</span> <span class="st">"D1"</span>, Y_C2 <span class="op">=</span> <span class="st">"D2"</span>,</span>
-<span>  form <span class="op">=</span> <span class="st">"P"</span>, Na <span class="op">=</span> <span class="st">"DE"</span>, ci_method <span class="op">=</span> <span class="st">"mc"</span>,</span>
-<span>  R <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">123</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span><span class="va">s</span><span class="op">$</span><span class="va">effects</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">s</span>, title <span class="op">=</span> <span class="st">"Core mediation effects"</span><span class="op">)</span></span></code></pre></div>
-</details>
+<p>The empirical data used in the manuscript are also available as
+<code>wsmed_examples</code>; see <code><a href="../reference/wsmed_examples.html">help("wsmed_examples")</a></code> for
+their source and variable definitions.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
