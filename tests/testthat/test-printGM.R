@@ -3,7 +3,7 @@ library(lavaan)
 library(semboottools)
 library(wsMed)
 
-# 创建一个最简模型语法字符串
+# Minimal model syntax
 mock_model <- paste(
   "Ydiff ~ cp*1 + b1*M1diff + d1*M1avg",
   "M1diff ~ a1*1",
@@ -16,8 +16,8 @@ mock_model <- paste(
 )
 
 test_that("printGM prints formatted output without error", {
-  #expect_silent(out <- printGM(mock_model))  # 应该不会报错
-  expect_invisible(printGM(mock_model))      # 返回值是 invisible
+  # expect_silent(out <- printGM(mock_model))  # Should not raise an error.
+  expect_invisible(printGM(mock_model))      # Return invisibly
 })
 
 test_that("printGM classifies and displays all model sections", {

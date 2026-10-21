@@ -2,7 +2,7 @@
 % Please edit documentation in R/MICombineWrapper.R
 \name{MICombineWrapper}
 \alias{MICombineWrapper}
-\title{Wrapper for Internal Multiple Imputation Combining Function}
+\title{Wrapper for internal multiple imputation combining function}
 \usage{
 MICombineWrapper(coefs, vcovs, M, k, adj = FALSE)
 }

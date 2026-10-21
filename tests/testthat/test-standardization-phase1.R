@@ -142,7 +142,7 @@ test_that("public both mode prints raw conditional tables and standardized table
   expect_false(is.null(out$mc$std_mc))
   expect_false(is.null(out$mc$std_boot))
   expect_equal(out$mc$std_mc$Estimate, out$mc$std_boot$est.std)
-  expect_output(print(out), "UNSTANDARDIZED CONDITIONAL EFFECTS")
+  expect_output(print(out, detail = "legacy"), "UNSTANDARDIZED CONDITIONAL EFFECTS")
 })
 
 test_that("changing measurement units preserves standardized estimates", {
@@ -160,7 +160,12 @@ test_that("changing measurement units preserves standardized estimates", {
     d[c("m11", "m12")] <- d[c("m11", "m12")] * 3
     d[c("y1", "y2")] <- d[c("y1", "y2")] * 7
     if (type == "continuous") d$W <- d$W * 5
-    expect_equal(fit_one(d), original, tolerance = 2e-5)
+    scaled <- withCallingHandlers(fit_one(d), warning = function(w) {
+      # Deliberate unit inflation can trigger lavaan's descriptive scale warning.
+      if (grepl("factor 1000", conditionMessage(w), fixed = TRUE))
+        invokeRestart("muffleWarning")
+    })
+    expect_equal(scaled, original, tolerance = 2e-5)
   }
 })
 
@@ -181,7 +186,7 @@ test_that("unmoderated and FIML models retain intercept and endpoint scales", {
   sy <- sqrt(lavaan::fitted(fit)$cov["Ydiff", "Ydiff"])
   take <- pt$label %in% c("cp", "indirect_1", "indirect_2", "total_indirect", "total_effect")
   expect_equal(out$mc$std_mc$Estimate[take], pt$est[take] / sy, tolerance = 1e-7)
-  expect_output(print(out), "UNSTANDARDIZED CONDITIONAL EFFECTS")
+  expect_output(print(out, detail = "legacy"), "UNSTANDARDIZED CONDITIONAL EFFECTS")
 })
 
 test_that("public moderated MI forwards fixed.x to pooled fitting", {
@@ -191,10 +196,11 @@ test_that("public moderated MI forwards fixed.x to pooled fitting", {
   raw$y2 <- raw$y2 + raw$y1
   raw$m11[seq(1, 240, 20)] <- NA
   for (fixed in c(FALSE, TRUE)) {
-    out <- wsMed(raw, M_C1 = c("m11", "m21"), M_C2 = c("m12", "m22"),
+    expect_warning(out <- wsMed(raw, M_C1 = c("m11", "m21"), M_C2 = c("m12", "m22"),
                  Y_C1 = "y1", Y_C2 = "y2", W = "W", W_type = "continuous", MP = "b1",
                  form = "P", Na = "MI", ci_method = "mc", fixed.x = fixed,
-                 mi_args = list(m = 3), R = 80, standardized = TRUE, verbose = FALSE)
+                 mi_args = list(m = 3), R = 80, standardized = TRUE, verbose = FALSE),
+      class = "wsmed_mi_compatibility_warning")
     expect_identical(lavaan::lavInspect(out$mc$result$args$lav, "options")$fixed.x, fixed)
     expect_false(is.null(out$mc$std_mc))
     p <- out$mc$result$thetahat$est
@@ -274,5 +280,5 @@ test_that("UD public both mode preserves paths and standardized MC/bootstrap agr
   expect_equal(out$mc$std_mc$Estimate, out$mc$std_boot$est.std)
   expect_equal(out$moderation$mc$conditional_overall$Estimate,
                out$moderation$boot$conditional_overall$Estimate)
-  expect_output(print(out), "UNSTANDARDIZED CONDITIONAL EFFECTS")
+  expect_output(print(out, detail = "legacy"), "UNSTANDARDIZED CONDITIONAL EFFECTS")
 })

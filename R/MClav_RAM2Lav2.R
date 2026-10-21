@@ -1,4 +1,4 @@
-#' @title Convert Standardized RAM Back to Lavaan Matrices
+#' @title Convert standardized RAM back to lavaan matrices
 #'
 #' @description Converts a standardized RAM object back to lavaan-style matrix structure.
 #' Preserves residual covariances on their transformed scales.
@@ -55,7 +55,7 @@ RAM2Lav2 <- function(ram, lav_mod, standardized = FALSE) {
 
   }
 
-  # 不处理 nu，仅处理 alpha
+  # Transform alpha only; leave nu unchanged
   if (!is.null(lav_mod$alpha)) {
     lav_mod$alpha[,] <- 0
     alpha_names <- rownames(lav_mod$alpha)

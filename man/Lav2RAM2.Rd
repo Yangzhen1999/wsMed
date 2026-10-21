@@ -2,7 +2,7 @@
 % Please edit documentation in R/MCLav_Lav2RAM2.R
 \name{Lav2RAM2}
 \alias{Lav2RAM2}
-\title{Convert Lavaan Model to RAM Matrices}
+\title{Convert lavaan model to RAM matrices}
 \usage{
 Lav2RAM2(lav_mod)
 }

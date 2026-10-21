@@ -2,7 +2,7 @@
 % Please edit documentation in R/GenerateModelP.R
 \name{GenerateModelP}
 \alias{GenerateModelP}
-\title{Generate Parallel Mediation Model}
+\title{Generate a parallel mediation model}
 \usage{
 GenerateModelP(prepared_data, MP = character(0))
 }
@@ -52,6 +52,15 @@ to observe the moderation effect of ‘X'.
 
 This model is suitable for parallel mediation designs where multiple mediators act independently.
 }
+\section{Product moments}{
+
+When a moderated path starts at an endogenous mediator, auxiliary product
+moment equations and covariances with its upstream disturbances preserve the
+joint predictor moment structure under reference recoding. These equations
+are not additional mediation paths. Genuine exogenous moments follow the
+fitting function's \code{fixed.x} setting; endogenous product moments are estimated.
+}
+
 \examples{
 # Example prepared data
 prepared_data <- data.frame(

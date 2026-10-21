@@ -2,7 +2,7 @@
 % Please edit documentation in R/MC_bootstrap_sd_list.R
 \name{bootstrap_sd_list}
 \alias{bootstrap_sd_list}
-\title{Bootstrap Standard Deviations for Standardization}
+\title{Bootstrap standard deviations for standardization}
 \usage{
 bootstrap_sd_list(data, var_names, nboot = 20000, seed = NULL)
 }

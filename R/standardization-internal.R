@@ -14,10 +14,15 @@
   free_rows <- match(seq_len(fit@Model@nx.free), pt$free)
   if (ncol(draws) == nrow(pt)) draws <- draws[, free_rows, drop = FALSE]
   if (ncol(draws) != fit@Model@nx.free) stop("Incorrect standardized draw dimensions.")
+  moments <- fit@external$wsmed_mi_marginal
+  if (!is.null(moments) && (is.null(moments$draws) || nrow(moments$draws) != nrow(draws)))
+    stop("Joint MI marginal-variance draws are unavailable; rerun inference.")
   reasons <- rep(NA_character_, nrow(draws))
   transformed <- t(vapply(seq_len(nrow(draws)), function(i) {
     tryCatch({
-      z <- StdLav2(draws[i, ], fit)
+      z <- StdLav2(draws[i, ], fit,
+        marginal_variances = if (is.null(moments)) NULL else
+          stats::setNames(moments$draws[i, ], colnames(moments$draws)))
       if (any(!is.finite(z))) stop("Non-finite standardized parameter.")
       z
     }, error = function(e) {

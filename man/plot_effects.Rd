@@ -54,6 +54,9 @@ Use \code{\link[=plot_conditional_effects]{plot_conditional_effects()}} to show 
 MC intervals come from the parameter draws (or the stored
 standardized parameter table). Bootstrap plots use the bootstrap limits,
 not the normal-theory limits that may also be present in the table.
+New workflow objects use \link{wsmed_plots}. Both interfaces expose full-precision
+\code{estimate}, \code{conf.low}, and \code{conf.high} columns in the plotted data; legacy
+column names remain available. Interval conventions are not silently changed.
 }
 \seealso{
 \code{\link[=plot_conditional_effects]{plot_conditional_effects()}}, \code{\link[=plot_contrasts]{plot_contrasts()}},

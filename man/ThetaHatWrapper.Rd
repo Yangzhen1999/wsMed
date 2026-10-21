@@ -2,7 +2,7 @@
 % Please edit documentation in R/ThetaHatWrapper.R
 \name{ThetaHatWrapper}
 \alias{ThetaHatWrapper}
-\title{Compute Updated Parameter Estimates for SEM Models}
+\title{Compute updated parameter estimates for SEM models}
 \usage{
 ThetaHatWrapper(object, est = NULL)
 }

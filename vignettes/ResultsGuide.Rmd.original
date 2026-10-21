@@ -1,0 +1,229 @@
+---
+title: "Read and export results"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Read and export results}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+library(wsMed)
+options(width = 80)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  cache = FALSE,
+  fig.width = 7,
+  fig.height = 4.5
+)
+```
+
+Start by reading the default report. Use more specific queries only when you
+need a different effect, reporting scale or confidence level.
+
+The example below is the parallel mediation model from [Get started](GetStarted.html).
+
+<details>
+<summary>Example setup</summary>
+
+```{r fit}
+data(example_data)
+result <- wsMed(
+  data = example_data,
+  M_C1 = c("A1", "B1"),
+  M_C2 = c("A2", "B2"),
+  Y_C1 = "D1",
+  Y_C2 = "D2"
+)
+```
+
+</details>
+
+## Read the default report
+
+```{r default-report}
+print(result)
+```
+
+`print()` displays the core effects and analysis information. The report gives
+the estimate, SE and CI for each specific indirect effect, the total indirect
+effect, the direct effect and the total effect. Here the default output is
+unstandardized, with 95% Monte Carlo CIs.
+
+## Get a statistical summary
+
+```{r default-summary}
+summary(result)
+```
+
+`summary()` returns a structured report containing effects, path coefficients
+and analysis settings; its default display shows the statistical tables.
+Unlike `print()`, it creates a summary object that can be saved and reused:
+
+```{r saved-summary}
+s <- summary(result)
+```
+
+Typing `s` displays the same summary. Neither operation repeats fitting or
+sampling. The stored tables retain full precision even though the printed
+values are rounded.
+
+## Plot the results
+
+```{r default-plot}
+plot(result)
+```
+
+The default plot of this model shows the specific indirect effects. To plot
+all effects selected in the summary, use `plot(s)`. Both inherit the reporting
+scale saved during the analysis. See the [plot gallery](PlottingEffects.html)
+for the available displays and optional settings.
+
+## Choose more specific output
+
+Start with the calls above. The following options change one part of the report
+without fitting again.
+
+### Request standardized effects
+
+```{r standardized-report}
+summary(
+  result,
+  standardized = TRUE
+)
+```
+
+For complete condition effects, standardization uses the model-implied marginal
+SD of the outcome difference. See [standardized effects](StandardizedModeratedMediation.html)
+for the treatment of paths, interactions and conditional effects.
+
+If the original call used `standardized = TRUE`, plain `print(result)`,
+`summary(result)` and `plot(result)` already use standardized output.
+
+### Select an effect family
+
+```{r select}
+summary(
+  result,
+  type = "indirect"
+)
+```
+
+Other selections include `"direct"`, `"total_indirect"`, `"total"`, `"paths"`
+and `"parameters"`. Use `terms` only when selecting particular named effects.
+
+### Change the confidence level
+
+```{r confidence-level}
+summary(
+  result,
+  level = 0.90
+)
+```
+
+The interval is recalculated from the stored draws. Effect SEs are sample SDs
+of the joint effect draws, and effect CIs are percentile intervals.
+
+For a model that stored both inference engines, choose `method = "mc"` or
+`method = "bootstrap"` in `summary()`. The default `print()` reports both.
+
+### Choose moderator values
+
+For moderated mediation, the default report uses the centering reference for
+a continuous moderator and all observed levels for a categorical moderator.
+Use `at` to choose raw values or category labels. For example, after fitting
+the second [Get started example](GetStarted.html#example-2-add-a-continuous-moderator):
+
+```{r probes, eval=FALSE}
+summary(
+  moderated,
+  at = list(D3 = mean(example_data$D3))
+)
+```
+
+These are conditional effects at specified values, not effects averaged over
+the moderator distribution.
+
+## Compare two pathways
+
+A difference between effects needs its own CI. Use the stored joint draws to
+form that difference, then print the result directly:
+
+```{r contrast}
+effects <- wsmed_effects(result)
+difference <- wsmed_contrasts(
+  effects,
+  list(B_minus_A = c(indirect_2 = 1, indirect_1 = -1))
+)
+print(difference)
+```
+
+`B_minus_A` is the indirect effect through B minus the effect through A. Do not
+subtract separate CI endpoints, or infer a difference simply because only one
+of the separate intervals excludes zero.
+
+## Extract or export results when needed
+
+Extraction is useful for further calculations or export; it is not required
+for ordinary reports and plots.
+
+| Task | Call |
+|---|---|
+| Effects as a data frame | `as.data.frame(s)` |
+| Selected result columns | `effect_table[, columns]` |
+| Effect estimates | `coef(s)` |
+| Effect CIs | `confint(s)` |
+| Covariance of effect draws | `vcov(s)` |
+| Path-coefficient table | `s$coefficients` |
+| Method, scale and confidence level | `s$info` |
+| Sample size of the fitted data | `nobs(result)` |
+
+The methods on `s` concern its selected effects. In contrast, `coef(result)`,
+`vcov(result)` and `confint(result)` concern primitive model parameters.
+
+To choose which columns to display, list their names in the order you want.
+For example, keep the effect name, estimate, SE and both CI limits:
+
+```{r select-columns}
+effect_table <- as.data.frame(s)
+columns <- c(
+  "label",
+  "estimate",
+  "std.error",
+  "conf.low",
+  "conf.high"
+)
+effect_table[, columns]
+```
+
+Remove `"std.error"` from `columns` to omit SEs, or remove `"conf.low"` and
+`"conf.high"` to omit CIs. `names(effect_table)` lists all available columns;
+for moderated mediation, retain `moderator` and `at` to identify the evaluated
+values or groups. Use `s$coefficients[, columns]` for the path-coefficient table.
+
+To export the same selected columns:
+
+```{r export, eval=FALSE}
+write.csv(
+  effect_table[, columns],
+  "mediation-effects.csv",
+  row.names = FALSE
+)
+
+p <- plot(result)
+ggplot2::ggsave(
+  "mediation-effects.png",
+  plot = p,
+  width = 7,
+  height = 4.5,
+  dpi = 300
+)
+```
+
+The CSV contains the selected columns at full precision. Use `as.data.frame(s)`
+instead to export the complete effect table, including analysis settings.
+Choose your own filenames when saving results.
+
+**Next:** [customize a plot](PlottingEffects.html), or
+[reuse a fit](ModularWorkflow.html) for another inference method.

@@ -1,4 +1,4 @@
-#' @title Monte Carlo Summary for Standardized Estimates
+#' @title Monte Carlo summary for standardized estimates
 #'
 #' @description Computes standardized estimates, standard errors, and confidence intervals
 #' based on Monte Carlo samples from a `semmcci` object. This function fully standardizes

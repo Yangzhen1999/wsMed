@@ -2,7 +2,7 @@ library(testthat)
 
 test_that("analyze_mm_continuous works on wsMed output (continuous W)", {
 
-  set.seed(20250625)       # 可复现
+  set.seed(20250625)       # Reproducible seed
 
   ## ------------ 1. run a *minimal* wsMed() -----------
   ws_out <- wsMed(
@@ -13,14 +13,14 @@ test_that("analyze_mm_continuous works on wsMed output (continuous W)", {
     form = "CP",
     W    = "D3",            W_type = "continuous",
     MP   = c("a1","b2","d1","cp","b_1_2","d_1_2"),
-    R = 250                # Monte-Carlo 抽样数降到 250
+    R = 250                # Use fewer Monte Carlo draws for fast tests
   )
 
   theta   <- ws_out$mc$result$thetahatstar
   prepdat <- ws_out$data
-  MP_vec  <- ws_out$input_vars$MP   # 或直接用上面那行常量
+  MP_vec  <- ws_out$input_vars$MP   # Retrieve MP from the fitted object
 
-  ## ------------ 2. 调用待测函数 -----------------------
+  # Call the function under test
   MP_vec <- c("a1","b2","d1","cp","b_1_2","d_1_2")
 
   cont_out <- analyze_mm_continuous(
@@ -29,61 +29,61 @@ test_that("analyze_mm_continuous works on wsMed output (continuous W)", {
     MP         = MP_vec,
     W_raw_name = "D3",
     ci_level   = .95,
-    n_curve    = 40,         # 曲线分辨率缩小
+    n_curve    = 40,         # Use a lower curve resolution for fast tests
     digits     = 4
   )
 
-  ## ------------ 3. 基本结构断言 -----------------------
+  # Check the basic structure
   expect_type(cont_out, "list")
 
-  # ① 必含 6 个命名元素
+  # Require the six named components
   expect_setequal(names(cont_out),
                   c("mod_coeff","beta_coef","path_HML",
                     "conditional_overall",
                     "theta_curve","path_curve","IE_contrasts", "path_contrasts"))
 
-  # ② mod_coeff 检测到与 MP 对应的调节列
+  # The moderator-coefficient table includes the MP interaction columns
   expect_false(is.null(cont_out$mod_coeff))
   expect_true(all(
     grepl("^(aw|bw|dw|cpw)", cont_out$mod_coeff$Path)
   ))
 
-  # 至少要覆盖 MP 中的每个基础系数
+  # Include every base coefficient named in MP
   expect_true(all(
     MP_vec %in% unique(cont_out$mod_coeff$BaseCoef)
   ))
 
-  # ③ beta_coef 有三行 × 每条路径
+  # The coefficient table has three rows per path
   expect_setequal(
     unique(cont_out$beta_coef$Level),
     c("-1 SD","0 SD","+1 SD")
   )
 
-  # 路径名称来自 get_indirect_paths，至少要包含 b_1_2 的那条
+  # Path names from get_indirect_paths include b_1_2
   expect_true(any(grepl("1_2", cont_out$beta_coef$Path)))
 
-  # ④ path_HML 行数应 = length(unique(baseCoef)) × 3
+  # The high/mean/low table has three rows per unique base coefficient
   expect_equal(
     nrow(cont_out$path_HML),
     length(unique(cont_out$path_HML$Path)) * 3
   )
 
-  # ⑤ conditional_overall 应有 total_indirect + total_effect × 3 level = 6
+  # Conditional overall effects have two effect types at three levels
   expect_equal(nrow(cont_out$conditional_overall), 6)
 
-  # ⑥ theta_curve 至少包含 total_indirect / total_effect 曲线
+  # The curve contains total indirect and total effects
   expect_true(
     all(c("total_indirect","total_effect") %in%
           unique(cont_out$theta_curve$Path))
   )
 
-  # ⑦ W_raw 序列长度 = n_curve
+  # The raw moderator vector has n_curve entries
   expect_equal(
     length(unique(cont_out$theta_curve$W_raw)),
     40
   )
 
-  # ⑧ CI 列名格式检查
+  # Check CI column names
   expect_true(any(grepl("%CI.Lo$", names(cont_out$beta_coef))))
   expect_true(any(grepl("%CI.Up$", names(cont_out$beta_coef))))
 })

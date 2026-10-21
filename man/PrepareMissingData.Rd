@@ -2,7 +2,7 @@
 % Please edit documentation in R/PrepareMissingData.R
 \name{PrepareMissingData}
 \alias{PrepareMissingData}
-\title{Prepare Data with Missing Values for Mediation Analysis}
+\title{Prepare data with missing values for mediation analysis}
 \usage{
 PrepareMissingData(
   data_missing,
@@ -53,7 +53,10 @@ Must match the length of \code{M_C1}.}
 Each element is \code{"continuous"}, \code{"categorical"}, or \code{"auto"}
 (default). Ignored when \code{C = NULL}.}
 
-\item{W}{Optional character vector: moderator names (at most J).}
+\item{W}{A character vector specifying the names of moderator variables
+that are used to generate interaction terms with mediators. These variables
+will be included in the imputation model and passed to \code{PrepareData}.
+Default is \code{NULL}.}
 
 \item{W_type}{Optional vector of the same length as \code{W}.
 Same coding as \code{C_type}. Ignored when \code{W = NULL}.}

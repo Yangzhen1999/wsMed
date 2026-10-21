@@ -1,0 +1,49 @@
+{
+  "date": "2026-09-28",
+  "base_commit": "b0323f7a9308d4a263bb4ece9a8c91d40a52c9ea",
+  "implementation_commit": "d70ed97d78afff67ce7094802c41a81d71f836d6",
+  "attempted_analyses": 3200,
+  "independent_datasets": 800,
+  "repetitions_per_scenario": 200,
+  "analysis_failures": 0,
+  "mc_draws": 2000,
+  "arms": [
+    "pmm (m=5)",
+    "smcfcs (m=5)",
+    "complete",
+    "smcfcs20 (m=20; added sensitivity arm)"
+  ],
+  "smcfcs_version": "2.0.2",
+  "smcfcs_numit": 20,
+  "smcfcs_rjlimit": 5000,
+  "smcfcs_source_archive_sha256": "969868345bcf9adaf4351352b020d2c1786c5157738d908dfe2a3606db49e2cf",
+  "loaded_wsmed_lazyload_sha256": "d84eae16db57250c0f95a9e1b7baf1b0574fbd3451307fca8aac93188916c750",
+  "primary_executed_script_sha256": "501d688e692677cd4e3771e68e82340cb7d1e4d3ad244fc457bfb6e22e7143b0",
+  "sensitivity_executed_script_sha256": "e554d27c324fe6add5fd14c95dfe2ab1351489dbe484bb4d1b5707a3d912dffc",
+  "sensitivity_partitioning": "Completed prefixes retained; remaining preassigned seeds computed in disjoint parallel partitions. Same 200 seeds in each scenario.",
+  "execution_note": "Primary script was edited during execution to add sensitivity controls. Rscript reported a trailing parse error after all 200 checkpoints had been written. All 200 unique attempts per arm/scenario and last-attempt independent reproduction were verified; all 2400 PMM effect rows match the previous study to 1e-12. Sensitivity used a frozen script snapshot.",
+  "files": {
+    "replicates.csv": "7b1500de6e54a5cb359a5bdcaf050b68dea8a3388ce1ac476c826c3fedaa8734",
+    "summary.csv": "57c009938c6db4fc5e1cbd694667867e979aa6e690f31f36c8187f481c28e839",
+    "paired.csv": "7f8527be5d9a9fd8b2dad211012a5a5297701d86ef6091d8eccfef1f0a38f4f1",
+    "denominators.csv": "2162c52523a62aa523828d92d0abc4acf35f319d814a1228c61a6718c8d8bbcb",
+    "environment.txt": "f72c3bdb16558c6490726e4c9cedd481b77cfc0dd17c26320c0f28a760f72bb7",
+    "run.R": "e554d27c324fe6add5fd14c95dfe2ab1351489dbe484bb4d1b5707a3d912dffc",
+    "summarize.R": "cc9fa65622ab92d29c5a664707668fe2ce37e37ee706cc2601d2837044ddf530",
+    "traces/scenario-5-m20.rds": "84398eea02ccbf4aaa63070f954df2a4b00088dbbd2473d73a176e2dd182cdac",
+    "traces/scenario-5-m5.rds": "8b13162f189546e996f84db6221f41411419b275a42b5e7050c393e9315b3067",
+    "traces/scenario-6-m20.rds": "da0e70a318594ef4685590c7767329e2a4a0d0e19aecae0174c549d3e5edd0f1",
+    "traces/scenario-6-m5.rds": "837a1e39e830f53fd85c6791fde189d7d121b03dfe9cfd3abde4f608f8fa20c8",
+    "traces/scenario-7-m20.rds": "b14870737e995e84e637e872c17d114425b92efa6f87ce7c140611e010d4fdcc",
+    "traces/scenario-7-m5.rds": "480c11d4265c3ac5d884ebe45d439a75cfd4e48decefbfb9f251cc2182614cf4",
+    "traces/scenario-8-m20.rds": "f45ab5803c751c5d06c3413e8fc3555c4db15ed52e668e3da6f364e1596be996",
+    "traces/scenario-8-m5.rds": "4121acbd5923d8ac17c18b8f80e1a3e06cc08b20ca0c624189d196100ec589a6",
+    "source-snapshots/primary.R.txt": "501d688e692677cd4e3771e68e82340cb7d1e4d3ad244fc457bfb6e22e7143b0",
+    "source-snapshots/sensitivity.R.txt": "e554d27c324fe6add5fd14c95dfe2ab1351489dbe484bb4d1b5707a3d912dffc",
+    "execution-verification.txt": "52d5e0697d2b3dbe3879c9f9bc95f956d75dc729524656cf6140928b30ee33b1"
+  },
+  "rejection_warning_analyses": {
+    "smcfcs_m5": 47,
+    "smcfcs_m20": 136
+  }
+}

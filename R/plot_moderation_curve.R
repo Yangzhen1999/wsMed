@@ -79,6 +79,7 @@ plot_moderation_curve <- function(result, path_name,
   if (standardized && missing(y_label)) y_label <- "Standardized effect"
   band_label <- paste0(format(100 * info$level, trim = TRUE), "% pointwise CI")
   region_label <- "Pointwise CI excludes 0"
+  tab <- .wsmed_legacy_plot_frame(tab, tab$Path, validate_ci = FALSE)
   p <- ggplot2::ggplot(tab, ggplot2::aes(x = .data$W_raw, y = .data$Estimate)) +
     ggplot2::geom_ribbon(ggplot2::aes(ymin = .data$CI.LL, ymax = .data$CI.UL,
                                    fill = "band"), alpha = alpha_ci, na.rm = TRUE) +

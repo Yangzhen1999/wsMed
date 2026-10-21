@@ -2,7 +2,7 @@
 % Please edit documentation in R/MC_evaluate_definitions.R
 \name{evaluate_definitions_v3}
 \alias{evaluate_definitions_v3}
-\title{Evaluate Standardized Monte Carlo Expressions}
+\title{Evaluate standardized Monte Carlo expressions}
 \usage{
 evaluate_definitions_v3(
   theta_star,

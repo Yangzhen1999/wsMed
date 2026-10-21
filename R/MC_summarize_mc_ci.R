@@ -1,4 +1,4 @@
-#' @title Summarize Monte Carlo Simulation Results
+#' @title Summarize Monte Carlo simulation results
 #'
 #' @description Computes summary statistics for Monte Carlo simulation results, including
 #' the mean estimate, standard error (SE), and confidence intervals (CIs).

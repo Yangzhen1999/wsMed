@@ -2,7 +2,7 @@
 % Please edit documentation in R/MC_build_std_map.R
 \name{build_path_std_map}
 \alias{build_path_std_map}
-\title{Build Standardization Maps PATH}
+\title{Build path-specific standardization maps}
 \usage{
 build_path_std_map(fit)
 }

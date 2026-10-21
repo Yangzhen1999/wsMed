@@ -1,5 +1,7 @@
 url: https://yangzhen1999.github.io/wsMed
 
+repo:
+  branch: master
 
 template:
   bootstrap: 5
@@ -10,69 +12,82 @@ assets:
 
 navbar:
   structure:
-    left: [home, reference, articles, news]
-    right: [github]
+    left: [start, analysis, results, reference, articles]
+    right: [search, github]
   components:
-    home:
-      text: "Home"
-      href: index.html
+    start:
+      text: Get started
+      href: articles/GetStarted.html
+    analysis:
+      text: Analysis guides
+      href: articles/AnalysisGuide.html
+    results:
+      text: Results & plots
+      menu:
+        - text: Read and export results
+          href: articles/ResultsGuide.html
+        - text: Plot gallery
+          href: articles/PlottingEffects.html
+        - text: Standardized effects
+          href: articles/StandardizedModeratedMediation.html
     reference:
-      text: "Functions"
+      text: Reference
       href: reference/index.html
     articles:
-      text: "Tutorials"
-      menu:
-        - text: "Using wsMed: A step-by-step tutorial"
-          href: articles/WsMed.html
-        - text: "Plotting effects and contrasts"
-          href: articles/PlottingEffects.html
-        - text: "Standardized moderated mediation"
-          href: articles/StandardizedModeratedMediation.html
-        - text: "Using printGM() to Generate SEM Models"
-          href: articles/printGM.html
-        - text: "Parallel Mediation (P)"
-          href: articles/GenerateModelP.html
-        - text: "Chained Mediation (CN)"
-          href: articles/GenerateModelCN.html
-        - text: "Combined Parallel and Chained (CP)"
-          href: articles/GenerateModelCP.html
-        - text: "Parallel + Chained (PC)"
-          href: articles/GenerateModelPC.html
-        - text: "Comparison: MEMORE 3.0 vs wsMed"
-          href: articles/MEMORE_vs_wsMed.html
-        - text: "User-defined mediation models"
-          href: articles/GenerateModelCustom.html
-    news:
-      text: "Changelog"
-      href: news/index.html
+      text: Articles
+      href: articles/index.html
     github:
       icon: fab fa-github
       href: https://github.com/Yangzhen1999/wsMed
-      aria-label: "GitHub Repository"
+      aria-label: GitHub Repository
+
+articles:
+  - title: Start here
+    contents: [GetStarted, AnalysisGuide]
+  - title: Read and present results
+    contents: [ResultsGuide, PlottingEffects, StandardizedModeratedMediation]
+  - title: Analysis options
+    contents: [WsMed, CategoricalPredictors, GenerateModelCustom]
+  - title: Advanced workflows and reliability
+    contents: [ModularWorkflow, WorkflowReliability, CompatibleImputation]
+  - title: Model equations and software comparison
+    contents: [GenerateModelP, GenerateModelCN, GenerateModelCP, GenerateModelPC, printGM, MEMORE_vs_wsMed]
 
 reference:
-  - title: "Main Functions"
+  - title: "Main functions"
     desc: "Core functions for within-subject mediation analysis"
     contents:
       - wsMed
-      - print.wsMed
-      - printGM
-  - title: "Model Generation"
+  - title: "Staged workflow"
+    desc: "Specify, fit, infer, and extract without repeating earlier stages"
+    contents:
+      - wsmed_model
+      - wsmed_fit
+      - wsmed_infer
+      - wsmed_inspect
+      - wsmed_reproducibility
+  - title: "Reports, summaries, and effect comparisons"
+    desc: "Use [print() and summary()](wsmed_methods.html) to read reports and extract structured tables, and [plot()](wsmed_plots.html) to visualize results. The functions below support focused effect queries and comparisons."
+    contents:
+      - wsmed_effects
+      - wsmed_contrasts
+  - title: "Model generation"
     desc: "Functions for generating SEM syntax for different mediation structures"
     contents:
+      - printGM
       - GenerateModelP
       - GenerateModelCN
       - GenerateModelCP
       - GenerateModelPC
       - GenerateModelCustom
-  - title: "Missing Data and Imputation"
+  - title: "Missing data and imputation"
     desc: "Functions to handle missing data with multiple imputation"
     contents:
       - ImputeData
       - PrepareMissingData
       - MCMI2
       - PrepareData
-  - title: "Standardization and Conditional Effects"
+  - title: "Standardization and conditional effects"
     desc: "Standardize conditional results and visualize effect curves"
     contents:
       - standardize_moderation
@@ -80,3 +95,14 @@ reference:
       - plot_effects
       - plot_conditional_effects
       - plot_contrasts
+  - title: "Data and variable types"
+    desc: "Packaged datasets and supported categorical predictors"
+    contents:
+      - wsmed_examples
+      - example_data
+      - wsmed_categorical
+
+  - title: internal
+    contents:
+      - wsmed_methods
+      - wsmed_plots

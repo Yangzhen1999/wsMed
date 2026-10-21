@@ -71,7 +71,8 @@ analyze_mm_categorical <- function(mc_result, prepared_data,
   Winfo <- attr(prepared_data, "W_info")
   if (is.null(Winfo)) stop("prepared_data is missing W_info attribute.")
   grp_var <- if (!is.null(Winfo$factor_name)) Winfo$factor_name else Winfo$raw
-  groups  <- sort(unique(prepared_data[[grp_var]]))
+  # Group values are list keys, never positional indices (notably numeric 0/1).
+  groups  <- as.character(sort(unique(prepared_data[[grp_var]])))
 
   msg("Moderator groups: %s", paste(groups, collapse = ", "))
   msg("theta dim: %d * %d", nrow(theta), ncol(theta))

@@ -1,4 +1,4 @@
-#' @title Convert Lavaan Model to RAM Matrices
+#' @title Convert lavaan model to RAM matrices
 #'
 #' @description Converts a lavaan-style matrix list into RAM (Reticular Action Model) format,
 #' including the A (asymmetric paths), S (symmetric paths), F (filter matrix), and M (means/intercepts) matrices.

@@ -1,4 +1,4 @@
-#' @title Extract All Parameters and Definitions
+#' @title Extract all parameters and definitions
 #'
 #' @description Extracts free and defined parameters from a fitted `lavaan` model,
 #' and builds a dependency map of user-defined parameters.

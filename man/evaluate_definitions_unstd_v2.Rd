@@ -2,7 +2,7 @@
 % Please edit documentation in R/MC_evaluate_definitions.R
 \name{evaluate_definitions_unstd_v2}
 \alias{evaluate_definitions_unstd_v2}
-\title{Evaluate Unstandardized Monte Carlo Definitions}
+\title{Evaluate unstandardized Monte Carlo definitions}
 \usage{
 evaluate_definitions_unstd_v2(theta_star, definitions)
 }

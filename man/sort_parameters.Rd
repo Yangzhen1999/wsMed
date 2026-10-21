@@ -2,7 +2,7 @@
 % Please edit documentation in R/sort_parameters.R
 \name{sort_parameters}
 \alias{sort_parameters}
-\title{Sort Parameters for Printing in SEM Output}
+\title{Sort parameters for printing in SEM output}
 \usage{
 sort_parameters(df)
 }

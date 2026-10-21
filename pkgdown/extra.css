@@ -1,0 +1,15 @@
+.wsmed-version-note {border-left: .25rem solid #257f76; background: #f2f8f7; padding: .8rem 1rem; margin: 1.25rem 0 1.8rem; color: #253b39;}
+.wsmed-start-grid {display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin: 1rem 0 1.8rem;}
+.wsmed-start-card {border: 1px solid #d5e2df; border-radius: .6rem; padding: 1.1rem; background: #fff;}
+.wsmed-start-card .wsmed-card-title {font-weight: 700; font-size: 1.1rem; margin: 0 0 .7rem; line-height: 1.4;}
+.wsmed-start-card p {font-size: .95rem; margin-bottom: .65rem;}
+.wsmed-start-card a {font-weight: 600; text-decoration: underline; text-underline-offset: .18em;}
+details {border: 1px solid #d5e2df; border-radius: .4rem; padding: .75rem 1rem; margin: 1rem 0;}
+summary {cursor: pointer; font-weight: 600;}
+details[open] > summary {margin-bottom: 1rem;}
+@media (max-width: 900px) {.wsmed-start-grid {grid-template-columns: 1fr;}}
+
+.wsmed-plot-grid {display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 1.5rem 0;}
+.wsmed-plot-card {min-width: 0; border: 1px solid #d5e2df; border-radius: .6rem; padding: .75rem;}
+.wsmed-plot-card img {width: 100%; height: auto;}
+@media (max-width: 600px) {.wsmed-plot-grid {grid-template-columns: 1fr;}}

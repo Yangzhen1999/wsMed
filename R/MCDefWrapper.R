@@ -1,4 +1,4 @@
-#' @title Process Monte Carlo Samples for Defined Parameters in SEM
+#' @title Process Monte Carlo samples for defined parameters in SEM
 #'
 #' @description A wrapper for the internal `.MCDef()` function from the `semmcci` package.
 #' This function processes Monte Carlo samples to compute defined parameters for structural

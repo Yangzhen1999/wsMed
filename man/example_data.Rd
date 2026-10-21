@@ -3,39 +3,38 @@
 \docType{data}
 \name{example_data}
 \alias{example_data}
-\title{Example Data for within subject mediation}
+\title{Simulated data for mediation tutorials}
 \format{
-A tibble (data frame) with 100 rows and 12 variables:
+A tibble (data frame) with 100 rows and 14 variables:
 \describe{
-\item{A1}{Numeric variable}
-\item{A2}{Numeric variable}
-\item{A3}{Numeric variable}
-\item{B1}{Numeric variable}
-\item{B2}{Numeric variable}
-\item{B3}{Numeric variable}
-\item{C1}{Numeric variable}
-\item{C2}{Numeric variable}
-\item{C3}{Numeric variable}
-\item{D1}{Numeric variable}
-\item{D2}{Numeric variable}
-\item{D3}{Numeric variable}
+\item{A1, A2, A3}{Numeric measurements for variable A at three conditions.}
+\item{B1, B2, B3}{Numeric measurements for variable B at three conditions.}
+\item{C1, C2, C3}{Numeric measurements for variable C at three conditions.}
+\item{D1, D2, D3}{Numeric measurements for variable D at three conditions.}
+\item{Group}{An unordered factor with levels high, med, and low, in that order.}
+\item{W_Group}{An unordered factor with levels high, med, and low, in that order.}
 }
 }
 \usage{
 example_data
 }
 \description{
-A simulated dataset containing variables for within-subject mediation analysis.
-The dataset includes four within-subject variables (A, B, C, D), each measured at three levels:
-\itemize{
-\item \strong{A1, A2, A3}: Levels of within-subject variable A (e.g., mediator conditions).
-\item \strong{B1, B2, B3}: Levels of within-subject variable B (e.g., outcome conditions).
-\item \strong{C1, C2, C3}: Levels of within-subject variable.
-\item \strong{D1, D2, D3}: Levels of within-subject variable.
+Artificial data used to demonstrate model syntax, estimation, and categorical
+predictors. The labels do not identify substantive psychological constructs.
+This is distinct from the empirical manuscript dataset \code{\link[=wsmed_examples]{wsmed_examples()}}.
 }
+\details{
+All columns are complete. A wsMed analysis selects two condition
+columns per outcome or mediator. The factor labels are nominal categories;
+they do not request an ordinal regression model. Set their level order
+explicitly before fitting to select a different reference category.
 }
 \examples{
 data(example_data)
-head(example_data)
+dim(example_data)
+levels(example_data$Group)
 }
-\keyword{internal}
+\seealso{
+\code{\link[=wsmed_examples]{wsmed_examples()}}, \link{wsmed_categorical}
+}
+\keyword{datasets}

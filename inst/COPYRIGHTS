@@ -1,0 +1,20 @@
+Dataset: wsmed_examples (data/wsmed_examples.rda)
+
+Source: Roberto Sagaribay (2025), iWeek: A Week-Long Social Media Abstinence
+Intervention and its Impact on Well-Being, Mental Health, Body Image, and Sleep
+in Latina College Students. Mendeley Data, version 1.
+https://doi.org/10.17632/fn9n95bsh5.1
+
+License for the source data and this prepared derivative: Creative Commons
+Attribution 4.0 International (CC BY 4.0).
+https://creativecommons.org/licenses/by/4.0/
+
+Modifications by the wsMed manuscript authors: retain the 14 example variables;
+recalculate BMI using 703 * weight_lb / height_in^2, accepting heights within
+48--84 inches and leaving 13 ambiguous/out-of-range heights with missing BMI.
+The package copy removes SPSS storage attributes but preserves every numerical
+value, participant row, and missing value from the prepared replication file.
+The data are illustrative, not a replication of the source study's analyses.
+
+The package code is licensed under GPL (>= 3). That code license does not replace
+the CC BY 4.0 license attached to wsmed_examples.

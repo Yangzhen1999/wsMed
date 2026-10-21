@@ -2,7 +2,7 @@
 % Please edit documentation in R/analyze_mm_continuous.R
 \name{get_indirect_paths}
 \alias{get_indirect_paths}
-\title{Parse All Possible Indirect Paths from Column Names}
+\title{Parse indirect paths from coefficient names}
 \usage{
 get_indirect_paths(col_names)
 }
