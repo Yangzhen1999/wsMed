@@ -2,7 +2,7 @@
 % Please edit documentation in R/ThetaHatStarWrapper.R
 \name{ThetaHatStarWrapper}
 \alias{ThetaHatStarWrapper}
-\title{Monte Carlo Sampling for Parameter Estimates}
+\title{Monte Carlo sampling for parameter estimates}
 \usage{
 ThetaHatStarWrapper(
   R = 20000L,
@@ -36,8 +36,15 @@ A list containing:
 }
 \description{
 Generates Monte Carlo samples for parameter estimates using a covariance matrix
-and a location vector. This function is a wrapper for the internal \code{.ThetaHatStar()}
-function from the \code{semmcci} package.
+and a location vector. With eigen decomposition, sampling uses the principal
+symmetric square root of the covariance matrix.
+}
+\details{
+The eigen sampler is invariant to eigenvector signs and to rotations
+within eigenspaces with repeated eigenvalues, up to numerical precision.
+This changes fixed-seed draws relative to wsMed 1.1.0, while preserving their
+target distribution. It does not guarantee identical results across different
+fitted inputs, imputation algorithms, or software environments.
 }
 \seealso{
 \code{\link[=MCMI2]{MCMI2()}}, \code{\link[=RunMCMIAnalysis]{RunMCMIAnalysis()}}

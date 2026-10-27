@@ -25,6 +25,9 @@
 #' @details MC intervals come from the parameter draws (or the stored
 #'   standardized parameter table). Bootstrap plots use the bootstrap limits,
 #'   not the normal-theory limits that may also be present in the table.
+#'   New workflow objects use [wsmed_plots]. Both interfaces expose full-precision
+#'   `estimate`, `conf.low`, and `conf.high` columns in the plotted data; legacy
+#'   column names remain available. Interval conventions are not silently changed.
 #' @seealso [plot_conditional_effects()], [plot_contrasts()],
 #'   [plot_moderation_curve()]
 #' @md
@@ -91,19 +94,14 @@ plot_conditional_effects <- function(result, paths = NULL,
     probes <- tab$W_value[match(values, tab$Level)]
     axis_labels <- paste0(values, "\nW = ", format(probes, trim = TRUE))
   }
-  p <- ggplot2::ggplot(tab, ggplot2::aes(x = .data$LevelLabel, y = .data$Estimate)) +
-    ggplot2::geom_hline(yintercept = 0, linetype = "dashed", colour = "grey60") +
-    ggplot2::geom_errorbar(ggplot2::aes(ymin = .data$CI.LL, ymax = .data$CI.UL),
-                          width = .12, colour = "#35618D") +
-    ggplot2::geom_point(size = 2.5, colour = "#234866") +
-    ggplot2::facet_wrap(ggplot2::vars(.data$PlotLabel), ncol = ncol) +
-    ggplot2::scale_x_discrete(labels = stats::setNames(axis_labels, values)) +
-    ggplot2::labs(title = if (is.null(title)) "Conditional effects" else title,
-      x = if (is.null(x_label)) if (key == "Group") "Moderator group" else "Moderator (raw units)" else x_label,
-      y = if (is.null(y_label)) .wsmed_plot_scale(info) else y_label,
-      subtitle = .wsmed_plot_ci_label(info, conditional = TRUE),
-      caption = "Individual intervals; differences require a contrast interval.") +
-    ggplot2::theme_minimal(base_size = base_size)
+  tab <- .wsmed_legacy_plot_frame(tab, tab$PlotLabel, tab$LevelLabel)
+  p <- .wsmed_render_effect_plot(tab, "conditional", TRUE,
+    title = title %||% "Conditional effects",
+    subtitle = .wsmed_plot_ci_label(info, conditional = TRUE),
+    caption = "Individual intervals; differences require a contrast interval.",
+    x_label = x_label %||% if (key == "Group") "Moderator group" else "Moderator (raw units)",
+    y_label = y_label %||% .wsmed_plot_scale(info), ncol = ncol, base_size = base_size,
+    x_tick_labels = stats::setNames(axis_labels, values))
   .wsmed_plot_finish(p, info)
 }
 
@@ -241,6 +239,8 @@ plot_contrasts <- function(result, paths = NULL,
     tab$Path <- ifelse(tab$op == ":=", tab$lhs, tab$label)
     tab$Estimate <- if (info$standardized) tab$est.std else tab$est
   } else tab$Path <- if (info$standardized) tab$Parameter else tab$name
+  if (info$engine == "boot") attr(tab, "wsmed_interval") <-
+    result$inference$bootstrap$controls$interval
   tab
 }
 
@@ -303,16 +303,15 @@ plot_contrasts <- function(result, paths = NULL,
 .wsmed_forest <- function(tab, axis, info, title, x_label, y_label,
                           base_size, caption = NULL, conditional = FALSE) {
   .wsmed_plot_check_intervals(tab)
-  ggplot2::ggplot(tab, ggplot2::aes(x = .data$Estimate, y = .data[[axis]])) +
-    ggplot2::geom_vline(xintercept = 0, linetype = "dashed", colour = "grey60") +
-    ggplot2::geom_segment(ggplot2::aes(x = .data$CI.LL, xend = .data$CI.UL,
-                                     yend = .data[[axis]]), colour = "#35618D", linewidth = .7) +
-    ggplot2::geom_point(size = 2.5, colour = "#234866") +
-    ggplot2::labs(title = title,
-      x = if (is.null(x_label)) .wsmed_plot_scale(info) else x_label,
-      y = if (is.null(y_label)) NULL else y_label,
-      subtitle = .wsmed_plot_ci_label(info, conditional), caption = caption) +
-    ggplot2::theme_minimal(base_size = base_size)
+  interval <- attr(tab, "wsmed_interval")
+  tab <- .wsmed_legacy_plot_frame(tab, tab[[axis]])
+  subtitle <- .wsmed_plot_ci_label(info, conditional)
+  if (!conditional && info$engine == "boot") subtitle <- paste0(subtitle, "; ",
+    if (is.null(interval)) "stored bootstrap intervals (type not recorded)" else paste0(
+      switch(interval, perc = "percentile", bc = "bias-corrected",
+        bca.simple = "bias-corrected (zero acceleration)", interval), " intervals"))
+  .wsmed_render_effect_plot(tab, "forest", TRUE, title, subtitle, caption,
+    x_label %||% .wsmed_plot_scale(info), y_label, ncol = NULL, base_size = base_size)
 }
 
 .wsmed_plot_basic_contrasts <- function(result, info, paths) {

@@ -2,11 +2,11 @@
 % Please edit documentation in R/analyze_mm_continuous.R
 \name{fix_pct_names}
 \alias{fix_pct_names}
-\title{Fix \% characters mangled by \code{make.names()}}
+\title{Repair percent signs altered by \code{make.names()}}
 \usage{
 fix_pct_names(df)
 }
 \description{
-Fix \% characters mangled by \code{make.names()}
+Repair percent signs altered by \code{make.names()}
 }
 \keyword{internal}

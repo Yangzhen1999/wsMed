@@ -2,7 +2,7 @@
 % Please edit documentation in R/ImputeData.R
 \name{ImputeData}
 \alias{ImputeData}
-\title{Impute Missing Data Using Multiple Imputation}
+\title{Impute missing data using multiple imputation}
 \usage{
 ImputeData(
   data_missing,

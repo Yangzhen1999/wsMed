@@ -2,7 +2,7 @@
 % Please edit documentation in R/GenerateModelPC.R
 \name{GenerateModelPC}
 \alias{GenerateModelPC}
-\title{Generate Parallel and Chained Mediation Model}
+\title{Generate a parallel-serial mediation model}
 \usage{
 GenerateModelPC(prepared_data, MP = character(0))
 }
@@ -60,6 +60,15 @@ to analyze moderation effects.
 This model is suitable for designs where mediators include both independent parallel paths and
 sequential chained paths, providing a comprehensive mediation analysis framework.
 }
+\section{Product moments}{
+
+When a moderated path starts at an endogenous mediator, auxiliary product
+moment equations and covariances with its upstream disturbances preserve the
+joint predictor moment structure under reference recoding. These equations
+are not additional mediation paths. Genuine exogenous moments follow the
+fitting function's \code{fixed.x} setting; endogenous product moments are estimated.
+}
+
 \examples{
 # Example prepared data
 prepared_data <- data.frame(

@@ -1,5 +1,4 @@
-#' Generate Random Variates from the Gaussian Distribution
-#' (Singular Value Decomposition)
+#' Generate Gaussian random variates using singular value decomposition
 #'
 #' @author Ivan Jacob Agaloos Pesigan
 #'

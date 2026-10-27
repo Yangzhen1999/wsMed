@@ -1,4 +1,4 @@
-#' @title Generate Combined Parallel and Chained Mediation Model
+#' @title Generate a serial-parallel mediation model
 #'
 #' @description Dynamically generates a structural equation modeling (SEM) syntax for
 #' combined parallel and chained mediation analysis based on the prepared dataset. The function computes regression
@@ -29,6 +29,13 @@
 #'
 #' This model is suitable for designs where mediators include both a sequential chain (chained mediation)
 #' and independent parallel mediators.
+#'
+#' @section Product moments:
+#' When a moderated path starts at an endogenous mediator, auxiliary product
+#' moment equations and covariances with its upstream disturbances preserve the
+#' joint predictor moment structure under reference recoding. These equations
+#' are not additional mediation paths. Genuine exogenous moments follow the
+#' fitting function's `fixed.x` setting; endogenous product moments are estimated.
 #'
 #' @param prepared_data A data frame returned by [PrepareData()], containing the processed
 #' within-subject mediator and outcome variables. The data frame must include columns for
@@ -67,7 +74,7 @@
 
 GenerateModelCP <- function(prepared_data, MP = character(0)) {
 
-  ## ---------- 变量提取 ----------
+  # Extract variables
   chain_md  <- grep("^M1diff$", colnames(prepared_data), value = TRUE)
   chain_ma  <- grep("^M1avg$",  colnames(prepared_data), value = TRUE)
   all_md    <- sort(grep("^M\\d+diff$", colnames(prepared_data), value = TRUE))
@@ -82,12 +89,12 @@ GenerateModelCP <- function(prepared_data, MP = character(0)) {
   controls<- c(between, within)
   ctrl_rhs<- if (length(controls)) paste(controls, collapse = " + ") else NULL
 
-  ## ---- W & 交互項 ----
+  # Moderator and interaction columns
   Wvars <- grep("^W\\d+$", colnames(prepared_data), value = TRUE)
   ints  <- grep("^int_", colnames(prepared_data), value = TRUE)
   Winfo <- attr(prepared_data, "W_info")
   if (!is.null(Winfo) && isTRUE(Winfo$type == "continuous"))
-    Wvars <- Wvars[1]  # 连续型只保留一个主效应变量
+    Wvars <- Wvars[1]  # Keep one main-effect column for continuous W
 
   add_int <- function(path_stub, pat_stub, coef_stub) {
     hits <- grep(pat_stub, ints, value = TRUE)
@@ -152,7 +159,7 @@ GenerateModelCP <- function(prepared_data, MP = character(0)) {
     regM_par[i] <- paste(par_md[i], "~", paste(rhs, collapse = " + "))
   }
 
-  ## ========== Step‑4  间接效应 ==========
+  # Define indirect effects
   ind_lines <- c("indirect_1 := a1 * b1")
   ind_names <- "indirect_1"
   for (i in seq_len(n_par)) {
@@ -165,9 +172,10 @@ GenerateModelCP <- function(prepared_data, MP = character(0)) {
   tot_ind <- paste("total_indirect :=", paste(ind_names, collapse = " + "))
   tot_eff <- "total_effect := cp + total_indirect"
 
-  ## ========== 汇总 ==========
-  paste(c(regY, regM_chain, regM_par, ind_lines, tot_ind, tot_eff),
+  # Assemble the model
+  sem_model <- paste(c(regY, regM_chain, regM_par, ind_lines, tot_ind, tot_eff),
         collapse = "\n")
+  .wsmed_product_covariances(sem_model)
 }
 
 

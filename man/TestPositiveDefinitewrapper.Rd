@@ -2,7 +2,7 @@
 % Please edit documentation in R/TestPositiveDefinitewrapper.R
 \name{TestPositiveDefinitewrapper}
 \alias{TestPositiveDefinitewrapper}
-\title{Test for a Positive Definite Matrix}
+\title{Test for a positive definite matrix}
 \usage{
 TestPositiveDefinitewrapper(eigen, tol = 1e-06)
 }

@@ -52,7 +52,7 @@
   invisible(df)
 }
 
-#' Build a compact Monte-Carlo parameter table (Estimate / SE / CI)
+#' Build a compact Monte Carlo parameter table (estimate / SE / CI)
 #'
 #' @param mc   List with two elements:
 #'   \describe{
@@ -108,11 +108,11 @@
   invisible()
 }
 # =============================================================================
-# Indirect-effect key （兼容 MC + Bootstrap）
+# Indirect-effect key for Monte Carlo and bootstrap results
 # =============================================================================
 .print_indirect_key <- function(x) {
 
-  ## ---- 1  取得所有间接效应名称 ----------------------------------------
+  # Collect all indirect-effect names
   ind_names <- character(0)
 
   ## 1-A  Monte-Carlo：thetahat$est
@@ -124,7 +124,7 @@
                         value = TRUE))
   }
 
-  ## 1-B  Bootstrap：param_boot（op == ":=" 且 lhs 以 indirect_ 开头）
+  # For bootstrap, select defined parameters whose lhs starts with indirect_
   if (!is.null(x$param_boot) && nrow(x$param_boot)) {
     boot_ind <- with(x$param_boot,
                      lhs[ op == ":=" & grepl("^indirect_\\d+", lhs) ])
@@ -134,7 +134,7 @@
   ind_names <- unique(ind_names)
   if (!length(ind_names)) return(invisible())
 
-  ## ---- 2  构造 Key 表 ------------------------------------------------
+  # Construct the key table
   mdiff_vars <- grep("^M\\d+diff$", names(x$data), value = TRUE)
   mnum <- sub("^M(\\d+)diff$", "\\1", mdiff_vars)
   names(mdiff_vars) <- mnum
@@ -149,7 +149,7 @@
       check.names = FALSE)
   }))
 
-  ## ---- 3  打印 -------------------------------------------------------
+  # Print results
   cat("\nIndirect-effect key:\n")
   print(knitr::kable(key_tbl, align = "l", row.names = FALSE))
   invisible()
@@ -457,7 +457,7 @@
 .print_d_key <- function(prep, mc = NULL, param_boot = NULL) {
   if (is.null(prep)) return(invisible())
 
-  ## ---- 1  收集已有的 d-系数名称 --------------------------------------
+  # Collect existing d coefficient names
   have <- character(0)
 
   # 1-A  Monte-Carlo
@@ -475,7 +475,7 @@
   have <- unique(have)
   if (!length(have)) return(invisible())
 
-  ## ---- 2  生成 key 表 ------------------------------------------------
+  # Generate the key table
   mdiff <- grep("^M\\d+diff$", names(prep), value = TRUE)
   mavg  <- grep("^M\\d+avg$",  names(prep), value = TRUE)
 
@@ -484,7 +484,7 @@
     rows[[length(rows) + 1]] <<-
     data.frame(Coefficient = coef, Path = path, Moderated = mod)
 
-  # 单阶 d1, d2 …
+  # Within-mediator coefficients d1, d2, and so on
   for (i in seq_along(mavg)) {
     coef <- paste0("d", i)
     if (coef %in% have)
@@ -493,7 +493,7 @@
           paste0(mdiff[i], " -> Ydiff"))
   }
 
-  # 多阶 d_1_2, d_1_3 …
+  # Between-mediator coefficients d_1_2, d_1_3, and so on
   for (i in seq_along(mavg))
     for (j in seq_along(mdiff))
       if (i != j) {
@@ -629,7 +629,7 @@
 
 
 
-# 9-a  帮手：根据候选列表找出真正的列名（忽略大小写）
+# Resolve actual column names without case sensitivity
 #' Pick a column name ignoring case
 #'
 #' @param df        A data.frame whose names are to be searched.
@@ -658,7 +658,7 @@
 .boot_param_table <- function(df, alpha) {
   r <- nrow(df)
 
-  ## 空区块：直接返回空表（列名随 alpha 生成）
+  # Return an empty table with alpha-specific column names for an empty block
   lo_name <- sprintf("%.1f%%CI.Lo", 100 * alpha / 2)
   up_name <- sprintf("%.1f%%CI.Up", 100 * (1 - alpha / 2))
   if (r == 0) {
@@ -673,17 +673,17 @@
     return(out)
   }
 
-  ## —— 1 侦测各列（忽略大小写） --------------------------------------
+  # Identify columns without case sensitivity
   est_col <- .pick_col(df, c("est", "estimate"))
   se_col  <- .pick_col(df, c("boot.se", "bse", "se_boot", "se"))
   lo_col  <- .pick_col(df, c("boot.ci.lower", "bci.lo", "ci.lower"))
   up_col  <- .pick_col(df, c("boot.ci.upper", "bci.up", "ci.upper"))
-  p_col   <- .pick_col(df, c("bp", "boot.p", "p_boot"))   # ←★ 新增
+  p_col   <- .pick_col(df, c("bp", "boot.p", "p_boot"))   # Locate the bootstrap p-value column
 
   safe <- function(col) if (is.na(col) || length(df[[col]]) != r)
     rep(NA_real_, r) else df[[col]]
 
-  ## —— 2 组装表格 ------------------------------------------------------
+  # Assemble the table
   out <- data.frame(
     Estimate = safe(est_col),
     SE       = safe(se_col),
@@ -693,10 +693,10 @@
   )
   names(out)[3:4] <- c(lo_name, up_name)
 
-  ## —— 3 如有 P 列且不全是 NA，就附加 -------------------------------
+  # Include the p-value column when it exists and is not entirely missing
   if (!is.na(p_col) && any(!is.na(df[[p_col]]))) {
-    out$P <- safe(p_col)            # 列名简洁地叫 “P”
-    # 把 “P” 列放在 SE 之后更顺眼
+    out$P <- safe(p_col)            # Use a concise p-value column name
+    # Place the p-value column after SE
     out <- out[, c("Estimate", "SE", "P", lo_name, up_name), drop = FALSE]
   }
 
@@ -725,7 +725,7 @@
     .print_tbl(tbl, digits)
   }
 
-  # 1 回归路径 -----------------------------------------------------------------
+  # Regression paths
   reg <- df[df$op == "~", ]
   add_path_tbl(reg, "REGRESSION PATHS",
                function(x) data.frame(
@@ -733,7 +733,7 @@
                  Label = x$label,
                  check.names = FALSE))
 
-  # 2 截距 ---------------------------------------------------------------------
+  # Intercepts
   int <- df[df$op == "~1", ]
   add_path_tbl(int, "INTERCEPTS",
                function(x) data.frame(
@@ -741,7 +741,7 @@
                  Label     = x$label,
                  check.names = FALSE))
 
-  # 3 方差 ---------------------------------------------------------------------
+  # Variances
   var <- df[df$op == "~~" & df$lhs == df$rhs, ]
   add_path_tbl(var, "VARIANCES",
                function(x) data.frame(
@@ -762,13 +762,13 @@
 .print_boot_totals <- function(df, alpha, digits = 3, title = "BOOT") {
   if (is.null(df) || !nrow(df)) return(invisible())
 
-  # 保留 Defined parameters + cp
-  dpar <- df[df$op == ":=" | df$label == "cp", ]    # ←★ 唯一改动
+  # Retain defined parameters and the direct effect cp
+  dpar <- df[df$op == ":=" | df$label == "cp", ]    # Include the direct effect with defined parameters
 
   if (!nrow(dpar)) return(invisible())
 
   tbl <- data.frame(
-    Label = ifelse(dpar$op == ":=", dpar$lhs, dpar$label),  # cp 行取 label
+    Label = ifelse(dpar$op == ":=", dpar$lhs, dpar$label),  # Use the label for the cp row
     .boot_param_table(dpar, alpha),
     check.names = FALSE
   )
@@ -888,7 +888,7 @@
   loH <- sprintf("%.1f%%CI.Lo", 100 * alpha / 2)
   upH <- sprintf("%.1f%%CI.Up", 100 * (1 - alpha / 2))
 
-  ## 数值列
+  # Numeric columns
   vals <- data.frame(
     Estimate = .boot_pick(std_boot, r, c("est.std","std","std.all")),
     SE       = .boot_pick(std_boot, r, c("boot.se","bse","se")),
@@ -899,7 +899,7 @@
   )
   names(vals)[4:5] <- c(loH, upH)
 
-  ## 关键字列
+  # Identifier columns
   key   <- character(r)
   reg_i <- std_boot$op == "~"
   int_i <- std_boot$op == "~1"
@@ -914,9 +914,9 @@
   key[def_i] <- std_boot$lhs[def_i]
 
   label <- std_boot$label
-  label[is.na(label) | label == ""] <- ""          #  空串替代 NA
+  label[is.na(label) | label == ""] <- ""          # Replace missing labels with empty strings
 
-  ## 合并大表（先加 Section 作排序后再删除
+  # Combine blocks using a temporary Section sorting column
   sec <- character(r)
   sec[reg_i] <- "1_Regressions"
   sec[cov_i] <- "2_Covariances"
@@ -928,13 +928,13 @@
     Term  = key,
     Label = label,
     vals,
-    Section = sec,                      # 排序用
+    Section = sec,                      # Sorting key
     check.names = FALSE, stringsAsFactors = FALSE
   )
   big_tbl <- big_tbl[order(big_tbl$Section), ]
-  big_tbl$Section <- NULL               #  删除 Section 列
+  big_tbl$Section <- NULL               # Remove the Section column
 
-  ## 打印
+  # Print results
   cat("\n*************** STANDARDIZED (", title, ") ***************\n", sep = "")
   .print_tbl(big_tbl, digits)
   invisible()
@@ -942,7 +942,7 @@
 
 
 
-# ---------- 小工具：让 “-” 左右对齐 -------
+# Align text around the minus sign
 #' Align text around a minus sign for pretty printing
 #'
 #' @param x   Character vector of "lhs - rhs" strings.
@@ -967,7 +967,7 @@ align_minus <- function(x, sep = "-") {
 }
 
 
-# ── 工具：修正 CI 列名
+# Repair CI column names
 #' Clean CI column names produced by `fix_pct_names()`
 #'
 #' @param nm Character vector of column names.
@@ -977,8 +977,8 @@ align_minus <- function(x, sep = "-") {
 #' @keywords internal
 #' @noRd
 clean_ci_names <- function(nm) {
-  nm <- gsub("CI\\.\\.CI", "CI", nm, perl = TRUE)  # 把 “CI..CI” → “CI”
-  nm <- gsub("\\.\\.", ".",  nm, perl = TRUE)      # 折叠任何 “..”
+  nm <- gsub("CI\\.\\.CI", "CI", nm, perl = TRUE)  # Replace repeated CI fragments with one CI label
+  nm <- gsub("\\.\\.", ".",  nm, perl = TRUE)      # Collapse repeated periods
   nm
 }
 

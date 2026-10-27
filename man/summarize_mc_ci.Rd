@@ -2,7 +2,7 @@
 % Please edit documentation in R/MC_summarize_mc_ci.R
 \name{summarize_mc_ci}
 \alias{summarize_mc_ci}
-\title{Summarize Monte Carlo Simulation Results}
+\title{Summarize Monte Carlo simulation results}
 \usage{
 summarize_mc_ci(mc_result, alpha = 0.05)
 }

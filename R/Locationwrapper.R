@@ -1,4 +1,4 @@
-#' Add Location Parameter
+#' Add a location parameter
 #'
 #' @author Ivan Jacob Agaloos Pesigan
 #'

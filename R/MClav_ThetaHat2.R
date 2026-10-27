@@ -1,4 +1,4 @@
-#' Extract Parameter Estimates
+#' Extract parameter estimates
 #'
 #' @author Ivan Jacob Agaloos Pesigan
 #'

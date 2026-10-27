@@ -1,4 +1,4 @@
-#' @title Resolve Dependencies of Defined Parameters
+#' @title Resolve dependencies of defined parameters
 #'
 #' @description Recursively resolves all free parameters involved in each defined parameter.
 #'

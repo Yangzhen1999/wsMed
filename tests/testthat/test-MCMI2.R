@@ -6,7 +6,7 @@ library(semboottools)
 library(wsMed)
 
 test_that("MCMI2 returns correct semmcci object structure", {
-  # 构建示例模型
+  # Build an example model
   model <- "
     Ydiff ~ b1 * M1diff + cp * 1
     M1diff ~ a1 * 1
@@ -14,7 +14,7 @@ test_that("MCMI2 returns correct semmcci object structure", {
     total := cp + indirect
   "
 
-  # 构建插补数据集
+  # Construct imputed datasets
   set.seed(123)
   imputations <- list(
     data.frame(M1diff = rnorm(100), Ydiff = rnorm(100)),
@@ -22,7 +22,7 @@ test_that("MCMI2 returns correct semmcci object structure", {
     data.frame(M1diff = rnorm(100), Ydiff = rnorm(100))
   )
 
-  # 调用函数
+  # Call the function
   result <- MCMI2(
     sem_model = model,
     imputations = imputations,
@@ -31,20 +31,20 @@ test_that("MCMI2 returns correct semmcci object structure", {
     seed = 456
   )
 
-  # 类型检查
+  # Check the output class
   expect_s3_class(result, "semmcci")
   expect_true(all(c("call", "args", "thetahat", "thetahatstar", "fun") %in% names(result)))
   expect_equal(result$fun, "MCMI")
 
-  # 参数结构检查
+  # Check the parameter structure
   expect_type(result$thetahat$est, "double")
   expect_true(is.matrix(result$thetahatstar))
   expect_equal(nrow(result$thetahatstar), 1000)
 
-  # 参数名称与列一致
+  # Parameter names match the draw-matrix columns
   expect_equal(colnames(result$thetahatstar), names(result$thetahat$est))
 
-  # 检查 args 信息完整性
+  # Check argument metadata
   expect_true(is.list(result$args))
   expect_equal(result$args$R, 1000)
   expect_equal(result$args$alpha, c(0.05, 0.01))

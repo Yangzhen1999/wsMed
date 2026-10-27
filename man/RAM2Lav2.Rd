@@ -2,19 +2,19 @@
 % Please edit documentation in R/MClav_RAM2Lav2.R
 \name{RAM2Lav2}
 \alias{RAM2Lav2}
-\title{Convert Standardized RAM Back to Lavaan Matrices}
+\title{Convert standardized RAM back to lavaan matrices}
 \usage{
 RAM2Lav2(ram, lav_mod, standardized = FALSE)
 }
 \arguments{
-\item{ram}{A RAM list containing standardized matrices (`A`, `S`, `F`, and `M`).}
+\item{ram}{A RAM list containing standardized matrices (\code{A}, \code{S}, \code{F}, and \code{M}).}
 
 \item{lav_mod}{A lavaan-style matrix list (e.g., GLIST) to be updated.}
 
 \item{standardized}{Retained for compatibility; RAM covariances are already rescaled.}
 }
 \value{
-A modified lavaan-style matrix list with updated `lambda`, `beta`, `theta`, `psi`, and `alpha`.
+A modified lavaan-style matrix list with updated \code{lambda}, \code{beta}, \code{theta}, \code{psi}, and \code{alpha}.
 }
 \description{
 Converts a standardized RAM object back to lavaan-style matrix structure.

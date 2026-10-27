@@ -1,8 +1,8 @@
-#' @title Prepare Data for Two-Condition Within-Subject Mediation (WsMed)
+#' @title Prepare data for two-condition mediation
 #'
 #' @description
 #' `PrepareData()` transforms raw pre/post data into the set of variables
-#' required by the **WsMed** workflow.
+#' required by the **wsMed** workflow.
 #' It handles *mediators*, *outcome*, *within-subject controls*, *between-subject
 #' controls*, *moderators*, and all necessary **interaction terms**, while
 #' automatically centering / dummy-coding variables as needed.
@@ -21,7 +21,7 @@
 #'      first level as the reference.
 #' 4. Within-subject controls \code{Cw}: difference and centered-average versions
 #'    (\code{Cw1diff}, \code{Cw1avg}, ...).
-#' 5. Moderators \code{W} (one or more):
+#' 5. Moderator \code{W} (at most one):
 #'    - Continuous variables are grand-mean centered (\code{W1}, \code{W2}, ...).
 #'    - Categorical variables are dummy-coded in the same way as \code{C}.
 #' 6. Interaction terms between each moderator column and each mediator column:
@@ -42,7 +42,7 @@
 #' @param C_type Optional vector of the same length as \code{C}.
 #'   Each element is one of \code{"continuous"}, \code{"categorical"}, or \code{"auto"}
 #'   (default). Ignored when \code{C = NULL}.
-#' @param W Optional character vector: moderator names (one or more).
+#' @param W Optional character scalar: one moderator column name.
 #' @param W_type Optional vector of the same length as \code{W}.
 #'   Same coding as \code{C_type}. Ignored when \code{W = NULL}.
 #' @param center_W Logical. Whether to center the moderator variable \code{W}.
@@ -61,7 +61,7 @@
 #'
 #' @seealso
 #' \code{\link{PrepareMissingData}}, \code{\link{GenerateModelP}},
-#' \code{\link{wsMed}}
+#' \code{\link{wsMed}}, \code{\link{wsmed_categorical}}
 #'
 #' @examples
 #' set.seed(1)
@@ -104,7 +104,7 @@ PrepareData <- function(data,
     stop("`center_W` must be TRUE or FALSE.", call. = FALSE)
 
 
-  ### 在 PrepareData() 函数顶端基本检查之后立即加入 -----------------
+  # Enforce the single-moderator restriction after basic checks
   # >>>> enforce single‑moderator rule
   if (!is.null(W) && length(W) != 1)
     stop("Exactly one moderator variable can be supplied in `W`.", call. = FALSE)
@@ -162,7 +162,9 @@ PrepareData <- function(data,
           c_dummy_map[[nm]]      <- build_dummy_map(base, levels(fac)[2])
           cb_counter <- cb_counter + 1L
         } else {
-          mm <- model.matrix(~ fac, na.action = stats::na.pass)[, -1, drop = FALSE]
+          mm <- stats::model.matrix(~ fac,
+            data = stats::model.frame(~ fac, na.action = stats::na.pass),
+            contrasts.arg = list(fac = stats::contr.treatment(levels(fac))))[, -1, drop = FALSE]
           for (j in seq_len(ncol(mm))) {
             nm <- paste0("Cb", cb_counter, "_", j)
             between_centered[[nm]] <- mm[, j]
@@ -216,7 +218,9 @@ PrepareData <- function(data,
           w_dummy_map[[nm]] <- build_dummy_map(base, levels(fac)[2])
           w_counter <- w_counter + 1L
         } else {
-          mm <- model.matrix(~ fac, na.action = stats::na.pass)[, -1, drop = FALSE]
+          mm <- stats::model.matrix(~ fac,
+            data = stats::model.frame(~ fac, na.action = stats::na.pass),
+            contrasts.arg = list(fac = stats::contr.treatment(levels(fac))))[, -1, drop = FALSE]
           for (j in seq_len(ncol(mm))) {
             nm <- paste0("W", w_counter)
             W_centered[[nm]] <- mm[, j]

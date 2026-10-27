@@ -2,7 +2,7 @@
 % Please edit documentation in R/MC_resolve_all_dependencies.R
 \name{resolve_all_dependencies}
 \alias{resolve_all_dependencies}
-\title{Resolve Dependencies of Defined Parameters}
+\title{Resolve dependencies of defined parameters}
 \usage{
 resolve_all_dependencies(def_map)
 }

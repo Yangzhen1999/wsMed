@@ -2,7 +2,7 @@
 % Please edit documentation in R/MC_run_mc_mediation.R
 \name{run_mc_mediation}
 \alias{run_mc_mediation}
-\title{Run Monte Carlo-Based Mediation Inference}
+\title{Run Monte Carlo-based mediation inference}
 \usage{
 run_mc_mediation(
   fit,

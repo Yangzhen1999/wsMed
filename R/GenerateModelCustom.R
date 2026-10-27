@@ -1,4 +1,4 @@
-#' Generate a User-Defined Within-Subject Mediation Model
+#' Generate a user-defined mediation model
 #'
 #' @description
 #' Generates lavaan model syntax for a user-defined within-subject
@@ -6,6 +6,13 @@
 #' from mediators to the outcome. The function automatically adds the
 #' corresponding difference and level components and identifies all
 #' indirect effects.
+#'
+#' @section Product moments:
+#' When a moderated path starts at an endogenous mediator, auxiliary product
+#' moment equations and covariances with its upstream disturbances preserve the
+#' joint predictor moment structure under reference recoding. These equations
+#' are not additional mediation paths. Genuine exogenous moments follow the
+#' fitting function's `fixed.x` setting; endogenous product moments are estimated.
 #'
 #' @param prepared_data A data frame returned by [PrepareData()].
 #'   It must contain `M1diff`, `M1avg`, ..., and `Ydiff`.
@@ -746,5 +753,5 @@ GenerateModelCustom <- function(prepared_data,
     collapse = "\n"
   )
 
-  sem_model
+  .wsmed_product_covariances(sem_model)
 }

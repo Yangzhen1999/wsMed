@@ -1,4 +1,4 @@
-#' Average Relative Increase in Variance
+#' Average relative increase in variance
 #'
 #' @author Ivan Jacob Agaloos Pesigan
 #'

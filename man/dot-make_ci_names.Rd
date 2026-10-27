@@ -2,11 +2,11 @@
 % Please edit documentation in R/analyze_mm_continuous.R
 \name{.make_ci_names}
 \alias{.make_ci_names}
-\title{Make CI column names like "2.5\%CI.Lo / 97.5\%CI.Up"}
+\title{Make CI column names}
 \usage{
 .make_ci_names(ci)
 }
 \description{
-Make CI column names like "2.5\%CI.Lo / 97.5\%CI.Up"
+Make CI column names
 }
 \keyword{internal}

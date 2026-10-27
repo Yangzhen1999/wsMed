@@ -2,14 +2,20 @@
 % Please edit documentation in R/MClav_StdLav2.R
 \name{StdLav2}
 \alias{StdLav2}
-\title{Standardize Parameter Estimates in a Lavaan Model}
+\title{Standardize parameter estimates in a lavaan model}
 \usage{
-StdLav2(est, object)
+StdLav2(
+  est,
+  object,
+  marginal_variances = object@external$wsmed_mi_marginal$point
+)
 }
 \arguments{
 \item{est}{A numeric vector of parameter estimates (free parameters).}
 
 \item{object}{A fitted lavaan model object (used to extract model structure).}
+
+\item{marginal_variances}{Optional jointly pooled MI marginal variances.}
 }
 \value{
 A numeric vector of fully standardized parameter estimates (including intercepts and defined parameters).
@@ -19,8 +25,8 @@ Applies full standardization (including intercepts) to a fitted lavaan model
 by converting to RAM form, performing standardization, and converting back to lavaan matrix structure.
 }
 \details{
-The function extracts the model's RAM representation via `Lav2RAM2`, applies `StdRAM2` standardization,
-restores the standardized GLIST via `RAM2Lav2`, and retrieves standardized user-defined parameter estimates
-with `lav_model_get_parameters()`.
+The function extracts the model's RAM representation via \code{Lav2RAM2}, applies \code{StdRAM2} standardization,
+restores the standardized GLIST via \code{RAM2Lav2}, and retrieves standardized user-defined parameter estimates
+with \code{lav_model_get_parameters()}.
 }
 \keyword{internal}

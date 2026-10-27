@@ -2,8 +2,7 @@
 % Please edit documentation in R/RandomGaussianSVDwrapper.R
 \name{RandomGaussianSVDwrapper}
 \alias{RandomGaussianSVDwrapper}
-\title{Generate Random Variates from the Gaussian Distribution
-(Singular Value Decomposition)}
+\title{Generate Gaussian random variates using singular value decomposition}
 \usage{
 RandomGaussianSVDwrapper(Z, svd)
 }
@@ -20,8 +19,7 @@ Result of \code{\link[=svd]{svd()}}.}
 Numeric matrix.
 }
 \description{
-Generate Random Variates from the Gaussian Distribution
-(Singular Value Decomposition)
+Generate Gaussian random variates using singular value decomposition
 }
 \author{
 Ivan Jacob Agaloos Pesigan

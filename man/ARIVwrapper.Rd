@@ -2,7 +2,7 @@
 % Please edit documentation in R/ARIVwrapper.R
 \name{ARIVwrapper}
 \alias{ARIVwrapper}
-\title{Average Relative Increase in Variance}
+\title{Average relative increase in variance}
 \usage{
 ARIVwrapper(between, within, M, k)
 }
@@ -25,7 +25,7 @@ Number of parameters.}
 Returns a numeric vector of length one.
 }
 \description{
-Average Relative Increase in Variance
+Average relative increase in variance
 }
 \details{
 The average relative increase in variance

@@ -1,313 +1,141 @@
 ---
-title: "GenerateModelCP"
+title: "Model equations: serial-parallel mediation"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{GenerateModelCP}
+  %\VignetteIndexEntry{Model equations: serial-parallel mediation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-## Introduction
+**Purpose:** definitions and equations for `CP` (serial-parallel mediation).
+For a first analysis, start with [Choose an analysis](AnalysisGuide.html#choose-your-model)
+or [Get started](GetStarted.html). `GenerateModelCP()` creates the model syntax
+used for this structure.
 
-The `GenerateModelCP` function dynamically generates a Structural Equation Model (SEM) formula to analyze models with a single chained mediator and multiple parallel mediators for 'lavaan' based on the prepared dataset. This document explains the mathematical principles and the structure of the generated model.
- <p align="center">
-    <img src="Wc.png" alt="serial-parallel within-subject mediation model" width="60%">
-  </p>
----
+M1 predicts each remaining mediator. There are no directed connections among M2, M3, and the other downstream mediators.
 
-## 1. Model Description
+<p align="center">
+<img src="Wc.png" alt="serial-parallel within-subject mediation model" width="100%">
+</p>
 
-### 1.1 Regression for \( Y_{\text{diff}} \) and \( M_{\text{diff}} \)
+## Difference scores and centered averages
 
-For a single chained mediator \( M_1 \) and \( N \) parallel mediators \( M_2, M_3, \dots, M_{N+1} \), the model is defined as:
+For mediator $i$, $M_{i1}$ and $M_{i2}$ are its measurements in conditions 1
+and 2. Define
 
-1. **Outcome Difference Model (\( Y_{\text{diff}} \)):**
-   \[
-   Y_{\text{diff}} = cp + b_1 M_{1\text{diff}} + \sum_{i=2}^{N+1} \left( b_i M_{i\text{diff}} + d_i M_{i\text{avg}} \right) + d_1 M_{1\text{avg}} + e
-   \]
+$$
+M_{\mathrm{diff},i}=M_{i2}-M_{i1},\qquad
+\widetilde M_{\mathrm{avg},i}=\frac{M_{i1}+M_{i2}}{2},\qquad
+M_{\mathrm{avg},i}=\widetilde M_{\mathrm{avg},i}-\overline{\widetilde M}_{\mathrm{avg},i}.
+$$
 
-2. **Mediator Difference Model (\( M_{i\text{diff}} \)):**
-    For the chained mediator (\( M_1 \)):
-     \[
-     M_{1\text{diff}} = a_1 + \epsilon_1
-     \]
-    For parallel mediators (\( M_2, \dots, M_{N+1} \)):
-     \[
-     M_{i\text{diff}} = a_i + b_{1i} M_{1\text{diff}} + d_{1i} M_{1\text{avg}} + \epsilon_i
-     \]
+The bar denotes the sample mean used for centering. The outcome difference
+is $Y_{\mathrm{diff}}=Y_2-Y_1$. `PrepareData()` constructs these variables:
+`diff` is not centered, whereas `avg` is centered.
 
-Where:
-- \( cp \): Direct effect of the independent variable.
-- \( b_1, b_i \): Effects of the chained and parallel mediators.
-- \( d_1, d_i, d_{1i} \): Moderating effects of mediator averages.
-- \( \epsilon_i \): Residuals.
+## Regression equations
 
----
+The equations below show the regression part of the model without covariates
+or an external moderator. All $N$ mediators predict the outcome difference:
 
-## 2. Indirect Effects
+$$
+Y_{\mathrm{diff}}=c'+\sum_{i=1}^{N}\left(b_iM_{\mathrm{diff},i}+d_iM_{\mathrm{avg},i}\right)+e.
+$$
 
-For each mediator, the indirect effects are calculated as:
+The mediator equations determine the structure:
 
-1. **Single-Mediator Effects:**
-    For the chained mediator:
-     \[
-     \text{indirect}_1 = a_1 \cdot b_1
-     \]
-    For the parallel mediators (\( M_2, \dots, M_{N+1} \)):
-     \[
-     \text{indirect}_i = a_i \cdot b_i
-     \]
+$$
+\begin{aligned}M_{\mathrm{diff},1}&=a_1+\epsilon_1,\\M_{\mathrm{diff},i}&=a_i+b_{1i}M_{\mathrm{diff},1}+d_{1i}M_{\mathrm{avg},1}+\epsilon_i,\quad i=2,\ldots,N.\end{aligned}
+$$
 
-2. **Chained Path Effects:**
-   For paths from the chained mediator through the parallel mediators:
-   \[
-   \text{indirect}_{1i} = a_1 \cdot b_{1i} \cdot b_i
-   \]
+The intercepts $a_i$ and $c'$ represent direct condition effects in their
+respective equations; the model syntax labels $c'$ as `cp`. Each $b_i$ is
+the coefficient of a mediator difference, and $d_i$ is the coefficient of
+its centered average. For a mediator-to-mediator connection, $b_{ji}$ and
+$d_{ji}$ are the corresponding coefficients from mediator $j$ to mediator $i$
+(syntax labels `b_j_i` and `d_j_i`).
 
-3. **Total Indirect Effect:**
-   The total indirect effect is the sum of all individual indirect effects:
-   \[
-   \text{total_indirect} = \text{indirect}_1 + \sum_{i=2}^{N+1} \left( \text{indirect}_i + \text{indirect}_{1i} \right)
-   \]
+The $d$ coefficients capture differences between condition-specific slopes.
+The average component is not itself an external moderator. Moderation by a
+separate variable $W$ requires specifying `W` and `MP`.
 
----
+## Indirect pathways
 
-## 3. Total Effect
+Every mediator has a single-mediator indirect pathway $IE_i=a_i b_i$.
+A longer directed pathway is the product of its starting $a$ coefficient,
+its mediator-to-mediator $b$ coefficients and its final outcome $b$ coefficient.
+The centered-average $d$ coefficients remain in the fitted regressions but
+do not enter these indirect-effect products.
 
-The total effect combines the direct effect and the total indirect effect:
-\[
-\text{total_effect} = cp + \text{total_indirect}
-\]
+For three mediators, the complete set is:
 
-Where \( cp \) is the direct effect.
+| Mediator route to Y | Indirect effect | Result identifier |
+|---|---|---|
+| M1 → Y | $a_1 b_1$ | `indirect_1` |
+| M2 → Y | $a_2 b_2$ | `indirect_2` |
+| M3 → Y | $a_3 b_3$ | `indirect_3` |
+| M1 → M2 → Y | $a_1 b_{12} b_2$ | `indirect_1_2` |
+| M1 → M3 → Y | $a_1 b_{13} b_3$ | `indirect_1_3` |
 
----
+## Total effects and contrasts
 
-## 4. Comparison of Indirect Effects
+Sum every complete indirect pathway to obtain the total indirect effect:
 
-When comparing the strengths of indirect effects, the contrast between two effects is calculated as:
-\[
-CI_{\text{path}_1\text{vs}\text{path}_2} = \text{indirect}_{\text{path}_1} - \text{indirect}_{\text{path}_2}
-\]
+$$
+IE_{\mathrm{total}}=\sum_{p\in\mathcal P}IE_p,\qquad
+TE=c'+IE_{\mathrm{total}}.
+$$
 
-### 4.1 Example: Three Mediators (\( M_1, M_2, M_3 \))
+Here $\mathcal P$ is the set of directed condition-to-outcome pathways through
+one or more mediators. To compare two such pathways, define a signed contrast:
 
-1. **Indirect Effects:**
+$$
+\Delta_{p,q}=IE_p-IE_q.
+$$
 
-   \[
-   \text{indirect}_1 = a_1 \cdot b_1
-   \]
+A positive contrast means that the first indirect effect is numerically larger;
+it does not necessarily have a larger absolute magnitude. For example,
+$-0.1-(-0.3)=0.2$, although $|-0.1|<|-0.3|$. A contrast estimate alone does
+not establish a difference. Compute its CI from the difference of the effects
+within each matched joint draw, using `wsmed_contrasts()`; do not subtract the
+endpoints of two separate CIs. See [Read and export results](ResultsGuide.html).
 
-   \[
-   \text{indirect}_2 = a_2 \cdot b_2
-   \]
+## Condition-specific slopes
 
-   \[
-   \text{indirect}_3 = a_3 \cdot b_3
-   \]
+On the unstandardized scale, the outcome slopes in conditions 1 and 2 are
 
-   \[
-   \text{indirect}_{12} = a_1 \cdot b_{12} \cdot b_2
-   \]
+$$
+g_{i1}=b_i-d_i/2,\qquad g_{i2}=b_i+d_i/2.
+$$
 
-   \[
-   \text{indirect}_{13} = a_1 \cdot b_{13} \cdot b_3
-   \]
-
-2. **Comparisons:**
-
-   \[
-   CI_{1\text{vs}2} = \text{indirect}_1 - \text{indirect}_2
-   \]
-
-   \[
-   CI_{1\text{vs}3} = \text{indirect}_1 - \text{indirect}_3
-   \]
-
-   \[
-   CI_{1\text{vs}12} = \text{indirect}_1 - \text{indirect}_{12}
-   \]
-
-   \[
-   CI_{1\text{vs}13} = \text{indirect}_1 - \text{indirect}_{13}
-   \]
-
-   \[
-   CI_{2\text{vs}3} = \text{indirect}_2 - \text{indirect}_3
-   \]
-
-   \[
-   CI_{2\text{vs}12} = \text{indirect}_2 - \text{indirect}_{12}
-   \]
-
-   \[
-   CI_{2\text{vs}13} = \text{indirect}_2 - \text{indirect}_{13}
-   \]
-
-   \[
-   CI_{3\text{vs}12} = \text{indirect}_3 - \text{indirect}_{12}
-   \]
-
-   \[
-   CI_{3\text{vs}13} = \text{indirect}_3 - \text{indirect}_{13}
-   \]
-
-   \[
-   CI_{12\text{vs}13} = \text{indirect}_{12} - \text{indirect}_{13}
-   \]
-
----
-
-## 5. C1 and C2 Coefficients
-
-### Definitions
-
-1. **C2-Measurement Coefficient (\( X1_{b,i} \)):**
-   \[
-   X1_{b,i} = b_i + d_i/2
-   \]
-
-2. **C1-Measurement Coefficient (\( X0_{b,i} \)):**
-   \[
-   X0_{b,i} = X1_{b,i} - d_i
-   \]
-
-### 5.1 Example: Three Mediators (\( M_1, M_2, M_3 \))
-
-1. **Mediator \( M_1 \):**
-
-   \[
-   X1_{b,1} = b_1 + d_1/2
-   \]
-
-   \[
-   X0_{b,1} = X1_{b,1} - d_1
-   \]
-
-2. **Mediator \( M_2 \):**
-
-   \[
-   X1_{b,2} = b_2 + d_2/2
-   \]
-
-   \[
-   X0_{b,2} = X1_{b,2} - d_2
-   \]
-
-3. **Mediator \( M_3 \):**
-
-   \[
-   X1_{b,3} = b_3 + d_3/2
-   \]
-
-   \[
-   X0_{b,3} = X1_{b,3} - d_3
-   \]
-
-4. **Chained Path (\( M_1 \to M_2 \)):**
-
-   \[
-   X1_{b,12} = b_{12} + d_{12}/2
-   \]
-
-   \[
-   X0_{b,12} = X1_{b,12} - d_{12}
-   \]
-
-5. **Chained Path (\( M_1 \to M_3 \)):**
-
-   \[
-   X1_{b,13} = b_{13} + d_{13}/2
-   \]
-
-   \[
-   X0_{b,13} = X1_{b,13} - d_{13}
-   \]
-
-
----
-
-
-## 6. Summary of Regression Equations
-
-This section summarizes all equations used in the model:
-
-
-   \[
-   Y_{\text{diff}} = cp + b_1 M_{1\text{diff}} + \sum_{i=2}^{N+1} \left( b_i M_{i\text{diff}} + d_i M_{i\text{avg}} \right) + d_1 M_{1\text{avg}} + e
-   \]
-
-   \[
-   M_{1\text{diff}} = a_1 + \epsilon_1
-   \]
-
-   \[
-   M_{i\text{diff}} = a_i + b_{1i} M_{1\text{diff}} + d_{1i} M_{1\text{avg}} + \epsilon_i
-   \]
-
-   \[
-   \text{indirect}_1 = a_1 \cdot b_1
-   \]
-
-   \[
-   \text{indirect}_i = a_i \cdot b_i
-   \]
-
-   \[
-   \text{indirect}_{1i} = a_1 \cdot b_{1i} \cdot b_i
-   \]
-
-   \[
-   CI_{\text{path}_1\text{vs}\text{path}_2} = \text{indirect}_{\text{path}_1} - \text{indirect}_{\text{path}_2}
-   \]
-   \[
-   X1_{b,i} = b_i + d_i/2
-   \]
-
-   \[
-   X0_{b,i} = X1_{b,i} - d_i
-   \]
-
-
----
-
-This comprehensive approach supports models with both chained and parallel mediators, enabling detailed analysis of their effects and interactions.
-
+The same relation applies to each included mediator-to-mediator connection,
+using $b_{ji}$ and $d_{ji}$. These are path coefficients, not additional
+indirect effects.
 
 ## Standardization and moderation
 
-`GenerateModel*()` constructs the unstandardized model syntax. Request
-standardized estimates when fitting with `wsMed(..., standardized = TRUE)`.
-`PrepareData()` uses condition-2 minus condition-1 differences and centered
-mediator averages. Differences are scaled without recentering; centering
-the average component changes the intercept, not the slopes above.
+`GenerateModel*()` constructs unstandardized model syntax. With a fitted
+`wsMed` result, use `summary(result, standardized = TRUE)` to request
+standardized effects and paths, or set `standardized = TRUE` in `wsMed()`
+to make that scale the reporting default.
 
-Let $s_{D M_i}$, $s_{A M_i}$ and $s_{D Y}$ denote the marginal model-implied
-SDs of mediator differences, centered mediator averages and the outcome
-difference. Then
+Let $s_{D M_i}$, $s_{A M_i}$ and $s_{D Y}$ be the marginal model-implied SDs
+of the mediator differences, centered averages and outcome difference. Then
 
 $$
-a_i^*=a_i/s_{D M_i},\quad
-b_i^*=b_i s_{D M_i}/s_{D Y},\quad
-d_i^*=d_i s_{A M_i}/s_{D Y},\quad
-c'^*=c'/s_{D Y}.
+a_i^*=a_i/s_{D M_i},\quad b_i^*=b_i s_{D M_i}/s_{D Y},\quad
+d_i^*=d_i s_{A M_i}/s_{D Y},\quad c'^*=c'/s_{D Y}.
 $$
 
-A mediator-to-mediator coefficient uses its own source and destination
-SDs. Intermediate SDs cancel in a serial indirect-effect product, so every
-complete indirect effect satisfies $IE^*(w)=IE(w)/s_{D Y}$. The same common
-marginal outcome SD applies across moderator values and categorical groups.
-Sum all model-implied indirect paths when computing the total indirect effect.
+Mediator-to-mediator slopes use the corresponding source and destination SDs.
+Intermediate scales cancel in each complete indirect-effect product, giving
+$IE_p^*=IE_p/s_{D Y}$. With moderation, evaluate the conditional paths first:
+$IE_p^*(w)=IE_p(w)/s_{D Y}$. All moderator values or groups share the same
+marginal endpoint scale. Continuous moderator probes retain their raw units.
 
-With moderators, use `result$moderation_std` for standardized conditional
-effects and retain `result$moderation` for raw effects. `MP` selects requested
-interactions and focal paths; already-fitted moderator main effects also enter
-conditional intercepts even when the corresponding `a` or `cp` is absent from
-`MP`. See [Standardized moderated mediation](StandardizedModeratedMediation.html)
-for continuous and categorical examples, joint-draw intervals and plots.
-
-The condition-specific slopes above are reconstructed on the raw scale:
-$X1_b=b+d/2$ and $X0_b=b-d/2$. Do not apply this reconstruction directly to
-standardized $b^*$ and $d^*$, whose predictor scale factors differ. A difference
-between two indirect effects is a contrast estimate; its confidence interval
-must be computed from the joint sampling distribution.
+Standardized CIs transform coefficients and scales jointly in each draw.
+Do not divide raw CI endpoints by a single fitted SD, or reconstruct
+condition-specific slopes as $b_i^*\pm d_i^*/2$: the two standardized
+coefficients use different predictor scales. See
+[Standardized effects](StandardizedModeratedMediation.html) for conditional
+effects, interaction coefficients and inference.

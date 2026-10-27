@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Working with categorical predictors</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Working with categorical predictors</h1>
+
+
+
+<div id="supported-variable-roles" class="section level2">
+<h2>Supported variable roles</h2>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Role</th>
+<th align="left">Supported representation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Outcome and mediators</td>
+<td align="left">Numeric measures analyzed as continuous responses</td>
+</tr>
+<tr class="even">
+<td align="left">Within-subject covariates</td>
+<td align="left">Paired numeric measures</td>
+</tr>
+<tr class="odd">
+<td align="left">Between-subject covariates</td>
+<td align="left">Numeric measures or unordered factors</td>
+</tr>
+<tr class="even">
+<td align="left">Moderator</td>
+<td align="left">One numeric measure or one unordered factor with two or
+more levels</td>
+</tr>
+</tbody>
+</table>
+<p>Categorical support concerns predictors. It does not add binary or
+ordinal outcome models, thresholds, or categorical links. A numerically
+coded binary outcome would still be analyzed as continuous. In the
+staged interface, character predictors and ordered factors must be
+converted explicitly; use an unordered factor only when categories
+should be treated as nominal.</p>
+</div>
+<div id="choose-the-reference-category" class="section level2">
+<h2>Choose the reference category</h2>
+<p>The simulated <code>example_data</code> has 100 complete rows and 14
+columns. Its <code>Group</code> variable is already a factor, originally
+ordered as <code>high</code>, <code>med</code>, <code>low</code>. These
+are nominal labels in artificial data, not observed subgroups of the
+manuscript dataset. Here we select <code>low</code> as the
+reference.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">data</span>(example_data)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>dat <span class="ot">&lt;-</span> example_data</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>dat<span class="sc">$</span>Group <span class="ot">&lt;-</span> <span class="fu">factor</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>  dat<span class="sc">$</span>Group,</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>  <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;low&quot;</span>, <span class="st">&quot;med&quot;</span>, <span class="st">&quot;high&quot;</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>)</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="fu">table</span>(dat<span class="sc">$</span>Group)</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co">#&gt;  low  med high </span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#&gt;   34   34   32</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="fu">levels</span>(dat<span class="sc">$</span>Group)</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co">#&gt; [1] &quot;low&quot;  &quot;med&quot;  &quot;high&quot;</span></span></code></pre></div>
+<p>Three categories require two indicators: <code>W1 = 1</code> for
+<code>med</code> and <code>W2 = 1</code> for <code>high</code>; both are
+zero for <code>low</code>. Indicators are not centered. Coding uses
+treatment contrasts regardless of the global R contrast option. For a
+binary factor the first level is likewise the reference and one
+indicator is created.</p>
+<p>Use this explicit factor declaration for categorical covariates and
+moderators in both interfaces. For binary groups,
+<code>factor(x, levels = c(0, 1))</code> selects 0 as the reference;
+<code>factor(x, levels = c(1, 0))</code> selects 1. Set the levels
+before fitting so the intended categories and reference group are
+recorded in the model.</p>
+<p>Existing default recognition rules are retained for compatibility.
+The staged interface treats numeric 0/1 predictors as continuous, while
+the one-call <code>wsMed()</code> interface retains automatic 0/1
+detection. Explicit factors avoid relying on those defaults. The
+one-call <code>C_type</code> and <code>W_type</code> arguments remain
+available for an explicit override. Both interfaces explain their
+numeric 0/1 moderator decision in a message, retained in
+<code>fit$diagnostics$input_notes</code>. These messages do not alter
+coding.</p>
+</div>
+<div id="fit-categorical-moderated-mediation" class="section level2">
+<h2>Fit categorical moderated mediation</h2>
+<p>This parallel model has two mediators. Group main effects enter every
+difference equation. <code>MP = &quot;b1&quot;</code> additionally allows the
+A-to-Y difference slope to vary by group. The B-to-Y slope is constant,
+although the indirect effect through B can still vary because its
+condition effect varies by group.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">wsMed</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="at">data =</span> dat,</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="at">M_C1 =</span> <span class="fu">c</span>(<span class="st">&quot;A1&quot;</span>, <span class="st">&quot;B1&quot;</span>),</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="at">M_C2 =</span> <span class="fu">c</span>(<span class="st">&quot;A2&quot;</span>, <span class="st">&quot;B2&quot;</span>),</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  <span class="at">Y_C1 =</span> <span class="st">&quot;D1&quot;</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  <span class="at">Y_C2 =</span> <span class="st">&quot;D2&quot;</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>  <span class="at">W =</span> <span class="st">&quot;Group&quot;</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  <span class="at">MP =</span> <span class="st">&quot;b1&quot;</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>)</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="fu">print</span>(result)</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt; wsMed analysis</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; Model: P | DE | Observations: 100 </span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt; Effects:</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; wsMed all | raw scale | mc </span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; Moderator: Group ; reference category = low </span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt;                                                         Estimate Std. Error</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt; cp@1: Direct effect [Group = low]                      -0.089555   0.030978</span></span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="co">#&gt; indirect_1@1: M1 [Group = low]                          0.013966   0.015561</span></span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt; indirect_2@1: M2 [Group = low]                         -0.001067   0.003754</span></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&gt; total_indirect@1: Total indirect effect [Group = low]   0.012899   0.016006</span></span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="co">#&gt; total@1: Total effect [Group = low]                    -0.076657   0.028670</span></span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="co">#&gt; cp@2: Direct effect [Group = med]                       0.026977   0.027498</span></span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a><span class="co">#&gt; indirect_1@2: M1 [Group = med]                         -0.000403   0.005403</span></span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a><span class="co">#&gt; indirect_2@2: M2 [Group = med]                         -0.000513   0.003547</span></span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a><span class="co">#&gt; total_indirect@2: Total indirect effect [Group = med]  -0.000916   0.006460</span></span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a><span class="co">#&gt; total@2: Total effect [Group = med]                     0.026060   0.028206</span></span>
+<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a><span class="co">#&gt; cp@3: Direct effect [Group = high]                     -0.043523   0.028476</span></span>
+<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a><span class="co">#&gt; indirect_1@3: M1 [Group = high]                        -0.000227   0.005610</span></span>
+<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a><span class="co">#&gt; indirect_2@3: M2 [Group = high]                        -0.001254   0.003959</span></span>
+<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a><span class="co">#&gt; total_indirect@3: Total indirect effect [Group = high] -0.001481   0.006860</span></span>
+<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a><span class="co">#&gt; total@3: Total effect [Group = high]                   -0.045004   0.029175</span></span>
+<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a><span class="co">#&gt;                                                         CI lower  CI upper</span></span>
+<span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a><span class="co">#&gt; cp@1: Direct effect [Group = low]                      -0.149674 -0.026957</span></span>
+<span id="cb2-36"><a href="#cb2-36" tabindex="-1"></a><span class="co">#&gt; indirect_1@1: M1 [Group = low]                         -0.013672  0.048313</span></span>
+<span id="cb2-37"><a href="#cb2-37" tabindex="-1"></a><span class="co">#&gt; indirect_2@1: M2 [Group = low]                         -0.010095  0.005841</span></span>
+<span id="cb2-38"><a href="#cb2-38" tabindex="-1"></a><span class="co">#&gt; total_indirect@1: Total indirect effect [Group = low]  -0.015959  0.048148</span></span>
+<span id="cb2-39"><a href="#cb2-39" tabindex="-1"></a><span class="co">#&gt; total@1: Total effect [Group = low]                    -0.132546 -0.018987</span></span>
+<span id="cb2-40"><a href="#cb2-40" tabindex="-1"></a><span class="co">#&gt; cp@2: Direct effect [Group = med]                      -0.027358  0.080842</span></span>
+<span id="cb2-41"><a href="#cb2-41" tabindex="-1"></a><span class="co">#&gt; indirect_1@2: M1 [Group = med]                         -0.012561  0.010989</span></span>
+<span id="cb2-42"><a href="#cb2-42" tabindex="-1"></a><span class="co">#&gt; indirect_2@2: M2 [Group = med]                         -0.008625  0.006668</span></span>
+<span id="cb2-43"><a href="#cb2-43" tabindex="-1"></a><span class="co">#&gt; total_indirect@2: Total indirect effect [Group = med]  -0.015266  0.012062</span></span>
+<span id="cb2-44"><a href="#cb2-44" tabindex="-1"></a><span class="co">#&gt; total@2: Total effect [Group = med]                    -0.029233  0.081462</span></span>
+<span id="cb2-45"><a href="#cb2-45" tabindex="-1"></a><span class="co">#&gt; cp@3: Direct effect [Group = high]                     -0.098881  0.012147</span></span>
+<span id="cb2-46"><a href="#cb2-46" tabindex="-1"></a><span class="co">#&gt; indirect_1@3: M1 [Group = high]                        -0.012696  0.011786</span></span>
+<span id="cb2-47"><a href="#cb2-47" tabindex="-1"></a><span class="co">#&gt; indirect_2@3: M2 [Group = high]                        -0.011018  0.005775</span></span>
+<span id="cb2-48"><a href="#cb2-48" tabindex="-1"></a><span class="co">#&gt; total_indirect@3: Total indirect effect [Group = high] -0.016720  0.012240</span></span>
+<span id="cb2-49"><a href="#cb2-49" tabindex="-1"></a><span class="co">#&gt; total@3: Total effect [Group = high]                   -0.101466  0.012298</span></span>
+<span id="cb2-50"><a href="#cb2-50" tabindex="-1"></a><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span id="cb2-51"><a href="#cb2-51" tabindex="-1"></a><span class="co">#&gt; Fitted group n: low = 34; med = 34; high = 32.</span></span>
+<span id="cb2-52"><a href="#cb2-52" tabindex="-1"></a><span class="co">#&gt; Fitted group counts after missing-data handling; observed counts exclude</span></span>
+<span id="cb2-53"><a href="#cb2-53" tabindex="-1"></a><span class="co">#&gt; missing moderator values. </span></span>
+<span id="cb2-54"><a href="#cb2-54" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span id="cb2-55"><a href="#cb2-55" tabindex="-1"></a><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0</span></span>
+<span id="cb2-56"><a href="#cb2-56" tabindex="-1"></a><span class="fu">summary</span>(result)</span>
+<span id="cb2-57"><a href="#cb2-57" tabindex="-1"></a><span class="co">#&gt; wsMed statistical summary</span></span>
+<span id="cb2-58"><a href="#cb2-58" tabindex="-1"></a><span class="co">#&gt; Model: P | Missing: DE | Observations: 100 </span></span>
+<span id="cb2-59"><a href="#cb2-59" tabindex="-1"></a><span class="co">#&gt; Effects:</span></span>
+<span id="cb2-60"><a href="#cb2-60" tabindex="-1"></a><span class="co">#&gt; wsMed all | raw scale | mc </span></span>
+<span id="cb2-61"><a href="#cb2-61" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span id="cb2-62"><a href="#cb2-62" tabindex="-1"></a><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span id="cb2-63"><a href="#cb2-63" tabindex="-1"></a><span class="co">#&gt; Moderator: Group ; reference category = low </span></span>
+<span id="cb2-64"><a href="#cb2-64" tabindex="-1"></a><span class="co">#&gt;                                                         Estimate Std. Error</span></span>
+<span id="cb2-65"><a href="#cb2-65" tabindex="-1"></a><span class="co">#&gt; cp@1: Direct effect [Group = low]                      -0.089555   0.030978</span></span>
+<span id="cb2-66"><a href="#cb2-66" tabindex="-1"></a><span class="co">#&gt; indirect_1@1: M1 [Group = low]                          0.013966   0.015561</span></span>
+<span id="cb2-67"><a href="#cb2-67" tabindex="-1"></a><span class="co">#&gt; indirect_2@1: M2 [Group = low]                         -0.001067   0.003754</span></span>
+<span id="cb2-68"><a href="#cb2-68" tabindex="-1"></a><span class="co">#&gt; total_indirect@1: Total indirect effect [Group = low]   0.012899   0.016006</span></span>
+<span id="cb2-69"><a href="#cb2-69" tabindex="-1"></a><span class="co">#&gt; total@1: Total effect [Group = low]                    -0.076657   0.028670</span></span>
+<span id="cb2-70"><a href="#cb2-70" tabindex="-1"></a><span class="co">#&gt; cp@2: Direct effect [Group = med]                       0.026977   0.027498</span></span>
+<span id="cb2-71"><a href="#cb2-71" tabindex="-1"></a><span class="co">#&gt; indirect_1@2: M1 [Group = med]                         -0.000403   0.005403</span></span>
+<span id="cb2-72"><a href="#cb2-72" tabindex="-1"></a><span class="co">#&gt; indirect_2@2: M2 [Group = med]                         -0.000513   0.003547</span></span>
+<span id="cb2-73"><a href="#cb2-73" tabindex="-1"></a><span class="co">#&gt; total_indirect@2: Total indirect effect [Group = med]  -0.000916   0.006460</span></span>
+<span id="cb2-74"><a href="#cb2-74" tabindex="-1"></a><span class="co">#&gt; total@2: Total effect [Group = med]                     0.026060   0.028206</span></span>
+<span id="cb2-75"><a href="#cb2-75" tabindex="-1"></a><span class="co">#&gt; cp@3: Direct effect [Group = high]                     -0.043523   0.028476</span></span>
+<span id="cb2-76"><a href="#cb2-76" tabindex="-1"></a><span class="co">#&gt; indirect_1@3: M1 [Group = high]                        -0.000227   0.005610</span></span>
+<span id="cb2-77"><a href="#cb2-77" tabindex="-1"></a><span class="co">#&gt; indirect_2@3: M2 [Group = high]                        -0.001254   0.003959</span></span>
+<span id="cb2-78"><a href="#cb2-78" tabindex="-1"></a><span class="co">#&gt; total_indirect@3: Total indirect effect [Group = high] -0.001481   0.006860</span></span>
+<span id="cb2-79"><a href="#cb2-79" tabindex="-1"></a><span class="co">#&gt; total@3: Total effect [Group = high]                   -0.045004   0.029175</span></span>
+<span id="cb2-80"><a href="#cb2-80" tabindex="-1"></a><span class="co">#&gt;                                                         CI lower  CI upper</span></span>
+<span id="cb2-81"><a href="#cb2-81" tabindex="-1"></a><span class="co">#&gt; cp@1: Direct effect [Group = low]                      -0.149674 -0.026957</span></span>
+<span id="cb2-82"><a href="#cb2-82" tabindex="-1"></a><span class="co">#&gt; indirect_1@1: M1 [Group = low]                         -0.013672  0.048313</span></span>
+<span id="cb2-83"><a href="#cb2-83" tabindex="-1"></a><span class="co">#&gt; indirect_2@1: M2 [Group = low]                         -0.010095  0.005841</span></span>
+<span id="cb2-84"><a href="#cb2-84" tabindex="-1"></a><span class="co">#&gt; total_indirect@1: Total indirect effect [Group = low]  -0.015959  0.048148</span></span>
+<span id="cb2-85"><a href="#cb2-85" tabindex="-1"></a><span class="co">#&gt; total@1: Total effect [Group = low]                    -0.132546 -0.018987</span></span>
+<span id="cb2-86"><a href="#cb2-86" tabindex="-1"></a><span class="co">#&gt; cp@2: Direct effect [Group = med]                      -0.027358  0.080842</span></span>
+<span id="cb2-87"><a href="#cb2-87" tabindex="-1"></a><span class="co">#&gt; indirect_1@2: M1 [Group = med]                         -0.012561  0.010989</span></span>
+<span id="cb2-88"><a href="#cb2-88" tabindex="-1"></a><span class="co">#&gt; indirect_2@2: M2 [Group = med]                         -0.008625  0.006668</span></span>
+<span id="cb2-89"><a href="#cb2-89" tabindex="-1"></a><span class="co">#&gt; total_indirect@2: Total indirect effect [Group = med]  -0.015266  0.012062</span></span>
+<span id="cb2-90"><a href="#cb2-90" tabindex="-1"></a><span class="co">#&gt; total@2: Total effect [Group = med]                    -0.029233  0.081462</span></span>
+<span id="cb2-91"><a href="#cb2-91" tabindex="-1"></a><span class="co">#&gt; cp@3: Direct effect [Group = high]                     -0.098881  0.012147</span></span>
+<span id="cb2-92"><a href="#cb2-92" tabindex="-1"></a><span class="co">#&gt; indirect_1@3: M1 [Group = high]                        -0.012696  0.011786</span></span>
+<span id="cb2-93"><a href="#cb2-93" tabindex="-1"></a><span class="co">#&gt; indirect_2@3: M2 [Group = high]                        -0.011018  0.005775</span></span>
+<span id="cb2-94"><a href="#cb2-94" tabindex="-1"></a><span class="co">#&gt; total_indirect@3: Total indirect effect [Group = high] -0.016720  0.012240</span></span>
+<span id="cb2-95"><a href="#cb2-95" tabindex="-1"></a><span class="co">#&gt; total@3: Total effect [Group = high]                   -0.101466  0.012298</span></span>
+<span id="cb2-96"><a href="#cb2-96" tabindex="-1"></a><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span id="cb2-97"><a href="#cb2-97" tabindex="-1"></a><span class="co">#&gt; Fitted group n: low = 34; med = 34; high = 32.</span></span>
+<span id="cb2-98"><a href="#cb2-98" tabindex="-1"></a><span class="co">#&gt; Fitted group counts after missing-data handling; observed counts exclude</span></span>
+<span id="cb2-99"><a href="#cb2-99" tabindex="-1"></a><span class="co">#&gt; missing moderator values. </span></span>
+<span id="cb2-100"><a href="#cb2-100" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span id="cb2-101"><a href="#cb2-101" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-102"><a href="#cb2-102" tabindex="-1"></a><span class="co">#&gt; Path coefficients:</span></span>
+<span id="cb2-103"><a href="#cb2-103" tabindex="-1"></a><span class="co">#&gt;                         Estimate Std. Error CI lower CI upper</span></span>
+<span id="cb2-104"><a href="#cb2-104" tabindex="-1"></a><span class="co">#&gt; cp@1: cp [Group = low]  -0.08956    0.03098 -0.14967 -0.02696</span></span>
+<span id="cb2-105"><a href="#cb2-105" tabindex="-1"></a><span class="co">#&gt; b1@1: b1 [Group = low]  -0.15866    0.15912 -0.47238  0.15442</span></span>
+<span id="cb2-106"><a href="#cb2-106" tabindex="-1"></a><span class="co">#&gt; d1@1: d1 [Group = low]  -0.04619    0.09253 -0.22580  0.13807</span></span>
+<span id="cb2-107"><a href="#cb2-107" tabindex="-1"></a><span class="co">#&gt; b2@1: b2 [Group = low]  -0.06480    0.08982 -0.23953  0.11299</span></span>
+<span id="cb2-108"><a href="#cb2-108" tabindex="-1"></a><span class="co">#&gt; d2@1: d2 [Group = low]  -0.04119    0.08537 -0.21002  0.12575</span></span>
+<span id="cb2-109"><a href="#cb2-109" tabindex="-1"></a><span class="co">#&gt; a1@1: a1 [Group = low]  -0.08802    0.02951 -0.14592 -0.03031</span></span>
+<span id="cb2-110"><a href="#cb2-110" tabindex="-1"></a><span class="co">#&gt; a2@1: a2 [Group = low]   0.01646    0.03087 -0.04418  0.07740</span></span>
+<span id="cb2-111"><a href="#cb2-111" tabindex="-1"></a><span class="co">#&gt; cp@2: cp [Group = med]   0.02698    0.02750 -0.02736  0.08084</span></span>
+<span id="cb2-112"><a href="#cb2-112" tabindex="-1"></a><span class="co">#&gt; b1@2: b1 [Group = med]  -0.07904    0.16472 -0.40198  0.24594</span></span>
+<span id="cb2-113"><a href="#cb2-113" tabindex="-1"></a><span class="co">#&gt; d1@2: d1 [Group = med]  -0.04619    0.09253 -0.22580  0.13807</span></span>
+<span id="cb2-114"><a href="#cb2-114" tabindex="-1"></a><span class="co">#&gt; b2@2: b2 [Group = med]  -0.06480    0.08982 -0.23953  0.11299</span></span>
+<span id="cb2-115"><a href="#cb2-115" tabindex="-1"></a><span class="co">#&gt; d2@2: d2 [Group = med]  -0.04119    0.08537 -0.21002  0.12575</span></span>
+<span id="cb2-116"><a href="#cb2-116" tabindex="-1"></a><span class="co">#&gt; a1@2: a1 [Group = med]   0.00510    0.02922 -0.05273  0.06201</span></span>
+<span id="cb2-117"><a href="#cb2-117" tabindex="-1"></a><span class="co">#&gt; a2@2: a2 [Group = med]   0.00792    0.03107 -0.05259  0.06936</span></span>
+<span id="cb2-118"><a href="#cb2-118" tabindex="-1"></a><span class="co">#&gt; cp@3: cp [Group = high] -0.04352    0.02848 -0.09888  0.01215</span></span>
+<span id="cb2-119"><a href="#cb2-119" tabindex="-1"></a><span class="co">#&gt; b1@3: b1 [Group = high] -0.06778    0.17203 -0.40586  0.26641</span></span>
+<span id="cb2-120"><a href="#cb2-120" tabindex="-1"></a><span class="co">#&gt; d1@3: d1 [Group = high] -0.04619    0.09253 -0.22580  0.13807</span></span>
+<span id="cb2-121"><a href="#cb2-121" tabindex="-1"></a><span class="co">#&gt; b2@3: b2 [Group = high] -0.06480    0.08982 -0.23953  0.11299</span></span>
+<span id="cb2-122"><a href="#cb2-122" tabindex="-1"></a><span class="co">#&gt; d2@3: d2 [Group = high] -0.04119    0.08537 -0.21002  0.12575</span></span>
+<span id="cb2-123"><a href="#cb2-123" tabindex="-1"></a><span class="co">#&gt; a1@3: a1 [Group = high]  0.00334    0.03023 -0.05573  0.06247</span></span>
+<span id="cb2-124"><a href="#cb2-124" tabindex="-1"></a><span class="co">#&gt; a2@3: a2 [Group = high]  0.01935    0.03177 -0.04247  0.08228</span></span>
+<span id="cb2-125"><a href="#cb2-125" tabindex="-1"></a><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span></span>
+<span id="cb2-126"><a href="#cb2-126" tabindex="-1"></a><span class="co">#&gt; Tables: $effects, $coefficients; analysis settings: $info.</span></span>
+<span id="cb2-127"><a href="#cb2-127" tabindex="-1"></a><span class="fu">plot</span>(result)</span></code></pre></div>
+<div class="float">
+<img role="img" aria-label="plot of chunk fit" src="data:image/png;base64,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" alt="plot of chunk fit" />
+<div class="figcaption">plot of chunk fit</div>
+</div>
+<p>This uses the default 20,000 Monte Carlo draws and seed. The default
+report includes all groups; the plot shows indirect effects in
+factor-level order. <code>summary()</code> also includes conditional
+path coefficients.</p>
+</div>
+<div id="conditional-effects-and-group-differences" class="section level2">
+<h2>Conditional effects and group differences</h2>
+<p>Queries use factor labels, not indicator numbers. With
+<code>at</code> omitted, all levels are returned. Specify labels
+explicitly when their order matters.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>effects <span class="ot">&lt;-</span> <span class="fu">wsmed_effects</span>(result)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">print</span>(effects)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt; wsMed indirect | raw scale | mc </span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; Moderator: Group ; reference category = low </span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt;                                  Estimate Std. Error  CI lower  CI upper</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; indirect_1@1: M1 [Group = low]   0.013966   0.015561 -0.013672  0.048313</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt; indirect_2@1: M2 [Group = low]  -0.001067   0.003754 -0.010095  0.005841</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; indirect_1@2: M1 [Group = med]  -0.000403   0.005403 -0.012561  0.010989</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; indirect_2@2: M2 [Group = med]  -0.000513   0.003547 -0.008625  0.006668</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; indirect_1@3: M1 [Group = high] -0.000227   0.005610 -0.012696  0.011786</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt; indirect_2@3: M2 [Group = high] -0.001254   0.003959 -0.011018  0.005775</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt; Fitted group n: low = 34; med = 34; high = 32.</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt; Fitted group counts after missing-data handling; observed counts exclude</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt; missing moderator values. </span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="fu">plot</span>(effects)</span></code></pre></div>
+<div class="float">
+<img role="img" aria-label="plot of chunk effects" src="data:image/png;base64,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" alt="plot of chunk effects" />
+<div class="figcaption">plot of chunk effects</div>
+</div>
+<p>The default plot uses the factor order: <code>low</code>,
+<code>med</code>, <code>high</code>. To change the order, supply
+<code>at = list(Group = c(&quot;high&quot;, &quot;med&quot;, &quot;low&quot;))</code> when extracting
+effects. Use <code>plot(effects, view = &quot;forest&quot;)</code> for horizontal
+intervals.</p>
+<p>Compare the indirect effect through A between <code>high</code> and
+<code>low</code> by assigning weights to the corresponding effect
+identifiers. The contrast uses matched joint draws, so its interval
+includes covariance between the two effects.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(effects)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>selected <span class="ot">&lt;-</span> tab<span class="sc">$</span>effect <span class="sc">==</span> <span class="st">&quot;indirect_1&quot;</span> <span class="sc">&amp;</span> tab<span class="sc">$</span>at <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;low&quot;</span>, <span class="st">&quot;high&quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>weights <span class="ot">&lt;-</span> <span class="fu">setNames</span>(<span class="fu">ifelse</span>(tab<span class="sc">$</span>at[selected] <span class="sc">==</span> <span class="st">&quot;high&quot;</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>),</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>                    tab<span class="sc">$</span>term[selected])</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>difference <span class="ot">&lt;-</span> <span class="fu">wsmed_contrasts</span>(</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  effects,</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">high_minus_low =</span> weights)</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>)</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>difference</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; wsMed contrasts | raw scale | mc </span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; Moderator: Group ; reference category = low </span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; Contrast direction (signed weights):</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt;  high_minus_low: -1 * M1 [Group = low] +1 * M1 [Group = high]</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt;                Estimate Std. Error CI lower CI upper</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; high_minus_low  -0.0142     0.0165  -0.0499   0.0158</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="fu">plot</span>(difference)</span></code></pre></div>
+<div class="float">
+<img role="img" aria-label="plot of chunk contrasts" src="data:image/png;base64,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" alt="plot of chunk contrasts" />
+<div class="figcaption">plot of chunk contrasts</div>
+</div>
+<p>The effect intervals in the group plot are pointwise. Their overlap
+is not a test of equality; use the contrast interval to assess the
+difference. The caption reports fitted group counts. With MI it reports
+their range across completed datasets, rather than treating imputed
+memberships as observed. The result table also provides
+<code>n.observed</code>, <code>n.fitted.min</code>, and
+<code>n.fitted.max</code>. These are descriptive participant counts, not
+effective sample sizes for effects.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>standardized <span class="ot">&lt;-</span> <span class="fu">wsmed_effects</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  result,</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="at">scale =</span> <span class="st">&quot;marginal&quot;</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="at">at =</span> <span class="fu">list</span>(<span class="at">Group =</span> <span class="fu">c</span>(<span class="st">&quot;low&quot;</span>, <span class="st">&quot;med&quot;</span>, <span class="st">&quot;high&quot;</span>))</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>)</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>standardized</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; wsMed indirect | marginal scale | mc </span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; Moderator: Group ; reference category = low </span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; Standardization: effect / marginal model-implied SD(D2 - D1); condition contrast is unscaled.</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; Plug-in marginal outcome-difference SD: 0.169127 </span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt;                                 Estimate Std. Error CI lower CI upper</span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt; indirect_1@1: M1 [Group = low]   0.08257    0.08858 -0.07817  0.27693</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#&gt; indirect_2@1: M2 [Group = low]  -0.00631    0.02137 -0.05736  0.03351</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt; indirect_1@2: M1 [Group = med]  -0.00238    0.03085 -0.07168  0.06239</span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co">#&gt; indirect_2@2: M2 [Group = med]  -0.00304    0.02025 -0.05015  0.03797</span></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt; indirect_1@3: M1 [Group = high] -0.00134    0.03194 -0.07208  0.06723</span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt; indirect_2@3: M2 [Group = high] -0.00742    0.02252 -0.06254  0.03335</span></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co">#&gt; Fitted group n: low = 34; med = 34; high = 32.</span></span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="co">#&gt; Fitted group counts after missing-data handling; observed counts exclude</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; missing moderator values. </span></span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span></code></pre></div>
+<p>Marginal standardization divides conditional indirect effects by the
+common model-implied SD of the outcome difference. It does not divide by
+a different within-group SD for each category. Factor labels and
+indicator coding remain fixed, while coefficients and the common SD vary
+together across simulation draws. See the <a href="StandardizedModeratedMediation.html">standardization
+tutorial</a>.</p>
+</div>
+<div id="optional-fit-the-same-model-in-stages" class="section level2">
+<h2>Optional: fit the same model in stages</h2>
+<p>The equivalent staged specification uses role names in its
+interaction arrows. <code>main_effects = &quot;all_equations&quot;</code> matches
+the one-call model, and <code>interactions = &quot;A -&gt; Y&quot;</code> matches
+<code>MP = &quot;b1&quot;</code>. The inference seed below matches the default
+one-call seed.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">wsmed_model</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;D1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;D2&quot;</span>),</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="at">mediators =</span> <span class="fu">list</span>(</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>    <span class="at">A =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;A1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;A2&quot;</span>),</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>    <span class="at">B =</span> <span class="fu">c</span>(<span class="at">before =</span> <span class="st">&quot;B1&quot;</span>, <span class="at">after =</span> <span class="st">&quot;B2&quot;</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>  ),</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>  <span class="at">moderator =</span> <span class="fu">list</span>(</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>    <span class="at">variable =</span> <span class="st">&quot;Group&quot;</span>,</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>    <span class="at">main_effects =</span> <span class="st">&quot;all_equations&quot;</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>    <span class="at">interactions =</span> <span class="st">&quot;A -&gt; Y&quot;</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>  )</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>)</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">wsmed_fit</span>(</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>  model,</span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>  dat</span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>)</span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>inference <span class="ot">&lt;-</span> <span class="fu">wsmed_infer</span>(</span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a>  fit,</span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">123</span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a>)</span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a>fit</span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a><span class="co">#&gt; wsMed fit: P | DE | 1 fitted dataset(s)</span></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a><span class="co">#&gt; Observations: 100 of 100 input rows</span></span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="co">#&gt; Converged: 1 of 1 </span></span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="co">#&gt; Condition contrast: after - before </span></span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a><span class="co">#&gt; Moderator: Group ; reference category = low </span></span>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0</span></span></code></pre></div>
+<p>Inspect the constructed data to check the indicator coding:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>prepared <span class="ot">&lt;-</span> <span class="fu">wsmed_inspect</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  fit,</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="st">&quot;data&quot;</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>)</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="fu">unique</span>(prepared[<span class="fu">c</span>(<span class="st">&quot;Group&quot;</span>, <span class="st">&quot;W1&quot;</span>, <span class="st">&quot;W2&quot;</span>)])</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt;   Group W1 W2</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; 1   low  0  0</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; 2  high  0  1</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; 3   med  1  0</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="fu">attr</span>(prepared, <span class="st">&quot;W_info&quot;</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; $raw</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Group&quot;</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="co">#&gt; $dummy_names</span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="co">#&gt; [1] &quot;W1&quot; &quot;W2&quot;</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="co">#&gt; $dummy_map</span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="co">#&gt; $dummy_map$W1</span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt; [1] &quot;low vs med&quot;</span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="co">#&gt; $dummy_map$W2</span></span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co">#&gt; [1] &quot;low vs high&quot;</span></span></code></pre></div>
+<p>In the mapping, <code>low vs med</code> means an indicator equal to
+one for <code>med</code> and zero for <code>low</code>; its coefficient
+is <strong>med minus low</strong>. Use
+<code>relevel(dat$Group, ref = &quot;high&quot;)</code> before fitting to choose a
+different reference.</p>
+<p>The two calls produce the same estimates and draws. See the <a href="ModularWorkflow.html">staged workflow</a> for what each object
+stores and how to reuse the fitted model for inference.</p>
+</div>
+<div id="categorical-covariates" class="section level2">
+<h2>Categorical covariates</h2>
+<p>A categorical between-subject covariate uses the same reference
+coding. This separate example adjusts for <code>Group</code> without
+treating it as a moderator:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>adjusted <span class="ot">&lt;-</span> <span class="fu">wsMed</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="at">data =</span> dat,</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="at">M_C1 =</span> <span class="st">&quot;A1&quot;</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="at">M_C2 =</span> <span class="st">&quot;A2&quot;</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  <span class="at">Y_C1 =</span> <span class="st">&quot;D1&quot;</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="at">Y_C2 =</span> <span class="st">&quot;D2&quot;</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>  <span class="at">C =</span> <span class="st">&quot;Group&quot;</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>)</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="fu">print</span>(adjusted)</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="co">#&gt; wsMed analysis</span></span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="co">#&gt; Model: P | DE | Observations: 100 </span></span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co">#&gt; Effects:</span></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt; wsMed all | raw scale | mc </span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt; Covariate: Group ; reference category = low </span></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co">#&gt;                                       Estimate Std. Error CI lower CI upper</span></span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt; cp: Direct effect                     -0.08738    0.02898 -0.14500 -0.03149</span></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="co">#&gt; indirect_1: M1                         0.01059    0.00948 -0.00568  0.03195</span></span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a><span class="co">#&gt; total_indirect: Total indirect effect  0.01059    0.00948 -0.00568  0.03195</span></span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a><span class="co">#&gt; total: Total effect                   -0.07679    0.02805 -0.13234 -0.02229</span></span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
+<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0</span></span></code></pre></div>
+</div>
+<div id="missing-categorical-predictors" class="section level2">
+<h2>Missing categorical predictors</h2>
+<p><code>wsmed_fit()</code> defaults to <code>missing = &quot;error&quot;</code>.
+Listwise deletion is available, but can discard otherwise useful
+measurements. FIML can be used when categorical predictors are fully
+observed; missing categorical predictors are unsupported and rejected by
+the staged interface. Apply the same restriction in one-call
+analyses.</p>
+<p>For multiple imputation, impute raw variables before computing dummy
+indicators and interactions. The following deliberately introduces
+missingness into the simulated data. In the staged interface,
+<code>mi$method</code> selects the method for numeric variables (here
+PMM). Binary factors automatically use logistic regression; factors with
+more than two levels use multinomial logistic regression. This setting
+differs from the lower-level <code>ImputeData()</code> interface.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>incomplete <span class="ot">&lt;-</span> dat</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>incomplete<span class="sc">$</span>Group[<span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">18</span>, <span class="dv">37</span>, <span class="dv">68</span>, <span class="dv">89</span>)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>incomplete<span class="sc">$</span>A2[<span class="fu">c</span>(<span class="dv">8</span>, <span class="dv">25</span>, <span class="dv">43</span>)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>mi_fit <span class="ot">&lt;-</span> <span class="fu">wsmed_fit</span>(</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>  model,</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>  incomplete,</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>  <span class="at">missing =</span> <span class="st">&quot;mi&quot;</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>  <span class="at">mi =</span> <span class="fu">list</span>(</span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>    <span class="at">m =</span> <span class="dv">5</span>,</span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;pmm&quot;</span>,</span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>    <span class="at">seed =</span> <span class="dv">123</span></span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>  )</span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>)</span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="co">#&gt; Warning: Internal MI uses main effects only and may be incompatible with</span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="co">#&gt; moderator interactions. Consider model-compatible external imputations via</span></span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a><span class="co">#&gt; completed; see the CompatibleImputation tutorial.</span></span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a>mi_inference <span class="ot">&lt;-</span> <span class="fu">wsmed_infer</span>(</span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a>  mi_fit,</span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;mc&quot;</span>,</span>
+<span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">123</span></span>
+<span id="cb9-21"><a href="#cb9-21" tabindex="-1"></a>)</span>
+<span id="cb9-22"><a href="#cb9-22" tabindex="-1"></a><span class="fu">wsmed_effects</span>(</span>
+<span id="cb9-23"><a href="#cb9-23" tabindex="-1"></a>  mi_inference,</span>
+<span id="cb9-24"><a href="#cb9-24" tabindex="-1"></a>  <span class="at">at =</span> <span class="fu">list</span>(<span class="at">Group =</span> <span class="fu">c</span>(<span class="st">&quot;low&quot;</span>, <span class="st">&quot;med&quot;</span>, <span class="st">&quot;high&quot;</span>))</span>
+<span id="cb9-25"><a href="#cb9-25" tabindex="-1"></a>)</span>
+<span id="cb9-26"><a href="#cb9-26" tabindex="-1"></a><span class="co">#&gt; wsMed indirect | raw scale | mc </span></span>
+<span id="cb9-27"><a href="#cb9-27" tabindex="-1"></a><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
+<span id="cb9-28"><a href="#cb9-28" tabindex="-1"></a><span class="co">#&gt; Condition contrast: after - before </span></span>
+<span id="cb9-29"><a href="#cb9-29" tabindex="-1"></a><span class="co">#&gt; Moderator: Group ; reference category = low </span></span>
+<span id="cb9-30"><a href="#cb9-30" tabindex="-1"></a><span class="co">#&gt; MI: per-imputation centering; first-imputation reporting reference.</span></span>
+<span id="cb9-31"><a href="#cb9-31" tabindex="-1"></a><span class="co">#&gt; Default MI uses main effects only; interactions may require model-compatible external imputations. </span></span>
+<span id="cb9-32"><a href="#cb9-32" tabindex="-1"></a><span class="co">#&gt;                                 Estimate Std. Error  CI lower  CI upper</span></span>
+<span id="cb9-33"><a href="#cb9-33" tabindex="-1"></a><span class="co">#&gt; indirect_1@1: A [Group = low]   0.009419   0.014976 -0.018085  0.042565</span></span>
+<span id="cb9-34"><a href="#cb9-34" tabindex="-1"></a><span class="co">#&gt; indirect_2@1: B [Group = low]  -0.000937   0.003624 -0.009837  0.005794</span></span>
+<span id="cb9-35"><a href="#cb9-35" tabindex="-1"></a><span class="co">#&gt; indirect_1@2: A [Group = med]  -0.000454   0.005792 -0.013511  0.011684</span></span>
+<span id="cb9-36"><a href="#cb9-36" tabindex="-1"></a><span class="co">#&gt; indirect_2@2: B [Group = med]  -0.000255   0.003600 -0.008566  0.007084</span></span>
+<span id="cb9-37"><a href="#cb9-37" tabindex="-1"></a><span class="co">#&gt; indirect_1@3: A [Group = high]  0.000237   0.005750 -0.011954  0.013518</span></span>
+<span id="cb9-38"><a href="#cb9-38" tabindex="-1"></a><span class="co">#&gt; indirect_2@3: B [Group = high] -0.001447   0.004076 -0.011492  0.005867</span></span>
+<span id="cb9-39"><a href="#cb9-39" tabindex="-1"></a><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
+<span id="cb9-40"><a href="#cb9-40" tabindex="-1"></a><span class="co">#&gt; Fitted group n: low = 34-36; med = 31-33; high = 32-34.</span></span>
+<span id="cb9-41"><a href="#cb9-41" tabindex="-1"></a><span class="co">#&gt; Fitted group counts: range across completed datasets; observed counts exclude</span></span>
+<span id="cb9-42"><a href="#cb9-42" tabindex="-1"></a><span class="co">#&gt; imputed moderator values. </span></span>
+<span id="cb9-43"><a href="#cb9-43" tabindex="-1"></a><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span></code></pre></div>
+<p>Imputation and inference have separate seeds. Five imputations keep
+this example small; choose the number and imputation model for the
+actual analysis. MI with bootstrap inference is not implemented. For MI,
+the package retains the current per-imputation centering and
+first-imputation reporting reference.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

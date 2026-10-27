@@ -1,5 +1,4 @@
-#' Generate Random Variates from the Gaussian Distribution
-#' (Cholesky Decomposition)
+#' Generate Gaussian random variates using Cholesky decomposition
 #'
 #' @author Ivan Jacob Agaloos Pesigan
 #'

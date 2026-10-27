@@ -2,7 +2,7 @@
 % Please edit documentation in R/MC_build_definitions.R
 \name{build_definitions}
 \alias{build_definitions}
-\title{Build Unstandardized Parameter Definitions}
+\title{Build unstandardized parameter definitions}
 \usage{
 build_definitions(fit)
 }

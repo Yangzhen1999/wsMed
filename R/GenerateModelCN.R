@@ -1,4 +1,4 @@
-#' @title Generate Chained Mediation Model
+#' @title Generate a serial mediation model
 #'
 #' @description Dynamically generates a structural equation modeling (SEM) syntax for
 #' chained mediation analysis based on the prepared dataset. The function computes regression
@@ -31,6 +31,13 @@
 #'
 #' This model is suitable for chained mediation designs where mediators influence each other in
 #' a sequential manner, forming multi-step mediation paths.
+#'
+#' @section Product moments:
+#' When a moderated path starts at an endogenous mediator, auxiliary product
+#' moment equations and covariances with its upstream disturbances preserve the
+#' joint predictor moment structure under reference recoding. These equations
+#' are not additional mediation paths. Genuine exogenous moments follow the
+#' fitting function's `fixed.x` setting; endogenous product moments are estimated.
 #'
 #' @param prepared_data A data frame returned by [PrepareData()], containing the processed
 #' within-subject mediator and outcome variables. The data frame must include columns for
@@ -70,7 +77,7 @@
 
 GenerateModelCN <- function(prepared_data, MP = character(0)) {
 
-  ## -------- 变量 --------
+  # Identify variables
   Md <- sort(grep("^M\\d+diff$", colnames(prepared_data), value = TRUE))
   Ma <- sort(grep("^M\\d+avg$",  colnames(prepared_data), value = TRUE))
   nM <- length(Md);  if (nM < 1) stop("Need at least one mediator.")
@@ -80,17 +87,17 @@ GenerateModelCN <- function(prepared_data, MP = character(0)) {
   controls<- c(between, within)
   ctrl_rhs<- if (length(controls)) paste(controls, collapse = " + ") else NULL
 
-  ## ---- W 与交互列 ----
+  # Moderator and interaction columns
   Wvars <- grep("^W\\d+$", colnames(prepared_data), value = TRUE)
   Winfo <- attr(prepared_data, "W_info")
   if (!is.null(Winfo) && isTRUE(Winfo$type == "continuous"))
-    Wvars <- Wvars[1]           # 连续 W 只保留第一个
-  if (length(Wvars) == 1)       # 安全起见
+    Wvars <- Wvars[1]           # Keep the first moderator column for continuous W
+  if (length(Wvars) == 1)       # Guard against multiple moderator columns
     Wvars <- Wvars[1]
 
   int_vars <- grep("^int_", colnames(prepared_data), value = TRUE)
 
-  ## ——— 帮助函数：仅保留 wtag ∈ Wvars ———
+  # Retain only moderator tags present in Wvars
   add_mod_terms <- function(pat_stub, param_stub) {
     hits <- grep(pat_stub, int_vars, value = TRUE)
     if (!length(hits)) return(NULL)
@@ -115,11 +122,11 @@ GenerateModelCN <- function(prepared_data, MP = character(0)) {
   if (length(Wvars))
     y_rhs <- c(y_rhs, paste0("cpw_", Wvars, "*", Wvars))
   if (length(Wvars))
-    y_rhs <- c(y_rhs, Wvars)  # 添加主效应 W
+    y_rhs <- c(y_rhs, Wvars)  # Add moderator main effects
   if (!is.null(ctrl_rhs)) y_rhs <- c(y_rhs, ctrl_rhs)
   regY <- paste("Ydiff ~", paste(y_rhs, collapse = " + "))
 
-  ## ---------- 每个 M 回归 ----------
+  # Regression equation for each mediator
   regM <- character(nM)
   for (i in seq_len(nM)) {
     rhs <- c(paste0("a", i, "*1"))
@@ -138,12 +145,12 @@ GenerateModelCN <- function(prepared_data, MP = character(0)) {
       }
 
     if (length(Wvars))
-      rhs <- c(rhs, Wvars)  # 添加主效应 W
+      rhs <- c(rhs, Wvars)  # Add moderator main effects
     if (!is.null(ctrl_rhs)) rhs <- c(rhs, ctrl_rhs)
     regM[i] <- paste(Md[i], "~", paste(rhs, collapse = " + "))
   }
 
-  ## ---------- 清理重复主效应项 ----------
+  # Remove duplicate main-effect terms
   for (i in seq_along(regM)) {
     for (w in Wvars) {
       if (grepl(paste0("aw", i, "_", w, "\\*", w), regM[i])) {
@@ -159,7 +166,7 @@ GenerateModelCN <- function(prepared_data, MP = character(0)) {
     }
   }
 
-  ## ---------- 间接效应 & 汇总 ----------
+  # Indirect effects and totals
   make_ie <- function(pth){
     if (length(pth)==1) return(paste0("a", pth, " * b", pth))
     last <- pth[length(pth)]
@@ -174,11 +181,12 @@ GenerateModelCN <- function(prepared_data, MP = character(0)) {
       ie_lines <- c(ie_lines, paste(nm,":=",make_ie(pth)))
       ie_names <- c(ie_names, nm)
     }
-  paste(c(regY, regM,
+  sem_model <- paste(c(regY, regM,
           ie_lines,
           paste("total_indirect :=", paste(ie_names, collapse=" + ")),
           "total_effect := cp + total_indirect"),
         collapse = "\n")
+  .wsmed_product_covariances(sem_model)
 }
 
 

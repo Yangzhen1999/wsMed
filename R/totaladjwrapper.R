@@ -1,4 +1,4 @@
-#' Adjusted Total Sampling Covariance Matrix
+#' Adjusted total sampling covariance matrix
 #'
 #' @author Ivan Jacob Agaloos Pesigan
 #'
