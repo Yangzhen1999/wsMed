@@ -47,21 +47,21 @@ summary(effects)
 #> Plug-in marginal outcome-difference SD: 0.169194 
 #> The denominator is not a moderator-specific conditional SD.
 #>                            Estimate Std. Error CI lower CI upper
-#> indirect_1@1: A [D3 = 0.2]  0.01950    0.03638 -0.03063  0.08758
-#> indirect_1@2: A [D3 = 0.5]  0.00886    0.01873 -0.02071  0.04337
+#> indirect_1@1: A [D3 = 0.2]  0.01950    0.03723 -0.03073  0.09045
+#> indirect_1@2: A [D3 = 0.5]  0.00886    0.01893 -0.01974  0.04253
 #> Inference draws: 1000 retained of 1000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 confint(effects)                 # stored 90% level
 #>                      5 %       95 %
-#> indirect_1@1 -0.03062835 0.08758182
-#> indirect_1@2 -0.02071058 0.04336693
+#> indirect_1@1 -0.03072722 0.09045346
+#> indirect_1@2 -0.01974249 0.04253021
 confint(
   effects,
   level = .95
 )    # explicit override
 #>                    2.5 %     97.5 %
-#> indirect_1@1 -0.04736114 0.10345303
-#> indirect_1@2 -0.02713894 0.05320883
+#> indirect_1@1 -0.04472425 0.11503044
+#> indirect_1@2 -0.02658780 0.05004395
 plot(
   effects,
   view = "conditional"
@@ -222,9 +222,9 @@ data.frame(
   recoded = coef(recoded_effects)
 )
 #>              group     original      recoded
-#> indirect_1@1  high -0.001614355 -0.001614355
-#> indirect_1@2   low  0.089299551  0.089299550
-#> indirect_1@3   med -0.003012100 -0.003012105
+#> indirect_1@1  high -0.001614356 -0.001614356
+#> indirect_1@2   low  0.089299556  0.089299548
+#> indirect_1@3   med -0.003012106 -0.003012104
 stopifnot(isTRUE(all.equal(unname(coef(original_effects)),
   unname(coef(recoded_effects)), tolerance = 1e-6)))
 ```

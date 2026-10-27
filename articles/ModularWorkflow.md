@@ -329,9 +329,9 @@ print(s)
 #>    Estimate Std. Error CI lower CI upper
 #> cp -0.03180    0.01700 -0.06453  0.00186
 #> b1 -0.04834    0.09555 -0.23422  0.13918
-#> d1 -0.06905    0.09524 -0.25390  0.11568
+#> d1 -0.06905    0.09508 -0.25500  0.11962
 #> b2 -0.07732    0.09387 -0.26459  0.10461
-#> d2 -0.03676    0.08675 -0.20684  0.13625
+#> d2 -0.03676    0.08692 -0.20737  0.13289
 #> a1 -0.02712    0.01772 -0.06162  0.00817
 #> a2  0.01448    0.01796 -0.02032  0.04929
 #> Post-fit admissibility: 1 of 1 ; excluded rows: 0 
@@ -498,22 +498,22 @@ summary(
 #> Plug-in marginal outcome-difference SD: 0.169239 
 #> The denominator is not a moderator-specific conditional SD.
 #>                                       Estimate Std. Error CI lower CI upper
-#> cp: Direct effect                     -0.18787    0.10032 -0.38252  0.01082
-#> indirect_1: A                          0.00775    0.01858 -0.02674  0.05071
-#> indirect_2: B                         -0.00662    0.01496 -0.04331  0.01831
-#> total_indirect: Total indirect effect  0.00113    0.02396 -0.04882  0.05067
-#> total: Total effect                   -0.18674    0.10061 -0.38051  0.01125
+#> cp: Direct effect                     -0.18787    0.10030 -0.38339  0.01074
+#> indirect_1: A                          0.00775    0.01858 -0.02663  0.05041
+#> indirect_2: B                         -0.00662    0.01496 -0.04328  0.01832
+#> total_indirect: Total indirect effect  0.00113    0.02396 -0.04869  0.05065
+#> total: Total effect                   -0.18674    0.10059 -0.38126  0.01122
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 #> 
 #> Path coefficients:
 #>    Estimate Std. Error CI lower CI upper
-#> cp  -0.1879     0.1003  -0.3825   0.0108
-#> b1  -0.0501     0.0970  -0.2352   0.1423
-#> d1  -0.0751     0.1013  -0.2707   0.1264
-#> b2  -0.0821     0.0975  -0.2715   0.1099
-#> d2  -0.0438     0.1012  -0.2393   0.1587
-#> a1  -0.1546     0.1028  -0.3594   0.0470
+#> cp  -0.1879     0.1003  -0.3834   0.0107
+#> b1  -0.0501     0.0972  -0.2385   0.1429
+#> d1  -0.0751     0.1012  -0.2706   0.1284
+#> b2  -0.0821     0.0975  -0.2709   0.1096
+#> d2  -0.0438     0.1015  -0.2421   0.1557
+#> a1  -0.1546     0.1027  -0.3589   0.0462
 #> a2   0.0806     0.1011  -0.1153   0.2784
 #> Post-fit admissibility: 1 of 1 ; excluded rows: 0 
 #> Tables: $effects, $coefficients; analysis settings: $info.
@@ -588,18 +588,18 @@ summary(mod_inference)
 #> Moderator: D3 in raw units; centering reference = 0.452271 
 #>                                                       Estimate Std. Error
 #> cp@1: Direct effect [D3 = 0.452]                     -0.029850   0.016991
-#> indirect_1_3@1: A -> C [D3 = 0.452]                  -0.000022   0.000367
+#> indirect_1_3@1: A -> C [D3 = 0.452]                  -0.000022   0.000373
 #> indirect_2@1: B [D3 = 0.452]                         -0.001400   0.002744
-#> indirect_3@1: C [D3 = 0.452]                         -0.000183   0.002168
-#> total_indirect@1: Total indirect effect [D3 = 0.452] -0.001605   0.003581
-#> total@1: Total effect [D3 = 0.452]                   -0.031455   0.017152
+#> indirect_3@1: C [D3 = 0.452]                         -0.000183   0.002197
+#> total_indirect@1: Total indirect effect [D3 = 0.452] -0.001605   0.003579
+#> total@1: Total effect [D3 = 0.452]                   -0.031455   0.017156
 #>                                                       CI lower  CI upper
-#> cp@1: Direct effect [D3 = 0.452]                     -0.063464  0.003219
-#> indirect_1_3@1: A -> C [D3 = 0.452]                  -0.000838  0.000719
+#> cp@1: Direct effect [D3 = 0.452]                     -0.063464  0.003220
+#> indirect_1_3@1: A -> C [D3 = 0.452]                  -0.000855  0.000696
 #> indirect_2@1: B [D3 = 0.452]                         -0.008152  0.003015
-#> indirect_3@1: C [D3 = 0.452]                         -0.005150  0.004257
-#> total_indirect@1: Total indirect effect [D3 = 0.452] -0.009945  0.004960
-#> total@1: Total effect [D3 = 0.452]                   -0.065383  0.002083
+#> indirect_3@1: C [D3 = 0.452]                         -0.005199  0.004533
+#> total_indirect@1: Total indirect effect [D3 = 0.452] -0.009658  0.004953
+#> total@1: Total effect [D3 = 0.452]                   -0.065270  0.002247
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 #> 
@@ -607,14 +607,14 @@ summary(mod_inference)
 #>                             Estimate Std. Error CI lower CI upper
 #> cp@1: cp [D3 = 0.452]       -0.02985    0.01699 -0.06346  0.00322
 #> b2@1: b2 [D3 = 0.452]       -0.09668    0.09286 -0.27706  0.08467
-#> d2@1: d2 [D3 = 0.452]       -0.00641    0.08965 -0.18213  0.16843
+#> d2@1: d2 [D3 = 0.452]       -0.00641    0.08965 -0.18213  0.16842
 #> b3@1: b3 [D3 = 0.452]       -0.01370    0.10379 -0.21420  0.19224
 #> d3@1: d3 [D3 = 0.452]       -0.15680    0.10278 -0.35544  0.04381
-#> a1@1: a1 [D3 = 0.452]       -0.02712    0.01728 -0.06113  0.00670
+#> a1@1: a1 [D3 = 0.452]       -0.02712    0.01728 -0.06097  0.00685
 #> a2@1: a2 [D3 = 0.452]        0.01448    0.01791 -0.02029  0.04996
-#> a3@1: a3 [D3 = 0.452]        0.01336    0.01623 -0.01834  0.04508
-#> b_1_3@1: b_1_3 [D3 = 0.452] -0.05915    0.09216 -0.24131  0.12014
-#> d_1_3@1: d_1_3 [D3 = 0.452] -0.05761    0.09046 -0.23376  0.11900
+#> a3@1: a3 [D3 = 0.452]        0.01336    0.01623 -0.01839  0.04499
+#> b_1_3@1: b_1_3 [D3 = 0.452] -0.05915    0.09247 -0.23924  0.12453
+#> d_1_3@1: d_1_3 [D3 = 0.452] -0.05761    0.09015 -0.23340  0.11933
 #> Post-fit admissibility: 1 of 1 ; excluded rows: 0 
 #> Tables: $effects, $coefficients; analysis settings: $info.
 ```
@@ -658,15 +658,15 @@ print(conditional)
 #> Condition contrast: after - before 
 #> Moderator: D3 in raw units; centering reference = 0.452271 
 #>                                    Estimate Std. Error  CI lower  CI upper
-#> indirect_1_3@1: A -> C [D3 = 0.2] -1.21e-04   1.25e-03 -2.92e-03  2.38e-03
+#> indirect_1_3@1: A -> C [D3 = 0.2] -1.21e-04   1.26e-03 -2.99e-03  2.35e-03
 #> indirect_2@1: B [D3 = 0.2]        -2.79e-03   4.45e-03 -1.38e-02  4.15e-03
-#> indirect_3@1: C [D3 = 0.2]        -5.60e-04   4.85e-03 -1.15e-02  9.48e-03
-#> indirect_1_3@2: A -> C [D3 = 0.4] -3.54e-05   4.23e-04 -9.91e-04  8.10e-04
+#> indirect_3@1: C [D3 = 0.2]        -5.60e-04   4.84e-03 -1.16e-02  9.42e-03
+#> indirect_1_3@2: A -> C [D3 = 0.4] -3.54e-05   4.30e-04 -1.01e-03  8.19e-04
 #> indirect_2@2: B [D3 = 0.4]        -1.69e-03   2.94e-03 -8.96e-03  2.92e-03
-#> indirect_3@2: C [D3 = 0.4]        -2.44e-04   2.33e-03 -5.57e-03  4.56e-03
-#> indirect_1_3@3: A -> C [D3 = 0.6] -3.81e-07   4.78e-04 -9.97e-04  1.03e-03
+#> indirect_3@2: C [D3 = 0.4]        -2.44e-04   2.35e-03 -5.55e-03  4.78e-03
+#> indirect_1_3@3: A -> C [D3 = 0.6] -3.81e-07   4.75e-04 -1.04e-03  9.56e-04
 #> indirect_2@3: B [D3 = 0.6]        -5.86e-04   2.90e-03 -7.41e-03  5.16e-03
-#> indirect_3@3: C [D3 = 0.6]        -5.77e-05   2.74e-03 -6.19e-03  5.82e-03
+#> indirect_3@3: C [D3 = 0.6]        -5.77e-05   2.78e-03 -6.07e-03  6.01e-03
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 ```

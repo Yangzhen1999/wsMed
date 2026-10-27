@@ -91,37 +91,37 @@ print(result)
 #> Condition contrast: C2 - C1 
 #> Moderator: Group ; reference category = low 
 #>                                                         Estimate Std. Error
-#> cp@1: Direct effect [Group = low]                      -0.089555   0.030978
-#> indirect_1@1: M1 [Group = low]                          0.013966   0.015565
+#> cp@1: Direct effect [Group = low]                      -0.089556   0.030978
+#> indirect_1@1: M1 [Group = low]                          0.013966   0.015440
 #> indirect_2@1: M2 [Group = low]                         -0.001067   0.003754
-#> total_indirect@1: Total indirect effect [Group = low]   0.012899   0.016008
-#> total@1: Total effect [Group = low]                    -0.076656   0.028663
-#> cp@2: Direct effect [Group = med]                       0.026977   0.027498
-#> indirect_1@2: M1 [Group = med]                         -0.000403   0.005514
+#> total_indirect@1: Total indirect effect [Group = low]   0.012899   0.015857
+#> total@1: Total effect [Group = low]                    -0.076657   0.028520
+#> cp@2: Direct effect [Group = med]                       0.026976   0.027498
+#> indirect_1@2: M1 [Group = med]                         -0.000403   0.005396
 #> indirect_2@2: M2 [Group = med]                         -0.000513   0.003516
-#> total_indirect@2: Total indirect effect [Group = med]  -0.000916   0.006507
-#> total@2: Total effect [Group = med]                     0.026060   0.028145
+#> total_indirect@2: Total indirect effect [Group = med]  -0.000916   0.006459
+#> total@2: Total effect [Group = med]                     0.026060   0.028110
 #> cp@3: Direct effect [Group = high]                     -0.043523   0.028476
-#> indirect_1@3: M1 [Group = high]                        -0.000226   0.005569
+#> indirect_1@3: M1 [Group = high]                        -0.000227   0.005622
 #> indirect_2@3: M2 [Group = high]                        -0.001254   0.003977
-#> total_indirect@3: Total indirect effect [Group = high] -0.001481   0.006840
-#> total@3: Total effect [Group = high]                   -0.045004   0.029203
+#> total_indirect@3: Total indirect effect [Group = high] -0.001481   0.006895
+#> total@3: Total effect [Group = high]                   -0.045004   0.029195
 #>                                                         CI lower  CI upper
 #> cp@1: Direct effect [Group = low]                      -0.149674 -0.026957
-#> indirect_1@1: M1 [Group = low]                         -0.013653  0.048356
+#> indirect_1@1: M1 [Group = low]                         -0.013696  0.048775
 #> indirect_2@1: M2 [Group = low]                         -0.010082  0.005827
-#> total_indirect@1: Total indirect effect [Group = low]  -0.015942  0.048170
-#> total@1: Total effect [Group = low]                    -0.132747 -0.019037
+#> total_indirect@1: Total indirect effect [Group = low]  -0.015656  0.048262
+#> total@1: Total effect [Group = low]                    -0.132153 -0.019044
 #> cp@2: Direct effect [Group = med]                      -0.027358  0.080842
-#> indirect_1@2: M1 [Group = med]                         -0.013195  0.010492
+#> indirect_1@2: M1 [Group = med]                         -0.012992  0.010753
 #> indirect_2@2: M2 [Group = med]                         -0.008734  0.006367
-#> total_indirect@2: Total indirect effect [Group = med]  -0.015454  0.011705
-#> total@2: Total effect [Group = med]                    -0.029364  0.081188
-#> cp@3: Direct effect [Group = high]                     -0.098881  0.012148
-#> indirect_1@3: M1 [Group = high]                        -0.012821  0.011406
+#> total_indirect@2: Total indirect effect [Group = med]  -0.015357  0.011791
+#> total@2: Total effect [Group = med]                    -0.029128  0.081609
+#> cp@3: Direct effect [Group = high]                     -0.098881  0.012147
+#> indirect_1@3: M1 [Group = high]                        -0.012724  0.011558
 #> indirect_2@3: M2 [Group = high]                        -0.010910  0.005954
-#> total_indirect@3: Total indirect effect [Group = high] -0.016572  0.011751
-#> total@3: Total effect [Group = high]                   -0.102191  0.012012
+#> total_indirect@3: Total indirect effect [Group = high] -0.016612  0.012010
+#> total@3: Total effect [Group = high]                   -0.102165  0.012154
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Fitted group n: low = 34; med = 34; high = 32.
 #> Fitted group counts after missing-data handling; observed counts exclude
@@ -137,37 +137,37 @@ summary(result)
 #> Condition contrast: C2 - C1 
 #> Moderator: Group ; reference category = low 
 #>                                                         Estimate Std. Error
-#> cp@1: Direct effect [Group = low]                      -0.089555   0.030978
-#> indirect_1@1: M1 [Group = low]                          0.013966   0.015565
+#> cp@1: Direct effect [Group = low]                      -0.089556   0.030978
+#> indirect_1@1: M1 [Group = low]                          0.013966   0.015440
 #> indirect_2@1: M2 [Group = low]                         -0.001067   0.003754
-#> total_indirect@1: Total indirect effect [Group = low]   0.012899   0.016008
-#> total@1: Total effect [Group = low]                    -0.076656   0.028663
-#> cp@2: Direct effect [Group = med]                       0.026977   0.027498
-#> indirect_1@2: M1 [Group = med]                         -0.000403   0.005514
+#> total_indirect@1: Total indirect effect [Group = low]   0.012899   0.015857
+#> total@1: Total effect [Group = low]                    -0.076657   0.028520
+#> cp@2: Direct effect [Group = med]                       0.026976   0.027498
+#> indirect_1@2: M1 [Group = med]                         -0.000403   0.005396
 #> indirect_2@2: M2 [Group = med]                         -0.000513   0.003516
-#> total_indirect@2: Total indirect effect [Group = med]  -0.000916   0.006507
-#> total@2: Total effect [Group = med]                     0.026060   0.028145
+#> total_indirect@2: Total indirect effect [Group = med]  -0.000916   0.006459
+#> total@2: Total effect [Group = med]                     0.026060   0.028110
 #> cp@3: Direct effect [Group = high]                     -0.043523   0.028476
-#> indirect_1@3: M1 [Group = high]                        -0.000226   0.005569
+#> indirect_1@3: M1 [Group = high]                        -0.000227   0.005622
 #> indirect_2@3: M2 [Group = high]                        -0.001254   0.003977
-#> total_indirect@3: Total indirect effect [Group = high] -0.001481   0.006840
-#> total@3: Total effect [Group = high]                   -0.045004   0.029203
+#> total_indirect@3: Total indirect effect [Group = high] -0.001481   0.006895
+#> total@3: Total effect [Group = high]                   -0.045004   0.029195
 #>                                                         CI lower  CI upper
 #> cp@1: Direct effect [Group = low]                      -0.149674 -0.026957
-#> indirect_1@1: M1 [Group = low]                         -0.013653  0.048356
+#> indirect_1@1: M1 [Group = low]                         -0.013696  0.048775
 #> indirect_2@1: M2 [Group = low]                         -0.010082  0.005827
-#> total_indirect@1: Total indirect effect [Group = low]  -0.015942  0.048170
-#> total@1: Total effect [Group = low]                    -0.132747 -0.019037
+#> total_indirect@1: Total indirect effect [Group = low]  -0.015656  0.048262
+#> total@1: Total effect [Group = low]                    -0.132153 -0.019044
 #> cp@2: Direct effect [Group = med]                      -0.027358  0.080842
-#> indirect_1@2: M1 [Group = med]                         -0.013195  0.010492
+#> indirect_1@2: M1 [Group = med]                         -0.012992  0.010753
 #> indirect_2@2: M2 [Group = med]                         -0.008734  0.006367
-#> total_indirect@2: Total indirect effect [Group = med]  -0.015454  0.011705
-#> total@2: Total effect [Group = med]                    -0.029364  0.081188
-#> cp@3: Direct effect [Group = high]                     -0.098881  0.012148
-#> indirect_1@3: M1 [Group = high]                        -0.012821  0.011406
+#> total_indirect@2: Total indirect effect [Group = med]  -0.015357  0.011791
+#> total@2: Total effect [Group = med]                    -0.029128  0.081609
+#> cp@3: Direct effect [Group = high]                     -0.098881  0.012147
+#> indirect_1@3: M1 [Group = high]                        -0.012724  0.011558
 #> indirect_2@3: M2 [Group = high]                        -0.010910  0.005954
-#> total_indirect@3: Total indirect effect [Group = high] -0.016572  0.011751
-#> total@3: Total effect [Group = high]                   -0.102191  0.012012
+#> total_indirect@3: Total indirect effect [Group = high] -0.016612  0.012010
+#> total@3: Total effect [Group = high]                   -0.102165  0.012154
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Fitted group n: low = 34; med = 34; high = 32.
 #> Fitted group counts after missing-data handling; observed counts exclude
@@ -181,21 +181,21 @@ summary(result)
 #> d1@1: d1 [Group = low]  -0.04619    0.09253 -0.22580  0.13807
 #> b2@1: b2 [Group = low]  -0.06480    0.08982 -0.23953  0.11299
 #> d2@1: d2 [Group = low]  -0.04119    0.08537 -0.21002  0.12575
-#> a1@1: a1 [Group = low]  -0.08802    0.02949 -0.14633 -0.03101
+#> a1@1: a1 [Group = low]  -0.08802    0.02949 -0.14518 -0.02993
 #> a2@1: a2 [Group = low]   0.01646    0.03086 -0.04441  0.07735
 #> cp@2: cp [Group = med]   0.02698    0.02750 -0.02736  0.08084
 #> b1@2: b1 [Group = med]  -0.07904    0.16472 -0.40198  0.24594
 #> d1@2: d1 [Group = med]  -0.04619    0.09253 -0.22580  0.13807
 #> b2@2: b2 [Group = med]  -0.06480    0.08982 -0.23953  0.11299
 #> d2@2: d2 [Group = med]  -0.04119    0.08537 -0.21002  0.12575
-#> a1@2: a1 [Group = med]   0.00510    0.02933 -0.05222  0.06209
+#> a1@2: a1 [Group = med]   0.00510    0.02922 -0.05161  0.06256
 #> a2@2: a2 [Group = med]   0.00792    0.03082 -0.05193  0.06885
 #> cp@3: cp [Group = high] -0.04352    0.02848 -0.09888  0.01215
 #> b1@3: b1 [Group = high] -0.06778    0.17203 -0.40586  0.26641
 #> d1@3: d1 [Group = high] -0.04619    0.09253 -0.22580  0.13807
 #> b2@3: b2 [Group = high] -0.06480    0.08982 -0.23953  0.11299
 #> d2@3: d2 [Group = high] -0.04119    0.08537 -0.21002  0.12575
-#> a1@3: a1 [Group = high]  0.00334    0.03010 -0.05597  0.06200
+#> a1@3: a1 [Group = high]  0.00334    0.03031 -0.05581  0.06247
 #> a2@3: a2 [Group = high]  0.01935    0.03204 -0.04312  0.08287
 #> Post-fit admissibility: 1 of 1 ; excluded rows: 0 
 #> Tables: $effects, $coefficients; analysis settings: $info.
@@ -225,11 +225,11 @@ print(effects)
 #> Condition contrast: C2 - C1 
 #> Moderator: Group ; reference category = low 
 #>                                  Estimate Std. Error  CI lower  CI upper
-#> indirect_1@1: M1 [Group = low]   0.013966   0.015565 -0.013653  0.048356
+#> indirect_1@1: M1 [Group = low]   0.013966   0.015440 -0.013696  0.048775
 #> indirect_2@1: M2 [Group = low]  -0.001067   0.003754 -0.010082  0.005827
-#> indirect_1@2: M1 [Group = med]  -0.000403   0.005514 -0.013195  0.010492
+#> indirect_1@2: M1 [Group = med]  -0.000403   0.005396 -0.012992  0.010753
 #> indirect_2@2: M2 [Group = med]  -0.000513   0.003516 -0.008734  0.006367
-#> indirect_1@3: M1 [Group = high] -0.000226   0.005569 -0.012821  0.011406
+#> indirect_1@3: M1 [Group = high] -0.000227   0.005622 -0.012724  0.011558
 #> indirect_2@3: M2 [Group = high] -0.001254   0.003977 -0.010910  0.005954
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Fitted group n: low = 34; med = 34; high = 32.
@@ -271,7 +271,7 @@ difference
 #> Contrast direction (signed weights):
 #>  high_minus_low: -1 * M1 [Group = low] +1 * M1 [Group = high]
 #>                Estimate Std. Error CI lower CI upper
-#> high_minus_low  -0.0142     0.0164  -0.0500   0.0159
+#> high_minus_low  -0.0142     0.0164  -0.0503   0.0154
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 plot(difference)
@@ -306,12 +306,12 @@ standardized
 #> Plug-in marginal outcome-difference SD: 0.169127 
 #> The denominator is not a moderator-specific conditional SD.
 #>                                 Estimate Std. Error CI lower CI upper
-#> indirect_1@1: M1 [Group = low]   0.08257    0.08854 -0.07898  0.27364
-#> indirect_2@1: M2 [Group = low]  -0.00631    0.02137 -0.05769  0.03341
-#> indirect_1@2: M1 [Group = med]  -0.00238    0.03141 -0.07480  0.05967
-#> indirect_2@2: M2 [Group = med]  -0.00304    0.02003 -0.04999  0.03621
-#> indirect_1@3: M1 [Group = high] -0.00134    0.03175 -0.07298  0.06504
-#> indirect_2@3: M2 [Group = high] -0.00742    0.02265 -0.06211  0.03395
+#> indirect_1@1: M1 [Group = low]   0.08257    0.08790 -0.07923  0.27686
+#> indirect_2@1: M2 [Group = low]  -0.00631    0.02137 -0.05755  0.03348
+#> indirect_1@2: M1 [Group = med]  -0.00238    0.03083 -0.07395  0.06113
+#> indirect_2@2: M2 [Group = med]  -0.00304    0.02003 -0.05010  0.03621
+#> indirect_1@3: M1 [Group = high] -0.00134    0.03203 -0.07222  0.06625
+#> indirect_2@3: M2 [Group = high] -0.00742    0.02266 -0.06210  0.03422
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Fitted group n: low = 34; med = 34; high = 32.
 #> Fitted group counts after missing-data handling; observed counts exclude
@@ -427,10 +427,10 @@ print(adjusted)
 #> Condition contrast: C2 - C1 
 #> Covariate: Group ; reference category = low 
 #>                                       Estimate Std. Error CI lower CI upper
-#> cp: Direct effect                     -0.08738    0.02898 -0.14500 -0.03149
-#> indirect_1: M1                         0.01059    0.00952 -0.00579  0.03198
-#> total_indirect: Total indirect effect  0.01059    0.00952 -0.00579  0.03198
-#> total: Total effect                   -0.07679    0.02815 -0.13165 -0.02243
+#> cp: Direct effect                     -0.08738    0.02898 -0.14441 -0.03092
+#> indirect_1: M1                         0.01059    0.00955 -0.00567  0.03230
+#> total_indirect: Total indirect effect  0.01059    0.00955 -0.00567  0.03230
+#> total: Total effect                   -0.07679    0.02813 -0.13138 -0.02206
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 #> Post-fit admissibility: 1 of 1 ; excluded rows: 0

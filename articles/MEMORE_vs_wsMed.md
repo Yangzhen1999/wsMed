@@ -255,7 +255,7 @@ print(result2)
 #> cp: Direct effect                      0.015995   0.016422 -0.017209  0.047258
 #> indirect_1: M1                         0.000977   0.003106 -0.004617  0.008159
 #> indirect_1_2: M1 -> M2                 0.000710   0.001088 -0.000763  0.003552
-#> indirect_2: M2                        -0.002337   0.003775 -0.011787  0.003241
+#> indirect_2: M2                        -0.002337   0.003775 -0.011788  0.003241
 #> total_indirect: Total indirect effect -0.000650   0.005013 -0.011443  0.009266
 #> total: Total effect                    0.015346   0.016257 -0.016721  0.046780
 #> Inference draws: 5000 retained of 5000 ; 0 excluded before effect extraction.

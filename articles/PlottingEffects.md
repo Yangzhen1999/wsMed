@@ -221,9 +221,9 @@ summary(effects)
 #> Plug-in marginal outcome-difference SD: 6.28886 
 #> The denominator is not a moderator-specific conditional SD.
 #>                          Estimate Std. Error CI lower CI upper
-#> indirect_1@1: M1 [W = 1]   0.3150     0.0314   0.2565   0.3799
-#> indirect_1@2: M1 [W = 3]   0.7859     0.0485   0.6953   0.8847
-#> indirect_1@3: M1 [W = 5]   1.4683     0.0748   1.3294   1.6210
+#> indirect_1@1: M1 [W = 1]   0.3150     0.0313   0.2565   0.3786
+#> indirect_1@2: M1 [W = 3]   0.7859     0.0484   0.6935   0.8853
+#> indirect_1@3: M1 [W = 5]   1.4683     0.0748   1.3273   1.6218
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 p <- plot(effects)
@@ -459,7 +459,7 @@ supported <- wsmed_effects(
 as.data.frame(supported)[, c("at", "estimate", "extrapolated")]
 #>                 at  estimate extrapolated
 #> 1 3.23287569618678 0.8544881        FALSE
-#> 2 10.6167533949209 4.5160203         TRUE
+#> 2 10.6167533949209 4.5160206         TRUE
 plot(
   supported,
   view = "forest"
@@ -482,11 +482,11 @@ These counts are not effective sample sizes for the conditional effects.
 
 forest$data[, c("Path","Estimate","CI.LL","CI.UL")]
 #>              Path   Estimate      CI.LL      CI.UL
-#> 16     indirect_1  1.8547443  1.7246500  1.9935134
-#> 17     indirect_2  1.0906142  0.9875177  1.1972101
-#> 18 total_indirect  2.9453585  2.7762265  3.1303118
-#> 1              cp -0.7473746 -0.8642842 -0.6260046
-#> 19   total_effect  2.1979839  2.0328561  2.3757007
+#> 16     indirect_1  1.8547443  1.7242857  1.9945971
+#> 17     indirect_2  1.0906142  0.9883886  1.2010407
+#> 18 total_indirect  2.9453585  2.7777187  3.1318455
+#> 1              cp -0.7473746 -0.8631247 -0.6264161
+#> 19   total_effect  2.1979839  2.0323706  2.3769728
 attr(forest, "wsmed_plot")
 #> $engine
 #> [1] "mc"
