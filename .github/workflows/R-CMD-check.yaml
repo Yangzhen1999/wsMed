@@ -2,14 +2,23 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master, feature/modular-api]
+    branches: [main, master]
   pull_request:
     branches: [main, master]
   workflow_dispatch:
+    inputs:
+      full_validation:
+        description: 'Also check old R, optional dependencies, and execute all tutorials once'
+        type: boolean
+        default: false
 
 name: R-CMD-check
 
 permissions: read-all
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   R-CMD-check:
@@ -20,13 +29,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config:
-          - {os: macos-latest,   r: 'release'}
-          - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
-          - {os: ubuntu-latest,   r: 'release'}
-          - {os: ubuntu-latest,   r: 'oldrel-1'}
-          - {os: ubuntu-latest,   r: 'release', nosuggests: true, special: "No Suggests"}
+        # Routine checks cover three operating systems and R-devel.
+        # Release preparation adds compatibility checks without duplicating jobs.
+        config: >-
+          ${{ fromJSON(inputs.full_validation == true &&
+          '[{"os":"macos-latest","r":"release"},{"os":"windows-latest","r":"release"},{"os":"ubuntu-latest","r":"devel","http-user-agent":"release"},{"os":"ubuntu-latest","r":"release"},{"os":"ubuntu-latest","r":"oldrel-1"},{"os":"ubuntu-latest","r":"release","nosuggests":true,"special":"No Suggests"}]' ||
+          '[{"os":"macos-latest","r":"release"},{"os":"windows-latest","r":"release"},{"os":"ubuntu-latest","r":"devel","http-user-agent":"release"},{"os":"ubuntu-latest","r":"release"}]') }}
 
     env:
       _R_CHECK_DEPENDS_ONLY_: ${{ matrix.config.nosuggests == true && 'true' || 'false' }}
@@ -68,19 +76,20 @@ jobs:
           stopifnot(status == 0L)
           check_installed_vignettes(getwd(), lib)
 
-      - name: Rebuild executable tutorials
-        if: matrix.config.nosuggests != true
+      - name: Re-execute tutorials once for full validation
+        if: inputs.full_validation == true && matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'release' && matrix.config.nosuggests != true
         shell: Rscript {0}
         run: |
           source("rebuild_vignettes.R")
           rebuild_vignettes()
 
-      - name: Verify tutorials installed from a source archive
+      - name: Record tutorial inputs for source-archive verification
         if: matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'release' && matrix.config.nosuggests != true
         shell: Rscript {0}
         run: |
-          source("tools/build-release.R")
-          build_wsmed_release(getwd(), file.path(Sys.getenv("RUNNER_TEMP"), "wsmed-installed-tutorials"))
+          source("tools/vignette-build-utils.R")
+          expected <- check_frozen_vignettes(getwd())
+          saveRDS(expected, file.path(Sys.getenv("RUNNER_TEMP"), "wsmed-tutorial-inputs.rds"))
 
       - uses: r-lib/actions/check-r-package@v2
         with:
@@ -94,3 +103,11 @@ jobs:
         run: |
           source(".github/check-completion.R")
           check_completion("check")
+
+      - name: Verify tutorials in the checked source-archive installation
+        if: success() && matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'release' && matrix.config.nosuggests != true
+        shell: Rscript {0}
+        run: |
+          source("tools/vignette-build-utils.R")
+          expected <- readRDS(file.path(Sys.getenv("RUNNER_TEMP"), "wsmed-tutorial-inputs.rds"))
+          check_installed_vignettes(getwd(), file.path("check", "wsMed.Rcheck"), expected)

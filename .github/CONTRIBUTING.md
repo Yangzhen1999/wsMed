@@ -31,7 +31,8 @@ check_frozen_vignettes(getwd())
 The helper discovers all source tutorials. It also updates `inst/doc` HTML and
 images so direct installations include current documentation. Commit sources,
 frozen tutorials, generated images, installed documents and `build-manifest.dcf`.
-CI validates their freshness before rebuilding.
+Routine CI validates their freshness, then builds and checks the committed
+tutorials without repeating their long Monte Carlo and bootstrap analyses.
 
 ```r
 source("tools/build-release.R")
@@ -45,6 +46,27 @@ a separate action. Add new articles to the categorized `_pkgdown.yml` index and
 check all internal links and heading anchors. Preserve existing article URLs.
 
 ## Reproducibility and validation
+
+Routine pull requests and main/master pushes run R CMD check on Windows,
+macOS and Linux with R-release, plus Linux with R-devel. Package regression
+tests remain part of these checks, and an independent completion check rejects
+truncated check logs. Development-branch pushes do not also trigger a duplicate
+run when a pull request is open. Branches without a pull request can be checked
+with the workflow's Run workflow button.
+
+For release preparation, run R-CMD-check manually with `full_validation` enabled.
+This adds R-oldrel and the dependencies-only environment, and re-executes all
+tutorial sources once on Linux R-release. The checked source-archive installation
+is reused to verify installed tutorials; it does not trigger another full rebuild.
+Run Manuscript replication and Monte Carlo reproducibility manually before
+release and after changes to numerical methods, imputation, standardization or
+the manuscript examples. Their numerical references and evidence checks remain
+unchanged. The separate package-test matrix has been removed because R CMD check
+already runs those tests on the supported platforms.
+
+Website previews run when website inputs change. They use the committed
+tutorials after verifying freshness; full tutorial execution belongs to the
+validation workflow rather than each website build.
 
 Pin an audited commit for reproducible analyses and save an analysis manifest.
 Use the same package build for numerical tables and figures. The simulation
