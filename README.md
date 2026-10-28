@@ -60,4 +60,4 @@ with the first level as the reference. The
 explains coding and missing-data restrictions.
 
 The empirical manuscript data are included as `wsmed_examples`.
-For source editing and tutorial rebuilding, see the [maintainer guide](.github/CONTRIBUTING.md).
+For source editing and tutorial rebuilding, see the [maintainer guide](https://github.com/Yangzhen1999/wsMed/blob/master/.github/CONTRIBUTING.md).

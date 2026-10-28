@@ -42,6 +42,25 @@ check_frozen_vignettes <- function(root) {
   invisible(expected)
 }
 
+check_local_vignette_links <- function(html) {
+  text <- paste(readLines(html, warn = FALSE), collapse = "\n")
+  attributes <- c(img = "src", a = "href")
+  for (element in names(attributes)) {
+    attribute <- attributes[[element]]
+    pattern <- paste0('<', element, '\\b[^>]*?\\b', attribute, '\\s*=\\s*["\x27][^"\x27]*["\x27]')
+    tags <- regmatches(text, gregexpr(pattern, text, perl = TRUE, ignore.case = TRUE))[[1]]
+    for (tag in tags) {
+      target <- sub(paste0('.*\\b', attribute, '\\s*=\\s*["\x27]([^"\x27]*)["\x27].*'),
+                    '\\1', tag, perl = TRUE, ignore.case = TRUE)
+      if (grepl("^([[:alpha:]][[:alnum:]+.-]*:|//|#)", target)) next
+      target <- utils::URLdecode(sub("[?#].*$", "", target))
+      if (nzchar(target) && !file.exists(file.path(dirname(html), target)))
+        stop("Missing installed tutorial file: ", target, " (from ", basename(html), ")")
+    }
+  }
+  invisible(TRUE)
+}
+
 check_installed_vignettes <- function(root, lib, expected = NULL) {
   if (is.null(expected)) expected <- check_frozen_vignettes(root)
   installed <- find.package("wsMed", lib.loc = lib)
@@ -60,14 +79,8 @@ check_installed_vignettes <- function(root, lib, expected = NULL) {
   for (id in expected$Article) {
     html <- file.path(installed, "doc", paste0(id, ".html"))
     if (!file.exists(html) || file.info(html)$size == 0) stop("Missing installed HTML tutorial: ", id)
-    text <- paste(readLines(html, warn = FALSE), collapse = "\n")
-    tags <- regmatches(text, gregexpr('<img[^>]+src=["\x27][^"\x27]+["\x27]', text, perl = TRUE))[[1]]
-    for (tag in tags) {
-      src <- sub('.*src=["\x27]([^"\x27]+)["\x27].*', '\\1', tag, perl = TRUE)
-      if (!grepl("^(data:|https?:|//)", src) && !file.exists(file.path(dirname(html), utils::URLdecode(src))))
-        stop("Missing installed tutorial image: ", src)
-    }
+    check_local_vignette_links(html)
   }
-  message("Installed tutorial inventory, titles and images verified: ", nrow(expected))
+  message("Installed tutorial inventory, titles, images and local links verified: ", nrow(expected))
   invisible(expected)
 }
