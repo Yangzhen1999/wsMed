@@ -112,21 +112,21 @@ new samples.</p>
 <span><span class="co">#&gt; Plug-in marginal outcome-difference SD: 0.169194 </span></span>
 <span><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
 <span><span class="co">#&gt;                            Estimate Std. Error CI lower CI upper</span></span>
-<span><span class="co">#&gt; indirect_1@1: A [D3 = 0.2]  0.01950    0.03723 -0.03073  0.09045</span></span>
-<span><span class="co">#&gt; indirect_1@2: A [D3 = 0.5]  0.00886    0.01893 -0.01974  0.04253</span></span>
+<span><span class="co">#&gt; indirect_1@1: A [D3 = 0.2]  0.01950    0.03741 -0.02777  0.08870</span></span>
+<span><span class="co">#&gt; indirect_1@2: A [D3 = 0.5]  0.00886    0.01979 -0.01737  0.04664</span></span>
 <span><span class="co">#&gt; Inference draws: 1000 retained of 1000 ; 0 excluded before effect extraction.</span></span>
 <span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">effects</span><span class="op">)</span>                 <span class="co"># stored 90% level</span></span>
 <span><span class="co">#&gt;                      5 %       95 %</span></span>
-<span><span class="co">#&gt; indirect_1@1 -0.03072722 0.09045346</span></span>
-<span><span class="co">#&gt; indirect_1@2 -0.01974249 0.04253021</span></span>
+<span><span class="co">#&gt; indirect_1@1 -0.02777232 0.08869974</span></span>
+<span><span class="co">#&gt; indirect_1@2 -0.01737350 0.04664084</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span></span>
 <span>  <span class="va">effects</span>,</span>
 <span>  level <span class="op">=</span> <span class="fl">.95</span></span>
 <span><span class="op">)</span>    <span class="co"># explicit override</span></span>
 <span><span class="co">#&gt;                    2.5 %     97.5 %</span></span>
-<span><span class="co">#&gt; indirect_1@1 -0.04472425 0.11503044</span></span>
-<span><span class="co">#&gt; indirect_1@2 -0.02658780 0.05004395</span></span>
+<span><span class="co">#&gt; indirect_1@1 -0.04443721 0.10637292</span></span>
+<span><span class="co">#&gt; indirect_1@2 -0.02711014 0.05686551</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">effects</span>,</span>
 <span>  view <span class="op">=</span> <span class="st">"conditional"</span></span>
@@ -271,9 +271,9 @@ standardizer and conditional effects, up to fitting precision.</p>
 <span>  recoded <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">recoded_effects</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;              group     original      recoded</span></span>
-<span><span class="co">#&gt; indirect_1@1  high -0.001614356 -0.001614356</span></span>
-<span><span class="co">#&gt; indirect_1@2   low  0.089299556  0.089299548</span></span>
-<span><span class="co">#&gt; indirect_1@3   med -0.003012106 -0.003012104</span></span>
+<span><span class="co">#&gt; indirect_1@1  high -0.001614357 -0.001614352</span></span>
+<span><span class="co">#&gt; indirect_1@2   low  0.089299548  0.089299556</span></span>
+<span><span class="co">#&gt; indirect_1@3   med -0.003012105 -0.003012102</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">original_effects</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">recoded_effects</span><span class="op">)</span><span class="op">)</span>, tolerance <span class="op">=</span> <span class="fl">1e-6</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>For MI moderated models, marginal variances are estimated in each
@@ -370,7 +370,7 @@ model.</p>
 <span><span class="co">#&gt; [1] "Mersenne-Twister" "Inversion"        "Rejection"</span></span>
 <span><span class="va">report</span><span class="op">$</span><span class="va">fitting_versions</span></span>
 <span><span class="co">#&gt; $R</span></span>
-<span><span class="co">#&gt; [1] "R version 4.6.1 (2026-06-24)"</span></span>
+<span><span class="co">#&gt; [1] "R version 4.4.3 (2025-02-28 ucrt)"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $wsMed</span></span>
 <span><span class="co">#&gt; [1] '1.2.0'</span></span>
@@ -384,13 +384,13 @@ model.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $lavaan</span></span>
-<span><span class="co">#&gt; [1] '0.7.3'</span></span>
+<span><span class="co">#&gt; [1] '0.6.19'</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $mice</span></span>
 <span><span class="co">#&gt; NULL</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $platform</span></span>
-<span><span class="co">#&gt; [1] "x86_64-pc-linux-gnu"</span></span>
+<span><span class="co">#&gt; [1] "x86_64-w64-mingw32"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $RNGkind</span></span>
 <span><span class="co">#&gt; [1] "Mersenne-Twister" "Inversion"        "Rejection"       </span></span>

@@ -97,10 +97,10 @@ Example setup
 <span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
 <span><span class="co">#&gt;                                        Estimate Std. Error  CI lower  CI upper</span></span>
 <span><span class="co">#&gt; cp: Direct effect                     -0.031795   0.017000 -0.064525  0.001864</span></span>
-<span><span class="co">#&gt; indirect_1: M1                         0.001311   0.003208 -0.004586  0.008760</span></span>
-<span><span class="co">#&gt; indirect_2: M2                        -0.001120   0.002587 -0.007507  0.003186</span></span>
-<span><span class="co">#&gt; total_indirect: Total indirect effect  0.000191   0.004138 -0.008459  0.008723</span></span>
-<span><span class="co">#&gt; total: Total effect                   -0.031604   0.017049 -0.064633  0.001895</span></span>
+<span><span class="co">#&gt; indirect_1: M1                         0.001311   0.003208 -0.004601  0.008917</span></span>
+<span><span class="co">#&gt; indirect_2: M2                        -0.001120   0.002570 -0.007617  0.003084</span></span>
+<span><span class="co">#&gt; total_indirect: Total indirect effect  0.000191   0.004111 -0.008172  0.008783</span></span>
+<span><span class="co">#&gt; total: Total effect                   -0.031604   0.017015 -0.064740  0.001839</span></span>
 <span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
 <span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
 <span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0</span></span></code></pre></div>
@@ -123,10 +123,10 @@ Carlo CIs.</p>
 <span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
 <span><span class="co">#&gt;                                        Estimate Std. Error  CI lower  CI upper</span></span>
 <span><span class="co">#&gt; cp: Direct effect                     -0.031795   0.017000 -0.064525  0.001864</span></span>
-<span><span class="co">#&gt; indirect_1: M1                         0.001311   0.003208 -0.004586  0.008760</span></span>
-<span><span class="co">#&gt; indirect_2: M2                        -0.001120   0.002587 -0.007507  0.003186</span></span>
-<span><span class="co">#&gt; total_indirect: Total indirect effect  0.000191   0.004138 -0.008459  0.008723</span></span>
-<span><span class="co">#&gt; total: Total effect                   -0.031604   0.017049 -0.064633  0.001895</span></span>
+<span><span class="co">#&gt; indirect_1: M1                         0.001311   0.003208 -0.004601  0.008917</span></span>
+<span><span class="co">#&gt; indirect_2: M2                        -0.001120   0.002570 -0.007617  0.003084</span></span>
+<span><span class="co">#&gt; total_indirect: Total indirect effect  0.000191   0.004111 -0.008172  0.008783</span></span>
+<span><span class="co">#&gt; total: Total effect                   -0.031604   0.017015 -0.064740  0.001839</span></span>
 <span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
 <span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -134,11 +134,11 @@ Carlo CIs.</p>
 <span><span class="co">#&gt;    Estimate Std. Error CI lower CI upper</span></span>
 <span><span class="co">#&gt; cp -0.03180    0.01700 -0.06453  0.00186</span></span>
 <span><span class="co">#&gt; b1 -0.04834    0.09555 -0.23422  0.13918</span></span>
-<span><span class="co">#&gt; d1 -0.06905    0.09508 -0.25500  0.11962</span></span>
+<span><span class="co">#&gt; d1 -0.06905    0.09508 -0.25772  0.11690</span></span>
 <span><span class="co">#&gt; b2 -0.07732    0.09387 -0.26459  0.10461</span></span>
-<span><span class="co">#&gt; d2 -0.03676    0.08692 -0.20737  0.13289</span></span>
-<span><span class="co">#&gt; a1 -0.02712    0.01772 -0.06162  0.00817</span></span>
-<span><span class="co">#&gt; a2  0.01448    0.01796 -0.02032  0.04929</span></span>
+<span><span class="co">#&gt; d2 -0.03676    0.08692 -0.20641  0.13385</span></span>
+<span><span class="co">#&gt; a1 -0.02712    0.01772 -0.06242  0.00737</span></span>
+<span><span class="co">#&gt; a2  0.01448    0.01796 -0.02033  0.04929</span></span>
 <span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span></span>
 <span><span class="co">#&gt; Tables: $effects, $coefficients; analysis settings: $info.</span></span></code></pre></div>
 <p><code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> returns a structured report containing
@@ -187,23 +187,23 @@ the report without fitting again.</p>
 <span><span class="co">#&gt; Plug-in marginal outcome-difference SD: 0.169239 </span></span>
 <span><span class="co">#&gt; The denominator is not a moderator-specific conditional SD.</span></span>
 <span><span class="co">#&gt;                                       Estimate Std. Error CI lower CI upper</span></span>
-<span><span class="co">#&gt; cp: Direct effect                     -0.18787    0.10030 -0.38339  0.01074</span></span>
-<span><span class="co">#&gt; indirect_1: M1                         0.00775    0.01858 -0.02663  0.05041</span></span>
-<span><span class="co">#&gt; indirect_2: M2                        -0.00662    0.01496 -0.04328  0.01832</span></span>
-<span><span class="co">#&gt; total_indirect: Total indirect effect  0.00113    0.02396 -0.04869  0.05065</span></span>
-<span><span class="co">#&gt; total: Total effect                   -0.18674    0.10059 -0.38126  0.01122</span></span>
+<span><span class="co">#&gt; cp: Direct effect                     -0.18787    0.10051 -0.38202  0.01096</span></span>
+<span><span class="co">#&gt; indirect_1: M1                         0.00775    0.01858 -0.02674  0.05159</span></span>
+<span><span class="co">#&gt; indirect_2: M2                        -0.00662    0.01480 -0.04360  0.01801</span></span>
+<span><span class="co">#&gt; total_indirect: Total indirect effect  0.00113    0.02378 -0.04770  0.05070</span></span>
+<span><span class="co">#&gt; total: Total effect                   -0.18674    0.10054 -0.38189  0.01043</span></span>
 <span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
 <span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Path coefficients:</span></span>
 <span><span class="co">#&gt;    Estimate Std. Error CI lower CI upper</span></span>
-<span><span class="co">#&gt; cp  -0.1879     0.1003  -0.3834   0.0107</span></span>
-<span><span class="co">#&gt; b1  -0.0501     0.0972  -0.2385   0.1429</span></span>
-<span><span class="co">#&gt; d1  -0.0751     0.1012  -0.2706   0.1284</span></span>
-<span><span class="co">#&gt; b2  -0.0821     0.0975  -0.2709   0.1096</span></span>
-<span><span class="co">#&gt; d2  -0.0438     0.1015  -0.2421   0.1557</span></span>
-<span><span class="co">#&gt; a1  -0.1546     0.1027  -0.3589   0.0462</span></span>
-<span><span class="co">#&gt; a2   0.0806     0.1011  -0.1153   0.2784</span></span>
+<span><span class="co">#&gt; cp  -0.1879     0.1005  -0.3820   0.0110</span></span>
+<span><span class="co">#&gt; b1  -0.0501     0.0972  -0.2381   0.1427</span></span>
+<span><span class="co">#&gt; d1  -0.0751     0.1012  -0.2724   0.1253</span></span>
+<span><span class="co">#&gt; b2  -0.0821     0.0973  -0.2710   0.1092</span></span>
+<span><span class="co">#&gt; d2  -0.0438     0.1014  -0.2392   0.1566</span></span>
+<span><span class="co">#&gt; a1  -0.1546     0.1026  -0.3598   0.0419</span></span>
+<span><span class="co">#&gt; a2   0.0806     0.1013  -0.1133   0.2817</span></span>
 <span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span></span>
 <span><span class="co">#&gt; Tables: $effects, $coefficients; analysis settings: $info.</span></span></code></pre></div>
 <p>For complete condition effects, standardization uses the
@@ -228,8 +228,8 @@ the treatment of paths, interactions and conditional effects.</p>
 <span><span class="co">#&gt; 95% percentile intervals; 20000 joint draws; SE from effect draws</span></span>
 <span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
 <span><span class="co">#&gt;                Estimate Std. Error CI lower CI upper</span></span>
-<span><span class="co">#&gt; indirect_1: M1  0.00131    0.00321 -0.00459  0.00876</span></span>
-<span><span class="co">#&gt; indirect_2: M2 -0.00112    0.00259 -0.00751  0.00319</span></span>
+<span><span class="co">#&gt; indirect_1: M1  0.00131    0.00321 -0.00460  0.00892</span></span>
+<span><span class="co">#&gt; indirect_2: M2 -0.00112    0.00257 -0.00762  0.00308</span></span>
 <span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
 <span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -237,11 +237,11 @@ the treatment of paths, interactions and conditional effects.</p>
 <span><span class="co">#&gt;    Estimate Std. Error CI lower CI upper</span></span>
 <span><span class="co">#&gt; cp -0.03180    0.01700 -0.06453  0.00186</span></span>
 <span><span class="co">#&gt; b1 -0.04834    0.09555 -0.23422  0.13918</span></span>
-<span><span class="co">#&gt; d1 -0.06905    0.09508 -0.25500  0.11962</span></span>
+<span><span class="co">#&gt; d1 -0.06905    0.09508 -0.25772  0.11690</span></span>
 <span><span class="co">#&gt; b2 -0.07732    0.09387 -0.26459  0.10461</span></span>
-<span><span class="co">#&gt; d2 -0.03676    0.08692 -0.20737  0.13289</span></span>
-<span><span class="co">#&gt; a1 -0.02712    0.01772 -0.06162  0.00817</span></span>
-<span><span class="co">#&gt; a2  0.01448    0.01796 -0.02032  0.04929</span></span>
+<span><span class="co">#&gt; d2 -0.03676    0.08692 -0.20641  0.13385</span></span>
+<span><span class="co">#&gt; a1 -0.02712    0.01772 -0.06242  0.00737</span></span>
+<span><span class="co">#&gt; a2  0.01448    0.01796 -0.02033  0.04929</span></span>
 <span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span></span>
 <span><span class="co">#&gt; Tables: $effects, $coefficients; analysis settings: $info.</span></span></code></pre></div>
 <p>Other selections include <code>"direct"</code>,
@@ -265,10 +265,10 @@ the treatment of paths, interactions and conditional effects.</p>
 <span><span class="co">#&gt; Condition contrast: C2 - C1 </span></span>
 <span><span class="co">#&gt;                                        Estimate Std. Error  CI lower  CI upper</span></span>
 <span><span class="co">#&gt; cp: Direct effect                     -0.031795   0.017000 -0.059453 -0.003589</span></span>
-<span><span class="co">#&gt; indirect_1: M1                         0.001311   0.003208 -0.003348  0.007167</span></span>
-<span><span class="co">#&gt; indirect_2: M2                        -0.001120   0.002587 -0.005991  0.002170</span></span>
-<span><span class="co">#&gt; total_indirect: Total indirect effect  0.000191   0.004138 -0.006581  0.006993</span></span>
-<span><span class="co">#&gt; total: Total effect                   -0.031604   0.017049 -0.059402 -0.003324</span></span>
+<span><span class="co">#&gt; indirect_1: M1                         0.001311   0.003208 -0.003280  0.007212</span></span>
+<span><span class="co">#&gt; indirect_2: M2                        -0.001120   0.002570 -0.006018  0.002135</span></span>
+<span><span class="co">#&gt; total_indirect: Total indirect effect  0.000191   0.004111 -0.006502  0.007132</span></span>
+<span><span class="co">#&gt; total: Total effect                   -0.031604   0.017015 -0.059271 -0.003342</span></span>
 <span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
 <span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -276,11 +276,11 @@ the treatment of paths, interactions and conditional effects.</p>
 <span><span class="co">#&gt;    Estimate Std. Error CI lower CI upper</span></span>
 <span><span class="co">#&gt; cp -0.03180    0.01700 -0.05945 -0.00359</span></span>
 <span><span class="co">#&gt; b1 -0.04834    0.09555 -0.20435  0.10967</span></span>
-<span><span class="co">#&gt; d1 -0.06905    0.09508 -0.22521  0.08916</span></span>
+<span><span class="co">#&gt; d1 -0.06905    0.09508 -0.22726  0.08711</span></span>
 <span><span class="co">#&gt; b2 -0.07732    0.09387 -0.23305  0.07588</span></span>
-<span><span class="co">#&gt; d2 -0.03676    0.08692 -0.18025  0.10468</span></span>
-<span><span class="co">#&gt; a1 -0.02712    0.01772 -0.05624  0.00217</span></span>
-<span><span class="co">#&gt; a2  0.01448    0.01796 -0.01494  0.04405</span></span>
+<span><span class="co">#&gt; d2 -0.03676    0.08692 -0.17820  0.10673</span></span>
+<span><span class="co">#&gt; a1 -0.02712    0.01772 -0.05642  0.00200</span></span>
+<span><span class="co">#&gt; a2  0.01448    0.01796 -0.01508  0.04391</span></span>
 <span><span class="co">#&gt; Post-fit admissibility: 1 of 1 ; excluded rows: 0 </span></span>
 <span><span class="co">#&gt; Tables: $effects, $coefficients; analysis settings: $info.</span></span></code></pre></div>
 <p>The interval is recalculated from the stored draws. Effect SEs are
@@ -326,7 +326,7 @@ draws to form that difference, then print the result directly:</p>
 <span><span class="co">#&gt; Contrast direction (signed weights):</span></span>
 <span><span class="co">#&gt;  B_minus_A: +1 * M2 -1 * M1</span></span>
 <span><span class="co">#&gt;           Estimate Std. Error CI lower CI upper</span></span>
-<span><span class="co">#&gt; B_minus_A -0.00243    0.00410 -0.01184  0.00489</span></span>
+<span><span class="co">#&gt; B_minus_A -0.00243    0.00411 -0.01178  0.00492</span></span>
 <span><span class="co">#&gt; Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.</span></span>
 <span><span class="co">#&gt; Use as.data.frame() for the full-precision table and metadata.</span></span></code></pre></div>
 <p><code>B_minus_A</code> is the indirect effect through B minus the
@@ -396,11 +396,11 @@ limits:</p>
 <span><span class="op">)</span></span>
 <span><span class="va">effect_table</span><span class="op">[</span>, <span class="va">columns</span><span class="op">]</span></span>
 <span><span class="co">#&gt;                   label      estimate   std.error     conf.low   conf.high</span></span>
-<span><span class="co">#&gt; 1         Direct effect -0.0317954295 0.016999695 -0.064525050 0.001863738</span></span>
-<span><span class="co">#&gt; 2                    M1  0.0013113045 0.003208354 -0.004586379 0.008759829</span></span>
-<span><span class="co">#&gt; 3                    M2 -0.0011199168 0.002587292 -0.007506753 0.003185604</span></span>
-<span><span class="co">#&gt; 4 Total indirect effect  0.0001913877 0.004138371 -0.008458737 0.008723282</span></span>
-<span><span class="co">#&gt; 5          Total effect -0.0316040417 0.017049340 -0.064633149 0.001894936</span></span></code></pre></div>
+<span><span class="co">#&gt; 1         Direct effect -0.0317954295 0.016999696 -0.064525051 0.001863739</span></span>
+<span><span class="co">#&gt; 2                    M1  0.0013113045 0.003207828 -0.004600745 0.008917406</span></span>
+<span><span class="co">#&gt; 3                    M2 -0.0011199168 0.002569908 -0.007616873 0.003084259</span></span>
+<span><span class="co">#&gt; 4 Total indirect effect  0.0001913877 0.004111147 -0.008172032 0.008783391</span></span>
+<span><span class="co">#&gt; 5          Total effect -0.0316040417 0.017015460 -0.064739552 0.001838718</span></span></code></pre></div>
 <p>Remove <code>"std.error"</code> from <code>columns</code> to omit
 SEs, or remove <code>"conf.low"</code> and <code>"conf.high"</code> to
 omit CIs. <code>names(effect_table)</code> lists all available columns;

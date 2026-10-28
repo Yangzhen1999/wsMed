@@ -336,10 +336,10 @@ print(result)
 #> Condition contrast: C2 - C1 
 #>                                        Estimate Std. Error  CI lower  CI upper
 #> cp: Direct effect                     -0.031795   0.017000 -0.064525  0.001864
-#> indirect_1: M1                         0.001311   0.003208 -0.004586  0.008760
+#> indirect_1: M1                         0.001311   0.003208 -0.004601  0.008917
 #> indirect_2: M2                        -0.001120   0.002587 -0.007507  0.003186
-#> total_indirect: Total indirect effect  0.000191   0.004138 -0.008459  0.008723
-#> total: Total effect                   -0.031604   0.017049 -0.064633  0.001895
+#> total_indirect: Total indirect effect  0.000191   0.004145 -0.008311  0.008883
+#> total: Total effect                   -0.031604   0.017031 -0.064494  0.001789
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 #> Post-fit admissibility: 1 of 1 ; excluded rows: 0 

@@ -83,7 +83,7 @@ contrasts:
 Full stored MEMORE 3.0 parallel-model report
 
 ``` text
-
+o;<bf>
 Run MATRIX procedure:
 
 *********************** MEMORE Procedure for SPSS Version 3.0 ***********************
@@ -276,7 +276,7 @@ print(result2)
 Full stored MEMORE 3.0 serial-model report
 
 ``` text
-
+o;<bf>
 Run MATRIX procedure:
 
 *********************** MEMORE Procedure for SPSS Version 3.0 ***********************

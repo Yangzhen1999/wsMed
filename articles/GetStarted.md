@@ -88,10 +88,10 @@ print(result)
 #> Condition contrast: C2 - C1 
 #>                                        Estimate Std. Error  CI lower  CI upper
 #> cp: Direct effect                     -0.031795   0.017000 -0.064525  0.001864
-#> indirect_1: M1                         0.001311   0.003208 -0.004586  0.008760
-#> indirect_2: M2                        -0.001120   0.002587 -0.007507  0.003186
-#> total_indirect: Total indirect effect  0.000191   0.004138 -0.008459  0.008723
-#> total: Total effect                   -0.031604   0.017049 -0.064633  0.001895
+#> indirect_1: M1                         0.001311   0.003208 -0.004601  0.008917
+#> indirect_2: M2                        -0.001120   0.002570 -0.007617  0.003084
+#> total_indirect: Total indirect effect  0.000191   0.004111 -0.008172  0.008783
+#> total: Total effect                   -0.031604   0.017015 -0.064740  0.001839
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 #> Post-fit admissibility: 1 of 1 ; excluded rows: 0
@@ -117,10 +117,10 @@ summary(result)
 #> Condition contrast: C2 - C1 
 #>                                        Estimate Std. Error  CI lower  CI upper
 #> cp: Direct effect                     -0.031795   0.017000 -0.064525  0.001864
-#> indirect_1: M1                         0.001311   0.003208 -0.004586  0.008760
-#> indirect_2: M2                        -0.001120   0.002587 -0.007507  0.003186
-#> total_indirect: Total indirect effect  0.000191   0.004138 -0.008459  0.008723
-#> total: Total effect                   -0.031604   0.017049 -0.064633  0.001895
+#> indirect_1: M1                         0.001311   0.003208 -0.004601  0.008917
+#> indirect_2: M2                        -0.001120   0.002570 -0.007617  0.003084
+#> total_indirect: Total indirect effect  0.000191   0.004111 -0.008172  0.008783
+#> total: Total effect                   -0.031604   0.017015 -0.064740  0.001839
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 #> 
@@ -128,11 +128,11 @@ summary(result)
 #>    Estimate Std. Error CI lower CI upper
 #> cp -0.03180    0.01700 -0.06453  0.00186
 #> b1 -0.04834    0.09555 -0.23422  0.13918
-#> d1 -0.06905    0.09508 -0.25500  0.11962
+#> d1 -0.06905    0.09508 -0.25772  0.11690
 #> b2 -0.07732    0.09387 -0.26459  0.10461
-#> d2 -0.03676    0.08692 -0.20737  0.13289
-#> a1 -0.02712    0.01772 -0.06162  0.00817
-#> a2  0.01448    0.01796 -0.02032  0.04929
+#> d2 -0.03676    0.08692 -0.20641  0.13385
+#> a1 -0.02712    0.01772 -0.06242  0.00737
+#> a2  0.01448    0.01796 -0.02033  0.04929
 #> Post-fit admissibility: 1 of 1 ; excluded rows: 0 
 #> Tables: $effects, $coefficients; analysis settings: $info.
 ```
@@ -189,16 +189,16 @@ print(moderated)
 #> Moderator: D3 in raw units; centering reference = 0.452271 
 #>                                                       Estimate Std. Error
 #> cp@1: Direct effect [D3 = 0.452]                     -0.034124   0.016983
-#> indirect_1@1: M1 [D3 = 0.452]                         0.001505   0.003204
-#> indirect_2@1: M2 [D3 = 0.452]                        -0.001426   0.002822
-#> total_indirect@1: Total indirect effect [D3 = 0.452]  0.000079   0.004266
-#> total@1: Total effect [D3 = 0.452]                   -0.034045   0.016997
+#> indirect_1@1: M1 [D3 = 0.452]                         0.001505   0.003187
+#> indirect_2@1: M2 [D3 = 0.452]                        -0.001426   0.002821
+#> total_indirect@1: Total indirect effect [D3 = 0.452]  0.000079   0.004260
+#> total@1: Total effect [D3 = 0.452]                   -0.034045   0.017063
 #>                                                       CI lower  CI upper
 #> cp@1: Direct effect [D3 = 0.452]                     -0.067146 -0.000556
-#> indirect_1@1: M1 [D3 = 0.452]                        -0.004158  0.009031
-#> indirect_2@1: M2 [D3 = 0.452]                        -0.008531  0.003144
-#> total_indirect@1: Total indirect effect [D3 = 0.452] -0.008839  0.008898
-#> total@1: Total effect [D3 = 0.452]                   -0.067121 -0.000499
+#> indirect_1@1: M1 [D3 = 0.452]                        -0.004314  0.008981
+#> indirect_2@1: M2 [D3 = 0.452]                        -0.008533  0.003150
+#> total_indirect@1: Total indirect effect [D3 = 0.452] -0.008900  0.008848
+#> total@1: Total effect [D3 = 0.452]                   -0.067365 -0.000430
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 #> Post-fit admissibility: 1 of 1 ; excluded rows: 0

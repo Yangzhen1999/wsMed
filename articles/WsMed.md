@@ -27,10 +27,10 @@ print(result)
 #> Condition contrast: C2 - C1 
 #>                                        Estimate Std. Error  CI lower  CI upper
 #> cp: Direct effect                     -0.031795   0.017000 -0.064525  0.001864
-#> indirect_1: M1                         0.001311   0.003208 -0.004586  0.008760
-#> indirect_2: M2                        -0.001120   0.002587 -0.007507  0.003186
-#> total_indirect: Total indirect effect  0.000191   0.004138 -0.008459  0.008723
-#> total: Total effect                   -0.031604   0.017049 -0.064633  0.001895
+#> indirect_1: M1                         0.001311   0.003208 -0.004601  0.008917
+#> indirect_2: M2                        -0.001120   0.002570 -0.007617  0.003084
+#> total_indirect: Total indirect effect  0.000191   0.004111 -0.008172  0.008783
+#> total: Total effect                   -0.031604   0.017015 -0.064740  0.001839
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 #> Post-fit admissibility: 1 of 1 ; excluded rows: 0
@@ -401,23 +401,23 @@ summary(
 #> Plug-in marginal outcome-difference SD: 0.169239 
 #> The denominator is not a moderator-specific conditional SD.
 #>                                       Estimate Std. Error CI lower CI upper
-#> cp: Direct effect                     -0.18787    0.10030 -0.38339  0.01074
-#> indirect_1: M1                         0.00775    0.01858 -0.02663  0.05041
-#> indirect_2: M2                        -0.00662    0.01496 -0.04328  0.01832
-#> total_indirect: Total indirect effect  0.00113    0.02396 -0.04869  0.05065
-#> total: Total effect                   -0.18674    0.10059 -0.38126  0.01122
+#> cp: Direct effect                     -0.18787    0.10051 -0.38202  0.01096
+#> indirect_1: M1                         0.00775    0.01858 -0.02674  0.05159
+#> indirect_2: M2                        -0.00662    0.01480 -0.04360  0.01801
+#> total_indirect: Total indirect effect  0.00113    0.02378 -0.04770  0.05070
+#> total: Total effect                   -0.18674    0.10054 -0.38189  0.01043
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 #> 
 #> Path coefficients:
 #>    Estimate Std. Error CI lower CI upper
-#> cp  -0.1879     0.1003  -0.3834   0.0107
-#> b1  -0.0501     0.0972  -0.2385   0.1429
-#> d1  -0.0751     0.1012  -0.2706   0.1284
-#> b2  -0.0821     0.0975  -0.2709   0.1096
-#> d2  -0.0438     0.1015  -0.2421   0.1557
-#> a1  -0.1546     0.1027  -0.3589   0.0462
-#> a2   0.0806     0.1011  -0.1153   0.2784
+#> cp  -0.1879     0.1005  -0.3820   0.0110
+#> b1  -0.0501     0.0972  -0.2381   0.1427
+#> d1  -0.0751     0.1012  -0.2724   0.1253
+#> b2  -0.0821     0.0973  -0.2710   0.1092
+#> d2  -0.0438     0.1014  -0.2392   0.1566
+#> a1  -0.1546     0.1026  -0.3598   0.0419
+#> a2   0.0806     0.1013  -0.1133   0.2817
 #> Post-fit admissibility: 1 of 1 ; excluded rows: 0 
 #> Tables: $effects, $coefficients; analysis settings: $info.
 ```
@@ -441,10 +441,10 @@ summary(result)
 #> Condition contrast: C2 - C1 
 #>                                        Estimate Std. Error  CI lower  CI upper
 #> cp: Direct effect                     -0.031795   0.017000 -0.064525  0.001864
-#> indirect_1: M1                         0.001311   0.003208 -0.004586  0.008760
-#> indirect_2: M2                        -0.001120   0.002587 -0.007507  0.003186
-#> total_indirect: Total indirect effect  0.000191   0.004138 -0.008459  0.008723
-#> total: Total effect                   -0.031604   0.017049 -0.064633  0.001895
+#> indirect_1: M1                         0.001311   0.003208 -0.004601  0.008917
+#> indirect_2: M2                        -0.001120   0.002570 -0.007617  0.003084
+#> total_indirect: Total indirect effect  0.000191   0.004111 -0.008172  0.008783
+#> total: Total effect                   -0.031604   0.017015 -0.064740  0.001839
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 #> 
@@ -452,11 +452,11 @@ summary(result)
 #>    Estimate Std. Error CI lower CI upper
 #> cp -0.03180    0.01700 -0.06453  0.00186
 #> b1 -0.04834    0.09555 -0.23422  0.13918
-#> d1 -0.06905    0.09508 -0.25500  0.11962
+#> d1 -0.06905    0.09508 -0.25772  0.11690
 #> b2 -0.07732    0.09387 -0.26459  0.10461
-#> d2 -0.03676    0.08692 -0.20737  0.13289
-#> a1 -0.02712    0.01772 -0.06162  0.00817
-#> a2  0.01448    0.01796 -0.02032  0.04929
+#> d2 -0.03676    0.08692 -0.20641  0.13385
+#> a1 -0.02712    0.01772 -0.06242  0.00737
+#> a2  0.01448    0.01796 -0.02033  0.04929
 #> Post-fit admissibility: 1 of 1 ; excluded rows: 0 
 #> Tables: $effects, $coefficients; analysis settings: $info.
 plot(result)

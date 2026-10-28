@@ -28,11 +28,11 @@ print(standardized_intro)
 #> Plug-in marginal outcome-difference SD: 0.169239 
 #> The denominator is not a moderator-specific conditional SD.
 #>                                       Estimate Std. Error CI lower CI upper
-#> cp: Direct effect                     -0.18787    0.10030 -0.38339  0.01074
-#> indirect_1: M1                         0.00775    0.01858 -0.02663  0.05041
-#> indirect_2: M2                        -0.00662    0.01496 -0.04328  0.01832
-#> total_indirect: Total indirect effect  0.00113    0.02396 -0.04869  0.05065
-#> total: Total effect                   -0.18674    0.10059 -0.38126  0.01122
+#> cp: Direct effect                     -0.18787    0.10051 -0.38202  0.01096
+#> indirect_1: M1                         0.00775    0.01858 -0.02674  0.05159
+#> indirect_2: M2                        -0.00662    0.01480 -0.04360  0.01801
+#> total_indirect: Total indirect effect  0.00113    0.02378 -0.04770  0.05070
+#> total: Total effect                   -0.18674    0.10054 -0.38189  0.01043
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 #> Post-fit admissibility: 1 of 1 ; excluded rows: 0
@@ -154,17 +154,17 @@ print(result)
 #> Plug-in marginal outcome-difference SD: 6.28886 
 #> The denominator is not a moderator-specific conditional SD.
 #>                                                    Estimate Std. Error CI lower
-#> cp@1: Direct effect [W = 3.23]                       0.3392     0.0536   0.2374
-#> indirect_1@1: M1 [W = 3.23]                          0.8545     0.0509   0.7572
-#> indirect_2@1: M2 [W = 3.23]                          0.4512     0.0360   0.3835
-#> total_indirect@1: Total indirect effect [W = 3.23]   1.3057     0.0699   1.1755
-#> total@1: Total effect [W = 3.23]                     1.6449     0.0645   1.5282
+#> cp@1: Direct effect [W = 3.23]                       0.3392     0.0535   0.2373
+#> indirect_1@1: M1 [W = 3.23]                          0.8545     0.0510   0.7598
+#> indirect_2@1: M2 [W = 3.23]                          0.4512     0.0364   0.3825
+#> total_indirect@1: Total indirect effect [W = 3.23]   1.3057     0.0705   1.1741
+#> total@1: Total effect [W = 3.23]                     1.6449     0.0650   1.5280
 #>                                                    CI upper
-#> cp@1: Direct effect [W = 3.23]                       0.4478
-#> indirect_1@1: M1 [W = 3.23]                          0.9591
-#> indirect_2@1: M2 [W = 3.23]                          0.5248
-#> total_indirect@1: Total indirect effect [W = 3.23]   1.4490
-#> total@1: Total effect [W = 3.23]                     1.7797
+#> cp@1: Direct effect [W = 3.23]                       0.4477
+#> indirect_1@1: M1 [W = 3.23]                          0.9588
+#> indirect_2@1: M2 [W = 3.23]                          0.5251
+#> total_indirect@1: Total indirect effect [W = 3.23]   1.4535
+#> total@1: Total effect [W = 3.23]                     1.7839
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 #> Post-fit admissibility: 1 of 1 ; excluded rows: 0
@@ -180,29 +180,29 @@ summary(result)
 #> Plug-in marginal outcome-difference SD: 6.28886 
 #> The denominator is not a moderator-specific conditional SD.
 #>                                                    Estimate Std. Error CI lower
-#> cp@1: Direct effect [W = 3.23]                       0.3392     0.0536   0.2374
-#> indirect_1@1: M1 [W = 3.23]                          0.8545     0.0509   0.7572
-#> indirect_2@1: M2 [W = 3.23]                          0.4512     0.0360   0.3835
-#> total_indirect@1: Total indirect effect [W = 3.23]   1.3057     0.0699   1.1755
-#> total@1: Total effect [W = 3.23]                     1.6449     0.0645   1.5282
+#> cp@1: Direct effect [W = 3.23]                       0.3392     0.0535   0.2373
+#> indirect_1@1: M1 [W = 3.23]                          0.8545     0.0510   0.7598
+#> indirect_2@1: M2 [W = 3.23]                          0.4512     0.0364   0.3825
+#> total_indirect@1: Total indirect effect [W = 3.23]   1.3057     0.0705   1.1741
+#> total@1: Total effect [W = 3.23]                     1.6449     0.0650   1.5280
 #>                                                    CI upper
-#> cp@1: Direct effect [W = 3.23]                       0.4478
-#> indirect_1@1: M1 [W = 3.23]                          0.9591
-#> indirect_2@1: M2 [W = 3.23]                          0.5248
-#> total_indirect@1: Total indirect effect [W = 3.23]   1.4490
-#> total@1: Total effect [W = 3.23]                     1.7797
+#> cp@1: Direct effect [W = 3.23]                       0.4477
+#> indirect_1@1: M1 [W = 3.23]                          0.9588
+#> indirect_2@1: M2 [W = 3.23]                          0.5251
+#> total_indirect@1: Total indirect effect [W = 3.23]   1.4535
+#> total@1: Total effect [W = 3.23]                     1.7839
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 #> 
 #> Path coefficients:
 #>                      Estimate Std. Error  CI lower  CI upper
-#> cp@1: cp [W = 3.23]  0.339206   0.053638  0.237400  0.447840
-#> b1@1: b1 [W = 3.23]  0.352858   0.017629  0.318267  0.387334
-#> d1@1: d1 [W = 3.23]  0.037421   0.008823  0.020411  0.055015
-#> b2@1: b2 [W = 3.23]  0.209823   0.015646  0.179364  0.240774
-#> d2@1: d2 [W = 3.23] -0.000698   0.008604 -0.017738  0.016190
-#> a1@1: a1 [W = 3.23]  2.421621   0.096351  2.244718  2.621101
-#> a2@1: a2 [W = 3.23]  2.150476   0.088257  1.989051  2.332774
+#> cp@1: cp [W = 3.23]  0.339206   0.053526  0.237305  0.447722
+#> b1@1: b1 [W = 3.23]  0.352858   0.017586  0.318347  0.387413
+#> d1@1: d1 [W = 3.23]  0.037421   0.008868  0.020336  0.055256
+#> b2@1: b2 [W = 3.23]  0.209823   0.015734  0.179330  0.240768
+#> d2@1: d2 [W = 3.23] -0.000698   0.008547 -0.017594  0.015884
+#> a1@1: a1 [W = 3.23]  2.421621   0.096227  2.245324  2.622087
+#> a2@1: a2 [W = 3.23]  2.150476   0.088209  1.988987  2.335306
 #> Post-fit admissibility: 1 of 1 ; excluded rows: 0 
 #> Tables: $effects, $coefficients; analysis settings: $info.
 ```
@@ -267,36 +267,36 @@ print(group_result)
 #> The denominator is not a moderator-specific conditional SD.
 #>                                                     Estimate Std. Error
 #> cp@1: Direct effect [Group = A]                      -0.0196     0.0649
-#> indirect_1@1: M1 [Group = A]                          0.4185     0.0611
-#> indirect_2@1: M2 [Group = A]                          0.4019     0.0365
-#> total_indirect@1: Total indirect effect [Group = A]   0.8204     0.0757
-#> total@1: Total effect [Group = A]                     0.8008     0.0559
-#> cp@2: Direct effect [Group = B]                       0.0997     0.0939
-#> indirect_1@2: M1 [Group = B]                          0.8752     0.0907
-#> indirect_2@2: M2 [Group = B]                          0.6407     0.0468
-#> total_indirect@2: Total indirect effect [Group = B]   1.5159     0.1086
-#> total@2: Total effect [Group = B]                     1.6156     0.0738
-#> cp@3: Direct effect [Group = C]                      -0.7902     0.1211
-#> indirect_1@3: M1 [Group = C]                          2.8137     0.1362
+#> indirect_1@1: M1 [Group = A]                          0.4185     0.0614
+#> indirect_2@1: M2 [Group = A]                          0.4019     0.0364
+#> total_indirect@1: Total indirect effect [Group = A]   0.8204     0.0759
+#> total@1: Total effect [Group = A]                     0.8008     0.0560
+#> cp@2: Direct effect [Group = B]                       0.0997     0.0938
+#> indirect_1@2: M1 [Group = B]                          0.8752     0.0908
+#> indirect_2@2: M2 [Group = B]                          0.6407     0.0467
+#> total_indirect@2: Total indirect effect [Group = B]   1.5159     0.1085
+#> total@2: Total effect [Group = B]                     1.6156     0.0734
+#> cp@3: Direct effect [Group = C]                      -0.7902     0.1212
+#> indirect_1@3: M1 [Group = C]                          2.8137     0.1365
 #> indirect_2@3: M2 [Group = C]                          0.9578     0.0640
-#> total_indirect@3: Total indirect effect [Group = C]   3.7715     0.1624
+#> total_indirect@3: Total indirect effect [Group = C]   3.7715     0.1627
 #> total@3: Total effect [Group = C]                     2.9813     0.1021
 #>                                                     CI lower CI upper
-#> cp@1: Direct effect [Group = A]                      -0.1474   0.1089
-#> indirect_1@1: M1 [Group = A]                          0.3017   0.5427
-#> indirect_2@1: M2 [Group = A]                          0.3347   0.4761
-#> total_indirect@1: Total indirect effect [Group = A]   0.6785   0.9750
-#> total@1: Total effect [Group = A]                     0.6962   0.9152
-#> cp@2: Direct effect [Group = B]                      -0.0811   0.2855
-#> indirect_1@2: M1 [Group = B]                          0.7013   1.0575
-#> indirect_2@2: M2 [Group = B]                          0.5521   0.7344
-#> total_indirect@2: Total indirect effect [Group = B]   1.3123   1.7371
-#> total@2: Total effect [Group = B]                     1.4780   1.7673
-#> cp@3: Direct effect [Group = C]                      -1.0273  -0.5554
-#> indirect_1@3: M1 [Group = C]                          2.5529   3.0883
-#> indirect_2@3: M2 [Group = C]                          0.8362   1.0866
-#> total_indirect@3: Total indirect effect [Group = C]   3.4616   4.1004
-#> total@3: Total effect [Group = C]                     2.7877   3.1927
+#> cp@1: Direct effect [Group = A]                      -0.1469   0.1095
+#> indirect_1@1: M1 [Group = A]                          0.3011   0.5435
+#> indirect_2@1: M2 [Group = A]                          0.3351   0.4770
+#> total_indirect@1: Total indirect effect [Group = A]   0.6765   0.9748
+#> total@1: Total effect [Group = A]                     0.6967   0.9163
+#> cp@2: Direct effect [Group = B]                      -0.0809   0.2861
+#> indirect_1@2: M1 [Group = B]                          0.7002   1.0581
+#> indirect_2@2: M2 [Group = B]                          0.5527   0.7360
+#> total_indirect@2: Total indirect effect [Group = B]   1.3101   1.7368
+#> total@2: Total effect [Group = B]                     1.4769   1.7664
+#> cp@3: Direct effect [Group = C]                      -1.0295  -0.5563
+#> indirect_1@3: M1 [Group = C]                          2.5557   3.0889
+#> indirect_2@3: M2 [Group = C]                          0.8351   1.0875
+#> total_indirect@3: Total indirect effect [Group = C]   3.4623   4.1001
+#> total@3: Total effect [Group = C]                     2.7917   3.1898
 #> Inference draws: 20000 retained of 20000 ; 0 excluded before effect extraction.
 #> Fitted group n: A = 100; B = 139; C = 111.
 #> Fitted group counts after missing-data handling; observed counts exclude

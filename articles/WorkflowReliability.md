@@ -47,21 +47,21 @@ summary(effects)
 #> Plug-in marginal outcome-difference SD: 0.169194 
 #> The denominator is not a moderator-specific conditional SD.
 #>                            Estimate Std. Error CI lower CI upper
-#> indirect_1@1: A [D3 = 0.2]  0.01950    0.03723 -0.03073  0.09045
-#> indirect_1@2: A [D3 = 0.5]  0.00886    0.01893 -0.01974  0.04253
+#> indirect_1@1: A [D3 = 0.2]  0.01950    0.03741 -0.02777  0.08870
+#> indirect_1@2: A [D3 = 0.5]  0.00886    0.01979 -0.01737  0.04664
 #> Inference draws: 1000 retained of 1000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 confint(effects)                 # stored 90% level
 #>                      5 %       95 %
-#> indirect_1@1 -0.03072722 0.09045346
-#> indirect_1@2 -0.01974249 0.04253021
+#> indirect_1@1 -0.02777232 0.08869974
+#> indirect_1@2 -0.01737350 0.04664084
 confint(
   effects,
   level = .95
 )    # explicit override
 #>                    2.5 %     97.5 %
-#> indirect_1@1 -0.04472425 0.11503044
-#> indirect_1@2 -0.02658780 0.05004395
+#> indirect_1@1 -0.04443721 0.10637292
+#> indirect_1@2 -0.02711014 0.05686551
 plot(
   effects,
   view = "conditional"
@@ -222,9 +222,9 @@ data.frame(
   recoded = coef(recoded_effects)
 )
 #>              group     original      recoded
-#> indirect_1@1  high -0.001614356 -0.001614356
-#> indirect_1@2   low  0.089299556  0.089299548
-#> indirect_1@3   med -0.003012106 -0.003012104
+#> indirect_1@1  high -0.001614357 -0.001614352
+#> indirect_1@2   low  0.089299548  0.089299556
+#> indirect_1@3   med -0.003012105 -0.003012102
 stopifnot(isTRUE(all.equal(unname(coef(original_effects)),
   unname(coef(recoded_effects)), tolerance = 1e-6)))
 ```
@@ -324,7 +324,7 @@ report$inference$mc$controls
 #> [1] "Mersenne-Twister" "Inversion"        "Rejection"
 report$fitting_versions
 #> $R
-#> [1] "R version 4.6.1 (2026-06-24)"
+#> [1] "R version 4.4.3 (2025-02-28 ucrt)"
 #> 
 #> $wsMed
 #> [1] '1.2.0'
@@ -338,13 +338,13 @@ report$fitting_versions
 #> 
 #> 
 #> $lavaan
-#> [1] '0.7.3'
+#> [1] '0.6.19'
 #> 
 #> $mice
 #> NULL
 #> 
 #> $platform
-#> [1] "x86_64-pc-linux-gnu"
+#> [1] "x86_64-w64-mingw32"
 #> 
 #> $RNGkind
 #> [1] "Mersenne-Twister" "Inversion"        "Rejection"       

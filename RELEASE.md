@@ -8,15 +8,21 @@ not reuse an archive built before the covariance/MI sampler correction.
     replication version checks together. Algorithm identifiers are
     independent of package version; change them when an incompatible
     model or inference algorithm changes.
-2.  Run `source("rebuild_vignettes.R"); rebuild_vignettes()` on the
-    release checkout. Edit only `.Rmd.original` sources (temporarily
+2.  Run R-CMD-check manually with `full_validation` enabled on the
+    release branch. It adds old-R/dependencies-only checks and executes
+    all tutorials once. To regenerate committed tutorial outputs
+    locally, run `source("rebuild_vignettes.R"); rebuild_vignettes()` on
+    the release checkout. Edit only `.Rmd.original` sources (temporarily
     `.Rmd` while editing/testing). Commit the appropriate generated
     release outputs after rebuilding.
-3.  Run tests and replication. The frozen candidate baseline must pass;
-    do not overwrite it to hide an unexplained difference. Synchronize
-    manuscript tables and figures with the reviewed candidate and verify
-    their displayed values. The candidate baseline does not mean the old
-    manuscript is already updated.
+3.  Run Manuscript replication and Monte Carlo reproducibility manually
+    on the same release commit. Package regression tests run within R
+    CMD check and do not need a second standalone matrix. The frozen
+    candidate baseline must pass; do not overwrite it to hide an
+    unexplained difference. Synchronize manuscript tables and figures
+    with the reviewed candidate and verify their displayed values. The
+    candidate baseline does not mean the old manuscript is already
+    updated.
 4.  Build with
     [`devtools::build()`](https://devtools.r-lib.org/reference/build.html)
     and check that exact archive with

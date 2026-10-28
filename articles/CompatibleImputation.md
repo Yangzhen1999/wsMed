@@ -155,12 +155,12 @@ effects
 #> MI: per-imputation centering; first-imputation reporting reference.
 #> External imputations: compatibility and convergence require the imputer's own checks. 
 #> Standardization: effect / marginal model-implied SD(y2 - y1); condition contrast is unscaled.
-#> Plug-in marginal outcome-difference SD: 1.18476 
+#> Plug-in marginal outcome-difference SD: 1.16987 
 #> The denominator is not a moderator-specific conditional SD.
 #>                          Estimate Std. Error CI lower CI upper
-#> indirect_1@1: M [W = -1] 0.035236   0.022901 0.000962 0.087493
-#> indirect_1@2: M [W = 0]  0.183211   0.034391 0.121135 0.255484
-#> indirect_1@3: M [W = 1]  0.444825   0.083462 0.294393 0.613633
+#> indirect_1@1: M [W = -1]  0.04352    0.02870  0.00287  0.10946
+#> indirect_1@2: M [W = 0]   0.17787    0.03456  0.11559  0.25144
+#> indirect_1@3: M [W = 1]   0.40188    0.06618  0.28050  0.54041
 #> Inference draws: 2000 retained of 2000 ; 0 excluded before effect extraction.
 #> Use as.data.frame() for the full-precision table and metadata.
 
