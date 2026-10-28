@@ -124,11 +124,41 @@ test_that("MC and bootstrap propagate the repaired covariance into every standar
   f <- wsmed_fit(product_model(one = TRUE), product_data())
   for (method in c("mc", "bootstrap")) {
     if (method == "bootstrap") {
-      expect_warning(i <- wsmed_infer(f, method = method, draws = 60, seed = 171),
+      refit_warnings <- character()
+      expect_warning(i <- withCallingHandlers(
+        wsmed_infer(f, method = method, draws = 60, seed = 171),
+        warning = function(w) {
+          # Allow a small number of numerical refit failures only after checking
+          # their original IDs, retained diagnostics and downstream summaries.
+          if (grepl("bootstrap runs failed or did not converge", conditionMessage(w), fixed = TRUE)) {
+            refit_warnings <<- c(refit_warnings, conditionMessage(w))
+            invokeRestart("muffleWarning")
+          }
+        }),
         "Bootstrap p-values are not computed")
+      boot <- i$backend$fit_u@external$sbt_boot_ustd
+      valid <- which(apply(boot, 1L, function(x) all(is.finite(x))))
+      invalid <- setdiff(seq_len(60), valid)
+      expect_equal(nrow(boot), 60L)
+      expect_equal(i$draw_ids, valid)
+      expect_equal(i$diagnostics$invalid_draw_ids, invalid)
+      expect_equal(sort(c(i$draw_ids, i$diagnostics$invalid_draw_ids)), seq_len(60))
+      expect_equal(i$diagnostics$requested, 60L)
+      expect_equal(i$diagnostics$valid, length(valid))
+      expect_equal(i$diagnostics$invalid, length(invalid))
+      expect_equal(nrow(i$draws), length(valid))
+      expect_gte(length(valid), 58L)
+      expect_true(all(is.finite(i$draws)))
+      expect_identical(length(refit_warnings) > 0L, length(invalid) > 0L)
+      expect_true(all(refit_warnings %in% i$diagnostics$warnings))
     } else i <- wsmed_infer(f, method = method, draws = 60, seed = 171)
     raw <- wsmed_effects(i, at = list(W = "low"))
     std <- wsmed_effects(i, at = list(W = "low"), scale = "marginal")
+    expect_equal(raw$draw_ids, i$draw_ids)
+    expect_false(anyNA(match(std$draw_ids, i$draw_ids)))
+    expect_equal(raw$table$std.error, sd(raw$draws[, 1]))
+    expect_equal(unname(as.numeric(confint(raw))),
+      unname(quantile(raw$draws[, 1], c(.025, .975))))
     lav <- f$backend[[1]]; pt <- lavaan::parameterTable(lav)
     theta <- .wsmed_full_draws(i)
     free <- match(seq_len(lav@Model@nx.free), pt$free)
