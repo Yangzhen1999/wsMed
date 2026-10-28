@@ -75,6 +75,6 @@ document limitations as well as successful execution. In particular, default MI
 can be incompatible with moderation interactions; platform agreement does not
 establish nominal coverage. See the model-compatible imputation tutorial.
 
-The website homepage is `pkgdown/index.md`; README.md keeps repository-relative
-links suitable for GitHub. Styles live in `pkgdown/extra.css`. Keep the minimal
+The website homepage is `pkgdown/index.md`. In README.md, use full GitHub URLs
+for files excluded from the source archive. Styles live in `pkgdown/extra.css`. Keep the minimal
 example consistent with the executable GetStarted tutorial.
