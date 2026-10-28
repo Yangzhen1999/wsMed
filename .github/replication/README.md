@@ -1,7 +1,9 @@
 # Manuscript replication audit
 
-The workflow runs on relevant main/master pushes and pull requests as well as
-the development branches. It validates the actual package being checked out.
+The workflow is started manually with Run workflow on the intended branch.
+Run it before release and after changes to numerical methods or manuscript
+examples. It validates the actual package being checked out; routine commits
+use the R CMD check workflow without repeating this full six-environment audit.
 
 Runs the four fitted models in manuscript Examples 1-3, including the PC and
 UD versions of Example 2, and generates the three Example 3 plots. The current

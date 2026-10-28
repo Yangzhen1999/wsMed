@@ -3,8 +3,38 @@
 on:
   push:
     branches: [main, master]
+    paths:
+      - 'R/**'
+      - 'man/**'
+      - 'data/**'
+      - 'DESCRIPTION'
+      - 'NAMESPACE'
+      - 'NEWS.md'
+      - 'README.md'
+      - 'vignettes/**'
+      - 'inst/**'
+      - 'pkgdown/**'
+      - '_pkgdown.yml'
+      - 'tools/vignette-build-utils.R'
+      - 'rebuild_vignettes.R'
+      - '.github/workflows/pkgdown.yaml'
   pull_request:
     branches: [main, master]
+    paths:
+      - 'R/**'
+      - 'man/**'
+      - 'data/**'
+      - 'DESCRIPTION'
+      - 'NAMESPACE'
+      - 'NEWS.md'
+      - 'README.md'
+      - 'vignettes/**'
+      - 'inst/**'
+      - 'pkgdown/**'
+      - '_pkgdown.yml'
+      - 'tools/vignette-build-utils.R'
+      - 'rebuild_vignettes.R'
+      - '.github/workflows/pkgdown.yaml'
   release:
     types: [published]
   workflow_dispatch:
@@ -16,15 +46,15 @@ permissions: read-all
 jobs:
   pkgdown:
     runs-on: ubuntu-latest
-    # Only restrict concurrency for non-PR jobs
     concurrency:
-      group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
+      group: pkgdown-${{ github.event.pull_request.number || 'deployment' }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -37,10 +67,10 @@ jobs:
           extra-packages: any::pkgdown, local::.
           needs: website
 
-      - name: Rebuild executable tutorial sources
+      - name: Verify committed tutorials before building the site
         run: |
-          source("rebuild_vignettes.R")
-          rebuild_vignettes()
+          source("tools/vignette-build-utils.R")
+          check_frozen_vignettes(getwd())
         shell: Rscript {0}
 
       - name: Build site
