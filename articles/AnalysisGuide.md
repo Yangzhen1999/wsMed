@@ -40,32 +40,28 @@ mediator connections.
 
 **P: Parallel**
 
-[![P model: parallel mediator
-pathways](Wa.png)](https://yangzhen1999.github.io/wsMed/articles/Wa.png)
+![P model: parallel mediator pathways](Wa.png)
 
 No directed connections among mediators. [Model
 equations](https://yangzhen1999.github.io/wsMed/articles/GenerateModelP.md).
 
 **CN: Serial**
 
-[![CN model: earlier mediators predict later
-mediators](Wb.png)](https://yangzhen1999.github.io/wsMed/articles/Wb.png)
+![CN model: earlier mediators predict later mediators](Wb.png)
 
 Each earlier mediator predicts every later mediator. [Model
 equations](https://yangzhen1999.github.io/wsMed/articles/GenerateModelCN.md).
 
 **CP: Serial-parallel**
 
-[![CP model: M1 predicts the remaining parallel
-mediators](Wc.png)](https://yangzhen1999.github.io/wsMed/articles/Wc.png)
+![CP model: M1 predicts the remaining parallel mediators](Wc.png)
 
 M1 predicts M2, M3, and so on. [Model
 equations](https://yangzhen1999.github.io/wsMed/articles/GenerateModelCP.md).
 
 **PC: Parallel-serial**
 
-[![PC model: the parallel mediators predict
-M1](Wd.png)](https://yangzhen1999.github.io/wsMed/articles/Wd.png)
+![PC model: the parallel mediators predict M1](Wd.png)
 
 M2, M3, and so on predict M1. [Model
 equations](https://yangzhen1999.github.io/wsMed/articles/GenerateModelPC.md).
